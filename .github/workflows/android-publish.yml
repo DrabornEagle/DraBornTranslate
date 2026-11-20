@@ -1,0 +1,77 @@
+name: DraBornTranslate v0.3.3 APK
+
+on:
+  push:
+    branches: [build/draborntranslate-v0.3.3]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SOURCE_SHA: 918843881ba5800638423ebc4c5e173adc709dfe
+  RELEASE_TAG: v0.3.3
+  APK_NAME: DraBornTranslate-v0.3.3-Android-arm64.apk
+
+concurrency:
+  group: draborntranslate-release-v0.3.3
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - name: Fetch the pinned model
+        run: |
+          model_dir="$RUNNER_TEMP/toz"
+          mkdir -p "$model_dir"
+          model_root=https://huggingface.co/TozAI/Toz-Cevir-1/resolve/6476d3e0b4b189891fcc07a262ec2d6473c69ae2
+          for file in onnx/encoder_q8.onnx onnx/decoder_q8.onnx tokenizer.model LICENSE; do
+            curl -fLS --retry 3 --retry-all-errors --connect-timeout 15 --max-time 240 -o "$model_dir/$(basename "$file")" "$model_root/$file"
+          done
+      - name: Build and verify ARM64 APK
+        run: |
+          sed -i "s|mavenCentral()|maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }|g" settings.gradle
+          ./gradlew --no-daemon --max-workers=3 -PtargetAbi=arm64-v8a "-PtozModelDir=$RUNNER_TEMP/toz" :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk "$APK_NAME"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK_NAME"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK_NAME" | awk '/^package:|^native-code:|^sdkVersion:/ {print}'
+          unzip -tq "$APK_NAME"
+          sha256sum "$APK_NAME" | tee "$APK_NAME.sha256"
+      - uses: actions/upload-artifact@v7
+        with:
+          path: ${{ env.APK_NAME }}
+          archive: false
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish direct APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
+          ## DraBornTranslate v0.3.3
+
+          - Töz-Çevir-1 modeli APK içinde. Canlı İngilizce–Türkçe çeviri telefonda, API anahtarı ve abonelik olmadan çalışır.
+          - Altyazıda cümleler, konuşmacı işaretleri ve oyun deyimleri işlenir. GameTranslator oyun paketleri desteklenir.
+          - Uzak PS5 bağlantısı örnek yazıyla sınanabilir. Portal yan paneli deneysel ve PS5 ekranının Uzaktan Oynama’ya nasıl aktarıldığına bağlıdır.
+
+          **Kurulum** · Android 10 ve üzeri, ARM64. Bu APK bir önizleme imzasıyla üretilmiştir. Farklı imzalı eski sürüm varsa önceden içe aktardığın oyun paketinin dosyasını sakla ve Android kurulumun üzerine yazılmasına izin vermezse eski sürümü kaldır.
+
+          [Ayrıntılı Portal kurulum adımları](https://github.com/DrabornEagle/DraBornTranslate/blob/v0.3.3/README.md)
+          NOTES
+          gh release create "$RELEASE_TAG" "$APK_NAME" "$APK_NAME.sha256" \
+            --repo "$GITHUB_REPOSITORY" --target "$SOURCE_SHA" \
+            --title 'DraBornTranslate v0.3.3' --notes-file "$RUNNER_TEMP/release-notes.md"
