@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>DraBornTranslate</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #0b111c; color: #f3f6fb; }
+  body { font-family: Arial, sans-serif; }
+  main { max-width: 34em; margin: 0 auto; padding: 14px; }
+  h1 { margin: 0 0 10px; color: #7cf0d2; font-size: 16px; }
+  p { margin: 0; line-height: 1.38; }
+  #status { color: #aebbd1; font-size: 15px; }
+  #caption { white-space: pre-wrap; overflow-wrap: break-word; word-wrap: break-word;
+    font-weight: bold; font-size: {{caption-size}}px; }
+  #attribution { width: 154px; max-width: 100%; height: auto; margin-top: 12px;
+    padding: 3px; background: #fff; border-radius: 3px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>DraBornTranslate</h1>
+  <p id="status" role="status">Altyazı bağlantısı açılıyor…</p>
+  <p id="caption" aria-live="polite" hidden></p>
+  <img id="attribution" src="translate.png" alt="Powered by Google Translate" hidden>
+</main>
+<script>
+(function () {
+  var status = document.getElementById("status");
+  var caption = document.getElementById("caption");
+  var attribution = document.getElementById("attribution");
+
+  function display(text, connected) {
+    if (caption.textContent !== text) caption.textContent = text;
+    caption.hidden = !text;
+    attribution.hidden = !text;
+    status.hidden = !!text;
+    status.textContent = connected ? "Panel açık. Oyun altyazısı bekleniyor." :
+      "Bağlantı kesildi. Telefonda canlı altyazı oturumunu kontrol et.";
+  }
+
+  function poll() {
+    var request = new XMLHttpRequest();
+    var completed = false;
+    function finish(ok) {
+      if (completed) return;
+      completed = true;
+      display(ok ? request.responseText : "", ok);
+      window.setTimeout(poll, ok ? 500 : 1200);
+    }
+
+    request.open("GET", "caption.txt", true);
+    request.timeout = 1800;
+    request.onreadystatechange = function () {
+      if (request.readyState === 4) finish(request.status === 200);
+    };
+    request.ontimeout = function () { finish(false); };
+    request.onerror = function () { finish(false); };
+    request.send();
+  }
+
+  poll();
+}());
+</script>
+</body>
+</html>

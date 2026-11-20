@@ -3,10 +3,14 @@ package com.draborneagle.draborntranslate
 
 /** Yalnızca ana iş parçacığında, uygulama süreci boyunca yaşayan oturum durumu. */
 internal object SessionState {
+    internal data class PortalPanel(val url: String, val opened: Boolean = false)
+
     internal data class State(
         val active: Boolean = false,
         val status: String = "Canlı altyazı kapalı.",
         val caption: Caption? = null,
+        val portalPanel: PortalPanel? = null,
+        val portalIssue: String? = null,
     )
 
     private val listeners = mutableSetOf<(State) -> Unit>()

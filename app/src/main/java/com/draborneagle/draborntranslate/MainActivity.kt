@@ -5,6 +5,8 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -50,6 +52,11 @@ class MainActivity : Activity() {
     private lateinit var instructions: TextView
     private lateinit var openSource: Button
     private lateinit var startStop: Button
+    private lateinit var displayChoice: Button
+    private lateinit var panelCard: LinearLayout
+    private lateinit var panelStatus: TextView
+    private lateinit var copyPanel: Button
+    private lateinit var testPanel: Button
     private lateinit var status: TextView
     private lateinit var captionLabel: TextView
     private lateinit var sourceLabel: TextView
@@ -67,6 +74,8 @@ class MainActivity : Activity() {
             prefs.getInt("band", 65).coerceIn(0, CaptureSettings.MAX_TOP),
             prefs.getInt("size", 22).coerceIn(CaptureSettings.MIN_SIZE, CaptureSettings.MAX_SIZE),
             if (prefs.getBoolean("mobile", false)) Source.MOBILE else Source.PORTAL,
+            SubtitleDisplay.entries.firstOrNull { it.name == prefs.getString("display", null) }
+                ?: SubtitleDisplay.PHONE,
         )
         pending = savedInstanceState?.getBoolean("pending") ?: false
         buildUi()
@@ -124,6 +133,9 @@ class MainActivity : Activity() {
         inputs.addView(phone, LinearLayout.LayoutParams(0, dp(50), 1f).apply { marginStart = dp(6) })
         content.append(inputs, 22)
 
+        displayChoice = button("") { selectDisplay() }
+        content.append(displayChoice, 14)
+
         val guide = card()
         content.append(guide, 14)
         instructions = label("", 15, MUTED).apply { setLineSpacing(dp(4).toFloat(), 1f) }
@@ -134,6 +146,19 @@ class MainActivity : Activity() {
         startStop = button("Google ile canlı altyazıyı başlat") { beginOrStop() }
         styleButton(startStop, true)
         content.append(startStop, 14)
+
+        panelCard = card()
+        content.append(panelCard, 14)
+        panelCard.addView(label("Portal yan paneli", 17, WHITE, bold = true))
+        panelStatus = label("", 14, MUTED)
+        panelCard.append(panelStatus, 6)
+        copyPanel = button("Panel bağlantısını kopyala") { copyPanelLink() }
+        panelCard.append(copyPanel, 10)
+        testPanel = button("Paneli bu telefonda sına") {
+            SessionState.current.portalPanel?.url?.let(::openLink)
+        }
+        panelCard.append(testPanel, 6)
+        panelCard.append(button("Portal’da paneli açma adımları") { showPortalHelp() }, 6)
 
         val live = card()
         content.append(live, 14)
@@ -193,9 +218,13 @@ class MainActivity : Activity() {
         portal.isSelected = !mobile
         phone.isSelected = mobile
         listOf(portal, phone, bandControl, sizeControl).forEach { it.isEnabled = !state.active && !pending }
+        displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
+        displayChoice.isEnabled = !state.active && !pending
+        displayChoice.text = "Altyazı ekranı · ${config.display.label}"
         startStop.isEnabled = !pending && demoTranslator == null
         startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Google ile canlı altyazıyı başlat"
         testButton.isEnabled = !state.active && !pending && demoTranslator == null
+        renderPortalPanel(state)
 
         val caption = state.caption ?: demoCaption
         status.text = if (state.active) state.status else demoMessage ?: state.status
@@ -212,6 +241,56 @@ class MainActivity : Activity() {
         render()
     }
 
+    private fun selectDisplay() {
+        val choices = SubtitleDisplay.entries
+        AlertDialog.Builder(this)
+            .setTitle("Altyazı ekranı")
+            .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.display)) { dialog, index ->
+                val selected = choices[index]
+                config = config.copy(display = selected)
+                prefs.edit().putString("display", selected.name).apply()
+                dialog.dismiss()
+                render()
+            }
+            .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    private fun renderPortalPanel(state: SessionState.State) {
+        panelCard.visibility = if (config.showOnPortal) View.VISIBLE else View.GONE
+        val panel = state.portalPanel
+        copyPanel.visibility = if (panel == null) View.GONE else View.VISIBLE
+        testPanel.visibility = copyPanel.visibility
+        panelStatus.text = state.portalIssue ?: when {
+            panel?.opened == true -> "Panel bir tarayıcıda açıldı. Portal’da oyunun yanında kalması için Yana Sabitle’yi seç."
+            panel != null -> "Bağlantı hazır. Telefon ve PS5 aynı yerel ağda kalmalı."
+            state.active -> "Portal bağlantısı hazırlanıyor…"
+            else -> "Deneysel. PS5 bağlantıyı açabiliyor ve Yana Sabitle’yi sunuyorsa Türkçe altyazı Portal’da görünebilir."
+        }
+    }
+
+    private fun copyPanelLink() {
+        val url = SessionState.current.portalPanel?.url ?: return
+        getSystemService(ClipboardManager::class.java)
+            .setPrimaryClip(ClipData.newPlainText("DraBornTranslate paneli", url))
+        if (Build.VERSION.SDK_INT < 33) {
+            Toast.makeText(this, "Portal paneli bağlantısı kopyalandı.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showPortalHelp() {
+        AlertDialog.Builder(this)
+            .setTitle("Portal yan paneli")
+            .setMessage(
+                "1. Telefonu ve PS5’i aynı yerel ağa bağla. Paylaşımlı Ekran yayınıyla canlı altyazıyı başlat.\n\n" +
+                    "2. Panel bağlantısını kopyala. PlayStation App’te kendi PS5 hesabına Game Base mesajıyla gönder ve Paylaşımlı Ekran yayınına dön.\n\n" +
+                    "3. Portal’da PS düğmesine bas. PS5’in Game Base mesajından bağlantıyı aç. Options menüsünde Yana Sabitle görünüyorsa seçip oyuna dön.\n\n" +
+                    "Bu seçenek PS5 sistem yazılımına ve Uzaktan Oynama oturumuna göre değişebilir.",
+            )
+            .setPositiveButton("Tamam", null)
+            .show()
+    }
+
     private fun beginOrStop() {
         if (SessionState.current.active) {
             CaptureService.stop(this)
@@ -225,7 +304,7 @@ class MainActivity : Activity() {
         demoCaption = null
         pending = true
         render()
-        if (!Settings.canDrawOverlays(this)) {
+        if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "DraBornTranslate için diğer uygulamaların üstünde gösterme iznini aç.", Toast.LENGTH_LONG).show()
             @Suppress("DEPRECATION")
             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), OVERLAY)
@@ -364,7 +443,7 @@ class MainActivity : Activity() {
 
     private fun showLicense() {
         AlertDialog.Builder(this)
-            .setTitle("DraBornTranslate 0.1.0")
+            .setTitle("DraBornTranslate ${packageManager.getPackageInfo(packageName, 0).versionName}")
             .setMessage("GameTranslator v1.8.48 ve CouchSubs kaynaklarından yararlanır.\n" +
                 "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n\n" +
                 "Çeviri, Google ML Kit ile cihazda yapılır. Google çevirilerin doğruluğu, güvenilirliği, satılabilirliği, belirli bir amaca uygunluğu ve hak ihlali içermemesi konusunda açık veya örtük garanti vermez.")

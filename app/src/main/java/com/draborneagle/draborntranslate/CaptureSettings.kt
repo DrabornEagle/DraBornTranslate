@@ -8,12 +8,21 @@ internal enum class Source(val appName: String, val packageName: String) {
     MOBILE("PS Remote Play", "com.playstation.remoteplay"),
 }
 
+internal enum class SubtitleDisplay(val label: String, val phone: Boolean, val portal: Boolean) {
+    PHONE("Telefon", true, false),
+    PORTAL("Portal yan paneli (deneysel)", false, true),
+    BOTH("Telefon ve Portal paneli (deneysel)", true, true),
+}
+
 internal data class CaptureSettings(
     val bandTop: Int = 65,
     val textSize: Int = 22,
     val source: Source = Source.PORTAL,
+    val display: SubtitleDisplay = SubtitleDisplay.PHONE,
 ) {
     val captionsAtTop: Boolean get() = bandTop >= 35
+    val showOnPhone: Boolean get() = source == Source.MOBILE || display.phone
+    val showOnPortal: Boolean get() = source == Source.PORTAL && display.portal
 
     companion object {
         const val BAND_HEIGHT = 30

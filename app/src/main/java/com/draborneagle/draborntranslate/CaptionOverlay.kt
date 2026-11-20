@@ -2,6 +2,7 @@
 package com.draborneagle.draborntranslate
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
@@ -84,7 +85,10 @@ internal class CaptionOverlay(
 internal fun Context.dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()
 
 internal fun translationAttribution(context: Context) = ImageView(context).apply {
-    setImageResource(R.drawable.google_translate_attribution)
+    val badge = context.resources.openRawResource(R.raw.google_translate_attribution).use {
+        BitmapFactory.decodeStream(it)
+    }
+    setImageBitmap(badge)
     scaleType = ImageView.ScaleType.FIT_CENTER
     contentDescription = "Powered by Google Translate"
     background = GradientDrawable().apply {

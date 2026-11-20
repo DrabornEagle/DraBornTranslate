@@ -20,4 +20,14 @@ class CaptureSettingsTest {
         assertTrue(area.y > 0)
         assertEquals(area.y + area.height, bottom.y + bottom.height)
     }
+
+    @Test
+    fun portalOnlyCanSkipThePhoneOverlay() {
+        val config = CaptureSettings(display = SubtitleDisplay.PORTAL)
+        assertTrue(config.showOnPortal)
+        assertEquals(false, config.showOnPhone)
+        val phoneSession = config.copy(source = Source.MOBILE)
+        assertEquals(false, phoneSession.showOnPortal)
+        assertTrue(phoneSession.showOnPhone)
+    }
 }

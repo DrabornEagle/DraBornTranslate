@@ -18,6 +18,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
+import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CaptureService : Service() {
@@ -28,6 +29,7 @@ class CaptureService : Service() {
     private var translator: DeviceTranslator? = null
     private var captions: CaptionSession? = null
     private var overlay: CaptionOverlay? = null
+    private var panel: PortalPanelServer? = null
     private var sourceName = "PlayStation App"
     private var source = FrameSource.WAITING
     private var epoch = 0
@@ -55,21 +57,41 @@ class CaptureService : Service() {
             finish("Ekran paylaşımı iznini yeniden ver.")
             return START_NOT_STICKY
         }
-        if (!Settings.canDrawOverlays(this)) {
-            finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
-            return START_NOT_STICKY
-        }
-
         val config = CaptureSettings(
             intent.getIntExtra(EXTRA_TOP, 65),
             intent.getIntExtra(EXTRA_SIZE, 22),
             if (intent.getBooleanExtra(EXTRA_MOBILE, false)) Source.MOBILE else Source.PORTAL,
+            SubtitleDisplay.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_DISPLAY) }
+                ?: SubtitleDisplay.PHONE,
         )
+        if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
+            finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
+            return START_NOT_STICKY
+        }
+        var panelIssue: String? = null
+        if (config.showOnPortal) {
+            try {
+                panel = openPanel(config.textSize)
+            } catch (error: IOException) {
+                panelIssue = error.message ?: "Portal paneli açılamadı."
+            } catch (_: SecurityException) {
+                panelIssue = "Android yerel ağ erişimine izin vermedi."
+            }
+            if (panel == null && !config.showOnPhone) {
+                finish(panelIssue ?: "Portal paneli açılamadı.")
+                return START_NOT_STICKY
+            }
+        }
         sourceName = config.source.appName
-        SessionState.update(SessionState.State(true, "Türkçe çeviri modeli hazırlanıyor…"))
+        SessionState.update(SessionState.State(
+            active = true,
+            status = "Türkçe çeviri modeli hazırlanıyor…",
+            portalPanel = panel?.let { SessionState.PortalPanel(it.url) },
+            portalIssue = panelIssue,
+        ))
         val language = DeviceTranslator().also { translator = it }
         ocr = SubtitleReader()
-        overlay = CaptionOverlay(this, config)
+        if (config.showOnPhone) overlay = CaptionOverlay(this, config)
         captions = CaptionSession(
             translate = language::translate,
             show = ::showCaption,
@@ -130,6 +152,7 @@ class CaptureService : Service() {
 
     private fun showCaption(caption: Caption?) {
         if (ended) return
+        panel?.publish(caption?.turkish)
         try {
             overlay?.show(caption?.turkish)
         } catch (error: RuntimeException) {
@@ -137,6 +160,26 @@ class CaptureService : Service() {
             return
         }
         SessionState.update(SessionState.current.copy(caption = caption))
+    }
+
+    private fun openPanel(textSize: Int): PortalPanelServer {
+        val address = portalLanAddress(this)
+            ?: throw IOException("Telefonu PS5 ile aynı yerel Wi-Fi ağına bağla, ardından canlı altyazıyı başlat.")
+        val page = assets.open("portal-panel.html").bufferedReader(Charsets.UTF_8).use { it.readText() }
+        val badge = resources.openRawResource(R.raw.google_translate_attribution).use { it.readBytes() }
+        return try {
+            PortalPanelServer(address, page, badge, textSize) {
+                main.post {
+                    val state = SessionState.current
+                    val currentPanel = state.portalPanel
+                    if (!ended && currentPanel != null) {
+                        SessionState.update(state.copy(portalPanel = currentPanel.copy(opened = true)))
+                    }
+                }
+            }
+        } catch (_: IOException) {
+            throw IOException("Portal paneli yerel ağda açılamadı. Wi-Fi bağlantını kontrol et.")
+        }
     }
 
     private fun sourceChanged(value: FrameSource) {
@@ -179,6 +222,8 @@ class CaptureService : Service() {
         frames?.close()
         captions?.close()
         overlay?.close()
+        runCatching { panel?.close() }
+        panel = null
         ocr?.close()
         translator?.close()
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -236,6 +281,7 @@ class CaptureService : Service() {
         private const val EXTRA_TOP = "bandTop"
         private const val EXTRA_SIZE = "textSize"
         private const val EXTRA_MOBILE = "mobile"
+        private const val EXTRA_DISPLAY = "display"
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
@@ -244,6 +290,7 @@ class CaptureService : Service() {
                 putExtra(EXTRA_TOP, config.bandTop)
                 putExtra(EXTRA_SIZE, config.textSize)
                 putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
+                putExtra(EXTRA_DISPLAY, config.display.name)
             })
         }
 
