@@ -40,23 +40,32 @@ class CaptureService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            finish("Canlı altyazı durduruldu.")
+            finish(stopMessage())
             return START_NOT_STICKY
         }
         if (frames != null || ended) return START_NOT_STICKY
+        if (intent?.action == ACTION_TEST_PANEL) {
+            if (panel == null) startPanelTest(intent.getIntExtra(EXTRA_SIZE, 22))
+            return START_NOT_STICKY
+        }
 
         val grant = intent?.let(::readGrant)
         if (grant == null || intent.getIntExtra(EXTRA_RESULT, Activity.RESULT_CANCELED) != Activity.RESULT_OK) {
-            finish("Android ekran paylaşımı izni gerekiyor.")
+            captureStartFailed("Android ekran paylaşımı izni gerekiyor.")
             return START_NOT_STICKY
         }
         try {
             startForeground(NOTIFICATION_ID, notification("Türkçe çeviri modeli hazırlanıyor…"),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
-        } catch (error: SecurityException) {
-            finish("Ekran paylaşımı iznini yeniden ver.")
+        } catch (_: SecurityException) {
+            captureStartFailed("Ekran paylaşımı iznini yeniden ver.")
+            return START_NOT_STICKY
+        } catch (_: IllegalStateException) {
+            captureStartFailed("Canlı altyazıyı uygulama açıkken yeniden başlat.")
             return START_NOT_STICKY
         }
+        main.removeCallbacks(panelTestTick)
+        main.removeCallbacks(panelTestTimeout)
         val config = CaptureSettings(
             intent.getIntExtra(EXTRA_TOP, 65),
             intent.getIntExtra(EXTRA_SIZE, 22),
@@ -68,25 +77,21 @@ class CaptureService : Service() {
             finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
             return START_NOT_STICKY
         }
-        var panelIssue: String? = null
-        if (config.showOnPortal) {
-            try {
-                panel = openPanel(config.textSize)
-            } catch (error: IOException) {
-                panelIssue = error.message ?: "Portal paneli açılamadı."
-            } catch (_: SecurityException) {
-                panelIssue = "Android yerel ağ erişimine izin vermedi."
-            }
-            if (panel == null && !config.showOnPhone) {
-                finish(panelIssue ?: "Portal paneli açılamadı.")
-                return START_NOT_STICKY
-            }
+        if (!config.showOnPortal) closePanel()
+        val panelIssue = if (config.showOnPortal) ensurePanel(config.textSize) else null
+        if (panelIssue != null && !config.showOnPhone) {
+            finish(panelIssue)
+            return START_NOT_STICKY
         }
+        val previousPanel = SessionState.current.portalPanel
+        panel?.publish(null)
         sourceName = config.source.appName
         SessionState.update(SessionState.State(
             active = true,
             status = "Türkçe çeviri modeli hazırlanıyor…",
-            portalPanel = panel?.let { SessionState.PortalPanel(it.url) },
+            portalPanel = panel?.let {
+                SessionState.PortalPanel(it.url, opened = previousPanel?.opened == true && previousPanel.url == it.url)
+            },
             portalIssue = panelIssue,
         ))
         val language = DeviceTranslator().also { translator = it }
@@ -119,6 +124,42 @@ class CaptureService : Service() {
             main.post(checkFrames)
         }
         return START_NOT_STICKY
+    }
+
+    private fun startPanelTest(textSize: Int) {
+        val type = if (Build.VERSION.SDK_INT >= 34) ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
+        else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+        val message = "Portal bağlantı testi açık · 2,5 dakika"
+        try {
+            startForeground(NOTIFICATION_ID, notification(message), type)
+        } catch (_: IllegalStateException) {
+            finish("Portal testini uygulama açıkken yeniden başlat.")
+            return
+        } catch (_: SecurityException) {
+            finish("Android Portal testini başlatmaya izin vermedi.")
+            return
+        }
+        val issue = ensurePanel(textSize)
+        val server = panel
+        if (server == null) {
+            finish(issue ?: "Portal test paneli açılamadı.")
+            return
+        }
+        SessionState.update(SessionState.State(
+            status = message,
+            portalPanel = SessionState.PortalPanel(server.url, testing = true),
+        ))
+        main.post(panelTestTick)
+        main.postDelayed(panelTestTimeout, 150_000L)
+    }
+
+    private fun captureStartFailed(message: String) {
+        val state = SessionState.current
+        if (state.portalPanel?.testing == true && panel != null) {
+            SessionState.update(state.copy(active = false, status = message))
+        } else {
+            finish(message)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -164,7 +205,7 @@ class CaptureService : Service() {
 
     private fun openPanel(textSize: Int): PortalPanelServer {
         val address = portalLanAddress(this)
-            ?: throw IOException("Telefonu PS5 ile aynı yerel Wi-Fi ağına bağla, ardından canlı altyazıyı başlat.")
+            ?: throw IOException("Telefonu PS5 ile aynı yerel Wi-Fi ağına bağlayıp yeniden dene.")
         val page = assets.open("portal-panel.html").bufferedReader(Charsets.UTF_8).use { it.readText() }
         val badge = resources.openRawResource(R.raw.google_translate_attribution).use { it.readBytes() }
         return try {
@@ -180,6 +221,24 @@ class CaptureService : Service() {
         } catch (_: IOException) {
             throw IOException("Portal paneli yerel ağda açılamadı. Wi-Fi bağlantını kontrol et.")
         }
+    }
+
+    private fun ensurePanel(textSize: Int): String? {
+        if (panel != null) return null
+        return try {
+            panel = openPanel(textSize)
+            null
+        } catch (error: IOException) {
+            error.message ?: "Portal paneli açılamadı."
+        } catch (_: SecurityException) {
+            "Android yerel ağ erişimine izin vermedi."
+        }
+    }
+
+    private fun closePanel() {
+        val previous = panel
+        panel = null
+        runCatching { previous?.close() }
     }
 
     private fun sourceChanged(value: FrameSource) {
@@ -211,19 +270,34 @@ class CaptureService : Service() {
         stopSelf()
     }
 
+    private fun stopMessage() = if (SessionState.current.portalPanel?.testing == true) {
+        "Portal bağlantı testi durduruldu."
+    } else {
+        "Canlı altyazı durduruldu."
+    }
+
+    override fun onTimeout(startId: Int) {
+        panelTestTimeout.run()
+    }
+
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        if (fgsType == ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE) panelTestTimeout.run()
+    }
+
     override fun onDestroy() {
         if (!ended) {
             ended = true
-            SessionState.update(SessionState.State(status = "Canlı altyazı durduruldu."))
+            SessionState.update(SessionState.State(status = stopMessage()))
         }
         modelReady = false
         main.removeCallbacks(modelTimeout)
         main.removeCallbacks(checkFrames)
+        main.removeCallbacks(panelTestTick)
+        main.removeCallbacks(panelTestTimeout)
         frames?.close()
         captions?.close()
         overlay?.close()
-        runCatching { panel?.close() }
-        panel = null
+        closePanel()
         ocr?.close()
         translator?.close()
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -232,6 +306,23 @@ class CaptureService : Service() {
 
     private val modelTimeout = Runnable {
         finish("Dil modeli hazırlanamadı. İnternet bağlantısını kontrol edip tekrar dene.")
+    }
+
+    private val panelTestTimeout = Runnable {
+        if (SessionState.current.portalPanel?.testing == true) finish("Portal bağlantı testi sona erdi.")
+    }
+
+    private val panelTestTick = object : Runnable {
+        private var first = true
+        override fun run() {
+            if (ended || SessionState.current.portalPanel?.testing != true) return
+            panel?.publish(
+                if (first) "Portal paneli bağlantı testi açık." else "Bu satır değiştiyse canlı güncelleme çalışıyor.",
+                testing = true,
+            )
+            first = !first
+            main.postDelayed(this, 2300L)
+        }
     }
 
     private val checkFrames = object : Runnable {
@@ -276,6 +367,7 @@ class CaptureService : Service() {
         private const val CHANNEL = "capture"
         private const val NOTIFICATION_ID = 25
         private const val ACTION_STOP = "com.draborneagle.draborntranslate.STOP"
+        private const val ACTION_TEST_PANEL = "com.draborneagle.draborntranslate.TEST_PANEL"
         private const val EXTRA_GRANT = "grant"
         private const val EXTRA_RESULT = "resultCode"
         private const val EXTRA_TOP = "bandTop"
@@ -296,6 +388,13 @@ class CaptureService : Service() {
 
         internal fun stop(context: Context) {
             context.stopService(Intent(context, CaptureService::class.java))
+        }
+
+        internal fun testPanel(context: Context, textSize: Int) {
+            context.startForegroundService(Intent(context, CaptureService::class.java).apply {
+                action = ACTION_TEST_PANEL
+                putExtra(EXTRA_SIZE, textSize)
+            })
         }
     }
 }

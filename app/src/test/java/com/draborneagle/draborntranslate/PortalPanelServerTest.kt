@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -64,19 +65,61 @@ class PortalPanelServerTest {
         }
     }
 
-    private fun get(url: String): Response {
+    @Test
+    fun testPanelSwitchesToLiveCaptionsAtTheSameUrl() {
+        PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+            val captionUrl = server.url + "caption.txt"
+            server.publish("Bağlantı testi.", testing = true)
+            val test = get(captionUrl)
+            assertEquals("test", test.panelMode)
+            assertEquals("Bağlantı testi.", test.body)
+
+            server.publish(null)
+            assertEquals("", get(captionUrl).body)
+            server.publish("Oyuna dön.")
+            val live = get(captionUrl)
+            assertNull(live.panelMode)
+            assertEquals("Oyuna dön.", live.body)
+        }
+    }
+
+    @Test
+    fun panelLinkStillOpensIfTheChatDropsTheTrailingSlash() {
+        PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+            val response = get(server.url.dropLast(1), followRedirects = false)
+            assertEquals(302, response.code)
+            assertEquals(URL(server.url).path, response.location)
+        }
+    }
+
+    private fun get(url: String, followRedirects: Boolean = true): Response {
         val connection = URL(url).openConnection() as HttpURLConnection
+        connection.instanceFollowRedirects = followRedirects
         connection.connectTimeout = 3000
         connection.readTimeout = 3000
         try {
             val code = connection.responseCode
             val input = if (code < 400) connection.inputStream else connection.errorStream
             val body = input?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
-            return Response(code, body, connection.contentType, connection.getHeaderField("Cache-Control"))
+            return Response(
+                code,
+                body,
+                connection.contentType,
+                connection.getHeaderField("Cache-Control"),
+                connection.getHeaderField("X-DraBorn-Panel"),
+                connection.getHeaderField("Location"),
+            )
         } finally {
             connection.disconnect()
         }
     }
 
-    private data class Response(val code: Int, val body: String, val contentType: String?, val cacheControl: String?)
+    private data class Response(
+        val code: Int,
+        val body: String,
+        val contentType: String?,
+        val cacheControl: String?,
+        val panelMode: String?,
+        val location: String?,
+    )
 }

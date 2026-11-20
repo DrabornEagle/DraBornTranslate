@@ -57,6 +57,7 @@ class MainActivity : Activity() {
     private lateinit var panelStatus: TextView
     private lateinit var copyPanel: Button
     private lateinit var testPanel: Button
+    private lateinit var launchPanelTest: Button
     private lateinit var status: TextView
     private lateinit var captionLabel: TextView
     private lateinit var sourceLabel: TextView
@@ -154,10 +155,12 @@ class MainActivity : Activity() {
         panelCard.append(panelStatus, 6)
         copyPanel = button("Panel bağlantısını kopyala") { copyPanelLink() }
         panelCard.append(copyPanel, 10)
-        testPanel = button("Paneli bu telefonda sına") {
+        testPanel = button("Bu bağlantıyı telefonda aç") {
             SessionState.current.portalPanel?.url?.let(::openLink)
         }
         panelCard.append(testPanel, 6)
+        launchPanelTest = button("Portal bağlantısını test et") { togglePanelTest() }
+        panelCard.append(launchPanelTest, 6)
         panelCard.append(button("Portal’da paneli açma adımları") { showPortalHelp() }, 6)
 
         val live = card()
@@ -217,17 +220,19 @@ class MainActivity : Activity() {
         styleButton(phone, mobile)
         portal.isSelected = !mobile
         phone.isSelected = mobile
-        listOf(portal, phone, bandControl, sizeControl).forEach { it.isEnabled = !state.active && !pending }
+        val panelTesting = state.portalPanel?.testing == true
+        val controlsAvailable = !state.active && !pending && !panelTesting
+        listOf(portal, phone, bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
-        displayChoice.isEnabled = !state.active && !pending
+        displayChoice.isEnabled = controlsAvailable
         displayChoice.text = "Altyazı ekranı · ${config.display.label}"
         startStop.isEnabled = !pending && demoTranslator == null
         startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Google ile canlı altyazıyı başlat"
-        testButton.isEnabled = !state.active && !pending && demoTranslator == null
+        testButton.isEnabled = controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
         val caption = state.caption ?: demoCaption
-        status.text = if (state.active) state.status else demoMessage ?: state.status
+        status.text = if (state.active || panelTesting) state.status else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = caption?.source.orEmpty()
         listOf(captionLabel, sourceLabel, attribution).forEach {
@@ -246,9 +251,7 @@ class MainActivity : Activity() {
         AlertDialog.Builder(this)
             .setTitle("Altyazı ekranı")
             .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.display)) { dialog, index ->
-                val selected = choices[index]
-                config = config.copy(display = selected)
-                prefs.edit().putString("display", selected.name).apply()
+                setDisplay(choices[index])
                 dialog.dismiss()
                 render()
             }
@@ -256,17 +259,44 @@ class MainActivity : Activity() {
             .show()
     }
 
+    private fun setDisplay(display: SubtitleDisplay) {
+        config = config.copy(display = display)
+        prefs.edit().putString("display", display.name).apply()
+    }
+
     private fun renderPortalPanel(state: SessionState.State) {
-        panelCard.visibility = if (config.showOnPortal) View.VISIBLE else View.GONE
+        panelCard.visibility =
+            if (config.source == Source.PORTAL && (!state.active || config.showOnPortal)) View.VISIBLE else View.GONE
         val panel = state.portalPanel
         copyPanel.visibility = if (panel == null) View.GONE else View.VISIBLE
         testPanel.visibility = copyPanel.visibility
+        launchPanelTest.visibility = if (state.active) View.GONE else View.VISIBLE
+        launchPanelTest.isEnabled = !pending && demoTranslator == null
+        launchPanelTest.text = if (panel?.testing == true) "Portal testini durdur" else "Portal bağlantısını test et"
         panelStatus.text = state.portalIssue ?: when {
+            panel?.testing == true && panel.opened -> "Test paneli açıldı. Oyuna dönüp metnin Portal ekranında değiştiğini kontrol et."
+            panel?.testing == true -> "Test bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
             panel?.opened == true -> "Panel bir tarayıcıda açıldı. Portal’da oyunun yanında kalması için Yana Sabitle’yi seç."
             panel != null -> "Bağlantı hazır. Telefon ve PS5 aynı yerel ağda kalmalı."
             state.active -> "Portal bağlantısı hazırlanıyor…"
-            else -> "Deneysel. PS5 bağlantıyı açabiliyor ve Yana Sabitle’yi sunuyorsa Türkçe altyazı Portal’da görünebilir."
+            else -> "Ekran paylaşımını açmadan önce Portal’da yan paneli ve canlı güncellemeyi dene."
         }
+    }
+
+    private fun togglePanelTest() {
+        if (SessionState.current.portalPanel?.testing == true) {
+            CaptureService.stop(this)
+            return
+        }
+        demoMessage = null
+        demoCaption = null
+        if (!config.showOnPortal) setDisplay(SubtitleDisplay.PORTAL)
+        try {
+            CaptureService.testPanel(this, config.textSize)
+        } catch (_: RuntimeException) {
+            showIdle("Portal bağlantı testi açılamadı. Uygulama açıkken yeniden dene.")
+        }
+        render()
     }
 
     private fun copyPanelLink() {
@@ -282,10 +312,11 @@ class MainActivity : Activity() {
         AlertDialog.Builder(this)
             .setTitle("Portal yan paneli")
             .setMessage(
-                "1. Telefonu ve PS5’i aynı yerel ağa bağla. Paylaşımlı Ekran yayınıyla canlı altyazıyı başlat.\n\n" +
-                    "2. Panel bağlantısını kopyala. PlayStation App’te kendi PS5 hesabına Game Base mesajıyla gönder ve Paylaşımlı Ekran yayınına dön.\n\n" +
-                    "3. Portal’da PS düğmesine bas. PS5’in Game Base mesajından bağlantıyı aç. Options menüsünde Yana Sabitle görünüyorsa seçip oyuna dön.\n\n" +
-                    "Bu seçenek PS5 sistem yazılımına ve Uzaktan Oynama oturumuna göre değişebilir.",
+                "1. Telefonu ve PS5’i aynı yerel ağa bağla. Portal bağlantı testini başlat.\n\n" +
+                    "2. Panel bağlantısını kopyala ve PlayStation App’te kendi PS5 hesabına Game Base mesajıyla gönder.\n\n" +
+                    "3. Portal’da PS düğmesine basıp Game Base mesajındaki bağlantıyı aç. Options menüsünde Yana Sabitle görünüyorsa seçip oyuna dön. Test metninin ekranda değiştiğini kontrol et.\n\n" +
+                    "4. Test açıkken PlayStation App’te Paylaşımlı Ekran yayınına dön ve DraBornTranslate’te canlı altyazıyı başlat. Panel bağlantın korunur.\n\n" +
+                    "Yan panel uyumluluğu PS5 sistem yazılımına ve Uzaktan Oynama oturumuna bağlıdır.",
             )
             .setPositiveButton("Tamam", null)
             .show()
@@ -346,7 +377,7 @@ class MainActivity : Activity() {
                 }
                 pending = false
                 try {
-                    SessionState.update(SessionState.State(true, "Ekran paylaşımı başlatılıyor…"))
+                    SessionState.update(SessionState.current.copy(active = true, status = "Ekran paylaşımı başlatılıyor…"))
                     CaptureService.start(this, resultCode, data, config)
                     if (Build.VERSION.SDK_INT < 34) openSourceApp(config.source, offerInstall = false)
                 } catch (error: RuntimeException) {
@@ -363,7 +394,9 @@ class MainActivity : Activity() {
 
     private fun showIdle(message: String) {
         pending = false
-        SessionState.update(SessionState.State(status = message))
+        val state = SessionState.current
+        SessionState.update(if (state.portalPanel?.testing == true) state.copy(active = false, status = message)
+            else SessionState.State(status = message))
         render()
     }
 

@@ -37,15 +37,17 @@ internal class PortalPanelServer(
     private val closed = AtomicBoolean(false)
     private val viewed = AtomicBoolean(false)
     private val currentClient = AtomicReference<Socket?>()
-    @Volatile private var caption = ByteArray(0)
+    private data class CaptionFrame(val body: ByteArray, val testing: Boolean = false)
+
+    @Volatile private var caption = CaptionFrame(ByteArray(0))
 
     private val thread = Thread(::listen, "DraBornTranslate-panel").apply {
         isDaemon = true
         start()
     }
 
-    fun publish(text: String?) {
-        if (!closed.get()) caption = text.orEmpty().toByteArray(Charsets.UTF_8)
+    fun publish(text: String?, testing: Boolean = false) {
+        if (!closed.get()) caption = CaptionFrame(text.orEmpty().toByteArray(Charsets.UTF_8), testing)
     }
 
     private fun listen() {
@@ -90,11 +92,18 @@ internal class PortalPanelServer(
 
         val headOnly = method == "HEAD"
         when (request[1].substringBefore('?')) {
+            prefix.dropLast(1) -> send(
+                client, "302 Found", "text/plain", ByteArray(0), headOnly, "Location: $prefix\r\n",
+            )
             prefix -> {
                 send(client, "200 OK", "text/html; charset=utf-8", page, headOnly)
                 if (!headOnly && viewed.compareAndSet(false, true)) onViewed()
             }
-            "${prefix}caption.txt" -> send(client, "200 OK", "text/plain; charset=utf-8", caption, headOnly)
+            "${prefix}caption.txt" -> {
+                val frame = caption
+                val mode = if (frame.testing) "X-DraBorn-Panel: test\r\n" else ""
+                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly, mode)
+            }
             "${prefix}translate.png" -> send(client, "200 OK", "image/png", badge, headOnly)
             else -> send(client, "404 Not Found", "text/plain", ByteArray(0), headOnly)
         }
@@ -136,7 +145,7 @@ internal class PortalPanelServer(
 
     override fun close() {
         if (!closed.compareAndSet(false, true)) return
-        caption = ByteArray(0)
+        caption = CaptionFrame(ByteArray(0))
         try {
             listener.close()
         } finally {

@@ -16,7 +16,17 @@ Alt yazı farklı bir hizadaysa **Okuma bölgesi** sürgüsünü ayarla. Oturumu
 
 [PlayStation App](https://play.google.com/store/apps/details?id=com.scee.psxandroid) · [Sony Paylaşımlı Ekran kılavuzu](https://www.playstation.com/tr-tr/support/games/ps5-share-screen/) · [PlayStation App destek sayfası](https://www.playstation.com/tr-tr/support/games/playstation-app-features/)
 
-## v0.2.0 · Portal yan paneli
+## v0.2.1 · Portal yan paneli
+
+### Önce bağlantıyı test et
+
+1. Telefon ve PS5 aynı yerel ağa bağlıyken DraBornTranslate’te **PS Portal → Portal bağlantısını test et** seçeneğine dokun. Test, Android ekran paylaşımı izni ve çeviri modeli olmadan örnek Türkçe metin gösterir.
+2. **Panel bağlantısını kopyala** ve PlayStation App’ten kendi PS5 hesabına Game Base mesajıyla gönder.
+3. Portal’da PS düğmesine basıp Game Base mesajındaki bağlantıyı aç. **Options → Yana Sabitle** görünürse oyuna dön ve örnek metnin değişmeye devam ettiğini kontrol et.
+
+Test 2,5 dakika sürer. Test açıkken canlı altyazıyı başlatarak aynı bağlantıyı kullanabilirsin. Test süresi dolarsa yeni oturum yeni bağlantı üretir.
+
+### Canlı altyazıyı başlat
 
 1. Telefonu ve kendi PS5’ini aynı yerel ağa bağla. Portal’ı PS5’e Uzaktan Oynama ile bağla.
 2. Android’de **PS Portal → Altyazı ekranı → Portal yan paneli (deneysel)** seç. Hem telefonda hem panelde görmek için **Telefon ve Portal paneli** seçeneğini kullan.
@@ -24,7 +34,7 @@ Alt yazı farklı bir hizadaysa **Okuma bölgesi** sürgüsünü ayarla. Oturumu
 4. DraBornTranslate’te **Panel bağlantısını kopyala** düğmesine dokun. Telefonda PlayStation App içinden bağlantıyı kendi PS5 hesabına Game Base mesajıyla gönder. Ardından telefonda Paylaşımlı Ekran yayınına dön.
 5. Portal’da oyundayken PS düğmesini kullanarak **Game Base**’i aç. PS5’te gelen bağlantıyı seç. Web görünümü açılır ve **Options → Yana Sabitle** seçeneği sunulursa onu seçip oyuna dön.
 
-DraBornTranslate, PS5’te açılabilen bir web paneli sunar. Panel Portal’da ancak PS5 bağlantıyı açabiliyor ve sabitlenen web görünümünü Uzaktan Oynama’ya aktarabiliyorsa oyunla birlikte görünür. Sony, Portal’ın kendi arayüzüne dışarıdan katman eklemek için belgelenmiş bir arayüz sunmuyor. Bağlantı açılmazsa **Paneli bu telefonda sına** düğmesiyle yerel paneli kontrol edebilirsin.
+DraBornTranslate yerel ağda bir web paneli sunar. Panel Portal’da ancak PS5 bağlantıyı açabiliyor ve sabitlenen web görünümünü Uzaktan Oynama’ya aktarabiliyorsa oyunla birlikte görünür. Sony, Portal’ın kendi arayüzüne dışarıdan katman eklemek için belgelenmiş bir arayüz sunmuyor. **Bu bağlantıyı telefonda aç** düğmesi yerel yayını kendi telefonunda sınar.
 
 Panel sadece oturum açıkken, telefonun özel yerel ağ adresinden hizmet verir. Rastgele oluşturulan bağlantı her oturumda değişir. Panel yalnızca çevrilmiş Türkçe metni alır. Portal paneli seçeneği için telefonda üstte gösterme izni gerekmez.
 
