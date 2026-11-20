@@ -15,9 +15,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
       - name: Test, build and verify the APK
         run: |
-          bash ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+          sed -i "s|mavenCentral()|maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }|g" settings.gradle
+          bash ./gradlew --no-daemon --max-workers=3 -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
           mkdir -p dist
           apk=dist/DraBornTranslate-v0.3.2-Android-arm64.apk
           cp app/build/outputs/apk/debug/app-debug.apk "$apk"
