@@ -7,6 +7,7 @@ internal object SessionState {
         val url: String,
         val opened: Boolean = false,
         val testing: Boolean = false,
+        val previewing: Boolean = false,
     )
 
     internal data class State(
@@ -15,6 +16,7 @@ internal object SessionState {
         val caption: Caption? = null,
         val portalPanel: PortalPanel? = null,
         val portalIssue: String? = null,
+        val voiceIssue: String? = null,
     )
 
     private val listeners = mutableSetOf<(State) -> Unit>()

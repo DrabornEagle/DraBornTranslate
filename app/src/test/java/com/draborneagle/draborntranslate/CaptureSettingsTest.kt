@@ -30,4 +30,19 @@ class CaptureSettingsTest {
         assertEquals(false, phoneSession.showOnPortal)
         assertTrue(phoneSession.showOnPhone)
     }
+
+    @Test
+    fun voiceUsesNeitherOverlayNorBrowserPanel() {
+        val config = CaptureSettings(display = SubtitleDisplay.VOICE)
+        assertTrue(config.speakOnPhone)
+        assertEquals(false, config.showOnPhone)
+        assertEquals(false, config.showOnPortal)
+    }
+
+    @Test
+    fun wholeGameModeUsesAllOfTheVideoArea() {
+        val area = videoArea(1600, 720)
+        val config = CaptureSettings(readingArea = ReadingArea.GAME_TEXT)
+        assertEquals(area, config.scanArea(area))
+    }
 }

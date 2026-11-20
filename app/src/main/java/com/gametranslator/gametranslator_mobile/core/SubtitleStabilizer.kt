@@ -24,6 +24,7 @@ class SubtitleStabilizer(
     private val stableFrames: Int = 2,
     private val clearAfterMs: Int = CLEAR_AFTER_MS,
     private val clock: () -> Long = { android.os.SystemClock.elapsedRealtime() },
+    private val exactText: Boolean = false,
 ) {
     companion object {
         /** Bölge bu kadar boş kalırsa altyazı kalkmış sayılır. */
@@ -61,7 +62,7 @@ class SubtitleStabilizer(
         val time = clock()
         val text = TextMatch.normalize(rawText)
         // 3 karakterden kısa okumalar (gürültü, tek simge) boş kare sayılır.
-        if (text.length < 3) {
+        if (text.length < if (exactText) 2 else 3) {
             candidate = ""
             candidateCount = 0
             val since = emptySince ?: time.also { emptySince = it }
@@ -73,7 +74,7 @@ class SubtitleStabilizer(
         }
 
         emptySince = null
-        if (TextMatch.isSimilar(text, candidate, similarity)) {
+        if (if (exactText) text == candidate else TextMatch.isSimilar(text, candidate, similarity)) {
             candidateCount++
         } else {
             candidate = text
@@ -82,13 +83,16 @@ class SubtitleStabilizer(
         }
         // Noktalamayla biten satır tamamdır; beklemeden ilk karede gider. Çöp gibi okunan satır beklemeden gitmez.
         val garbled = OcrNoise.looksGarbled(rawText)
-        val ready = if (garbled) candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
-        else candidateCount >= stableFrames || endsSentence(rawText)
+        val ready = when {
+            garbled -> candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
+            exactText -> candidateCount >= stableFrames
+            else -> candidateCount >= stableFrames || endsSentence(rawText)
+        }
         // Gönderilenin gürültülü yeniden okuması yeni satır değildir.
         if (isSame(text, sent)) return StabilizerAction.None
         if (!ready) return StabilizerAction.None
         // Aynı cümlenin daha iyi olmayan okuması da yeni satır değildir.
-        if (sentRaw.isNotEmpty() && TextMatch.isWorseReread(rawText, sentRaw)) return StabilizerAction.None
+        if (!exactText && sentRaw.isNotEmpty() && TextMatch.isWorseReread(rawText, sentRaw)) return StabilizerAction.None
 
         // Az önce kalkan satır geri geldiyse okuma birkaç kare kaçmıştır: çevirisi yeniden gösterilir.
         val index = history.indexOfLast { time - it.leftAt <= RESTORE_WITHIN_MS && isSame(text, it.rows) }
@@ -109,7 +113,8 @@ class SubtitleStabilizer(
         return StabilizerAction.translate(sentRaw)
     }
 
-    private fun isSame(text: String, rows: String) = rows.isNotEmpty() && TextMatch.isSameSubtitle(text, rows)
+    private fun isSame(text: String, rows: String) = rows.isNotEmpty() &&
+        if (exactText) text == rows.replace('\n', ' ') else TextMatch.isSameSubtitle(text, rows)
 
     /** Ekrandaki satırı geçmişe yazar (kalktı ya da yerine başkası geldi). */
     private fun leaveScreen(time: Long) {

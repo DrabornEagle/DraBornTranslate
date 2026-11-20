@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.ImageView
@@ -38,6 +39,10 @@ internal class CaptionOverlay(
             gravity = Gravity.CENTER
             setTextColor(Color.WHITE)
             maxWidth = minOf(context.dp(700), context.resources.displayMetrics.widthPixels - margin * 2)
+            if (settings.readingArea == ReadingArea.GAME_TEXT) {
+                maxLines = 6
+                ellipsize = TextUtils.TruncateAt.END
+            }
             setShadowLayer(2f, 0f, 1f, Color.BLACK)
         }
         val view = LinearLayout(context).apply {

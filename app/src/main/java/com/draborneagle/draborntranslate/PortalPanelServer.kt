@@ -96,7 +96,8 @@ internal class PortalPanelServer(
                 client, "302 Found", "text/plain", ByteArray(0), headOnly, "Location: $prefix\r\n",
             )
             prefix -> {
-                send(client, "200 OK", "text/html; charset=utf-8", page, headOnly)
+                send(client, "200 OK", "text/html; charset=utf-8", page, headOnly,
+                    "X-DraBorn-Panel: ready\r\n")
                 if (!headOnly && viewed.compareAndSet(false, true)) onViewed()
             }
             "${prefix}caption.txt" -> {

@@ -33,7 +33,7 @@ internal class DeviceTranslator : AutoCloseable {
     override fun close() = translator.close()
 }
 
-internal class SubtitleReader : AutoCloseable {
+internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     fun read(bitmap: Bitmap, done: (List<String>?) -> Unit) {
@@ -45,12 +45,19 @@ internal class SubtitleReader : AutoCloseable {
                 done(null)
                 return@addOnCompleteListener
             }
-            // Bir yakın satır grubunu oku. Köşelerdeki HUD yazıları yerine ortadaki satırı temel al.
             val lines = task.result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
                 val box = line.boundingBox ?: return@mapNotNull null
                 if (line.text.count(Char::isLetter) < 2 || box.height() < 7) return@mapNotNull null
                 line.text.trim() to box
             }
+            if (readingArea == ReadingArea.GAME_TEXT) {
+                done(lines.sortedWith(compareBy({ it.second.top / 10 }, { it.second.left }))
+                    .map { it.first.take(100) }
+                    .distinct()
+                    .take(24))
+                return@addOnCompleteListener
+            }
+            // Altyazı bölgesinde ortadaki satır grubuna öncelik ver.
             val anchor = lines.minByOrNull { (_, box) ->
                 abs(box.exactCenterX() / width - 0.5f) + abs(box.exactCenterY() / height - 0.5f) * 0.35f
             }

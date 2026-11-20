@@ -66,4 +66,33 @@ class CaptionSessionTest {
         requests.removeFirst().second("Gitmeye hazır mısın?")
         assertNull(caption)
     }
+
+    @Test
+    fun menuTextKeepsStableLabelsEvenWhenHudNumbersChange() {
+        val session = CaptionSession(
+            translate = { source, answer -> requests.addLast(source to answer) },
+            show = { caption = it },
+            onFailure = {},
+            readingArea = ReadingArea.GAME_TEXT,
+            stabilizer = SubtitleStabilizer(stableFrames = 1, clock = { now }, exactText = true),
+        )
+        session.read(listOf("Settings", "Exit", "99 HP"))
+        assertEquals(0, requests.size)
+        session.read(listOf("Settings", "Exit", "98 HP"))
+        val first = requests.removeFirst()
+        assertEquals("Settings\nExit", first.first)
+        first.second("Ayarlar\nÇıkış")
+        assertEquals("Ayarlar\nÇıkış", caption?.turkish)
+
+        session.read(listOf("Settings", "Resume", "97 HP"))
+        val second = requests.removeFirst()
+        assertEquals("Settings", second.first)
+        session.read(listOf("Settings", "Resume", "96 HP"))
+        second.second("Ayarlar")
+        assertNull(caption)
+        val third = requests.removeFirst()
+        assertEquals("Settings\nResume", third.first)
+        third.second("Ayarlar\nDevam et")
+        assertEquals("Ayarlar\nDevam et", caption?.turkish)
+    }
 }

@@ -9,6 +9,10 @@
     <queries>
         <package android:name="com.scee.psxandroid" />
         <package android:name="com.playstation.remoteplay" />
+        <package android:name="com.termux" />
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
     </queries>
     <application
         android:allowBackup="false"

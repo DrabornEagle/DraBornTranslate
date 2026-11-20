@@ -13,7 +13,11 @@ internal class CaptionSession(
     private val translate: (String, (String?) -> Unit) -> Unit,
     private val show: (Caption?) -> Unit,
     private val onFailure: () -> Unit,
-    private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(),
+    private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
+    private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(
+        stableFrames = if (readingArea == ReadingArea.GAME_TEXT) 1 else 2,
+        exactText = readingArea == ReadingArea.GAME_TEXT,
+    ),
 ) {
     private data class Request(val number: Int, val source: String, val key: String)
 
@@ -24,10 +28,12 @@ internal class CaptionSession(
     private var waiting: Request? = null
     private var busy = false
     private var closed = false
+    private var previousGameLines = emptySet<String>()
 
     fun read(lines: List<String>) {
         if (closed) return
-        val text = lines.map(OcrNoise::clean).filter(String::isNotBlank).joinToString("\n")
+        val clean = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(lines) else lines.map(OcrNoise::clean)
+        val text = clean.filter(String::isNotBlank).joinToString("\n")
         val action = stabilizer.feed(text)
         when (action.kind) {
             StabilizerKind.NONE -> Unit
@@ -48,6 +54,7 @@ internal class CaptionSession(
     }
 
     fun reset() {
+        previousGameLines = emptySet()
         stabilizer.reset()
         clearCaption()
     }
@@ -56,6 +63,13 @@ internal class CaptionSession(
         closed = true
         reset()
         cache.clear()
+    }
+
+    private fun steadyGameText(lines: List<String>): List<String> {
+        val current = lines.associateBy(TextMatch::normalize).filterKeys { it.length >= 2 }
+        val steady = current.filterKeys(previousGameLines::contains).values.take(6)
+        previousGameLines = current.keys
+        return steady
     }
 
     private fun clearCaption() {
@@ -69,7 +83,8 @@ internal class CaptionSession(
         val request = waiting ?: return
         waiting = null
         busy = true
-        translate(request.source.replace('\n', ' ')) { result ->
+        val text = if (readingArea == ReadingArea.GAME_TEXT) request.source else request.source.replace('\n', ' ')
+        translate(text) { result ->
             busy = false
             if (!closed) {
                 val turkish = result?.trim()?.takeIf(String::isNotEmpty)
@@ -88,6 +103,8 @@ internal class CaptionSession(
     }
 
     private fun deliver(source: String, turkish: String) {
-        if (stabilizer.shouldSend(source, turkish)) show(Caption(source, turkish))
+        val changed = if (readingArea == ReadingArea.GAME_TEXT) TextMatch.normalize(source) != TextMatch.normalize(turkish)
+        else stabilizer.shouldSend(source, turkish)
+        if (changed) show(Caption(source, turkish))
     }
 }

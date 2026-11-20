@@ -25,7 +25,7 @@ internal enum class FrameSource { WAITING, VISIBLE, DARK }
 /** Android'in izin verdiği yansıtmayı okur; görüntü hiçbir dosyaya yazılmaz. */
 internal class ScreenFrames(
     private val context: Context,
-    private val bandTop: Int,
+    private val settings: CaptureSettings,
     private val reserveFrame: () -> Boolean,
     private val discardFrame: () -> Unit,
     private val onFrame: (Bitmap) -> Unit,
@@ -42,8 +42,8 @@ internal class ScreenFrames(
     private var display: VirtualDisplay? = null
     private var reader: ImageReader? = null
     private var video = Pixels(0, 0, 0, 0)
-    private var band = Pixels(0, 0, 0, 0)
-    private var bandBuffer: ByteBuffer? = null
+    private var scan = Pixels(0, 0, 0, 0)
+    private var scanBuffer: ByteBuffer? = null
     private var lastSampleAt = 0L
     private var darkSince = 0L
     private var signal = FrameSource.WAITING
@@ -107,7 +107,7 @@ internal class ScreenFrames(
         if (previous?.width == scaledWidth && previous.height == scaledHeight) return
 
         val nextVideo = videoArea(scaledWidth, scaledHeight)
-        val nextBand = subtitleBand(nextVideo, bandTop)
+        val nextScan = settings.scanArea(nextVideo)
         val nextReader = ImageReader.newInstance(scaledWidth, scaledHeight, PixelFormat.RGBA_8888, 2)
         try {
             nextReader.setOnImageAvailableListener(::onImage, handler)
@@ -138,8 +138,8 @@ internal class ScreenFrames(
         }
         reader = nextReader
         video = nextVideo
-        band = nextBand
-        bandBuffer = null
+        scan = nextScan
+        scanBuffer = null
         lastSampleAt = 0L
         darkSince = 0L
         previous?.close()
@@ -157,7 +157,7 @@ internal class ScreenFrames(
             if (!visible) return
             val now = SystemClock.elapsedRealtime()
             lastFrameAt = now
-            if (now - lastSampleAt < 340L) return
+            if (now - lastSampleAt < settings.readingArea.sampleIntervalMs) return
             lastSampleAt = now
 
             val plane = image.planes.firstOrNull() ?: return
@@ -174,7 +174,7 @@ internal class ScreenFrames(
             setSignal(FrameSource.VISIBLE)
             if (!reserveFrame()) return
             val bitmap = try {
-                copyBand(rgba, rowStride)
+                copyScanArea(rgba, rowStride)
             } catch (error: RuntimeException) {
                 discardFrame()
                 onEnded("Oyun karesi okunamadı. Kaynağı açıp yeniden dene.")
@@ -199,9 +199,9 @@ internal class ScreenFrames(
                 if (lit >= 2) return false
             }
         }
-        // Karanlık bir sahnede altta beyaz altyazı varsa kareyi okumaya devam et.
-        for (y in band.y until band.y + band.height step 5) {
-            for (x in band.x until band.x + band.width step 8) {
+        // Karanlık bir sahnede okuma alanında açık renkli yazı varsa OCR'a devam et.
+        for (y in scan.y until scan.y + scan.height step 5) {
+            for (x in scan.x until scan.x + scan.width step 8) {
                 val index = pixels.position() + y * stride + x * 4
                 if (index + 2 >= pixels.limit()) continue
                 if ((pixels.get(index).toInt() and 255) > 70 ||
@@ -213,21 +213,21 @@ internal class ScreenFrames(
         return true
     }
 
-    private fun copyBand(source: ByteBuffer, stride: Int): Bitmap? {
-        val rowBytes = band.width * 4
-        val offset = source.position() + band.y * stride + band.x * 4
-        if (offset + (band.height - 1) * stride + rowBytes > source.limit()) return null
+    private fun copyScanArea(source: ByteBuffer, stride: Int): Bitmap? {
+        val rowBytes = scan.width * 4
+        val offset = source.position() + scan.y * stride + scan.x * 4
+        if (offset + (scan.height - 1) * stride + rowBytes > source.limit()) return null
         val input = source.duplicate()
-        val output = bandBuffer ?: ByteBuffer.allocateDirect(rowBytes * band.height).also { bandBuffer = it }
+        val output = scanBuffer ?: ByteBuffer.allocateDirect(rowBytes * scan.height).also { scanBuffer = it }
         output.clear()
-        for (row in 0 until band.height) {
+        for (row in 0 until scan.height) {
             val start = offset + row * stride
             input.limit(start + rowBytes)
             input.position(start)
             output.put(input)
         }
         output.flip()
-        return Bitmap.createBitmap(band.width, band.height, Bitmap.Config.ARGB_8888).also {
+        return Bitmap.createBitmap(scan.width, scan.height, Bitmap.Config.ARGB_8888).also {
             it.copyPixelsFromBuffer(output)
         }
     }
@@ -258,7 +258,7 @@ internal class ScreenFrames(
             reader?.close()
             projection?.unregisterCallback(callback)
             projection?.stop()
-            bandBuffer = null
+            scanBuffer = null
             thread.quitSafely()
         }
     }

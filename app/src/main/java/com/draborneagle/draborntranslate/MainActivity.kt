@@ -21,16 +21,21 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
 import android.widget.Button
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URI
 
 private const val BACKGROUND = 0xFF0B111C.toInt()
 private const val PANEL = 0xFF131E30.toInt()
@@ -46,6 +51,9 @@ class MainActivity : Activity() {
     private var demoCaption: Caption? = null
     private var demoTranslator: DeviceTranslator? = null
     private var demoReader: SubtitleReader? = null
+    private var voicePreview: TurkishVoice? = null
+    private var tunnelAddress = ""
+    private var tunnelSession: String? = null
 
     private lateinit var portal: Button
     private lateinit var phone: Button
@@ -53,19 +61,24 @@ class MainActivity : Activity() {
     private lateinit var openSource: Button
     private lateinit var startStop: Button
     private lateinit var displayChoice: Button
+    private lateinit var readingChoice: Button
     private lateinit var panelCard: LinearLayout
     private lateinit var panelStatus: TextView
     private lateinit var copyPanel: Button
     private lateinit var testPanel: Button
     private lateinit var launchPanelTest: Button
+    private lateinit var previewPanel: Button
+    private lateinit var tunnelWizard: Button
     private lateinit var status: TextView
     private lateinit var captionLabel: TextView
     private lateinit var sourceLabel: TextView
     private lateinit var attribution: View
     private lateinit var bandPreview: BandPreview
+    private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
     private lateinit var sizeControl: SeekBar
     private lateinit var testButton: Button
+    private lateinit var voiceButton: Button
 
     private val observe: (SessionState.State) -> Unit = { render() }
 
@@ -77,8 +90,12 @@ class MainActivity : Activity() {
             if (prefs.getBoolean("mobile", false)) Source.MOBILE else Source.PORTAL,
             SubtitleDisplay.entries.firstOrNull { it.name == prefs.getString("display", null) }
                 ?: SubtitleDisplay.PHONE,
+            ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
+                ?: ReadingArea.SUBTITLES,
         )
         pending = savedInstanceState?.getBoolean("pending") ?: false
+        tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
+        tunnelSession = savedInstanceState?.getString("tunnelSession")
         buildUi()
         render()
     }
@@ -95,11 +112,14 @@ class MainActivity : Activity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean("pending", pending)
+        outState.putString("tunnelAddress", tunnelAddress)
+        outState.putString("tunnelSession", tunnelSession)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
         finishDemo()
+        voicePreview?.close()
         super.onDestroy()
     }
 
@@ -136,6 +156,8 @@ class MainActivity : Activity() {
 
         displayChoice = button("") { selectDisplay() }
         content.append(displayChoice, 14)
+        readingChoice = button("") { selectReadingArea() }
+        content.append(readingChoice, 6)
 
         val guide = card()
         content.append(guide, 14)
@@ -155,10 +177,14 @@ class MainActivity : Activity() {
         panelCard.append(panelStatus, 6)
         copyPanel = button("Panel bağlantısını kopyala") { copyPanelLink() }
         panelCard.append(copyPanel, 10)
-        testPanel = button("Bu bağlantıyı telefonda aç") {
+        testPanel = button("Yerel bağlantıyı telefonda aç") {
             SessionState.current.portalPanel?.url?.let(::openLink)
         }
         panelCard.append(testPanel, 6)
+        tunnelWizard = button("PS5 uzakta · Bağlantıyı hazırla") { showTunnelWizard() }
+        panelCard.append(tunnelWizard, 6)
+        previewPanel = button("Portal’da örnek yazı göster") { CaptureService.togglePreview(this) }
+        panelCard.append(previewPanel, 6)
         launchPanelTest = button("Portal bağlantısını test et") { togglePanelTest() }
         panelCard.append(launchPanelTest, 6)
         panelCard.append(button("Portal’da paneli açma adımları") { showPortalHelp() }, 6)
@@ -176,17 +202,19 @@ class MainActivity : Activity() {
 
         val settings = card()
         content.append(settings, 18)
-        settings.addView(label("Okuma bölgesi", 17, WHITE, bold = true))
-        settings.append(label("Yeşil bandı oyundaki İngilizce altyazı hizasına getir.", 14, MUTED), 4)
+        bandSettings = column()
+        settings.addView(bandSettings)
+        bandSettings.addView(label("Altyazı hizası", 17, WHITE, bold = true))
+        bandSettings.append(label("Yeşil bandı oyundaki İngilizce altyazı hizasına getir.", 14, MUTED), 4)
         bandPreview = BandPreview()
-        settings.addView(bandPreview, LinearLayout.LayoutParams(-1, dp(84)).apply { topMargin = dp(8) })
+        bandSettings.addView(bandPreview, LinearLayout.LayoutParams(-1, dp(84)).apply { topMargin = dp(8) })
         bandControl = slider("Altyazı bölgesinin yüksekliği", CaptureSettings.MAX_TOP, config.bandTop) { value ->
             config = config.copy(bandTop = value)
             prefs.edit().putInt("band", value).apply()
             bandPreview.invalidate()
             bandPreview.contentDescription = "Oyun görüntüsünün yüzde ${value} hizasındaki okuma bandı"
         }
-        settings.addView(bandControl)
+        bandSettings.addView(bandControl)
         val sizeLabel = label("Altyazı boyutu · ${config.textSize}", 15, WHITE)
         settings.append(sizeLabel, 8)
         sizeControl = slider("Altyazı yazı boyutu", CaptureSettings.MAX_SIZE - CaptureSettings.MIN_SIZE,
@@ -199,21 +227,26 @@ class MainActivity : Activity() {
         settings.addView(sizeControl)
         testButton = button("Google ile örnek altyazıyı çevir") { runDemo() }
         content.append(testButton, 14)
+        voiceButton = button("Türkçe sesi dene") { previewVoice() }
+        content.append(voiceButton, 6)
         content.append(button("Kaynak kod ve lisans") { showLicense() }, 8)
     }
 
     private fun render() {
         val state = SessionState.current
         val mobile = config.source == Source.MOBILE
+        val textInstructions = if (config.readingArea == ReadingArea.GAME_TEXT) {
+            "Çevirmek istediğin menüyü veya görevi açıp metni birkaç saniye ekranda tut."
+        } else "Oyunun İngilizce altyazısını aç."
         instructions.text = if (mobile) {
             "1. PS Remote Play ile telefondan konsola bağlan.\n" +
-                "2. Oyunun İngilizce altyazısını aç ve yatay tam ekrana geç.\n" +
+                "2. Yatay tam ekrana geç. $textInstructions\n" +
                 "3. Buraya dön, altyazıyı başlat ve Android paylaşımında PS Remote Play’i seç."
         } else {
-            "1. Portal’da oyuna gir ve İngilizce altyazıyı aç.\n" +
-                "2. PS5’te Game Base’den bir sesli sohbet aç ve Paylaşımlı Ekran’ı başlat.\n" +
-                "3. Telefonda PlayStation App’te ikinci hesabınla yayını yatay tam ekran izle.\n" +
-                "4. Buraya dön, altyazıyı başlat ve Android paylaşımında PlayStation App’i seç."
+            "1. Portal’da PS düğmesi → Game Base → Paylaşımlı Ekran’ı Başlat.\n" +
+                "2. Telefonda PlayStation App’te ikinci hesabınla yayın önizlemesine dokun ve yatay tam ekrana geç.\n" +
+                "3. DraBornTranslate’te başlat ve Android paylaşımında Tek uygulama → PlayStation App’i seç. Yayını önde tut.\n" +
+                "4. $textInstructions"
         }
         openSource.text = "${config.source.appName} uygulamasını aç"
         styleButton(portal, !mobile)
@@ -226,13 +259,18 @@ class MainActivity : Activity() {
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
         displayChoice.isEnabled = controlsAvailable
         displayChoice.text = "Altyazı ekranı · ${config.display.label}"
+        readingChoice.isEnabled = controlsAvailable
+        readingChoice.text = "Çevrilecek alan · ${config.readingArea.label}"
+        bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
+        voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
+        voiceButton.isEnabled = controlsAvailable
         startStop.isEnabled = !pending && demoTranslator == null
         startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Google ile canlı altyazıyı başlat"
         testButton.isEnabled = controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
         val caption = state.caption ?: demoCaption
-        status.text = if (state.active || panelTesting) state.status else demoMessage ?: state.status
+        status.text = if (state.active || panelTesting) state.voiceIssue ?: state.status else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = caption?.source.orEmpty()
         listOf(captionLabel, sourceLabel, attribution).forEach {
@@ -264,22 +302,51 @@ class MainActivity : Activity() {
         prefs.edit().putString("display", display.name).apply()
     }
 
+    private fun selectReadingArea() {
+        val choices = ReadingArea.entries
+        AlertDialog.Builder(this)
+            .setTitle("Çevrilecek alan")
+            .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.readingArea)) { dialog, index ->
+                config = config.copy(readingArea = choices[index])
+                prefs.edit().putString("readingArea", config.readingArea.name).apply()
+                dialog.dismiss()
+                render()
+            }
+            .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    private fun previewVoice() {
+        voicePreview?.close()
+        voicePreview = TurkishVoice(this) { issue ->
+            Toast.makeText(this, issue, Toast.LENGTH_LONG).show()
+        }.also { it.speak("Bu bir Türkçe altyazı ses testidir.") }
+    }
+
     private fun renderPortalPanel(state: SessionState.State) {
-        panelCard.visibility =
-            if (config.source == Source.PORTAL && (!state.active || config.showOnPortal)) View.VISIBLE else View.GONE
+        panelCard.visibility = if (config.showOnPortal) View.VISIBLE else View.GONE
         val panel = state.portalPanel
+        if (tunnelSession != panel?.url) {
+            tunnelAddress = ""
+            tunnelSession = panel?.url
+        }
         copyPanel.visibility = if (panel == null) View.GONE else View.VISIBLE
         testPanel.visibility = copyPanel.visibility
+        tunnelWizard.visibility = copyPanel.visibility
+        tunnelWizard.isEnabled = panel?.testing == false && !pending
+        previewPanel.visibility = if (state.active && panel != null && !panel.testing) View.VISIBLE else View.GONE
+        previewPanel.text = if (panel?.previewing == true) "Canlı çeviriye dön" else "Portal’da örnek yazı göster"
         launchPanelTest.visibility = if (state.active) View.GONE else View.VISIBLE
         launchPanelTest.isEnabled = !pending && demoTranslator == null
         launchPanelTest.text = if (panel?.testing == true) "Portal testini durdur" else "Portal bağlantısını test et"
         panelStatus.text = state.portalIssue ?: when {
+            panel?.previewing == true -> "Örnek yazı 3 dakika gösterilir. Portal’da oyuna dönüp yazının değiştiğini kontrol et."
             panel?.testing == true && panel.opened -> "Test paneli açıldı. Oyuna dönüp metnin Portal ekranında değiştiğini kontrol et."
             panel?.testing == true -> "Test bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
-            panel?.opened == true -> "Panel bir tarayıcıda açıldı. Portal’da oyunun yanında kalması için Yana Sabitle’yi seç."
-            panel != null -> "Bağlantı hazır. Telefon ve PS5 aynı yerel ağda kalmalı."
+            panel?.opened == true -> "Panel bir tarayıcıda açıldı. Portal’da Yana Sabitle görünüyorsa seç."
+            panel != null -> "PS5 evdeki ağdaysa yerel bağlantıyı kullan. PS5 uzaktaysa dış bağlantıyı hazırla."
             state.active -> "Portal bağlantısı hazırlanıyor…"
-            else -> "Ekran paylaşımını açmadan önce Portal’da yan paneli ve canlı güncellemeyi dene."
+            else -> "Uzak PS5 için önce canlı altyazıyı başlat. Aynı ağdaki PS5 için Portal bağlantısını test et."
         }
     }
 
@@ -301,11 +368,105 @@ class MainActivity : Activity() {
 
     private fun copyPanelLink() {
         val url = SessionState.current.portalPanel?.url ?: return
+        copyText("DraBornTranslate paneli", url)
+    }
+
+    private fun copyText(label: String, value: String) {
         getSystemService(ClipboardManager::class.java)
-            .setPrimaryClip(ClipData.newPlainText("DraBornTranslate paneli", url))
+            .setPrimaryClip(ClipData.newPlainText(label, value))
         if (Build.VERSION.SDK_INT < 33) {
-            Toast.makeText(this, "Portal paneli bağlantısı kopyalandı.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Kopyalandı.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showTunnelWizard() {
+        val panel = SessionState.current.portalPanel ?: return
+        if (panel.testing) return
+        val fields = column().apply { setPadding(dp(20), dp(8), dp(20), dp(12)) }
+        val scroll = ScrollView(this).apply { addView(fields) }
+        fields.addView(label("1. Komutu Termux’a yapıştır ve çalıştır. Termux açık kalsın.", 15, WHITE))
+        fields.append(button("Komutu kopyala ve Termux’u aç") {
+            copyText("Cloudflare tünel komutu", portalTunnelCommand(panel.url))
+            val termux = packageManager.getLaunchIntentForPackage("com.termux")
+            if (termux != null) startActivity(termux)
+            else Toast.makeText(this, "Komut kopyalandı. Termux’u açıp yapıştır.", Toast.LENGTH_LONG).show()
+        }, 6)
+        fields.append(label("2. Termux’taki trycloudflare.com HTTPS adresini buraya yapıştır.", 15, WHITE), 12)
+        val address = EditText(this).apply {
+            hint = "https://…trycloudflare.com"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+            setText(tunnelAddress)
+            maxLines = 2
+        }
+        fields.append(address, 4)
+        val result = label("", 14, ACCENT).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
+        val dialog = AlertDialog.Builder(this).setTitle("Uzak PS5 bağlantısı").setView(scroll)
+            .setNegativeButton("Kapat", null).create()
+        fun publicLink(): String? {
+            if (SessionState.current.portalPanel?.url != panel.url) {
+                result.text = "Panel oturumu değişti. Canlı altyazı ekranından yeni bağlantıyı hazırla."
+                return null
+            }
+            val link = portalPublicLink(panel.url, address.text.toString())
+            if (link == null) {
+                address.error = "Termux’un verdiği HTTPS adresini yapıştır."
+            } else {
+                tunnelAddress = "https://${URI(link).host}"
+            }
+            return link
+        }
+        val test = button("Dış bağlantıyı kontrol et") {}.apply {
+            setOnClickListener {
+                val link = publicLink() ?: return@setOnClickListener
+                isEnabled = false
+                result.text = "Panel bağlantısı kontrol ediliyor…"
+                checkTunnelLink(link) { message ->
+                    if (dialog.isShowing) {
+                        isEnabled = true
+                        result.text = if (SessionState.current.portalPanel?.url == panel.url) message
+                        else "Panel oturumu değişti. Yeni bağlantıyı hazırla."
+                    }
+                }
+            }
+        }
+        fields.append(test, 4)
+        fields.append(result, 6)
+        fields.append(label("3. Tam bağlantıyı Game Base mesajında ana hesabına gönder. Portal’da aç ve varsa Yana Sabitle’yi seç.", 15, WHITE), 10)
+        fields.append(button("Tam Portal bağlantısını kopyala") {
+            val link = publicLink() ?: return@button
+            copyText("Portal HTTPS paneli", link)
+            result.text = "Bağlantı kopyalandı. Mesajı gönderdikten sonra PS App yayınını tam ekranda açık bırak."
+        }, 6)
+        fields.isFocusableInTouchMode = true
+        fields.requestFocus()
+        dialog.show()
+    }
+
+    private fun checkTunnelLink(link: String, complete: (String) -> Unit) {
+        Thread({
+            val result = try {
+                val request = URI(link).toURL().openConnection() as HttpURLConnection
+                try {
+                    request.requestMethod = "HEAD"
+                    request.instanceFollowRedirects = false
+                    request.connectTimeout = 4500
+                    request.readTimeout = 4500
+                    when (val code = request.responseCode) {
+                        200 -> if (request.getHeaderField("X-DraBorn-Panel") == "ready") {
+                            "Dış bağlantı hazır. Tam bağlantıyı kopyalayıp Portal’da aç."
+                        } else "Bu adres DraBornTranslate panelini göstermiyor. Termux’taki güncel adresi kontrol et."
+                        404 -> "Panel bulunamadı. Güncel Termux komutunu çalıştırıp yeni adresi yapıştır."
+                        502, 503, 504, 530 -> "Tünel panele ulaşamadı ($code). Canlı altyazıyı ve Termux oturumunu kontrol et."
+                        else -> "Cloudflare HTTP $code döndürdü. Termux’taki güncel adresi kontrol et."
+                    }
+                } finally {
+                    request.disconnect()
+                }
+            } catch (_: IOException) {
+                "Bağlantı yanıt vermedi. Termux’ta tünel kaydını bekleyip tekrar kontrol et."
+            }
+            runOnUiThread { if (!isDestroyed) complete(result) }
+        }, "DraBornTranslate-tunnel-check").start()
     }
 
     private fun showPortalHelp() {
@@ -316,7 +477,8 @@ class MainActivity : Activity() {
                     "2. Panel bağlantısını kopyala ve PlayStation App’te kendi PS5 hesabına Game Base mesajıyla gönder.\n\n" +
                     "3. Portal’da PS düğmesine basıp Game Base mesajındaki bağlantıyı aç. Options menüsünde Yana Sabitle görünüyorsa seçip oyuna dön. Test metninin ekranda değiştiğini kontrol et.\n\n" +
                     "4. Test açıkken PlayStation App’te Paylaşımlı Ekran yayınına dön ve DraBornTranslate’te canlı altyazıyı başlat. Panel bağlantın korunur.\n\n" +
-                    "Yan panel uyumluluğu PS5 sistem yazılımına ve Uzaktan Oynama oturumuna bağlıdır.",
+                    "PS5 uzaktaysa canlı altyazıyı başlatıp PS5 uzakta · Bağlantıyı hazırla düğmesini kullan.\n\n" +
+                    "Yana Sabitle görünmezse bu Portal oturumunda sayfayı oyunun yanında açık tutamazsın.",
             )
             .setPositiveButton("Tamam", null)
             .show()
@@ -327,6 +489,8 @@ class MainActivity : Activity() {
             CaptureService.stop(this)
             return
         }
+        voicePreview?.close()
+        voicePreview = null
         if (packageManager.getLaunchIntentForPackage(config.source.packageName) == null) {
             openSourceApp(config.source, offerInstall = true)
             return

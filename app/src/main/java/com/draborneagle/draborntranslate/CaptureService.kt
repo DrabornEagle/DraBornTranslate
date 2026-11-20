@@ -29,9 +29,11 @@ class CaptureService : Service() {
     private var translator: DeviceTranslator? = null
     private var captions: CaptionSession? = null
     private var overlay: CaptionOverlay? = null
+    private var voice: TurkishVoice? = null
     private var panel: PortalPanelServer? = null
     private var sourceName = "PlayStation App"
     private var source = FrameSource.WAITING
+    private var readingArea = ReadingArea.SUBTITLES
     private var epoch = 0
     @Volatile private var modelReady = false
     private var ended = false
@@ -41,6 +43,10 @@ class CaptureService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
             finish(stopMessage())
+            return START_NOT_STICKY
+        }
+        if (intent?.action == ACTION_TOGGLE_PREVIEW) {
+            togglePanelPreview()
             return START_NOT_STICKY
         }
         if (frames != null || ended) return START_NOT_STICKY
@@ -72,6 +78,8 @@ class CaptureService : Service() {
             if (intent.getBooleanExtra(EXTRA_MOBILE, false)) Source.MOBILE else Source.PORTAL,
             SubtitleDisplay.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_DISPLAY) }
                 ?: SubtitleDisplay.PHONE,
+            ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
+                ?: ReadingArea.SUBTITLES,
         )
         if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
             finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
@@ -86,6 +94,7 @@ class CaptureService : Service() {
         val previousPanel = SessionState.current.portalPanel
         panel?.publish(null)
         sourceName = config.source.appName
+        readingArea = config.readingArea
         SessionState.update(SessionState.State(
             active = true,
             status = "Türkçe çeviri modeli hazırlanıyor…",
@@ -95,16 +104,23 @@ class CaptureService : Service() {
             portalIssue = panelIssue,
         ))
         val language = DeviceTranslator().also { translator = it }
-        ocr = SubtitleReader()
+        ocr = SubtitleReader(readingArea)
         if (config.showOnPhone) overlay = CaptionOverlay(this, config)
+        if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
+            if (!ended) {
+                SessionState.update(SessionState.current.copy(voiceIssue = issue))
+                getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(issue))
+            }
+        }
         captions = CaptionSession(
             translate = language::translate,
             show = ::showCaption,
             onFailure = { updateStatus("Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
+            readingArea = readingArea,
         )
         frames = ScreenFrames(
             context = this,
-            bandTop = config.bandTop,
+            settings = config,
             reserveFrame = { modelReady && ocrPending.compareAndSet(false, true) },
             discardFrame = { ocrPending.set(false) },
             onFrame = { bitmap -> main.post { recognize(bitmap) } },
@@ -167,7 +183,7 @@ class CaptureService : Service() {
         frames?.onLegacyRotation()
         val current = SessionState.current.caption
         overlay?.close()
-        if (current != null) showCaption(current)
+        if (overlay != null && current != null) showCaption(current)
     }
 
     private fun recognize(bitmap: Bitmap) {
@@ -185,7 +201,11 @@ class CaptureService : Service() {
             if (lines == null) {
                 updateStatus("Yazı tanıma yanıtı alınamadı.")
             } else {
-                updateStatus(if (lines.isEmpty()) "Görüntü alınıyor. Altyazı bekleniyor." else "İngilizce altyazı okunuyor.")
+                updateStatus(when {
+                    lines.isEmpty() -> waitingForText()
+                    readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
+                    else -> "İngilizce altyazı okunuyor."
+                })
                 captions?.read(lines)
             }
         }
@@ -193,7 +213,8 @@ class CaptureService : Service() {
 
     private fun showCaption(caption: Caption?) {
         if (ended) return
-        panel?.publish(caption?.turkish)
+        if (SessionState.current.portalPanel?.previewing != true) panel?.publish(caption?.turkish)
+        voice?.speak(caption?.turkish)
         try {
             overlay?.show(caption?.turkish)
         } catch (error: RuntimeException) {
@@ -246,21 +267,26 @@ class CaptureService : Service() {
         if (source != value) {
             source = value
             epoch++
+            if (value != FrameSource.VISIBLE) voice?.pause()
             captions?.reset()
         }
         if (!modelReady) return
         updateStatus(when (value) {
             FrameSource.WAITING -> "${sourceName} üzerinde tam ekran oyun görüntüsünü aç."
-            FrameSource.VISIBLE -> "Görüntü alınıyor. Altyazı bekleniyor."
+            FrameSource.VISIBLE -> waitingForText()
             FrameSource.DARK -> "Görüntü karanlık. Yayını ve ekran paylaşımı iznini kontrol et."
         })
     }
+
+    private fun waitingForText() = if (readingArea == ReadingArea.GAME_TEXT) {
+        "Görüntü alınıyor. Okunabilir oyun metni bekleniyor."
+    } else "Görüntü alınıyor. Altyazı bekleniyor."
 
     private fun updateStatus(message: String) {
         val state = SessionState.current
         if (ended || state.status == message) return
         SessionState.update(state.copy(status = message))
-        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(message))
+        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(state.voiceIssue ?: message))
     }
 
     private fun finish(message: String) {
@@ -294,9 +320,11 @@ class CaptureService : Service() {
         main.removeCallbacks(checkFrames)
         main.removeCallbacks(panelTestTick)
         main.removeCallbacks(panelTestTimeout)
+        main.removeCallbacks(endPanelPreview)
         frames?.close()
         captions?.close()
         overlay?.close()
+        voice?.close()
         closePanel()
         ocr?.close()
         translator?.close()
@@ -312,10 +340,34 @@ class CaptureService : Service() {
         if (SessionState.current.portalPanel?.testing == true) finish("Portal bağlantı testi sona erdi.")
     }
 
+    private val endPanelPreview = Runnable { setPanelPreview(false) }
+
+    private fun togglePanelPreview() {
+        val state = SessionState.current
+        val current = state.portalPanel ?: return
+        if (state.active && !current.testing) setPanelPreview(!current.previewing)
+    }
+
+    private fun setPanelPreview(enabled: Boolean) {
+        val state = SessionState.current
+        val current = state.portalPanel ?: return
+        if (ended || current.previewing == enabled) return
+        main.removeCallbacks(panelTestTick)
+        main.removeCallbacks(endPanelPreview)
+        SessionState.update(state.copy(portalPanel = current.copy(previewing = enabled)))
+        if (enabled) {
+            panelTestTick.run()
+            main.postDelayed(endPanelPreview, 180_000L)
+        } else {
+            panel?.publish(state.caption?.turkish)
+        }
+    }
+
     private val panelTestTick = object : Runnable {
         private var first = true
         override fun run() {
-            if (ended || SessionState.current.portalPanel?.testing != true) return
+            val current = SessionState.current.portalPanel ?: return
+            if (ended || (!current.testing && !current.previewing)) return
             panel?.publish(
                 if (first) "Portal paneli bağlantı testi açık." else "Bu satır değiştiyse canlı güncelleme çalışıyor.",
                 testing = true,
@@ -368,12 +420,14 @@ class CaptureService : Service() {
         private const val NOTIFICATION_ID = 25
         private const val ACTION_STOP = "com.draborneagle.draborntranslate.STOP"
         private const val ACTION_TEST_PANEL = "com.draborneagle.draborntranslate.TEST_PANEL"
+        private const val ACTION_TOGGLE_PREVIEW = "com.draborneagle.draborntranslate.TOGGLE_PREVIEW"
         private const val EXTRA_GRANT = "grant"
         private const val EXTRA_RESULT = "resultCode"
         private const val EXTRA_TOP = "bandTop"
         private const val EXTRA_SIZE = "textSize"
         private const val EXTRA_MOBILE = "mobile"
         private const val EXTRA_DISPLAY = "display"
+        private const val EXTRA_READING_AREA = "readingArea"
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
@@ -383,6 +437,7 @@ class CaptureService : Service() {
                 putExtra(EXTRA_SIZE, config.textSize)
                 putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
                 putExtra(EXTRA_DISPLAY, config.display.name)
+                putExtra(EXTRA_READING_AREA, config.readingArea.name)
             })
         }
 
@@ -395,6 +450,10 @@ class CaptureService : Service() {
                 action = ACTION_TEST_PANEL
                 putExtra(EXTRA_SIZE, textSize)
             })
+        }
+
+        internal fun togglePreview(context: Context) {
+            context.startService(Intent(context, CaptureService::class.java).setAction(ACTION_TOGGLE_PREVIEW))
         }
     }
 }

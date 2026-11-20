@@ -1,10 +1,23 @@
 # DraBornTranslate
 
-PlayStation Portal’da oynarken PS5’in **Paylaşımlı Ekran** videosunu Android telefonda İngilizceden Türkçeye çevirir. Telefon, PlayStation App’te açılan görüntüyü Android ekran paylaşımı izniyle okur. Türkçe altyazıyı telefonda gösterebilir ve yerel bir yan panel üzerinden PS5’e sunabilir. Kamera, mikrofon, bilgisayar ve görüntü yakalama kartı gerekmez.
+PlayStation Portal’da oynarken PS5’in **Paylaşımlı Ekran** videosunu Android telefonda İngilizceden Türkçeye çevirir. Telefon, PlayStation App’te açılan görüntüyü Android ekran paylaşımı izniyle okur. Çeviriyi telefonda yazıyla gösterir, Türkçe sesle okur veya bir web paneline verir. Kamera, mikrofon, bilgisayar ve görüntü yakalama kartı gerekmez.
 
 **Android 10 ve üzeri.** Android 14 ve üzeri, yalnızca seçtiğiniz uygulamayı paylaşmanıza izin verir. Portal yan paneli deneysel. Gerçek bir PS5 ve Portal oturumunda sabitleme henüz doğrulanmadı.
 
-## Portal’da oyna, telefonda oku
+## Portal’da oyna, Türkçe çeviriyi dinle
+
+1. Portal’dan PS5’e bağlan. Oyunda İngilizce altyazıyı aç ve Game Base sesli sohbetinden **Paylaşımlı Ekran’ı Başlat** seçeneğini kullan.
+2. Telefonda ikinci hesabınla **PlayStation App**’i aç. Yayın önizlemesine dokun ve yatay tam ekrana geç.
+3. DraBornTranslate’te **PS Portal → Altyazı ekranı → Sesli Türkçe** seç. **Türkçe sesi dene** ile telefonun ses çıkışını kontrol et. Gerekirse Android metin okuma ayarlarında Türkçe ses verisini yükle.
+4. Canlı altyazıyı başlat. Android 14 ve üzerindeki paylaşım penceresinde **Tek uygulama → PlayStation App** seç. Yayını telefonda önde tut. Telefon, Türkçe satırları hoparlöründen veya bağlı kulaklıktan okur.
+
+Bu mod, PS5 uzaktayken de Paylaşımlı Ekran üzerinden çalışır. Termux veya tünel kurulumu gerekmez.
+
+## PlayStation App’te yayın metnini çevir
+
+**Çevrilecek alan** düğmesinden **Altyazı bölgesi** ya da **Tam oyun görüntüsü** seç. Tam oyun görüntüsü, yatay tam ekran videoda okunabilen menü ve görev yazılarını tarar. Sonuç, aynı anda en fazla altı sabit satır olarak gösterilir. Çevirmek istediğin metni birkaç saniye ekranda tut. **Altyazı ekranı → Telefon** ile Türkçe metin yayın üstünde görünür. İlk kullanımda **Diğer uygulamaların üzerinde göster** iznini ver.
+
+## Portal’da oyna, telefonda altyazı oku
 
 1. Portal’dan kendi PS5 konsoluna **Uzaktan Oynama** ile bağlan. Oyunda dili İngilizce seç ve altyazıları aç.
 2. Telefonda **PlayStation App**’e ikinci bir PlayStation hesabıyla giriş yap. İki hesabı arkadaş olarak ekle ve aynı Game Base sesli sohbetine katıl.
@@ -16,7 +29,16 @@ Alt yazı farklı bir hizadaysa **Okuma bölgesi** sürgüsünü ayarla. Oturumu
 
 [PlayStation App](https://play.google.com/store/apps/details?id=com.scee.psxandroid) · [Sony Paylaşımlı Ekran kılavuzu](https://www.playstation.com/tr-tr/support/games/ps5-share-screen/) · [PlayStation App destek sayfası](https://www.playstation.com/tr-tr/support/games/playstation-app-features/)
 
-## v0.2.1 · Portal yan paneli
+## Portal yan paneli (deneysel)
+
+### PS5 uzaktaysa
+
+1. **PS Portal → Altyazı ekranı → Portal yan paneli (deneysel)** seç ve PlayStation App’i paylaşarak canlı altyazıyı başlat.
+2. **PS5 uzakta · Bağlantıyı hazırla → Komutu kopyala ve Termux’u aç** düğmesine dokun. Komutu Termux’ta çalıştır ve Termux’un verdiği trycloudflare.com HTTPS adresini DraBornTranslate’e yapıştır.
+3. **Dış bağlantıyı kontrol et** ve **Tam Portal bağlantısını kopyala**. Bağlantıyı ikinci hesabından ana hesabına Game Base mesajıyla gönder. PS App yayınını telefonda yeniden tam ekran aç.
+4. Portal’da **PS düğmesi → Game Base → mesajdaki bağlantı** yolunu izle. **Yana Sabitle** çıkıyorsa seçip oyuna dön. **Portal’da örnek yazı göster** düğmesi aynı bağlantıda üç dakika boyunca değişen örnek metin sunar. Testi durdurmak için **Canlı çeviriye dön** düğmesini kullan.
+
+Canlı oturum veya Termux tüneli yeniden başladığında dış bağlantıyı yeniden hazırla. Dış bağlantı kontrolü telefonun paneline ulaşmayı doğrular. Portal’da oyunun yanında göstermek, PS5’in sayfayı sabitlemesine ve Uzaktan Oynama’ya aktarmasına bağlıdır. **Yana Sabitle** seçeneği çıkmazsa bu oturumda Portal ekranında oyunla birlikte panel görünmez.
 
 ### Önce bağlantıyı test et
 
@@ -34,7 +56,7 @@ Test 2,5 dakika sürer. Test açıkken canlı altyazıyı başlatarak aynı bağ
 4. DraBornTranslate’te **Panel bağlantısını kopyala** düğmesine dokun. Telefonda PlayStation App içinden bağlantıyı kendi PS5 hesabına Game Base mesajıyla gönder. Ardından telefonda Paylaşımlı Ekran yayınına dön.
 5. Portal’da oyundayken PS düğmesini kullanarak **Game Base**’i aç. PS5’te gelen bağlantıyı seç. Web görünümü açılır ve **Options → Yana Sabitle** seçeneği sunulursa onu seçip oyuna dön.
 
-DraBornTranslate yerel ağda bir web paneli sunar. Panel Portal’da ancak PS5 bağlantıyı açabiliyor ve sabitlenen web görünümünü Uzaktan Oynama’ya aktarabiliyorsa oyunla birlikte görünür. Sony, Portal’ın kendi arayüzüne dışarıdan katman eklemek için belgelenmiş bir arayüz sunmuyor. **Bu bağlantıyı telefonda aç** düğmesi yerel yayını kendi telefonunda sınar.
+DraBornTranslate yerel ağda bir web paneli sunar. Panel Portal’da ancak PS5 bağlantıyı açabiliyor ve sabitlenen web görünümünü Uzaktan Oynama’ya aktarabiliyorsa oyunla birlikte görünür. Sony, Portal’ın kendi arayüzüne dışarıdan katman eklemek için belgelenmiş bir arayüz sunmuyor. **Yerel bağlantıyı telefonda aç** düğmesi yerel yayını kendi telefonunda sınar.
 
 Panel sadece oturum açıkken, telefonun özel yerel ağ adresinden hizmet verir. Rastgele oluşturulan bağlantı her oturumda değişir. Panel yalnızca çevrilmiş Türkçe metni alır. Portal paneli seçeneği için telefonda üstte gösterme izni gerekmez.
 
@@ -49,7 +71,7 @@ Panel sadece oturum açıkken, telefonun özel yerel ağ adresinden hizmet verir
 - Portal modu, PS5’in ayrı **Paylaşımlı Ekran** yayınını kullanır. Telefonda ikinci bir Remote Play oturumu açma. Sony’nin **Paylaşımlı Oyun** özelliği farklıdır. PS5 Pro’nun 8K çıkışında Sony, Paylaşımlı Ekran ile Uzaktan Oynama’nın birlikte kullanımını kısıtlar. [Sony Uzaktan Oynama kısıtlamaları](https://remoteplay.dl.playstation.net/remoteplay/lang/en/#restrictions)
 - Portal’ın ayrı **Bulut Akışı** modu bir PS5 Paylaşımlı Ekran yayını sağlamaz. Bulut Akışı sırasında bu uygulamanın Portal yan paneli kullanılamaz.
 - Android kaynak videonun görüntüsünü paylaşmaya izin vermelidir. Video ekran paylaşımında siyah kalırsa oyun, PlayStation App veya cihaz ekran yakalamayı sınırlıyor olabilir.
-- Uygulama ekranda yazılı olan İngilizce altyazıları okur. İlk kullanımda dil modeli internetten indirilir. Ardından yazı tanıma ve çeviri cihazda çalışır. Uygulama oyun karelerini veya altyazı metnini diske kaydetmez. Portal paneli seçildiğinde Türkçe metni aynı yerel ağdaki panele sunar. [ML Kit veri açıklaması](https://developers.google.com/ml-kit/terms#data_disclosure)
+- Uygulama ekrandaki İngilizce yazıları okur. İlk kullanımda dil modeli internetten indirilir. Ardından yazı tanıma ve çeviri cihazda çalışır. Uygulama oyun karelerini veya altyazı metnini diske kaydetmez. Portal paneli, Türkçe metni oturuma özel bağlantıyı açan tarayıcıya sunar. [ML Kit veri açıklaması](https://developers.google.com/ml-kit/terms#data_disclosure)
 
 ## Android derlemesi
 

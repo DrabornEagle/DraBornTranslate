@@ -25,6 +25,7 @@ class PortalPanelServerTest {
             val page = get(server.url)
             assertEquals(200, page.code)
             assertEquals("<p>24</p>", page.body)
+            assertEquals("ready", page.panelMode)
             assertTrue(opened.await(2, TimeUnit.SECONDS))
 
             val captionUrl = server.url + "caption.txt"
