@@ -36,6 +36,7 @@ class PortalPanelServerTest {
             assertEquals(sample, caption.body)
             assertEquals("no-store", caption.cacheControl)
             assertEquals("text/plain; charset=utf-8", caption.contentType)
+            assertEquals("google", caption.translation)
             server.publish(null)
             assertEquals("", get(captionUrl).body)
         }
@@ -74,12 +75,14 @@ class PortalPanelServerTest {
             val test = get(captionUrl)
             assertEquals("test", test.panelMode)
             assertEquals("Bağlantı testi.", test.body)
+            assertNull(test.translation)
 
             server.publish(null)
             assertEquals("", get(captionUrl).body)
-            server.publish("Oyuna dön.")
+            server.publish("Oyuna dön.", googleAttribution = false)
             val live = get(captionUrl)
             assertNull(live.panelMode)
+            assertNull(live.translation)
             assertEquals("Oyuna dön.", live.body)
         }
     }
@@ -109,6 +112,7 @@ class PortalPanelServerTest {
                 connection.getHeaderField("Cache-Control"),
                 connection.getHeaderField("X-DraBorn-Panel"),
                 connection.getHeaderField("Location"),
+                connection.getHeaderField("X-DraBorn-Translation"),
             )
         } finally {
             connection.disconnect()
@@ -122,5 +126,6 @@ class PortalPanelServerTest {
         val cacheControl: String?,
         val panelMode: String?,
         val location: String?,
+        val translation: String?,
     )
 }

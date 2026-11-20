@@ -37,7 +37,11 @@ internal class PortalPanelServer(
     private val closed = AtomicBoolean(false)
     private val viewed = AtomicBoolean(false)
     private val currentClient = AtomicReference<Socket?>()
-    private data class CaptionFrame(val body: ByteArray, val testing: Boolean = false)
+    private data class CaptionFrame(
+        val body: ByteArray,
+        val testing: Boolean = false,
+        val googleAttribution: Boolean = false,
+    )
 
     @Volatile private var caption = CaptionFrame(ByteArray(0))
 
@@ -46,8 +50,11 @@ internal class PortalPanelServer(
         start()
     }
 
-    fun publish(text: String?, testing: Boolean = false) {
-        if (!closed.get()) caption = CaptionFrame(text.orEmpty().toByteArray(Charsets.UTF_8), testing)
+    fun publish(text: String?, testing: Boolean = false, googleAttribution: Boolean = true) {
+        if (!closed.get()) caption = CaptionFrame(
+            text.orEmpty().toByteArray(Charsets.UTF_8), testing,
+            googleAttribution = googleAttribution && !testing && !text.isNullOrBlank(),
+        )
     }
 
     private fun listen() {
@@ -103,7 +110,8 @@ internal class PortalPanelServer(
             "${prefix}caption.txt" -> {
                 val frame = caption
                 val mode = if (frame.testing) "X-DraBorn-Panel: test\r\n" else ""
-                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly, mode)
+                val attribution = if (frame.googleAttribution) "X-DraBorn-Translation: google\r\n" else ""
+                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly, mode + attribution)
             }
             "${prefix}translate.png" -> send(client, "200 OK", "image/png", badge, headOnly)
             else -> send(client, "404 Not Found", "text/plain", ByteArray(0), headOnly)

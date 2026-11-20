@@ -26,7 +26,7 @@ class CaptureService : Service() {
     private val ocrPending = AtomicBoolean(false)
     private var frames: ScreenFrames? = null
     private var ocr: SubtitleReader? = null
-    private var translator: DeviceTranslator? = null
+    private var translator: CaptionTranslator? = null
     private var captions: CaptionSession? = null
     private var overlay: CaptionOverlay? = null
     private var voice: TurkishVoice? = null
@@ -80,11 +80,19 @@ class CaptureService : Service() {
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
                 ?: ReadingArea.SUBTITLES,
+            TranslationEngine.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_ENGINE) }
+                ?: TranslationEngine.OFFLINE,
         )
         if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
             finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
             return START_NOT_STICKY
         }
+        val language = captionTranslator(config.engine)
+        if (language == null) {
+            finish("Doğal Türkçe için uygulamaya Gemini API anahtarını ekle.")
+            return START_NOT_STICKY
+        }
+        translator = language
         if (!config.showOnPortal) closePanel()
         val panelIssue = if (config.showOnPortal) ensurePanel(config.textSize) else null
         if (panelIssue != null && !config.showOnPhone) {
@@ -97,13 +105,12 @@ class CaptureService : Service() {
         readingArea = config.readingArea
         SessionState.update(SessionState.State(
             active = true,
-            status = "Türkçe çeviri modeli hazırlanıyor…",
+            status = if (config.engine == TranslationEngine.NATURAL) "Doğal Türkçe hazırlanıyor…" else "Türkçe çeviri modeli hazırlanıyor…",
             portalPanel = panel?.let {
                 SessionState.PortalPanel(it.url, opened = previousPanel?.opened == true && previousPanel.url == it.url)
             },
             portalIssue = panelIssue,
         ))
-        val language = DeviceTranslator().also { translator = it }
         ocr = SubtitleReader(readingArea)
         if (config.showOnPhone) overlay = CaptionOverlay(this, config)
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
@@ -115,8 +122,9 @@ class CaptureService : Service() {
         captions = CaptionSession(
             translate = language::translate,
             show = ::showCaption,
-            onFailure = { updateStatus("Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
+            onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
+            engine = config.engine,
         )
         frames = ScreenFrames(
             context = this,
@@ -213,7 +221,7 @@ class CaptureService : Service() {
 
     private fun showCaption(caption: Caption?) {
         if (ended) return
-        if (SessionState.current.portalPanel?.previewing != true) panel?.publish(caption?.turkish)
+        if (SessionState.current.portalPanel?.previewing != true) publishCaption(caption)
         voice?.speak(caption?.turkish)
         try {
             overlay?.show(caption?.turkish)
@@ -222,6 +230,11 @@ class CaptureService : Service() {
             return
         }
         SessionState.update(SessionState.current.copy(caption = caption))
+        if (caption != null) updateTranslationIssue(null)
+    }
+
+    private fun publishCaption(caption: Caption?) {
+        panel?.publish(caption?.turkish, googleAttribution = caption?.googleAttribution == true)
     }
 
     private fun openPanel(textSize: Int): PortalPanelServer {
@@ -286,7 +299,18 @@ class CaptureService : Service() {
         val state = SessionState.current
         if (ended || state.status == message) return
         SessionState.update(state.copy(status = message))
-        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(state.voiceIssue ?: message))
+        getSystemService(NotificationManager::class.java).notify(
+            NOTIFICATION_ID, notification(state.voiceIssue ?: state.translationIssue ?: message),
+        )
+    }
+
+    private fun updateTranslationIssue(issue: String?) {
+        val state = SessionState.current
+        if (ended || state.translationIssue == issue) return
+        SessionState.update(state.copy(translationIssue = issue))
+        getSystemService(NotificationManager::class.java).notify(
+            NOTIFICATION_ID, notification(state.voiceIssue ?: issue ?: state.status),
+        )
     }
 
     private fun finish(message: String) {
@@ -359,7 +383,7 @@ class CaptureService : Service() {
             panelTestTick.run()
             main.postDelayed(endPanelPreview, 180_000L)
         } else {
-            panel?.publish(state.caption?.turkish)
+            publishCaption(state.caption)
         }
     }
 
@@ -369,7 +393,7 @@ class CaptureService : Service() {
             val current = SessionState.current.portalPanel ?: return
             if (ended || (!current.testing && !current.previewing)) return
             panel?.publish(
-                if (first) "Portal paneli bağlantı testi açık." else "Bu satır değiştiyse canlı güncelleme çalışıyor.",
+                if (first) "Beni bekleme.\nSen önden git." else "Gözünü yoldan ayırma.\nKöprüde buluşuruz.",
                 testing = true,
             )
             first = !first
@@ -428,6 +452,7 @@ class CaptureService : Service() {
         private const val EXTRA_MOBILE = "mobile"
         private const val EXTRA_DISPLAY = "display"
         private const val EXTRA_READING_AREA = "readingArea"
+        private const val EXTRA_ENGINE = "engine"
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
@@ -438,6 +463,7 @@ class CaptureService : Service() {
                 putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
                 putExtra(EXTRA_DISPLAY, config.display.name)
                 putExtra(EXTRA_READING_AREA, config.readingArea.name)
+                putExtra(EXTRA_ENGINE, config.engine.name)
             })
         }
 

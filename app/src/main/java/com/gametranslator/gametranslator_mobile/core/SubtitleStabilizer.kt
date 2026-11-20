@@ -25,6 +25,8 @@ class SubtitleStabilizer(
     private val clearAfterMs: Int = CLEAR_AFTER_MS,
     private val clock: () -> Long = { android.os.SystemClock.elapsedRealtime() },
     private val exactText: Boolean = false,
+    private val acceptCompletedSentence: Boolean = true,
+    private val minTextLength: Int = if (exactText) 2 else 3,
 ) {
     companion object {
         /** Bölge bu kadar boş kalırsa altyazı kalkmış sayılır. */
@@ -62,7 +64,7 @@ class SubtitleStabilizer(
         val time = clock()
         val text = TextMatch.normalize(rawText)
         // 3 karakterden kısa okumalar (gürültü, tek simge) boş kare sayılır.
-        if (text.length < if (exactText) 2 else 3) {
+        if (text.length < minTextLength) {
             candidate = ""
             candidateCount = 0
             val since = emptySince ?: time.also { emptySince = it }
@@ -86,7 +88,7 @@ class SubtitleStabilizer(
         val ready = when {
             garbled -> candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
             exactText -> candidateCount >= stableFrames
-            else -> candidateCount >= stableFrames || endsSentence(rawText)
+            else -> candidateCount >= stableFrames || (acceptCompletedSentence && endsSentence(rawText))
         }
         // Gönderilenin gürültülü yeniden okuması yeni satır değildir.
         if (isSame(text, sent)) return StabilizerAction.None

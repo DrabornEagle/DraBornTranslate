@@ -17,6 +17,7 @@ internal object SessionState {
         val portalPanel: PortalPanel? = null,
         val portalIssue: String? = null,
         val voiceIssue: String? = null,
+        val translationIssue: String? = null,
     )
 
     private val listeners = mutableSetOf<(State) -> Unit>()

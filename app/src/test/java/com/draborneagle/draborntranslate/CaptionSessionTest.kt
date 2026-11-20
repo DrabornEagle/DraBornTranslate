@@ -9,7 +9,7 @@ import org.junit.Test
 class CaptionSessionTest {
     private var now = 100L
     private var caption: Caption? = null
-    private val requests = ArrayDeque<Pair<String, (String?) -> Unit>>()
+    private val requests = ArrayDeque<Pair<TranslationInput, (TranslationReply) -> Unit>>()
     private val session = CaptionSession(
         translate = { source, answer -> requests.addLast(source to answer) },
         show = { caption = it },
@@ -26,17 +26,17 @@ class CaptionSessionTest {
         session.read(listOf("Close the gate."))
 
         assertEquals(1, requests.size)
-        requests.removeFirst().second("Köprüye git!")
+        requests.removeFirst().second(TranslationReply("Köprüye git!"))
         assertNull(caption)
-        assertEquals("Close the gate.", requests.first().first)
-        requests.removeFirst().second("Kapıyı kapat.")
+        assertEquals("Close the gate.", requests.first().first.text)
+        requests.removeFirst().second(TranslationReply("Kapıyı kapat."))
         assertEquals(Caption("Close the gate.", "Kapıyı kapat."), caption)
     }
 
     @Test
     fun subtitleIsRemovedWhenSourceDisappears() {
         session.read(listOf("Follow me."))
-        requests.removeFirst().second("Beni takip et.")
+        requests.removeFirst().second(TranslationReply("Beni takip et."))
         assertEquals("Beni takip et.", caption?.turkish)
         now += 340
         session.read(emptyList())
@@ -48,7 +48,7 @@ class CaptionSessionTest {
     @Test
     fun aReturningSubtitleUsesTheCachedTranslation() {
         session.read(listOf("Follow me."))
-        requests.removeFirst().second("Beni takip et.")
+        requests.removeFirst().second(TranslationReply("Beni takip et."))
         now += 340
         session.read(emptyList())
         now += SubtitleStabilizer.CLEAR_AFTER_MS
@@ -63,7 +63,7 @@ class CaptionSessionTest {
     fun stoppedSessionDiscardsAnInFlightTranslation() {
         session.read(listOf("Ready to go?"))
         session.close()
-        requests.removeFirst().second("Gitmeye hazır mısın?")
+        requests.removeFirst().second(TranslationReply("Gitmeye hazır mısın?"))
         assertNull(caption)
     }
 
@@ -80,19 +80,54 @@ class CaptionSessionTest {
         assertEquals(0, requests.size)
         session.read(listOf("Settings", "Exit", "98 HP"))
         val first = requests.removeFirst()
-        assertEquals("Settings\nExit", first.first)
-        first.second("Ayarlar\nÇıkış")
+        assertEquals("Settings\nExit", first.first.text)
+        first.second(TranslationReply("Ayarlar\nÇıkış"))
         assertEquals("Ayarlar\nÇıkış", caption?.turkish)
 
         session.read(listOf("Settings", "Resume", "97 HP"))
         val second = requests.removeFirst()
-        assertEquals("Settings", second.first)
+        assertEquals("Settings", second.first.text)
         session.read(listOf("Settings", "Resume", "96 HP"))
-        second.second("Ayarlar")
+        second.second(TranslationReply("Ayarlar"))
         assertNull(caption)
         val third = requests.removeFirst()
-        assertEquals("Settings\nResume", third.first)
-        third.second("Ayarlar\nDevam et")
+        assertEquals("Settings\nResume", third.first.text)
+        third.second(TranslationReply("Ayarlar\nDevam et"))
         assertEquals("Ayarlar\nDevam et", caption?.turkish)
+    }
+
+    @Test
+    fun contextualModeKeepsPreviousDialogueAndReplacesItOnlyWithTheCurrentAnswer() {
+        val dialogue = CaptionSession(
+            translate = { input, answer -> requests.addLast(input to answer) },
+            show = { caption = it },
+            onFailure = {},
+            engine = TranslationEngine.NATURAL,
+            stabilizer = SubtitleStabilizer(clock = { now }, acceptCompletedSentence = false, minTextLength = 2),
+        )
+        dialogue.read(listOf("The cops are after us."))
+        assertEquals(0, requests.size)
+        now += 340
+        dialogue.read(listOf("The cops are after us."))
+        requests.removeFirst().second(TranslationReply("Polis peşimizde."))
+        val previous = Caption("The cops are after us.", "Polis peşimizde.", googleAttribution = false)
+        assertEquals(previous, caption)
+        now += 340
+        dialogue.read(listOf("Go!"))
+        now += 340
+        dialogue.read(listOf("Go!"))
+        assertEquals(previous, caption)
+        val next = requests.removeFirst()
+        assertEquals(TranslationInput("Go!", listOf("The cops are after us.")), next.first)
+        next.second(TranslationReply("Bas gaza!"))
+        assertEquals(Caption("Go!", "Bas gaza!", googleAttribution = false), caption)
+    }
+
+    @Test
+    fun longDialogueUsesTwoLinesWithoutLosingWords() {
+        val text = "Hadi buradan çıkalım. Polisler gelmeden köprüde buluşmamız gerek."
+        val lines = formatDialogue(text).lines()
+        assertEquals(2, lines.size)
+        assertEquals(text, lines.joinToString(" "))
     }
 }

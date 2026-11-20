@@ -49,7 +49,7 @@ class MainActivity : Activity() {
     private var pending = false
     private var demoMessage: String? = null
     private var demoCaption: Caption? = null
-    private var demoTranslator: DeviceTranslator? = null
+    private var demoTranslator: CaptionTranslator? = null
     private var demoReader: SubtitleReader? = null
     private var voicePreview: TurkishVoice? = null
     private var tunnelAddress = ""
@@ -62,6 +62,7 @@ class MainActivity : Activity() {
     private lateinit var startStop: Button
     private lateinit var displayChoice: Button
     private lateinit var readingChoice: Button
+    private lateinit var engineChoice: Button
     private lateinit var panelCard: LinearLayout
     private lateinit var panelStatus: TextView
     private lateinit var copyPanel: Button
@@ -92,6 +93,8 @@ class MainActivity : Activity() {
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
                 ?: ReadingArea.SUBTITLES,
+            TranslationEngine.entries.firstOrNull { it.name == prefs.getString("engine", null) }
+                ?: TranslationEngine.OFFLINE,
         )
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
@@ -158,6 +161,8 @@ class MainActivity : Activity() {
         content.append(displayChoice, 14)
         readingChoice = button("") { selectReadingArea() }
         content.append(readingChoice, 6)
+        engineChoice = button("") { selectEngine() }
+        content.append(engineChoice, 6)
 
         val guide = card()
         content.append(guide, 14)
@@ -166,7 +171,7 @@ class MainActivity : Activity() {
         openSource = button("") { openSourceApp(config.source, offerInstall = true) }
         guide.append(openSource, 14)
 
-        startStop = button("Google ile canlı altyazıyı başlat") { beginOrStop() }
+        startStop = button("Canlı altyazıyı başlat") { beginOrStop() }
         styleButton(startStop, true)
         content.append(startStop, 14)
 
@@ -225,7 +230,7 @@ class MainActivity : Activity() {
             sizeLabel.text = "Altyazı boyutu · $size"
         }
         settings.addView(sizeControl)
-        testButton = button("Google ile örnek altyazıyı çevir") { runDemo() }
+        testButton = button("Örnek altyazıyı çevir") { runDemo() }
         content.append(testButton, 14)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
         content.append(voiceButton, 6)
@@ -261,21 +266,25 @@ class MainActivity : Activity() {
         displayChoice.text = "Altyazı ekranı · ${config.display.label}"
         readingChoice.isEnabled = controlsAvailable
         readingChoice.text = "Çevrilecek alan · ${config.readingArea.label}"
+        engineChoice.isEnabled = controlsAvailable && demoTranslator == null
+        engineChoice.text = "Çeviri motoru · ${config.engine.label}"
         bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
         startStop.isEnabled = !pending && demoTranslator == null
-        startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Google ile canlı altyazıyı başlat"
+        startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Canlı altyazıyı başlat"
         testButton.isEnabled = controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
         val caption = state.caption ?: demoCaption
-        status.text = if (state.active || panelTesting) state.voiceIssue ?: state.status else demoMessage ?: state.status
+        status.text = if (state.active || panelTesting) state.voiceIssue ?: state.translationIssue ?: state.status
+        else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = caption?.source.orEmpty()
-        listOf(captionLabel, sourceLabel, attribution).forEach {
+        listOf(captionLabel, sourceLabel).forEach {
             it.visibility = if (caption == null) View.GONE else View.VISIBLE
         }
+        attribution.visibility = if (caption?.googleAttribution == true) View.VISIBLE else View.GONE
     }
 
     private fun select(value: Source) {
@@ -321,6 +330,69 @@ class MainActivity : Activity() {
         voicePreview = TurkishVoice(this) { issue ->
             Toast.makeText(this, issue, Toast.LENGTH_LONG).show()
         }.also { it.speak("Bu bir Türkçe altyazı ses testidir.") }
+    }
+
+    private fun selectEngine() {
+        val engines = TranslationEngine.entries
+        AlertDialog.Builder(this)
+            .setTitle("Çeviri motoru")
+            .setSingleChoiceItems(engines.map { it.label }.toTypedArray(), engines.indexOf(config.engine)) { dialog, index ->
+                dialog.dismiss()
+                val engine = engines[index]
+                if (engine == TranslationEngine.NATURAL && GeminiKey.read(this) == null) editGeminiKey()
+                else useEngine(engine)
+            }
+            .setNeutralButton("Gemini anahtarı") { _, _ -> editGeminiKey() }
+            .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    private fun useEngine(engine: TranslationEngine) {
+        config = config.copy(engine = engine)
+        prefs.edit().putString("engine", engine.name).apply()
+        demoMessage = null
+        demoCaption = null
+        render()
+    }
+
+    private fun editGeminiKey() {
+        val fields = column().apply { setPadding(dp(20), dp(8), dp(20), 0) }
+        fields.addView(label(
+            "Doğal Türkçe için Google AI Studio’da bir Gemini API anahtarı oluştur. Bu mod, okunan metni ve kısa diyalog bağlamını Gemini’ye gönderir.",
+            14, WHITE,
+        ))
+        val input = EditText(this).apply {
+            hint = "Gemini API anahtarı"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            setSingleLine()
+        }
+        fields.append(input, 8)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Doğal Türkçe")
+            .setView(fields)
+            .setNeutralButton("AI Studio’yu aç") { _, _ -> openLink("https://aistudio.google.com/app/apikey") }
+            .setNegativeButton("Kapat", null)
+            .setPositiveButton("Kaydet", null)
+            .create()
+        if (GeminiKey.read(this) != null) {
+            fields.append(button("Kayıtlı anahtarı kaldır") {
+                GeminiKey.remove(this)
+                useEngine(TranslationEngine.OFFLINE)
+                dialog.dismiss()
+            }, 5)
+        }
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val key = input.text.toString().trim()
+            if (key.length !in 20..640 || key.any { it.isWhitespace() || it.isISOControl() }) {
+                input.error = "AI Studio’da oluşturduğun API anahtarını yapıştır."
+            } else if (!GeminiKey.save(this, key)) {
+                input.error = "Anahtar Android’de saklanamadı. Tekrar dene."
+            } else {
+                useEngine(TranslationEngine.NATURAL)
+                dialog.dismiss()
+            }
+        }
     }
 
     private fun renderPortalPanel(state: SessionState.State) {
@@ -489,6 +561,10 @@ class MainActivity : Activity() {
             CaptureService.stop(this)
             return
         }
+        if (config.engine == TranslationEngine.NATURAL && GeminiKey.read(this) == null) {
+            editGeminiKey()
+            return
+        }
         voicePreview?.close()
         voicePreview = null
         if (packageManager.getLaunchIntentForPackage(config.source.packageName) == null) {
@@ -581,8 +657,14 @@ class MainActivity : Activity() {
     }
 
     private fun runDemo() {
-        val translator = DeviceTranslator().also { demoTranslator = it }
-        demoMessage = "Örnek için cihazdaki dil modeli hazırlanıyor…"
+        val engine = config.engine
+        val translator = captionTranslator(engine)
+        if (translator == null) {
+            editGeminiKey()
+            return
+        }
+        demoTranslator = translator
+        demoMessage = "Çeviri motoru hazırlanıyor…"
         demoCaption = null
         render()
         translator.prepare { ready ->
@@ -601,10 +683,13 @@ class MainActivity : Activity() {
                     completeDemo("Örnek görseldeki yazı okunamadı.")
                     return@read
                 }
-                translator.translate(original) { result ->
+                val input = TranslationInput(original, listOf("A patrol car has been following us since the bridge."))
+                translator.translate(input) { result ->
                     if (demoTranslator !== translator) return@translate
-                    if (result.isNullOrBlank()) completeDemo("Örnek altyazı çevrilemedi.")
-                    else completeDemo("Örnek altyazı çevrildi.", Caption(original, result))
+                    val text = result.text
+                    if (text.isNullOrBlank()) completeDemo(result.issue ?: "Örnek altyazı çevrilemedi.")
+                    else completeDemo("Örnek altyazı çevrildi.",
+                        Caption(original, formatDialogue(text), googleAttribution = engine == TranslationEngine.OFFLINE))
                 }
             }
         }
@@ -629,7 +714,7 @@ class MainActivity : Activity() {
         val bitmap = Bitmap.createBitmap(960, 186, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(BACKGROUND)
-        canvas.drawText("We need to reach the bridge before dark.", 480f, 108f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        canvas.drawText("We're being tailed. Lose the cops!", 480f, 108f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.WHITE
             textSize = 40f
             textAlign = Paint.Align.CENTER
@@ -643,7 +728,7 @@ class MainActivity : Activity() {
             .setTitle("DraBornTranslate ${packageManager.getPackageInfo(packageName, 0).versionName}")
             .setMessage("GameTranslator v1.8.48 ve CouchSubs kaynaklarından yararlanır.\n" +
                 "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n\n" +
-                "Çeviri, Google ML Kit ile cihazda yapılır. Google çevirilerin doğruluğu, güvenilirliği, satılabilirliği, belirli bir amaca uygunluğu ve hak ihlali içermemesi konusunda açık veya örtük garanti vermez.")
+                "Çevrimdışı mod Google ML Kit çevirisini kullanır. Google çevirilerin doğruluğu, güvenilirliği, satılabilirliği, belirli bir amaca uygunluğu ve hak ihlali içermemesi konusunda açık veya örtük garanti vermez.")
             .setPositiveButton("GitHub") { _, _ -> openLink("https://github.com/DrabornEagle/DraBornTranslate") }
             .setNeutralButton("Lisans metni") { _, _ ->
                 val terms = assets.open("LICENSE").bufferedReader().use { it.readText() }

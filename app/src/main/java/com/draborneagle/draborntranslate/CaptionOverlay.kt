@@ -54,11 +54,13 @@ internal class CaptionOverlay(
             }
             setPadding(margin, context.dp(8), margin, context.dp(6))
             addView(caption)
-            addView(translationAttribution(context).apply {
-                layoutParams = LinearLayout.LayoutParams(context.dp(152), context.dp(19)).also {
-                    it.topMargin = context.dp(3)
-                }
-            })
+            if (settings.engine == TranslationEngine.OFFLINE) {
+                addView(translationAttribution(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(context.dp(152), context.dp(19)).also {
+                        it.topMargin = context.dp(3)
+                    }
+                })
+            }
         }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
