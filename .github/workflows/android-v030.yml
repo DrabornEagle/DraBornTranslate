@@ -1,30 +1,30 @@
-name: DraBornTranslate v0.3.0 Android
+name: DraBornTranslate v0.3.0 APK
 on:
   push:
     branches: [build/draborntranslate-v0.3.0]
   workflow_dispatch:
 permissions:
+  actions: read
   contents: read
 jobs:
-  android:
+  apk:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - name: Build and check ARM64 APK
-        run: |
-          bash ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
-          mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/DraBornTranslate-v0.3.0-Android-arm64.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs dist/DraBornTranslate-v0.3.0-Android-arm64.apk
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/DraBornTranslate-v0.3.0-Android-arm64.apk | grep -E '^package:|^native-code:'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: DraBornTranslate-v0.3.0-Android-arm64
+          run-id: '44800143516'
+          github-token: ${{ github.token }}
+          path: dist
+      - name: Verify the signed APK
+        run: |
+          apk=dist/DraBornTranslate-v0.3.0-Android-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          sha256sum "$apk"
+      - uses: actions/upload-artifact@v7
+        with:
           path: dist/DraBornTranslate-v0.3.0-Android-arm64.apk
+          archive: false
           if-no-files-found: error
           retention-days: 30
