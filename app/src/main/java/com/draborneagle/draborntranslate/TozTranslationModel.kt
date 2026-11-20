@@ -4,7 +4,6 @@ package com.draborneagle.draborntranslate
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
-import com.gametranslator.gametranslator_mobile.core.TextTranslator
 import java.io.File
 import java.nio.FloatBuffer
 import java.nio.LongBuffer
@@ -12,7 +11,7 @@ import kotlin.math.exp
 import kotlin.math.ln
 
 /** Quantized CPU inference. Each decoder step reuses the preceding step's key and value tensors. */
-internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable {
+internal class TozTranslationModel(model: File) : AutoCloseable {
     private val environment = OrtEnvironment.getEnvironment()
     private val tokenizer = File(model, "tokenizer.model").inputStream().use(::TozTokenizer)
     private val encoder = open(File(model, "encoder_q8.onnx"))
@@ -25,6 +24,7 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
 
     private data class Beam(val tokens: IntArray, val score: Float, val parent: Int)
     private data class Candidate(val token: Int, val score: Float, val parent: Int)
+    private data class Finished(val tokens: IntArray, val score: Float)
 
     private fun open(file: File): OrtSession = OrtSession.SessionOptions().use { options ->
         options.setIntraOpNumThreads(2)
@@ -32,26 +32,27 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
         environment.createSession(file.absolutePath, options)
     }
 
-    override fun translate(text: String): String? {
+    fun candidates(text: String): List<String> {
         val source = tokenizer.encode(text)
-        if (source.isEmpty() || source.size > MAX_INPUT_TOKENS) return null
+        if (source.isEmpty() || source.size > MAX_INPUT_TOKENS) return emptyList()
         val ids = (listOf(tokenizer.turkish) + source + EOS).map(Int::toLong).toLongArray()
         return ints(ids, longArrayOf(1, ids.size.toLong())).use { input ->
             encoder.run(mapOf("src" to input)).use { cross ->
-                decode(cross, minOf(2 * source.size + 10, MAX_INPUT_TOKENS))
+                decode(cross, minOf(2 * source.size + 10, MAX_INPUT_TOKENS), source.size)
             }
         }
     }
 
-    private fun decode(cross: OrtSession.Result, steps: Int): String? {
+    private fun decode(cross: OrtSession.Result, steps: Int, sourceLength: Int): List<String> {
         val emptyShape = longArrayOf(6, 1, 8, 0, 64)
         return OnnxTensor.createTensor(environment, FloatBuffer.allocate(0), emptyShape).use { empty ->
             var previous: OrtSession.Result? = null
             try {
                 var beams = listOf(Beam(intArrayOf(BOS), 0f, 0))
-                var bestFinished: Beam? = null
-                var bestFinishedScore = Float.NEGATIVE_INFINITY
-                var finished = 0
+                val finished = mutableListOf<Finished>()
+                var preferred: Finished? = null
+                var firstEnd = steps
+                val extraSteps = (sourceLength / 3).coerceIn(4, 12)
                 for (step in 0 until steps) {
                     val current = advance(beams, step, previous, cross, empty)
                     previous?.close()
@@ -62,21 +63,23 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
                         val prefix = beams[candidate.parent].tokens
                         if (candidate.token == EOS) {
                             if (prefix.size == 1) continue
-                            val score = candidate.score / prefix.size
-                            if (score > bestFinishedScore) {
-                                bestFinishedScore = score
-                                bestFinished = Beam(prefix, candidate.score, candidate.parent)
-                            }
-                            finished++
+                            if (finished.isEmpty()) firstEnd = step
+                            finished.add(Finished(prefix, candidate.score / prefix.size))
                         } else if (next.size < BEAM_WIDTH) {
                             next.add(Beam(prefix + candidate.token, candidate.score, candidate.parent))
                         }
                     }
-                    if (next.isEmpty() || finished >= BEAM_WIDTH) break
+                    // Preserve the ordinary beam winner and also collect complete alternatives for validation.
+                    if (preferred == null && finished.size >= BEAM_WIDTH) preferred = finished.maxByOrNull(Finished::score)
+                    if (next.isEmpty() || finished.size >= BEAM_WIDTH && step >= firstEnd + extraSteps) break
                     beams = next
                 }
-                val output = (bestFinished ?: beams.first()).tokens
-                tokenizer.decode(output.copyOfRange(1, output.size)).takeIf(String::isNotBlank)
+                (listOfNotNull(preferred) + finished.sortedByDescending(Finished::score)).asSequence()
+                    .map { tokenizer.decode(it.tokens.copyOfRange(1, it.tokens.size)) }
+                    .filter(String::isNotBlank)
+                    .distinct()
+                    .take(MAX_CANDIDATES)
+                    .toList()
             } finally {
                 previous?.close()
             }
@@ -141,6 +144,7 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
 
     companion object {
         private const val BEAM_WIDTH = 4
+        private const val MAX_CANDIDATES = 6
         private const val BOS = 2
         private const val EOS = 3
         private const val MAX_INPUT_TOKENS = 254

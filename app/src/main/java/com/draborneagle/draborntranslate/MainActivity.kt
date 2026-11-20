@@ -695,7 +695,7 @@ class MainActivity : Activity() {
             val reader = SubtitleReader().also { demoReader = it }
             reader.read(exampleBitmap()) { lines ->
                 if (demoTranslator !== translator) return@read
-                val original = lines.orEmpty().joinToString(" ").trim()
+                val original = lines.orEmpty().joinToString("\n").trim()
                 if (original.isEmpty()) {
                     completeDemo("Örnek görseldeki yazı okunamadı.")
                     return@read
@@ -737,8 +737,8 @@ class MainActivity : Activity() {
             textAlign = Paint.Align.CENTER
             typeface = Typeface.DEFAULT_BOLD
         }
-        canvas.drawText("I told you to wait by the car.", 480f, 76f, paint)
-        canvas.drawText("Why are you still here?", 480f, 132f, paint)
+        canvas.drawText("Don't blow your cover.", 480f, 76f, paint)
+        canvas.drawText("Just act like you belong here.", 480f, 132f, paint)
         return bitmap
     }
 

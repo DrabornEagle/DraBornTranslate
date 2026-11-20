@@ -49,14 +49,14 @@ object SubtitleSegmenter {
     fun labelName(piece: Piece): String? =
         if (!piece.translate && piece.text.endsWith(": ")) piece.text.dropLast(2) else null
 
-    fun split(text: String): List<Piece> {
+    fun split(text: String, preserveSpeakers: Boolean = true): List<Piece> {
         val pieces = mutableListOf<Piece>()
         val block = StringBuilder()
         var pendingSeparator = ""
         fun flushBlock() {
             if (block.isEmpty()) return
             if (pendingSeparator.isNotEmpty()) pieces.add(Piece(pendingSeparator, false))
-            addBlock(pieces, block.toString())
+            addBlock(pieces, block.toString(), preserveSpeakers)
             block.clear()
             pendingSeparator = "\n"
         }
@@ -64,7 +64,9 @@ object SubtitleSegmenter {
             val line = raw.trim()
             if (line.isEmpty()) continue
             // Etiketli ya da tireli satır yeni bir konuşmadır; diğer satırlar sarmadır, birleştirilir.
-            if (speakerLabel(line) != null || dialogueDash.containsMatchIn(line)) flushBlock()
+            if ((preserveSpeakers && speakerLabel(line) != null) || dialogueDash.containsMatchIn(line) ||
+                closedCaption(line) || closedCaption(block)
+            ) flushBlock()
             if (block.isNotEmpty()) block.append(' ')
             block.append(line)
         }
@@ -72,7 +74,9 @@ object SubtitleSegmenter {
         return pieces
     }
 
-    private fun addBlock(pieces: MutableList<Piece>, original: String) {
+    private fun closedCaption(text: CharSequence): Boolean = text.startsWith('[') && text.endsWith(']')
+
+    private fun addBlock(pieces: MutableList<Piece>, original: String, preserveSpeakers: Boolean) {
         var block = whitespace.replace(original, " ")
         dialogueDash.find(block)?.let { dash ->
             pieces.add(Piece(dash.groups["dash"]!!.value + " ", false))
@@ -83,7 +87,7 @@ object SubtitleSegmenter {
             if (!first) pieces.add(Piece(" ", false))
             first = false
             var body = sentence
-            speakerLabel(body)?.let { label ->
+            if (preserveSpeakers) speakerLabel(body)?.let { label ->
                 pieces.add(Piece(label.groups["label"]!!.value + " ", false))
                 body = body.substring(label.value.length)
             }
@@ -131,7 +135,8 @@ object SubtitleSegmenter {
         fun flushWord() {
             if (word.isEmpty()) return
             val lower = word.toString().lowercase(Locale.ROOT)
-            val capital = startOfSentence || lower == "i" || lower in names
+            val stem = lower.substringBefore('\'').substringBefore('’')
+            val capital = startOfSentence || stem == "i" || stem in names
             output.append(if (capital) lower[0].uppercaseChar() + lower.substring(1) else lower)
             startOfSentence = false
             word.clear()

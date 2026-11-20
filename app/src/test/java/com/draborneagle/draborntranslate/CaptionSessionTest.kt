@@ -123,6 +123,32 @@ class CaptionSessionTest {
     }
 
     @Test
+    fun recognizesDifferentNumbersAndQuestionsAcrossSuccessiveSubtitles() {
+        val dialogue = CaptionSession(
+            translate = { input, answer -> requests.addLast(input to answer) },
+            show = { caption = it },
+            onFailure = {},
+            stabilizer = SubtitleStabilizer(clock = { now }, exactText = true),
+        )
+        for ((source, turkish) in listOf(
+            "Do we need 3 more cars?" to "3 araba daha gerekiyor mu?",
+            "Do we need 4 more cars?" to "4 araba daha gerekiyor mu?",
+            "We need 4 more cars." to "4 araba daha gerekiyor.",
+            "We need 4 more cars?" to "4 araba daha mı gerekiyor?",
+        )) {
+            dialogue.read(listOf(source))
+            assertEquals(0, requests.size)
+            now += 280
+            dialogue.read(listOf(source))
+            val (input, answer) = requests.removeFirst()
+            assertEquals(source, input.text)
+            answer(TranslationReply(turkish))
+            assertEquals(Caption(source, turkish), caption)
+            now += 280
+        }
+    }
+
+    @Test
     fun longDialogueUsesTwoLinesWithoutLosingWords() {
         val text = "Hadi buradan çıkalım. Polisler gelmeden köprüde buluşmamız gerek."
         val lines = formatDialogue(text).lines()

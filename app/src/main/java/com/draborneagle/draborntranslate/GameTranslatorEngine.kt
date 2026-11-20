@@ -17,8 +17,8 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
     private var model: TozTranslationModel? = null
     private val packs = ImportedGamePack.library(app)
     private val pipeline = GameTranslationPipeline(
-        packLookup = { text -> PackTranslation.match(packs, text) },
-        model = { text -> model?.translate(text) },
+        packLookup = { text -> PackTranslation.match(text, packs::findWithPack) },
+        candidates = { text -> model?.candidates(text).orEmpty() },
     )
     @Volatile private var closed = false
 

@@ -27,6 +27,7 @@ class SubtitleStabilizer(
     private val exactText: Boolean = false,
     private val acceptCompletedSentence: Boolean = true,
     private val minTextLength: Int = if (exactText) 2 else 3,
+    private val isGarbled: (String) -> Boolean = OcrNoise::looksGarbled,
 ) {
     companion object {
         /** Bölge bu kadar boş kalırsa altyazı kalkmış sayılır. */
@@ -62,7 +63,7 @@ class SubtitleStabilizer(
 
     fun feed(rawText: String): StabilizerAction {
         val time = clock()
-        val text = TextMatch.normalize(rawText)
+        val text = if (exactText) TextMatch.literal(rawText) else TextMatch.normalize(rawText)
         // 3 karakterden kısa okumalar (gürültü, tek simge) boş kare sayılır.
         if (text.length < minTextLength) {
             candidate = ""
@@ -84,7 +85,7 @@ class SubtitleStabilizer(
             candidateSince = time
         }
         // Noktalamayla biten satır tamamdır; beklemeden ilk karede gider. Çöp gibi okunan satır beklemeden gitmez.
-        val garbled = OcrNoise.looksGarbled(rawText)
+        val garbled = isGarbled(rawText)
         val ready = when {
             garbled -> candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
             exactText -> candidateCount >= stableFrames
@@ -111,12 +112,12 @@ class SubtitleStabilizer(
         leaveScreen(time)
         forgotten = ""
         sentRaw = rawText.trim()
-        sent = TextMatch.normalizeRows(sentRaw)
+        sent = if (exactText) text else TextMatch.normalizeRows(sentRaw)
         return StabilizerAction.translate(sentRaw)
     }
 
     private fun isSame(text: String, rows: String) = rows.isNotEmpty() &&
-        if (exactText) text == rows.replace('\n', ' ') else TextMatch.isSameSubtitle(text, rows)
+        if (exactText) text == rows else TextMatch.isSameSubtitle(text, rows)
 
     /** Ekrandaki satırı geçmişe yazar (kalktı ya da yerine başkası geldi). */
     private fun leaveScreen(time: Long) {

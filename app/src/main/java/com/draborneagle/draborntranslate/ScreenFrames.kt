@@ -100,7 +100,8 @@ internal class ScreenFrames(
     }
 
     private fun attachReader(width: Int, height: Int, session: MediaProjection) {
-        val scale = minOf(1f, 1600f / maxOf(width, height))
+        val captureWidth = if (settings.readingArea == ReadingArea.SUBTITLES) 1920f else 1600f
+        val scale = minOf(1f, captureWidth / maxOf(width, height))
         val scaledWidth = (width * scale).roundToInt().coerceAtLeast(2)
         val scaledHeight = (height * scale).roundToInt().coerceAtLeast(2)
         val previous = reader

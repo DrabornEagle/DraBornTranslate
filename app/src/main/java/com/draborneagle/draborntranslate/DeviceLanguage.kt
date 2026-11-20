@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import kotlin.math.abs
 
 internal interface CaptionTranslator : AutoCloseable {
     fun prepare(done: (Boolean) -> Unit) = done(true)
@@ -27,30 +26,16 @@ internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea
             val lines = task.result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
                 val box = line.boundingBox ?: return@mapNotNull null
                 if (line.text.count(Char::isLetter) < 2 || box.height() < 7) return@mapNotNull null
-                line.text.trim() to box
+                RecognizedLine(line.text.trim(), box.left, box.top, box.right, box.bottom, line.confidence)
             }
             if (readingArea == ReadingArea.GAME_TEXT) {
-                done(lines.sortedWith(compareBy({ it.second.top / 10 }, { it.second.left }))
-                    .map { it.first.take(100) }
+                done(lines.sortedWith(compareBy({ it.top / 10 }, { it.left }))
+                    .map { it.text }
                     .distinct()
                     .take(24))
                 return@addOnCompleteListener
             }
-            // Altyazı bölgesinde ortadaki satır grubuna öncelik ver.
-            val anchor = lines.minByOrNull { (_, box) ->
-                abs(box.exactCenterX() / width - 0.5f) + abs(box.exactCenterY() / height - 0.5f) * 0.35f
-            }
-            if (anchor == null) {
-                done(emptyList())
-                return@addOnCompleteListener
-            }
-            val center = anchor.second
-            val group = lines.filter { (_, box) ->
-                abs(box.exactCenterY() - center.exactCenterY()) <= center.height() * 2.1f &&
-                    abs(box.exactCenterX() - center.exactCenterX()) <= width * 0.32f &&
-                    box.height() in (center.height() * 0.5f).toInt()..(center.height() * 2f).toInt()
-            }.sortedWith(compareBy({ it.second.top }, { it.second.left }))
-            done(group.take(3).map { it.first })
+            done(selectSubtitleLines(lines, width, height))
         }
     }
 

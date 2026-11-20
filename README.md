@@ -2,13 +2,14 @@
 
 PlayStation Portal’da oyun oynarken PS5’in **Paylaşımlı Ekran** videosundaki İngilizce altyazıyı Android telefonda okur ve Türkçeye çevirir. Türkçe metni telefondaki yayının üzerine yazabilir, telefonun hoparlöründen okuyabilir veya deneysel bir web paneline verebilir.
 
-**[DraBornTranslate v0.3.3 APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.3.3/DraBornTranslate-v0.3.3-Android-arm64.apk)** · Android 10 ve üzeri, ARM64.
+**Android 10 ve üzeri, ARM64.** [Sürümler](https://github.com/DrabornEagle/DraBornTranslate/releases)
 
-## v0.3.3 çeviri
+## v0.3.4 çeviri
 
 - **Töz-Çevir-1** İngilizce–Türkçe modeli APK’ya dahildir. İlk açılışta telefonda hazırlanır. Çeviri için hesap, API anahtarı, abonelik veya ek model indirmesi gerekmez.
-- Oyun altyazısı cümle cümle çevrilir. Ekrana sığdığı için iki satıra bölünen bir cümle birleştirilir. Konuşmacı adları ve diyalog işaretleri korunur. Oyun terimleri ve yaygın deyimler, kelimesi kelimesine hataları azaltmak için ele alınır.
-- **Oyun paketi ekle** ile GameTranslator biçimindeki `.json` veya `.json.gz` paketini seçebilirsin. Eşleşen satırda paketin Türkçesi kullanılır. Oyun paketi isteğe bağlıdır.
+- Altyazı bölgesinde art arda gelen, aynı okunan kareler doğrulanır. Alt satıra kayan cümleler birleştirilir. Noktalama ve sayılar değiştiğinde yeni çeviri yapılır.
+- Oyun deyimleri, Türkçe menü etiketleri ve yer adları çeviride dikkate alınır. Modelin tamamladığı seçenekler içinden kaynakta görülen sayıları ve tanınan özel adları koruyan sonuç kullanılır.
+- **Oyun paketi ekle** ile GameTranslator biçimindeki `.json` veya `.json.gz` paketini seçebilirsin. Kaynak cümle pakette eşleşirse paketin Türkçesi kullanılır. Oyun paketi isteğe bağlıdır.
 - **Örnek altyazıyı çevir** ile PS5 bağlantısı kurmadan iki cümleli bir görselde metin tanımayı ve çeviriyi dene. Sonucun altında okunan İngilizceyi görürsün. **İngilizceyi Google Çeviri’de aç** seçeneği, seçtiğin metni Google Çeviri sayfasında açar.
 
 Canlı çeviri telefonda tamamlanır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.

@@ -10,6 +10,14 @@ import kotlin.math.min
  * Windows'taki GameTranslator.Core/TextMatch.cs ile aynı kurallar.
  */
 object TextMatch {
+    private val spaces = Regex("[\\s\\p{Z}]+")
+
+    /** Whitespace and typographic apostrophes can vary between frames. Words, numbers and punctuation matter. */
+    fun literal(text: String): String =
+        spaces.replace(text.replace('’', '\''), " ")
+            .replace("...", "…")
+            .trim()
+
     /** Küçük harf, yalnız harf/rakam, tek boşluk. */
     fun normalize(s: String): String {
         val builder = StringBuilder(s.length)

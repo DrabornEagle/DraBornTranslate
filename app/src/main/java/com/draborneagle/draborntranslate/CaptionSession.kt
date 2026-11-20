@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
-import com.gametranslator.gametranslator_mobile.core.OcrNoise
-import com.gametranslator.gametranslator_mobile.core.SpeakerPrefix
 import com.gametranslator.gametranslator_mobile.core.StabilizerKind
 import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import com.gametranslator.gametranslator_mobile.core.TextMatch
@@ -17,9 +15,10 @@ internal class CaptionSession(
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
     private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(
         stableFrames = if (readingArea == ReadingArea.GAME_TEXT) 1 else 2,
-        exactText = readingArea == ReadingArea.GAME_TEXT,
+        exactText = true,
         acceptCompletedSentence = false,
         minTextLength = 2,
+        isGarbled = ::looksDamaged,
     ),
 ) {
     private data class Request(
@@ -39,12 +38,9 @@ internal class CaptionSession(
 
     fun read(lines: List<String>) {
         if (closed) return
-        val clean = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(lines) else lines.map { line ->
-            val (prefix, body) = SpeakerPrefix.split(line)
-            val cleaned = OcrNoise.clean(body)
-            if (cleaned.isBlank()) "" else prefix + cleaned
-        }
-        val text = clean.filter(String::isNotBlank).joinToString("\n")
+        val clean = lines.map(::cleanOcrLine).filter(String::isNotBlank)
+        val accepted = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(clean) else clean
+        val text = accepted.joinToString("\n")
         val action = stabilizer.feed(text)
         when (action.kind) {
             StabilizerKind.NONE -> Unit
@@ -77,7 +73,7 @@ internal class CaptionSession(
     }
 
     private fun steadyGameText(lines: List<String>): List<String> {
-        val current = lines.associateBy(TextMatch::normalize).filterKeys { it.length >= 2 }
+        val current = lines.associateBy(TextMatch::literal).filterKeys { it.length >= 2 }
         val steady = current.filterKeys(previousGameLines::contains).values.take(6)
         previousGameLines = current.keys
         return steady
@@ -115,8 +111,7 @@ internal class CaptionSession(
 
     private fun deliver(source: String, reply: TranslationReply) {
         val turkish = reply.text?.trim() ?: return
-        val changed = if (readingArea == ReadingArea.GAME_TEXT) TextMatch.normalize(source) != TextMatch.normalize(turkish)
-        else stabilizer.shouldSend(source, turkish)
+        val changed = !TextMatch.literal(source).equals(TextMatch.literal(turkish), ignoreCase = true)
         val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(turkish) else turkish
         if (changed) show(Caption(source, displayed))
         else show(null)

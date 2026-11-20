@@ -2,41 +2,58 @@
 package com.draborneagle.draborntranslate
 
 import com.gametranslator.gametranslator_mobile.core.Glossary
-import com.gametranslator.gametranslator_mobile.core.GlossaryTranslator
-import com.gametranslator.gametranslator_mobile.core.PackKey
 import com.gametranslator.gametranslator_mobile.core.PackMatch
 import com.gametranslator.gametranslator_mobile.core.SubtitleSegmenter
-import com.gametranslator.gametranslator_mobile.core.TextTranslator
+import com.gametranslator.gametranslator_mobile.core.TermProtector
+import com.gametranslator.gametranslator_mobile.core.TextMatch
 import java.util.Locale
 
 internal data class TranslationInput(val text: String, val readingArea: ReadingArea = ReadingArea.SUBTITLES)
 internal data class TranslationReply(val text: String? = null, val issue: String? = null)
 
-/** Gives the sentence-level model complete sentences and keeps menu lines and speaker turns separate. */
+/** Translates complete dialogue sentences or independently recognized menu labels on the device. */
 internal class GameTranslationPipeline(
     private val packLookup: (String) -> PackMatch?,
-    model: TextTranslator,
+    private val candidates: (String) -> List<String>,
 ) {
-    private val withTerms = GlossaryTranslator(GAME_TERMS, model)
-
     fun translate(input: TranslationInput): TranslationReply {
-        val text = input.text.trim()
-        if (text.isEmpty()) return TranslationReply()
-        val isSubtitles = input.readingArea == ReadingArea.SUBTITLES
-        if (isSubtitles) findPack(text)?.let { return TranslationReply(it) }
-        val lines = if (isSubtitles) listOf(text) else text.lines()
-        val rendered = lines.mapNotNull { line ->
-            (if (isSubtitles) null else findPack(line)) ?: translateLine(line)
+        val lines = input.text.lines().map(::cleanOcrLine).filter(String::isNotBlank)
+        if (lines.isEmpty()) return TranslationReply()
+        val area = input.readingArea
+        val rendered = if (area == ReadingArea.SUBTITLES) {
+            translateText(lines.joinToString("\n"), area)
+        } else {
+            lines.mapNotNull { translateMenuLine(it) }.joinToString("\n")
         }
-        return TranslationReply(rendered.joinToString("\n").takeIf(String::isNotBlank))
+        return TranslationReply(rendered?.takeIf(String::isNotBlank))
     }
 
-    private fun findPack(text: String): String? =
-        runCatching { packLookup(text)?.text?.trim()?.takeIf(String::isNotEmpty) }.getOrNull()
+    private fun translateMenuLine(line: String): String? {
+        findPack(line)?.let { return it }
+        val colon = line.indexOf(':')
+        if (colon > 0) {
+            val header = GamePhrases.direct(line.substring(0, colon), ReadingArea.GAME_TEXT)
+            if (header != null) {
+                val detail = line.substring(colon + 1).trim()
+                return when {
+                    detail.isEmpty() -> "$header:"
+                    detail.none(Char::isLetter) -> "$header: $detail"
+                    else -> translateText(detail, ReadingArea.GAME_TEXT)?.let { "$header: $it" }
+                }
+            }
+        }
+        return translateText(line, ReadingArea.GAME_TEXT, lookupWholeText = false)
+    }
 
-    private fun translateLine(text: String): String? {
-        val pieces = SubtitleSegmenter.split(text)
+    private fun translateText(text: String, area: ReadingArea, lookupWholeText: Boolean = true): String? {
+        if (lookupWholeText) findPack(text)?.let { return it }
+        val pieces = SubtitleSegmenter.split(text, preserveSpeakers = area == ReadingArea.SUBTITLES)
         if (pieces.none { it.translate }) return null
+        val names = pieces.mapNotNull(SubtitleSegmenter::labelName).map { label ->
+            label.split(' ').joinToString(" ") { word ->
+                word.lowercase(Locale.ROOT).replaceFirstChar(Char::uppercaseChar)
+            }
+        } + knownNames
         return buildString {
             for (piece in pieces) {
                 if (!piece.translate) {
@@ -44,114 +61,108 @@ internal class GameTranslationPipeline(
                     continue
                 }
                 val source = piece.text
-                val direct = PackKey.key(source)?.let(commonLines::get)
-                val translation = findPack(source) ?: direct ?: translateSentence(source)
-                if (translation.isNullOrBlank()) return null
+                val translation = findPack(source) ?: GamePhrases.direct(source, area)
+                    ?: translateSentence(source, area, names)
+                    ?: return null
                 append(translation)
             }
         }.trim().takeIf(String::isNotEmpty)
     }
 
-    private fun translateSentence(source: String): String? {
-        val sentence = SubtitleSegmenter.normalizeCase(source, knownNames).replace('’', '\'')
-        val input = idioms.fold(sentence) { text, (phrase, replacement) ->
-            phrase.replace(text) { match ->
-                replacement(match).replaceFirstChar { if (match.value[0].isUpperCase()) it.uppercaseChar() else it }
-            }
+    private fun findPack(source: String): String? {
+        val text = runCatching { packLookup(source)?.text?.trim()?.takeIf(String::isNotEmpty) }.getOrNull() ?: return null
+        // The pack key ignores punctuation. A statement can share its key with an incredulous question.
+        if (ending(source)?.startsWith('?') == true && ending(text)?.startsWith('?') != true) return null
+        return text.takeIf { preservesNumbers(source, it) }
+    }
+
+    private fun translateSentence(source: String, area: ReadingArea, names: List<String>): String? {
+        if (looksDamaged(source)) return null
+        val sound = source.startsWith('[') && source.endsWith(']')
+        val body = if (sound) source.substring(1, source.length - 1) else source
+        val ids = gameId.findAll(body).map(MatchResult::value).toList()
+        val namesInSource = Glossary.of(emptyMap(), names + ids).find(body).map { it.turkish }.distinct()
+        val wordsToKeep = namesInSource.flatMap { it.lowercase(Locale.ROOT).split(' ') }.toSet()
+        val preserved = Glossary.of(emptyMap(), namesInSource)
+        val normalized = SubtitleSegmenter.normalizeCase(body, wordsToKeep)
+        val rewritten = GamePhrases.forModel(normalized, area)
+
+        fun choose(options: List<String>): String? = options.firstNotNullOfOrNull { suggestion ->
+            val candidate = simplifyRepetition(body, suggestion.trim())
+            if (candidate.isBlank() || '\uFFFD' in candidate || looksDamaged(candidate) ||
+                !preservesNumbers(body, candidate) || preserved.find(candidate).map { it.turkish }.toSet().size != namesInSource.size ||
+                looksUntranslated(body, candidate)
+            ) null else candidate
         }
-        val translated = withTerms.translate(input)?.trim()?.takeIf(String::isNotEmpty) ?: return null
-        val sentences = SubtitleSegmenter.split(translated).filter { it.translate }.map { it.text }
-        val filtered = sentences.distinctBy { PackKey.key(it) }
-        val natural = if (filtered.size < sentences.size) filtered.joinToString(" ") else translated
-        return when (val end = source.trimEnd('"', '”').lastOrNull()) {
-            '?', '!' -> natural.trimEnd('.', '?', '!') + end
-            else -> natural
-        }
+
+        val withTerms = if (area == ReadingArea.SUBTITLES) choose(protectedCandidates(rewritten, dialogueTerms)) else null
+        val selected = withTerms ?: choose(candidates(rewritten))
+            ?: choose(protectedCandidates(rewritten, preserved))
+            ?: (if (rewritten != normalized) choose(candidates(normalized)) else null)
+            ?: return null
+        val restored = restoreEnding(body, selected)
+        return if (sound) "[${restored.trim('[', ']')}]" else restored
+    }
+
+    private fun protectedCandidates(text: String, glossary: Glossary): List<String> {
+        val protector = TermProtector(glossary, text)
+        val (protected, slots) = protector.protect(text)
+        if (slots.isEmpty()) return emptyList()
+        return candidates(protected).mapNotNull { TermProtector.restore(it, slots, protector.allSlots) }
     }
 }
 
 private val places = listOf("Vice City", "Leonida", "Los Santos", "Liberty City", "San Andreas")
-private val knownNames = places.flatMap { it.lowercase(Locale.ROOT).split(' ') }.toSet()
-private val GAME_TERMS = Glossary.of(
+private val knownNames = places + listOf(
+    "Lucia", "Jason", "Franklin", "Michael", "Trevor", "Lamar", "Kratos", "Atreus", "Mimir",
+)
+private val dialogueTerms = Glossary.of(
     terms = mapOf(
-        "wanted level" to "aranma seviyesi",
-        "side mission" to "yan görev",
         "safe house" to "sığınak",
-        "save point" to "kayıt noktası",
-        "fast travel" to "hızlı seyahat",
-        "health bar" to "can çubuğu",
+        "wanted level" to "aranma seviyesi",
+        "glove compartment" to "torpido gözü",
     ),
     keep = places,
 )
 
-private val commonLines = mapOf(
-    "Lose the cops!" to "Polisleri atlat!",
-    "We are being tailed." to "Takip ediliyoruz.",
-    "We're being tailed." to "Takip ediliyoruz.",
-    "They're on our tail." to "Peşimizdeler.",
-    "Take cover!" to "Siper al!",
-    "Get in the car!" to "Arabaya bin!",
-    "Stay out of sight." to "Görünmeden ilerle.",
-    "Hold your fire!" to "Ateş etme!",
-    "Keep your head down." to "Başını kaldırma.",
-    "Let's get out of here." to "Hadi buradan çıkalım.",
-    "Meet me at the bridge." to "Köprüde buluşalım.",
-    "I'll cover you." to "Seni korurum.",
-    "I should've seen it coming." to "Bunu tahmin etmeliydim.",
-    "I should have seen it coming." to "Bunu tahmin etmeliydim.",
-    "You set me up." to "Bana tuzak kurdun.",
-    "I owe you one." to "Sana bir iyilik borçluyum.",
-    "You made it." to "Başardın.",
-    "Get down!" to "Yere yat!",
-    "Run the plates." to "Plakayı sorgula.",
-    "Go around the back." to "Arkadan dolaş.",
-    "We're not out of the woods yet." to "Tehlike henüz geçmedi.",
-    "Don't make me regret it." to "Beni pişman etme.",
-    "The coast is clear." to "Ortalık temiz.",
-    "Make a run for it." to "Koş, kaç!",
-    "Got it." to "Anladım.",
-    "I got this." to "Ben hallederim.",
-    "Something's off." to "Bir terslik var.",
-    "I don't buy it." to "Buna inanmıyorum.",
-    "Keep still." to "Kıpırdama.",
-    "Yeah." to "Evet.",
-    "No." to "Hayır.",
-    "Okay." to "Tamam.",
-    "Thanks." to "Sağ ol.",
-    "Come on!" to "Hadi!",
-    "Go!" to "Git!",
-    "Wait!" to "Bekle!",
-    "Look out!" to "Dikkat et!",
-    "Move!" to "Çabuk!",
-    "Continue" to "Devam et",
-    "Settings" to "Ayarlar",
-    "Resume" to "Oyuna dön",
-    "New game" to "Yeni oyun",
-    "Load game" to "Oyun yükle",
-    "Tracked missions" to "Takip edilen görevler",
-    "Game saved" to "Oyun kaydedildi",
-).mapKeys { (source, _) -> checkNotNull(PackKey.key(source)) }
+private val number = Regex("\\d+(?:[.,:/]\\d+)*")
+private val thousands = Regex("\\d{1,3}(?:[.,]\\d{3})+")
+private val bareNumbers = Regex("[.,]")
+private val endMark = Regex("""([?!…]+)(["”'’»\)\]]*)$""")
+private val endClosers = setOf('"', '”', '\'', '’', '»', ')', ']')
+private val englishFunctionWords = Regex("""\b(?:the|you|your|we|they|is|are|was|were|have|will|with|must|could|don't|can't)\b""", RegexOption.IGNORE_CASE)
 
-private fun idiom(phrase: String, replacement: String): Pair<Regex, (MatchResult) -> String> =
-    Regex("""\b$phrase\b""", RegexOption.IGNORE_CASE) to { replacement }
+private fun numberCounts(text: String): Map<String, Int> = number.findAll(text).map {
+    val value = it.value
+    if (thousands.matches(value)) bareNumbers.replace(value, "") else value.replace(',', '.')
+}.groupingBy { it }.eachCount()
 
-private val idioms = listOf(
-    idiom("lay low", "stay hidden"),
-    idiom("until the heat dies down", "until things calm down"),
-    idiom("pull over", "stop by the side of the road"),
-    idiom("county line", "county boundary"),
-    idiom("lose the cops", "escape from the police"),
-    idiom("getaway car", "escape vehicle"),
-    idiom("ditch the car", "leave the car behind"),
-    idiom("leave me hanging", "abandon me"),
-    idiom("quit messing around", "stop playing around"),
-    idiom("keep your eyes on the road", "watch the road"),
-    idiom("keep an eye on", "watch"),
-    idiom("we've got to move", "we have to leave now"),
-    idiom("i thought you said(?: that)?(?= the | he | she | you | we | it | they | this | i )", "I thought you told me that"),
-    idiom("wait by the car", "wait next to the car"),
-    idiom("out of the woods yet", "safe yet"),
-    Regex("""\b(is|was|are|were) unlocked\b""", RegexOption.IGNORE_CASE) to { match: MatchResult ->
-        match.groupValues[1] + " not locked"
-    },
-)
+private fun preservesNumbers(source: String, candidate: String): Boolean {
+    val numbers = numberCounts(source)
+    if (numbers.isEmpty()) return true
+    val translated = numberCounts(candidate)
+    return numbers.all { (value, count) -> (translated[value] ?: 0) >= count }
+}
+
+private fun ending(text: String): String? = endMark.find(text.trimEnd())?.groupValues?.get(1)
+
+private fun restoreEnding(source: String, translated: String): String {
+    val end = ending(source) ?: return translated
+    val closing = translated.takeLastWhile { it in endClosers }
+    return translated.dropLast(closing.length).trimEnd('.', '?', '!', '…') + end + closing
+}
+
+private fun looksUntranslated(source: String, output: String): Boolean =
+    englishFunctionWords.containsMatchIn(source) && TextMatch.normalize(source) == TextMatch.normalize(output)
+
+private fun simplifyRepetition(source: String, output: String): String {
+    val sourceWords = TextMatch.normalize(source).split(' ')
+    val repeatedSource = sourceWords.size >= 2 && sourceWords.windowed(2).distinct().size < sourceWords.size - 1
+    if (repeatedSource) return output
+    val sentences = SubtitleSegmenter.split(output, preserveSpeakers = false).filter { it.translate }.map { it.text }
+    if (sentences.size < 2) return output
+    val distinct = sentences.filterIndexed { index, sentence ->
+        index == 0 || TextMatch.normalize(sentence) != TextMatch.normalize(sentences[index - 1])
+    }
+    return if (distinct.size < sentences.size) distinct.joinToString(" ") else output
+}
