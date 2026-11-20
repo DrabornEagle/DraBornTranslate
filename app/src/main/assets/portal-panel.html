@@ -19,8 +19,6 @@
     font-weight: bold; font-size: {{caption-size}}px; line-height: 1.25;
     color: #fff; background: #06080d; padding: 10px 8px; border-radius: 7px;
     text-shadow: 0 1px 3px #000; }
-  #attribution { width: 154px; max-width: 100%; height: auto; margin-top: 12px;
-    padding: 3px; background: #fff; border-radius: 3px; }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -30,7 +28,6 @@
   <p id="status" role="status">Altyazı bağlantısı açılıyor…</p>
   <div class="subtitle">
     <p id="caption" aria-live="polite" hidden></p>
-    <img id="attribution" src="translate.png" alt="Powered by Google Translate" hidden>
   </div>
 </main>
 <script>
@@ -38,14 +35,12 @@
   var title = document.getElementById("title");
   var status = document.getElementById("status");
   var caption = document.getElementById("caption");
-  var attribution = document.getElementById("attribution");
 
-  function display(text, connected, testing, googleAttribution) {
+  function display(text, connected, testing) {
     title.textContent = testing ? "Portal bağlantı testi" : "DraBornTranslate";
     title.hidden = !!text && !testing;
     if (caption.textContent !== text) caption.textContent = text;
     caption.hidden = !text;
-    attribution.hidden = !text || !googleAttribution;
     status.hidden = !!text;
     status.textContent = connected ? "Panel açık. Oyun altyazısı bekleniyor." :
       "Bağlantı kesildi. Telefonda canlı altyazı oturumunu kontrol et.";
@@ -58,8 +53,7 @@
       if (completed) return;
       completed = true;
       var testing = ok && request.getResponseHeader("X-DraBorn-Panel") === "test";
-      var googleAttribution = ok && request.getResponseHeader("X-DraBorn-Translation") === "google";
-      display(ok ? request.responseText : "", ok, testing, googleAttribution);
+      display(ok ? request.responseText : "", ok, testing);
       window.setTimeout(poll, ok ? 500 : 1200);
     }
 

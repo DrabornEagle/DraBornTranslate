@@ -27,7 +27,7 @@ object SubtitleSegmenter {
         "listen", "look", "wait", "okay", "ok", "well", "so", "yes", "no", "now", "then", "and", "but",
     )
 
-    private val dialogueDash = Regex("^(?<dash>[-–—]+)\\s*")
+    private val dialogueDash = Regex("^(?<dash>[-–—]+|>{1,3})\\s*")
     // Cümle sonu: . ! ? … ardından isteğe bağlı kapanış tırnağı/parantez ve boşluk. Java'nın geriye bakışı sınırlı uzunluk
     // ister; sonlandırıcıdan sonraki kapanışlar için 10 karakter yeter (.NET'teki [.!?…]+[…]* ile aynı sonuç).
     private val sentenceGap = Regex("(?<=[.!?…][\"'”’)\\]]{0,10})\\s+")

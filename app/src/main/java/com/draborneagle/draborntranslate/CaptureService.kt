@@ -80,14 +80,12 @@ class CaptureService : Service() {
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
                 ?: ReadingArea.SUBTITLES,
-            TranslationEngine.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_ENGINE) }
-                ?: TranslationEngine.AUTO,
         )
         if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
             finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
             return START_NOT_STICKY
         }
-        val language = GameTranslatorEngine(this, config.engine)
+        val language = GameTranslatorEngine(this)
         translator = language
         if (!config.showOnPortal) closePanel()
         val panelIssue = if (config.showOnPortal) ensurePanel(config.textSize) else null
@@ -101,7 +99,7 @@ class CaptureService : Service() {
         readingArea = config.readingArea
         SessionState.update(SessionState.State(
             active = true,
-            status = "GameTranslator hazırlanıyor…",
+            status = "Telefondaki Türkçe çeviri modeli hazırlanıyor…",
             portalPanel = panel?.let {
                 SessionState.PortalPanel(it.url, opened = previousPanel?.opened == true && previousPanel.url == it.url)
             },
@@ -135,7 +133,7 @@ class CaptureService : Service() {
             main.removeCallbacks(modelTimeout)
             if (ended) return@prepare
             if (!ok) {
-                finish("Türkçe çeviri modeli indirilemedi. İnterneti kontrol edip yeniden başlat.")
+                finish("Türkçe çeviri modeli açılamadı. Telefonda boş yer kontrolü yapıp oturumu yeniden başlat.")
                 return@prepare
             }
             modelReady = true
@@ -229,16 +227,15 @@ class CaptureService : Service() {
     }
 
     private fun publishCaption(caption: Caption?) {
-        panel?.publish(caption?.turkish, googleAttribution = caption?.googleAttribution == true)
+        panel?.publish(caption?.turkish)
     }
 
     private fun openPanel(textSize: Int): PortalPanelServer {
         val address = portalLanAddress(this)
-            ?: throw IOException("Telefonu PS5 ile aynı yerel Wi-Fi ağına bağlayıp yeniden dene.")
+            ?: throw IOException("Telefonu evdeki Wi-Fi ağına bağlayıp yeniden dene.")
         val page = assets.open("portal-panel.html").bufferedReader(Charsets.UTF_8).use { it.readText() }
-        val badge = resources.openRawResource(R.raw.google_translate_attribution).use { it.readBytes() }
         return try {
-            PortalPanelServer(address, page, badge, textSize) {
+            PortalPanelServer(address, page, textSize) {
                 main.post {
                     val state = SessionState.current
                     val currentPanel = state.portalPanel
@@ -352,7 +349,7 @@ class CaptureService : Service() {
     }
 
     private val modelTimeout = Runnable {
-        finish("Dil modeli hazırlanamadı. İnternet bağlantısını kontrol edip tekrar dene.")
+        finish("Çeviri modeli çok geç açıldı. Oturumu yeniden başlat.")
     }
 
     private val panelTestTimeout = Runnable {
@@ -447,7 +444,6 @@ class CaptureService : Service() {
         private const val EXTRA_MOBILE = "mobile"
         private const val EXTRA_DISPLAY = "display"
         private const val EXTRA_READING_AREA = "readingArea"
-        private const val EXTRA_ENGINE = "engine"
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
@@ -458,7 +454,6 @@ class CaptureService : Service() {
                 putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
                 putExtra(EXTRA_DISPLAY, config.display.name)
                 putExtra(EXTRA_READING_AREA, config.readingArea.name)
-                putExtra(EXTRA_ENGINE, config.engine.name)
             })
         }
 

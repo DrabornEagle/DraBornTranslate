@@ -65,7 +65,6 @@ class MainActivity : Activity() {
     private lateinit var startStop: Button
     private lateinit var displayChoice: Button
     private lateinit var readingChoice: Button
-    private lateinit var engineChoice: Button
     private lateinit var packButton: Button
     private lateinit var panelCard: LinearLayout
     private lateinit var panelStatus: TextView
@@ -77,7 +76,7 @@ class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var captionLabel: TextView
     private lateinit var sourceLabel: TextView
-    private lateinit var attribution: View
+    private lateinit var googleTranslate: Button
     private lateinit var bandPreview: BandPreview
     private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
@@ -98,8 +97,6 @@ class MainActivity : Activity() {
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
                 ?: ReadingArea.SUBTITLES,
-            TranslationEngine.entries.firstOrNull { it.name == prefs.getString("engine", null) }
-                ?: TranslationEngine.AUTO,
         )
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
@@ -175,8 +172,6 @@ class MainActivity : Activity() {
         content.append(displayChoice, 14)
         readingChoice = button("") { selectReadingArea() }
         content.append(readingChoice, 6)
-        engineChoice = button("") { selectEngine() }
-        content.append(engineChoice, 6)
         packButton = button("") { showPackMenu() }
         content.append(packButton, 6)
 
@@ -218,8 +213,18 @@ class MainActivity : Activity() {
         live.append(captionLabel, 9)
         sourceLabel = label("", 14, MUTED)
         live.append(sourceLabel, 4)
-        attribution = translationAttribution(this)
-        live.addView(attribution, LinearLayout.LayoutParams(dp(152), dp(19)).apply { topMargin = dp(8) })
+        googleTranslate = button("İngilizceyi Google Çeviri’de aç") {
+            (SessionState.current.caption ?: demoCaption)?.let { caption ->
+                val uri = Uri.parse("https://translate.google.com/").buildUpon()
+                    .appendQueryParameter("sl", "en")
+                    .appendQueryParameter("tl", "tr")
+                    .appendQueryParameter("text", caption.source)
+                    .appendQueryParameter("op", "translate")
+                    .build()
+                openLink(uri.toString())
+            }
+        }
+        live.append(googleTranslate, 8)
 
         val settings = card()
         content.append(settings, 18)
@@ -282,8 +287,6 @@ class MainActivity : Activity() {
         displayChoice.text = "Altyazı ekranı · ${config.display.label}"
         readingChoice.isEnabled = controlsAvailable
         readingChoice.text = "Çevrilecek alan · ${config.readingArea.label}"
-        engineChoice.isEnabled = controlsAvailable && demoTranslator == null
-        engineChoice.text = "Çeviri motoru · ${config.engine.label}"
         packButton.isEnabled = controlsAvailable && demoTranslator == null
         packButton.text = when {
             packLoading -> "Oyun paketi yükleniyor…"
@@ -306,7 +309,7 @@ class MainActivity : Activity() {
         listOf(captionLabel, sourceLabel).forEach {
             it.visibility = if (caption == null) View.GONE else View.VISIBLE
         }
-        attribution.visibility = if (caption?.googleAttribution == true) View.VISIBLE else View.GONE
+        googleTranslate.visibility = if (caption == null) View.GONE else View.VISIBLE
     }
 
     private fun select(value: Source) {
@@ -352,26 +355,6 @@ class MainActivity : Activity() {
         voicePreview = TurkishVoice(this) { issue ->
             Toast.makeText(this, issue, Toast.LENGTH_LONG).show()
         }.also { it.speak("Bu bir Türkçe altyazı ses testidir.") }
-    }
-
-    private fun selectEngine() {
-        val engines = TranslationEngine.entries
-        AlertDialog.Builder(this)
-            .setTitle("Çeviri motoru")
-            .setSingleChoiceItems(engines.map { it.label }.toTypedArray(), engines.indexOf(config.engine)) { dialog, index ->
-                dialog.dismiss()
-                useEngine(engines[index])
-            }
-            .setNegativeButton("Kapat", null)
-            .show()
-    }
-
-    private fun useEngine(engine: TranslationEngine) {
-        config = config.copy(engine = engine)
-        prefs.edit().putString("engine", engine.name).apply()
-        demoMessage = null
-        demoCaption = null
-        render()
     }
 
     private fun showPackMenu() {
@@ -446,7 +429,7 @@ class MainActivity : Activity() {
         copyPanel.visibility = if (panel == null) View.GONE else View.VISIBLE
         testPanel.visibility = copyPanel.visibility
         tunnelWizard.visibility = copyPanel.visibility
-        tunnelWizard.isEnabled = panel?.testing == false && !pending
+        tunnelWizard.isEnabled = panel != null && !pending
         previewPanel.visibility = if (state.active && panel != null && !panel.testing) View.VISIBLE else View.GONE
         previewPanel.text = if (panel?.previewing == true) "Canlı çeviriye dön" else "Portal’da örnek yazı göster"
         launchPanelTest.visibility = if (state.active) View.GONE else View.VISIBLE
@@ -456,10 +439,10 @@ class MainActivity : Activity() {
             panel?.previewing == true -> "Örnek yazı 3 dakika gösterilir. Portal’da oyuna dönüp yazının değiştiğini kontrol et."
             panel?.testing == true && panel.opened -> "Test paneli açıldı. Oyuna dönüp metnin Portal ekranında değiştiğini kontrol et."
             panel?.testing == true -> "Test bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
-            panel?.opened == true -> "Panel bir tarayıcıda açıldı. Portal’da Yana Sabitle görünüyorsa seç."
+            panel?.opened == true -> "Bir tarayıcı altyazıyı alıyor. Portal’da Yana Sabitle görünüyorsa seç."
             panel != null -> "PS5 evdeki ağdaysa yerel bağlantıyı kullan. PS5 uzaktaysa dış bağlantıyı hazırla."
             state.active -> "Portal bağlantısı hazırlanıyor…"
-            else -> "Uzak PS5 için önce canlı altyazıyı başlat. Aynı ağdaki PS5 için Portal bağlantısını test et."
+            else -> "Örnek yazıyla bağlantıyı test et veya canlı altyazıyı başlat. PS5 uzaktaysa dış bağlantıyı hazırla."
         }
     }
 
@@ -494,7 +477,6 @@ class MainActivity : Activity() {
 
     private fun showTunnelWizard() {
         val panel = SessionState.current.portalPanel ?: return
-        if (panel.testing) return
         val fields = column().apply { setPadding(dp(20), dp(8), dp(20), dp(12)) }
         val scroll = ScrollView(this).apply { addView(fields) }
         fields.addView(label("1. Komutu Termux’a yapıştır ve çalıştır. Termux açık kalsın.", 15, WHITE))
@@ -569,7 +551,7 @@ class MainActivity : Activity() {
                             "Dış bağlantı hazır. Tam bağlantıyı kopyalayıp Portal’da aç."
                         } else "Bu adres DraBornTranslate panelini göstermiyor. Termux’taki güncel adresi kontrol et."
                         404 -> "Panel bulunamadı. Güncel Termux komutunu çalıştırıp yeni adresi yapıştır."
-                        502, 503, 504, 530 -> "Tünel panele ulaşamadı ($code). Canlı altyazıyı ve Termux oturumunu kontrol et."
+                        502, 503, 504, 530 -> "Tünel panele ulaşamadı ($code). DraBornTranslate’te panelin açık olduğunu ve Termux’u kontrol et."
                         else -> "Cloudflare HTTP $code döndürdü. Termux’taki güncel adresi kontrol et."
                     }
                 } finally {
@@ -586,11 +568,11 @@ class MainActivity : Activity() {
         AlertDialog.Builder(this)
             .setTitle("Portal yan paneli")
             .setMessage(
-                "1. Telefonu ve PS5’i aynı yerel ağa bağla. Portal bağlantı testini başlat.\n\n" +
+                "1. Portal bağlantı testini başlat. PS5 uzaktaysa PS5 uzakta · Bağlantıyı hazırla ile HTTPS adresi al.\n\n" +
                     "2. Panel bağlantısını kopyala ve PlayStation App’te kendi PS5 hesabına Game Base mesajıyla gönder.\n\n" +
                     "3. Portal’da PS düğmesine basıp Game Base mesajındaki bağlantıyı aç. Options menüsünde Yana Sabitle görünüyorsa seçip oyuna dön. Test metninin ekranda değiştiğini kontrol et.\n\n" +
                     "4. Test açıkken PlayStation App’te Paylaşımlı Ekran yayınına dön ve DraBornTranslate’te canlı altyazıyı başlat. Panel bağlantın korunur.\n\n" +
-                    "PS5 uzaktaysa canlı altyazıyı başlatıp PS5 uzakta · Bağlantıyı hazırla düğmesini kullan.\n\n" +
+                    "Kısa test sona ererse canlı altyazıyı başlat ve bağlantıyı yeniden hazırla.\n\n" +
                     "Yana Sabitle görünmezse bu Portal oturumunda sayfayı oyunun yanında açık tutamazsın.",
             )
             .setPositiveButton("Tamam", null)
@@ -697,15 +679,15 @@ class MainActivity : Activity() {
     }
 
     private fun runDemo() {
-        val translator = GameTranslatorEngine(this, config.engine)
+        val translator = GameTranslatorEngine(this)
         demoTranslator = translator
-        demoMessage = "Çeviri motoru hazırlanıyor…"
+        demoMessage = "Telefondaki çeviri modeli hazırlanıyor…"
         demoCaption = null
         render()
         translator.prepare { ready ->
             if (demoTranslator !== translator) return@prepare
             if (!ready) {
-                completeDemo("Dil modeli hazırlanamadı. İnterneti kontrol edip yeniden dene.")
+                completeDemo("Çeviri modeli açılamadı. Telefonda boş yer kontrolü yapıp yeniden dene.")
                 return@prepare
             }
             demoMessage = "Örnek görseldeki İngilizce altyazı okunuyor…"
@@ -724,7 +706,7 @@ class MainActivity : Activity() {
                     val text = result.text
                     if (text.isNullOrBlank()) completeDemo(result.issue ?: "Örnek altyazı çevrilemedi.")
                     else completeDemo("Örnek altyazı çevrildi.",
-                        Caption(original, formatDialogue(text), googleAttribution = result.googleAttribution))
+                        Caption(original, formatDialogue(text)))
                 }
             }
         }
@@ -749,12 +731,14 @@ class MainActivity : Activity() {
         val bitmap = Bitmap.createBitmap(960, 186, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(BACKGROUND)
-        canvas.drawText("We're being tailed. Lose the cops!", 480f, 108f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.WHITE
             textSize = 40f
             textAlign = Paint.Align.CENTER
             typeface = Typeface.DEFAULT_BOLD
-        })
+        }
+        canvas.drawText("I told you to wait by the car.", 480f, 76f, paint)
+        canvas.drawText("Why are you still here?", 480f, 132f, paint)
         return bitmap
     }
 
@@ -763,8 +747,12 @@ class MainActivity : Activity() {
             .setTitle("DraBornTranslate ${packageManager.getPackageInfo(packageName, 0).versionName}")
             .setMessage("GameTranslator v1.8.48 ve CouchSubs kaynaklarından yararlanır.\n" +
                 "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n\n" +
-                "Çevrimdışı mod Google ML Kit çevirisini kullanır. Google çevirilerin doğruluğu, güvenilirliği, satılabilirliği, belirli bir amaca uygunluğu ve hak ihlali içermemesi konusunda açık veya örtük garanti vermez.")
+                "Töz AI · Töz-Çevir-1 · Apache License 2.0\nONNX Runtime · MIT\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
             .setPositiveButton("GitHub") { _, _ -> openLink("https://github.com/DrabornEagle/DraBornTranslate") }
+            .setNegativeButton("Töz lisansı") { _, _ ->
+                val terms = assets.open("toz/LICENSE").bufferedReader().use { it.readText() }
+                AlertDialog.Builder(this).setTitle("Apache License 2.0").setMessage(terms).setPositiveButton("Kapat", null).show()
+            }
             .setNeutralButton("Lisans metni") { _, _ ->
                 val terms = assets.open("LICENSE").bufferedReader().use { it.readText() }
                 AlertDialog.Builder(this).setTitle("GNU AGPL v3").setMessage(terms).setPositiveButton("Kapat", null).show()

@@ -108,8 +108,8 @@ class CaptionSessionTest {
         assertEquals(0, requests.size)
         now += 340
         dialogue.read(listOf("The cops are after us."))
-        requests.removeFirst().second(TranslationReply("Polis peşimizde.", googleAttribution = false))
-        val previous = Caption("The cops are after us.", "Polis peşimizde.", googleAttribution = false)
+        requests.removeFirst().second(TranslationReply("Polis peşimizde."))
+        val previous = Caption("The cops are after us.", "Polis peşimizde.")
         assertEquals(previous, caption)
         now += 340
         dialogue.read(listOf("Go!"))
@@ -118,8 +118,8 @@ class CaptionSessionTest {
         assertEquals(previous, caption)
         val next = requests.removeFirst()
         assertEquals(TranslationInput("Go!"), next.first)
-        next.second(TranslationReply("Bas gaza!", googleAttribution = false))
-        assertEquals(Caption("Go!", "Bas gaza!", googleAttribution = false), caption)
+        next.second(TranslationReply("Bas gaza!"))
+        assertEquals(Caption("Go!", "Bas gaza!"), caption)
     }
 
     @Test

@@ -19,24 +19,26 @@ class PortalPanelServerTest {
     @Test
     fun browserReceivesNewTurkishCaptionAndClearsIt() {
         val opened = CountDownLatch(1)
-        PortalPanelServer(loopback, "<p>{{caption-size}}</p>", byteArrayOf(0, 1), 24) {
+        PortalPanelServer(loopback, "<p>{{caption-size}}</p>", 24) {
             opened.countDown()
         }.use { server ->
             val page = get(server.url)
             assertEquals(200, page.code)
             assertEquals("<p>24</p>", page.body)
             assertEquals("ready", page.panelMode)
-            assertTrue(opened.await(2, TimeUnit.SECONDS))
+            assertEquals(1L, opened.count)
 
             val captionUrl = server.url + "caption.txt"
             assertEquals("", get(captionUrl).body)
+            assertTrue(opened.await(2, TimeUnit.SECONDS))
             val sample = "Köprüye git!\nKapıyı aç."
             server.publish(sample)
             val caption = get(captionUrl)
             assertEquals(sample, caption.body)
             assertEquals("no-store", caption.cacheControl)
             assertEquals("text/plain; charset=utf-8", caption.contentType)
-            assertEquals("google", caption.translation)
+            assertNull(caption.translation)
+            assertEquals(404, get(server.url + "translate.png").code)
             server.publish(null)
             assertEquals("", get(captionUrl).body)
         }
@@ -44,7 +46,7 @@ class PortalPanelServerTest {
 
     @Test
     fun missingOrDifferentTokenCannotReadCaptions() {
-        PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+        PortalPanelServer(loopback, "panel", 22) {}.use { server ->
             val url = URL(server.url)
             val origin = "http://${url.host}:${url.port}"
             server.publish("Gizli altyazı")
@@ -57,11 +59,11 @@ class PortalPanelServerTest {
 
     @Test
     fun eachPanelStartsWithItsOwnLinkAndEmptyCaption() {
-        val firstUrl = PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+        val firstUrl = PortalPanelServer(loopback, "panel", 22) {}.use { server ->
             server.publish("Son satır")
             server.url
         }
-        PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+        PortalPanelServer(loopback, "panel", 22) {}.use { server ->
             assertNotEquals(URL(firstUrl).path, URL(server.url).path)
             assertEquals("", get(server.url + "caption.txt").body)
         }
@@ -69,7 +71,7 @@ class PortalPanelServerTest {
 
     @Test
     fun testPanelSwitchesToLiveCaptionsAtTheSameUrl() {
-        PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+        PortalPanelServer(loopback, "panel", 22) {}.use { server ->
             val captionUrl = server.url + "caption.txt"
             server.publish("Bağlantı testi.", testing = true)
             val test = get(captionUrl)
@@ -79,7 +81,7 @@ class PortalPanelServerTest {
 
             server.publish(null)
             assertEquals("", get(captionUrl).body)
-            server.publish("Oyuna dön.", googleAttribution = false)
+            server.publish("Oyuna dön.")
             val live = get(captionUrl)
             assertNull(live.panelMode)
             assertNull(live.translation)
@@ -89,7 +91,7 @@ class PortalPanelServerTest {
 
     @Test
     fun panelLinkStillOpensIfTheChatDropsTheTrailingSlash() {
-        PortalPanelServer(loopback, "panel", byteArrayOf(), 22) {}.use { server ->
+        PortalPanelServer(loopback, "panel", 22) {}.use { server ->
             val response = get(server.url.dropLast(1), followRedirects = false)
             assertEquals(302, response.code)
             assertEquals(URL(server.url).path, response.location)

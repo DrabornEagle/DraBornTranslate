@@ -11,7 +11,7 @@ import org.junit.Test
 
 class GameTranslationPipelineTest {
     @Test
-    fun compatibleGamePackKeepsSpeakerMarksAndSkipsBothEngines() {
+    fun compatibleGamePackKeepsSpeakerMarksAndSkipsTheModel() {
         val pack = JSONObject().put("id", "sample").put("format", 1)
             .put("entries", JSONObject()
                 .put(checkNotNull(PackKey.key("Go downstairs.")), "Aşağı in.")
@@ -19,46 +19,63 @@ class GameTranslationPipelineTest {
         val library = GamePackLibrary({ listOf("sample.json" to { pack.toString().toByteArray() }) }, null)
         val pipeline = GameTranslationPipeline(
             packLookup = { PackTranslation.match(library, it) },
-            online = { error("Pack hits must not call the online engine") },
-            offline = { error("Pack hits must not call the local model") },
+            model = { error("Pack hits must not call the model") },
         )
         val cue = pipeline.translate(TranslationInput("- Go downstairs.\n- Shut the window!"))
-        assertEquals(TranslationReply("- Aşağı in.\n- Pencereyi kapat!", googleAttribution = false), cue)
+        assertEquals(TranslationReply("- Aşağı in.\n- Pencereyi kapat!"), cue)
     }
 
     @Test
-    fun fallsBackToTheDeviceWhenTheKeylessEngineDoesNotRespond() {
+    fun splitSentencesAvoidMissingDialogueAndKeepSeparateSpeakers() {
         val calls = mutableListOf<String>()
-        val pipeline = GameTranslationPipeline(
-            packLookup = { null },
-            online = { calls.add("online"); null },
-            offline = { calls.add("offline"); "Biraz daha yakıt lazım." },
-        )
-        assertEquals(TranslationReply(">> Biraz daha yakıt lazım."), pipeline.translate(TranslationInput(">> We need more fuel.")))
-        assertEquals(listOf("online", "offline"), calls)
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            calls.add(text)
+            when (text) {
+                "We need more fuel." -> "Biraz daha yakıt lazım."
+                "Where's the truck?" -> "Kamyon nerede."
+                else -> error(text)
+            }
+        })
+        val input = ">> LUCIA: We need more\nfuel.\n- JASON: Where’s the truck?"
+        val output = ">> LUCIA: Biraz daha yakıt lazım.\n- JASON: Kamyon nerede?"
+        assertEquals(TranslationReply(output), pipeline.translate(TranslationInput(input)))
+        assertEquals(listOf("We need more fuel.", "Where's the truck?"), calls)
     }
 
     @Test
-    fun commonDialogueAndMenusKeepTheirOwnLineStructure() {
+    fun normalizesGameIdiomsAndAvoidsDuplicateModelOutput() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            assertEquals("We need to stay hidden until things calm down.", text)
+            "Ortalık sakinleşene kadar saklanmalıyız. Ortalık sakinleşene kadar saklanmalıyız."
+        })
+        assertEquals(
+            "Ortalık sakinleşene kadar saklanmalıyız.",
+            pipeline.translate(TranslationInput("We need to lay low until the heat dies down.")).text,
+        )
+    }
+
+    @Test
+    fun translatesMenuLabelsSeparatelyAndPreservesKnownLines() {
         val pipeline = GameTranslationPipeline(
             packLookup = { null },
-            online = null,
-            offline = { text ->
-                assertEquals("Settings\nResume", text)
-                "Ayarlar\nDevam et"
+            model = { text ->
+                assertEquals("Change the radio station", text)
+                "Radyo istasyonunu değiştir"
             },
         )
         assertEquals(
-            TranslationReply("Takip ediliyoruz. Polisleri atlat!", googleAttribution = false),
-            pipeline.translate(TranslationInput("We're being tailed. Lose the cops!")),
+            "Takip ediliyoruz. Polisleri atlat!",
+            pipeline.translate(TranslationInput("We're being tailed. Lose the cops!")).text,
         )
-        assertEquals("Ayarlar\nDevam et", pipeline.translate(TranslationInput("Settings\nResume", ReadingArea.GAME_TEXT)).text)
+        assertEquals(
+            "Ayarlar\nRadyo istasyonunu değiştir\nOyuna dön",
+            pipeline.translate(TranslationInput("Settings\nChange the radio station\nResume", ReadingArea.GAME_TEXT)).text,
+        )
     }
 
     @Test
-    fun acceptsBothResponseShapesUsedByGameTranslator() {
-        assertEquals("Köprüye git!", parseGoogleTranslation("""[[["Köprüye ","To the "],["git!","bridge!"]]]"""))
-        assertEquals("Siper al!", parseGoogleTranslation(")]}'\n[\"Siper al!\"]"))
-        assertNull(parseGoogleTranslation("[null]"))
+    fun doesNotDisplayOnlyFirstSentenceOfAMultiSentenceSubtitleWhenTheModelFails() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { null })
+        assertNull(pipeline.translate(TranslationInput("Take cover! I will look for a way around the building.")).text)
     }
 }

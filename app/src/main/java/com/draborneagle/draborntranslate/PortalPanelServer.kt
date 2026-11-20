@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference
 internal class PortalPanelServer(
     address: Inet4Address,
     template: String,
-    private val badge: ByteArray,
     fontSize: Int,
     private val onViewed: () -> Unit,
 ) : AutoCloseable {
@@ -40,7 +39,6 @@ internal class PortalPanelServer(
     private data class CaptionFrame(
         val body: ByteArray,
         val testing: Boolean = false,
-        val googleAttribution: Boolean = false,
     )
 
     @Volatile private var caption = CaptionFrame(ByteArray(0))
@@ -50,10 +48,9 @@ internal class PortalPanelServer(
         start()
     }
 
-    fun publish(text: String?, testing: Boolean = false, googleAttribution: Boolean = true) {
+    fun publish(text: String?, testing: Boolean = false) {
         if (!closed.get()) caption = CaptionFrame(
             text.orEmpty().toByteArray(Charsets.UTF_8), testing,
-            googleAttribution = googleAttribution && !testing && !text.isNullOrBlank(),
         )
     }
 
@@ -105,15 +102,13 @@ internal class PortalPanelServer(
             prefix -> {
                 send(client, "200 OK", "text/html; charset=utf-8", page, headOnly,
                     "X-DraBorn-Panel: ready\r\n")
-                if (!headOnly && viewed.compareAndSet(false, true)) onViewed()
             }
             "${prefix}caption.txt" -> {
                 val frame = caption
                 val mode = if (frame.testing) "X-DraBorn-Panel: test\r\n" else ""
-                val attribution = if (frame.googleAttribution) "X-DraBorn-Translation: google\r\n" else ""
-                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly, mode + attribution)
+                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly, mode)
+                if (!headOnly && viewed.compareAndSet(false, true)) onViewed()
             }
-            "${prefix}translate.png" -> send(client, "200 OK", "image/png", badge, headOnly)
             else -> send(client, "404 Not Found", "text/plain", ByteArray(0), headOnly)
         }
     }

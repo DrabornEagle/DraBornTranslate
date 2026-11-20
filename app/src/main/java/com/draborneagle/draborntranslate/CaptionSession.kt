@@ -7,7 +7,7 @@ import com.gametranslator.gametranslator_mobile.core.StabilizerKind
 import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import com.gametranslator.gametranslator_mobile.core.TextMatch
 
-internal data class Caption(val source: String, val turkish: String, val googleAttribution: Boolean = true)
+internal data class Caption(val source: String, val turkish: String)
 
 /** Tüm çağrılar ana iş parçacığından gelir. Çevirmene yalnızca en yeni bekleyen satır verilir. */
 internal class CaptionSession(
@@ -118,7 +118,7 @@ internal class CaptionSession(
         val changed = if (readingArea == ReadingArea.GAME_TEXT) TextMatch.normalize(source) != TextMatch.normalize(turkish)
         else stabilizer.shouldSend(source, turkish)
         val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(turkish) else turkish
-        if (changed) show(Caption(source, displayed, googleAttribution = reply.googleAttribution))
+        if (changed) show(Caption(source, displayed))
         else show(null)
     }
 }
@@ -126,9 +126,7 @@ internal class CaptionSession(
 private val subtitleWhitespace = Regex("[\\s\\u00a0]+")
 
 internal fun formatDialogue(text: String): String {
-    if (text.contains('\n') && text.lineSequence().drop(1).any { SpeakerPrefix.split(it).first.isNotEmpty() }) {
-        return text.trim()
-    }
+    if (text.contains('\n')) return text.trim()
     val line = subtitleWhitespace.replace(text.trim(), " ")
     if (line.length <= 43) return line
     val midpoint = line.length / 2

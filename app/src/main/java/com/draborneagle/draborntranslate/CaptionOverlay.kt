@@ -2,16 +2,13 @@
 package com.draborneagle.draborntranslate
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.View
 import android.view.WindowManager
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -22,7 +19,6 @@ internal class CaptionOverlay(
     private val windows = context.getSystemService(WindowManager::class.java)
     private var panel: LinearLayout? = null
     private var label: TextView? = null
-    private var attribution: ImageView? = null
 
     fun show(cue: Caption?) {
         if (cue == null) {
@@ -31,7 +27,6 @@ internal class CaptionOverlay(
         }
         label?.let {
             it.text = cue.turkish
-            attribution?.visibility = if (cue.googleAttribution) View.VISIBLE else View.GONE
             return
         }
         val margin = context.dp(14)
@@ -55,16 +50,8 @@ internal class CaptionOverlay(
                 setColor(0xFF101423.toInt())
                 cornerRadius = context.dp(14).toFloat()
             }
-            setPadding(margin, context.dp(8), margin, context.dp(6))
+            setPadding(margin, context.dp(8), margin, context.dp(8))
             addView(caption)
-            val badge = translationAttribution(context).apply {
-                visibility = if (cue.googleAttribution) View.VISIBLE else View.GONE
-                layoutParams = LinearLayout.LayoutParams(context.dp(152), context.dp(19)).also {
-                    it.topMargin = context.dp(3)
-                }
-            }
-            attribution = badge
-            addView(badge)
         }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -89,23 +76,8 @@ internal class CaptionOverlay(
         val view = panel ?: return
         panel = null
         label = null
-        attribution = null
         windows.removeViewImmediate(view)
     }
 }
 
 internal fun Context.dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()
-
-internal fun translationAttribution(context: Context) = ImageView(context).apply {
-    val badge = context.resources.openRawResource(R.raw.google_translate_attribution).use {
-        BitmapFactory.decodeStream(it)
-    }
-    setImageBitmap(badge)
-    scaleType = ImageView.ScaleType.FIT_CENTER
-    contentDescription = "Powered by Google Translate"
-    background = GradientDrawable().apply {
-        setColor(Color.WHITE)
-        cornerRadius = context.dp(3).toFloat()
-    }
-    setPadding(context.dp(4), context.dp(2), context.dp(4), context.dp(2))
-}

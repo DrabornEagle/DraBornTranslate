@@ -7,17 +7,6 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlin.math.abs
 
-internal data class TranslationInput(
-    val text: String,
-    val readingArea: ReadingArea = ReadingArea.SUBTITLES,
-)
-
-internal data class TranslationReply(
-    val text: String? = null,
-    val issue: String? = null,
-    val googleAttribution: Boolean = true,
-)
-
 internal interface CaptionTranslator : AutoCloseable {
     fun prepare(done: (Boolean) -> Unit) = done(true)
     fun translate(input: TranslationInput, done: (TranslationReply) -> Unit)

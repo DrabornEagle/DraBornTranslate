@@ -4,6 +4,7 @@ plugins {
 }
 
 def targetAbi = providers.gradleProperty('targetAbi').orNull
+def modelDir = layout.buildDirectory.dir('generated/toz/assets')
 
 android {
     namespace 'com.draborneagle.draborntranslate'
@@ -13,8 +14,8 @@ android {
         applicationId 'com.draborneagle.draborntranslate'
         minSdk 29
         targetSdk 35
-        versionCode 6
-        versionName '0.3.2'
+        versionCode 7
+        versionName '0.3.3'
         if (targetAbi != null) {
             ndk {
                 abiFilters targetAbi
@@ -26,6 +27,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    sourceSets.main.assets.srcDir(modelDir)
 }
 
 kotlin {
@@ -36,7 +38,64 @@ kotlin {
 
 dependencies {
     implementation 'com.google.mlkit:text-recognition:16.0.1'
-    implementation 'com.google.mlkit:translate:17.0.3'
+    implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.22.0'
+    implementation 'com.google.protobuf:protobuf-javalite:4.31.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20250517'
 }
+
+def modelRevision = '6476d3e0b4b189891fcc07a262ec2d6473c69ae2'
+def modelFiles = [
+    'onnx/encoder_q8.onnx': '4441e1d09a42968d1402a5e317911b10e6e95981f248fc7e9bf3381ab34cec31',
+    'onnx/decoder_q8.onnx': '8aa2dd543a1601cd0701446b3eda497ef210a82b2d6f2c69cb3c672c4dce5030',
+    'tokenizer.model': '1c41bf316152821dbb7e547cd7da306433149005f5e49e235b36eb623a3e8cb1',
+    'LICENSE': 'cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30',
+]
+def modelOverride = providers.gradleProperty('tozModelDir').orNull
+def prepareTozModel = tasks.register('prepareTozModel') {
+    inputs.property('revision', modelRevision)
+    inputs.property('checksums', modelFiles)
+    if (modelOverride != null) inputs.dir(file(modelOverride))
+    outputs.dir(modelDir)
+    doLast {
+        def destination = modelDir.get().dir('toz').asFile
+        destination.mkdirs()
+        modelFiles.each { remotePath, checksum ->
+            def name = remotePath.tokenize('/').last()
+            def target = new File(destination, name)
+            if (target.isFile() && target.withInputStream { sha256(it) } == checksum) return
+            def temporary = new File(destination, name + '.part')
+            try {
+                if (modelOverride != null) {
+                    def local = new File(file(modelOverride), name)
+                    java.nio.file.Files.copy(local.toPath(), temporary.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                } else {
+                    def connection = URI.create("https://huggingface.co/TozAI/Toz-Cevir-1/resolve/${modelRevision}/${remotePath}").toURL().openConnection()
+                    connection.connectTimeout = 20000
+                    connection.readTimeout = 45000
+                    connection.inputStream.withCloseable { input ->
+                        temporary.withOutputStream { output -> input.transferTo(output) }
+                    }
+                }
+                if (temporary.withInputStream { sha256(it) } != checksum) {
+                    throw new GradleException("Töz-Çevir-1 checksum mismatch: ${name}")
+                }
+                java.nio.file.Files.move(temporary.toPath(), target.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+            } finally {
+                temporary.delete()
+            }
+        }
+    }
+}
+
+String sha256(InputStream stream) {
+    def digest = java.security.MessageDigest.getInstance('SHA-256')
+    byte[] buffer = new byte[65536]
+    int count
+    while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
+    return digest.digest().encodeHex().toString()
+}
+
+tasks.named('preBuild').configure { dependsOn(prepareTozModel) }
