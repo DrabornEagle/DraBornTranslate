@@ -21,8 +21,8 @@ internal enum class ReadingArea(val label: String, val sampleIntervalMs: Long) {
 }
 
 internal enum class TranslationEngine(val label: String) {
-    OFFLINE("Google Çeviri · Çevrimdışı"),
-    NATURAL("Doğal Türkçe · Gemini"),
+    AUTO("GameTranslator · Otomatik"),
+    OFFLINE("Yalnızca cihazda"),
 }
 
 internal data class CaptureSettings(
@@ -31,7 +31,7 @@ internal data class CaptureSettings(
     val source: Source = Source.PORTAL,
     val display: SubtitleDisplay = SubtitleDisplay.PHONE,
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
-    val engine: TranslationEngine = TranslationEngine.OFFLINE,
+    val engine: TranslationEngine = TranslationEngine.AUTO,
 ) {
     val captionsAtTop: Boolean get() = bandTop >= 35
     val showOnPhone: Boolean get() = source == Source.MOBILE || display.phone

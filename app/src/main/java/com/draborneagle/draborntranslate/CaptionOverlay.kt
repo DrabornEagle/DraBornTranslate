@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -21,19 +22,21 @@ internal class CaptionOverlay(
     private val windows = context.getSystemService(WindowManager::class.java)
     private var panel: LinearLayout? = null
     private var label: TextView? = null
+    private var attribution: ImageView? = null
 
-    fun show(text: String?) {
-        if (text == null) {
+    fun show(cue: Caption?) {
+        if (cue == null) {
             close()
             return
         }
         label?.let {
-            it.text = text
+            it.text = cue.turkish
+            attribution?.visibility = if (cue.googleAttribution) View.VISIBLE else View.GONE
             return
         }
         val margin = context.dp(14)
         val caption = TextView(context).apply {
-            this.text = text
+            this.text = cue.turkish
             textSize = settings.textSize.toFloat()
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             gravity = Gravity.CENTER
@@ -54,13 +57,14 @@ internal class CaptionOverlay(
             }
             setPadding(margin, context.dp(8), margin, context.dp(6))
             addView(caption)
-            if (settings.engine == TranslationEngine.OFFLINE) {
-                addView(translationAttribution(context).apply {
-                    layoutParams = LinearLayout.LayoutParams(context.dp(152), context.dp(19)).also {
-                        it.topMargin = context.dp(3)
-                    }
-                })
+            val badge = translationAttribution(context).apply {
+                visibility = if (cue.googleAttribution) View.VISIBLE else View.GONE
+                layoutParams = LinearLayout.LayoutParams(context.dp(152), context.dp(19)).also {
+                    it.topMargin = context.dp(3)
+                }
             }
+            attribution = badge
+            addView(badge)
         }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -85,6 +89,7 @@ internal class CaptionOverlay(
         val view = panel ?: return
         panel = null
         label = null
+        attribution = null
         windows.removeViewImmediate(view)
     }
 }

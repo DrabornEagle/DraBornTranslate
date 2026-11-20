@@ -81,17 +81,13 @@ class CaptureService : Service() {
             ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
                 ?: ReadingArea.SUBTITLES,
             TranslationEngine.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_ENGINE) }
-                ?: TranslationEngine.OFFLINE,
+                ?: TranslationEngine.AUTO,
         )
         if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
             finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
             return START_NOT_STICKY
         }
-        val language = captionTranslator(config.engine)
-        if (language == null) {
-            finish("Doğal Türkçe için uygulamaya Gemini API anahtarını ekle.")
-            return START_NOT_STICKY
-        }
+        val language = GameTranslatorEngine(this, config.engine)
         translator = language
         if (!config.showOnPortal) closePanel()
         val panelIssue = if (config.showOnPortal) ensurePanel(config.textSize) else null
@@ -105,7 +101,7 @@ class CaptureService : Service() {
         readingArea = config.readingArea
         SessionState.update(SessionState.State(
             active = true,
-            status = if (config.engine == TranslationEngine.NATURAL) "Doğal Türkçe hazırlanıyor…" else "Türkçe çeviri modeli hazırlanıyor…",
+            status = "GameTranslator hazırlanıyor…",
             portalPanel = panel?.let {
                 SessionState.PortalPanel(it.url, opened = previousPanel?.opened == true && previousPanel.url == it.url)
             },
@@ -124,7 +120,6 @@ class CaptureService : Service() {
             show = ::showCaption,
             onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
-            engine = config.engine,
         )
         frames = ScreenFrames(
             context = this,
@@ -224,7 +219,7 @@ class CaptureService : Service() {
         if (SessionState.current.portalPanel?.previewing != true) publishCaption(caption)
         voice?.speak(caption?.turkish)
         try {
-            overlay?.show(caption?.turkish)
+            overlay?.show(caption)
         } catch (error: RuntimeException) {
             main.post { finish("Altyazı katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
             return

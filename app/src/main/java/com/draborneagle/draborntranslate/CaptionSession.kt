@@ -2,6 +2,7 @@
 package com.draborneagle.draborntranslate
 
 import com.gametranslator.gametranslator_mobile.core.OcrNoise
+import com.gametranslator.gametranslator_mobile.core.SpeakerPrefix
 import com.gametranslator.gametranslator_mobile.core.StabilizerKind
 import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import com.gametranslator.gametranslator_mobile.core.TextMatch
@@ -14,7 +15,6 @@ internal class CaptionSession(
     private val show: (Caption?) -> Unit,
     private val onFailure: (String?) -> Unit,
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
-    private val engine: TranslationEngine = TranslationEngine.OFFLINE,
     private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(
         stableFrames = if (readingArea == ReadingArea.GAME_TEXT) 1 else 2,
         exactText = readingArea == ReadingArea.GAME_TEXT,
@@ -26,13 +26,11 @@ internal class CaptionSession(
         val number: Int,
         val source: String,
         val input: TranslationInput,
-        val key: TranslationInput,
     )
 
-    private val cache = object : LinkedHashMap<TranslationInput, String>(128, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TranslationInput, String>?): Boolean = size > 128
+    private val cache = object : LinkedHashMap<TranslationInput, TranslationReply>(128, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TranslationInput, TranslationReply>?): Boolean = size > 128
     }
-    private val recent = ArrayDeque<TranslationInput>()
     private var number = 0
     private var waiting: Request? = null
     private var busy = false
@@ -41,7 +39,11 @@ internal class CaptionSession(
 
     fun read(lines: List<String>) {
         if (closed) return
-        val clean = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(lines) else lines.map(OcrNoise::clean)
+        val clean = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(lines) else lines.map { line ->
+            val (prefix, body) = SpeakerPrefix.split(line)
+            val cleaned = OcrNoise.clean(body)
+            if (cleaned.isBlank()) "" else prefix + cleaned
+        }
         val text = clean.filter(String::isNotBlank).joinToString("\n")
         val action = stabilizer.feed(text)
         when (action.kind) {
@@ -49,15 +51,13 @@ internal class CaptionSession(
             StabilizerKind.CLEAR -> clearCaption()
             StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
                 val source = action.text ?: return
-                clearCaption(hide = engine == TranslationEngine.OFFLINE || readingArea == ReadingArea.GAME_TEXT)
-                val input = translationInput(source, action.kind == StabilizerKind.RESTORE)
-                val key = if (engine == TranslationEngine.NATURAL) input
-                else input.copy(text = TextMatch.normalize(input.text))
-                val cached = cache[key]
+                clearCaption(hide = readingArea == ReadingArea.GAME_TEXT)
+                val input = TranslationInput(source, readingArea)
+                val cached = cache[input]
                 if (cached != null) {
                     deliver(source, cached)
                 } else {
-                    waiting = Request(number, source, input, key)
+                    waiting = Request(number, source, input)
                     translateNext()
                 }
             }
@@ -66,7 +66,6 @@ internal class CaptionSession(
 
     fun reset() {
         previousGameLines = emptySet()
-        recent.clear()
         stabilizer.reset()
         clearCaption()
     }
@@ -84,19 +83,6 @@ internal class CaptionSession(
         return steady
     }
 
-    private fun translationInput(source: String, restore: Boolean): TranslationInput {
-        if (readingArea == ReadingArea.GAME_TEXT) return TranslationInput(source, readingArea = readingArea)
-        val text = source.replace('\n', ' ')
-        if (engine == TranslationEngine.OFFLINE) return TranslationInput(text)
-
-        if (restore) recent.lastOrNull { it.text == text }?.let { return it }
-        if (recent.lastOrNull()?.text == text) return recent.last()
-        val input = TranslationInput(text, recent.takeLast(3).map { it.text })
-        recent.addLast(input)
-        if (recent.size > 4) recent.removeFirst()
-        return input
-    }
-
     private fun clearCaption(hide: Boolean = true) {
         number++
         waiting = null
@@ -112,14 +98,14 @@ internal class CaptionSession(
             busy = false
             if (!closed) {
                 val turkish = reply.text?.trim()?.takeIf(String::isNotEmpty)
-                if (turkish != null) cache[request.key] = turkish
+                if (turkish != null) cache[request.input] = reply
                 if (request.number == number) {
                     if (turkish == null) {
                         stabilizer.forgetSent()
                         show(null)
                         onFailure(reply.issue)
                     } else {
-                        deliver(request.source, turkish)
+                        deliver(request.source, reply)
                     }
                 }
                 translateNext()
@@ -127,11 +113,12 @@ internal class CaptionSession(
         }
     }
 
-    private fun deliver(source: String, turkish: String) {
+    private fun deliver(source: String, reply: TranslationReply) {
+        val turkish = reply.text?.trim() ?: return
         val changed = if (readingArea == ReadingArea.GAME_TEXT) TextMatch.normalize(source) != TextMatch.normalize(turkish)
         else stabilizer.shouldSend(source, turkish)
         val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(turkish) else turkish
-        if (changed) show(Caption(source, displayed, googleAttribution = engine == TranslationEngine.OFFLINE))
+        if (changed) show(Caption(source, displayed, googleAttribution = reply.googleAttribution))
         else show(null)
     }
 }
@@ -139,6 +126,9 @@ internal class CaptionSession(
 private val subtitleWhitespace = Regex("[\\s\\u00a0]+")
 
 internal fun formatDialogue(text: String): String {
+    if (text.contains('\n') && text.lineSequence().drop(1).any { SpeakerPrefix.split(it).first.isNotEmpty() }) {
+        return text.trim()
+    }
     val line = subtitleWhitespace.replace(text.trim(), " ")
     if (line.length <= 43) return line
     val midpoint = line.length / 2

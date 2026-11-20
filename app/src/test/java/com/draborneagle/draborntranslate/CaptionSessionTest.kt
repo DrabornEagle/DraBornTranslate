@@ -97,19 +97,18 @@ class CaptionSessionTest {
     }
 
     @Test
-    fun contextualModeKeepsPreviousDialogueAndReplacesItOnlyWithTheCurrentAnswer() {
+    fun keepsPreviousDialogueWhileTheNextLineIsTranslated() {
         val dialogue = CaptionSession(
             translate = { input, answer -> requests.addLast(input to answer) },
             show = { caption = it },
             onFailure = {},
-            engine = TranslationEngine.NATURAL,
             stabilizer = SubtitleStabilizer(clock = { now }, acceptCompletedSentence = false, minTextLength = 2),
         )
         dialogue.read(listOf("The cops are after us."))
         assertEquals(0, requests.size)
         now += 340
         dialogue.read(listOf("The cops are after us."))
-        requests.removeFirst().second(TranslationReply("Polis peşimizde."))
+        requests.removeFirst().second(TranslationReply("Polis peşimizde.", googleAttribution = false))
         val previous = Caption("The cops are after us.", "Polis peşimizde.", googleAttribution = false)
         assertEquals(previous, caption)
         now += 340
@@ -118,8 +117,8 @@ class CaptionSessionTest {
         dialogue.read(listOf("Go!"))
         assertEquals(previous, caption)
         val next = requests.removeFirst()
-        assertEquals(TranslationInput("Go!", listOf("The cops are after us.")), next.first)
-        next.second(TranslationReply("Bas gaza!"))
+        assertEquals(TranslationInput("Go!"), next.first)
+        next.second(TranslationReply("Bas gaza!", googleAttribution = false))
         assertEquals(Caption("Go!", "Bas gaza!", googleAttribution = false), caption)
     }
 

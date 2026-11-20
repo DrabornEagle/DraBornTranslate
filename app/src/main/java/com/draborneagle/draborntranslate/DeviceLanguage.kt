@@ -1,12 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
-import android.content.Context
 import android.graphics.Bitmap
-import com.google.mlkit.common.model.DownloadConditions
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.TranslatorOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -14,42 +9,18 @@ import kotlin.math.abs
 
 internal data class TranslationInput(
     val text: String,
-    val previous: List<String> = emptyList(),
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
 )
 
-internal data class TranslationReply(val text: String? = null, val issue: String? = null)
+internal data class TranslationReply(
+    val text: String? = null,
+    val issue: String? = null,
+    val googleAttribution: Boolean = true,
+)
 
 internal interface CaptionTranslator : AutoCloseable {
     fun prepare(done: (Boolean) -> Unit) = done(true)
     fun translate(input: TranslationInput, done: (TranslationReply) -> Unit)
-}
-
-internal fun Context.captionTranslator(engine: TranslationEngine): CaptionTranslator? = when (engine) {
-    TranslationEngine.OFFLINE -> DeviceTranslator()
-    TranslationEngine.NATURAL -> GeminiKey.read(this)?.let(::GeminiTranslator)
-}
-
-internal class DeviceTranslator : CaptionTranslator {
-    private val translator = Translation.getClient(
-        TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(TranslateLanguage.TURKISH)
-            .build(),
-    )
-
-    override fun prepare(done: (Boolean) -> Unit) {
-        translator.downloadModelIfNeeded(DownloadConditions.Builder().build())
-            .addOnCompleteListener { done(it.isSuccessful) }
-    }
-
-    override fun translate(input: TranslationInput, done: (TranslationReply) -> Unit) {
-        translator.translate(input.text).addOnCompleteListener {
-            done(TranslationReply(text = if (it.isSuccessful) it.result else null))
-        }
-    }
-
-    override fun close() = translator.close()
 }
 
 internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {

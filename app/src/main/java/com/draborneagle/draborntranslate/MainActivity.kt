@@ -7,6 +7,7 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -36,6 +37,7 @@ import android.widget.Toast
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
+import java.security.KeyStore
 
 private const val BACKGROUND = 0xFF0B111C.toInt()
 private const val PANEL = 0xFF131E30.toInt()
@@ -52,6 +54,7 @@ class MainActivity : Activity() {
     private var demoTranslator: CaptionTranslator? = null
     private var demoReader: SubtitleReader? = null
     private var voicePreview: TurkishVoice? = null
+    private var packLoading = false
     private var tunnelAddress = ""
     private var tunnelSession: String? = null
 
@@ -63,6 +66,7 @@ class MainActivity : Activity() {
     private lateinit var displayChoice: Button
     private lateinit var readingChoice: Button
     private lateinit var engineChoice: Button
+    private lateinit var packButton: Button
     private lateinit var panelCard: LinearLayout
     private lateinit var panelStatus: TextView
     private lateinit var copyPanel: Button
@@ -85,6 +89,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        removeOldTranslationCredentials()
         config = CaptureSettings(
             prefs.getInt("band", 65).coerceIn(0, CaptureSettings.MAX_TOP),
             prefs.getInt("size", 22).coerceIn(CaptureSettings.MIN_SIZE, CaptureSettings.MAX_SIZE),
@@ -94,13 +99,22 @@ class MainActivity : Activity() {
             ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
                 ?: ReadingArea.SUBTITLES,
             TranslationEngine.entries.firstOrNull { it.name == prefs.getString("engine", null) }
-                ?: TranslationEngine.OFFLINE,
+                ?: TranslationEngine.AUTO,
         )
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
         buildUi()
         render()
+    }
+
+    private fun removeOldTranslationCredentials() {
+        if (prefs.getBoolean("translation032Migrated", false)) return
+        deleteSharedPreferences("dialogue-credentials")
+        runCatching {
+            KeyStore.getInstance("AndroidKeyStore").apply { load(null) }.deleteEntry("DraBornTranslate.Gemini")
+        }
+        prefs.edit().putBoolean("translation032Migrated", true).apply()
     }
 
     override fun onStart() {
@@ -163,6 +177,8 @@ class MainActivity : Activity() {
         content.append(readingChoice, 6)
         engineChoice = button("") { selectEngine() }
         content.append(engineChoice, 6)
+        packButton = button("") { showPackMenu() }
+        content.append(packButton, 6)
 
         val guide = card()
         content.append(guide, 14)
@@ -259,7 +275,7 @@ class MainActivity : Activity() {
         portal.isSelected = !mobile
         phone.isSelected = mobile
         val panelTesting = state.portalPanel?.testing == true
-        val controlsAvailable = !state.active && !pending && !panelTesting
+        val controlsAvailable = !state.active && !pending && !panelTesting && !packLoading
         listOf(portal, phone, bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
         displayChoice.isEnabled = controlsAvailable
@@ -268,10 +284,16 @@ class MainActivity : Activity() {
         readingChoice.text = "Çevrilecek alan · ${config.readingArea.label}"
         engineChoice.isEnabled = controlsAvailable && demoTranslator == null
         engineChoice.text = "Çeviri motoru · ${config.engine.label}"
+        packButton.isEnabled = controlsAvailable && demoTranslator == null
+        packButton.text = when {
+            packLoading -> "Oyun paketi yükleniyor…"
+            ImportedGamePack.hasPack(this) -> "Oyun paketi · ${prefs.getString("packTitle", "Yüklü")}"
+            else -> "Oyun paketi ekle"
+        }
         bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
-        startStop.isEnabled = !pending && demoTranslator == null
+        startStop.isEnabled = !pending && demoTranslator == null && !packLoading
         startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Canlı altyazıyı başlat"
         testButton.isEnabled = controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
@@ -338,11 +360,8 @@ class MainActivity : Activity() {
             .setTitle("Çeviri motoru")
             .setSingleChoiceItems(engines.map { it.label }.toTypedArray(), engines.indexOf(config.engine)) { dialog, index ->
                 dialog.dismiss()
-                val engine = engines[index]
-                if (engine == TranslationEngine.NATURAL && GeminiKey.read(this) == null) editGeminiKey()
-                else useEngine(engine)
+                useEngine(engines[index])
             }
-            .setNeutralButton("Gemini anahtarı") { _, _ -> editGeminiKey() }
             .setNegativeButton("Kapat", null)
             .show()
     }
@@ -355,44 +374,66 @@ class MainActivity : Activity() {
         render()
     }
 
-    private fun editGeminiKey() {
-        val fields = column().apply { setPadding(dp(20), dp(8), dp(20), 0) }
-        fields.addView(label(
-            "Doğal Türkçe için Google AI Studio’da bir Gemini API anahtarı oluştur. Bu mod, okunan metni ve kısa diyalog bağlamını Gemini’ye gönderir.",
-            14, WHITE,
-        ))
-        val input = EditText(this).apply {
-            hint = "Gemini API anahtarı"
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setSingleLine()
+    private fun showPackMenu() {
+        val current = ImportedGamePack.hasPack(this)
+        val appPacks = ImportedGamePack.installedAppPacks(this)
+        val actions = linkedMapOf<String, () -> Unit>()
+        if (appPacks.isNotEmpty()) {
+            actions["Yüklü GameTranslator’dan al"] = { pickInstalledPack(appPacks) }
         }
-        fields.append(input, 8)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Doğal Türkçe")
-            .setView(fields)
-            .setNeutralButton("AI Studio’yu aç") { _, _ -> openLink("https://aistudio.google.com/app/apikey") }
+        actions[".json veya .json.gz dosyası seç"] = ::pickGamePack
+        if (current) actions["Paketi kaldır"] = {
+            ImportedGamePack.remove(this)
+            prefs.edit().remove("packTitle").apply()
+            render()
+        }
+        val entries = actions.entries.toList()
+        AlertDialog.Builder(this)
+            .setTitle("Oyun paketi")
+            .setItems(entries.map { it.key }.toTypedArray()) { _, index -> entries[index].value() }
             .setNegativeButton("Kapat", null)
-            .setPositiveButton("Kaydet", null)
-            .create()
-        if (GeminiKey.read(this) != null) {
-            fields.append(button("Kayıtlı anahtarı kaldır") {
-                GeminiKey.remove(this)
-                useEngine(TranslationEngine.OFFLINE)
-                dialog.dismiss()
-            }, 5)
-        }
-        dialog.show()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val key = input.text.toString().trim()
-            if (key.length !in 20..640 || key.any { it.isWhitespace() || it.isISOControl() }) {
-                input.error = "AI Studio’da oluşturduğun API anahtarını yapıştır."
-            } else if (!GeminiKey.save(this, key)) {
-                input.error = "Anahtar Android’de saklanamadı. Tekrar dene."
-            } else {
-                useEngine(TranslationEngine.NATURAL)
-                dialog.dismiss()
+            .show()
+    }
+
+    private fun pickInstalledPack(names: List<String>) {
+        AlertDialog.Builder(this)
+            .setTitle("GameTranslator paketleri")
+            .setItems(names.map { it.substringBefore(".json").replace('-', ' ') }.toTypedArray()) { _, index ->
+                installPack { app -> ImportedGamePack.installFromApp(app, names[index]) }
             }
+            .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun pickGamePack() {
+        try {
+            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }, GAME_PACK)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, "Dosya seçici açılamadı.", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun installPack(load: (Context) -> String) {
+        packLoading = true
+        render()
+        val app = applicationContext
+        Thread({
+            val title = runCatching { load(app) }.getOrNull()
+            if (title != null) prefs.edit().putString("packTitle", title).apply()
+            runOnUiThread {
+                if (isDestroyed) return@runOnUiThread
+                packLoading = false
+                Toast.makeText(this,
+                    if (title == null) "Geçerli bir GameTranslator oyun paketi seç." else "Oyun paketi yüklendi.",
+                    Toast.LENGTH_LONG,
+                ).show()
+                render()
+            }
+        }, "DraBornTranslate-pack-import").start()
     }
 
     private fun renderPortalPanel(state: SessionState.State) {
@@ -561,10 +602,6 @@ class MainActivity : Activity() {
             CaptureService.stop(this)
             return
         }
-        if (config.engine == TranslationEngine.NATURAL && GeminiKey.read(this) == null) {
-            editGeminiKey()
-            return
-        }
         voicePreview?.close()
         voicePreview = null
         if (packageManager.getLaunchIntentForPackage(config.source.packageName) == null) {
@@ -606,6 +643,9 @@ class MainActivity : Activity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
+            GAME_PACK -> if (resultCode == RESULT_OK) data?.data?.let { uri ->
+                installPack { app -> ImportedGamePack.install(app, uri) }
+            }
             OVERLAY -> {
                 if (Settings.canDrawOverlays(this)) requestCapture()
                 else showIdle("Canlı altyazı için diğer uygulamaların üzerinde gösterme iznini aç.")
@@ -657,12 +697,7 @@ class MainActivity : Activity() {
     }
 
     private fun runDemo() {
-        val engine = config.engine
-        val translator = captionTranslator(engine)
-        if (translator == null) {
-            editGeminiKey()
-            return
-        }
+        val translator = GameTranslatorEngine(this, config.engine)
         demoTranslator = translator
         demoMessage = "Çeviri motoru hazırlanıyor…"
         demoCaption = null
@@ -683,13 +718,13 @@ class MainActivity : Activity() {
                     completeDemo("Örnek görseldeki yazı okunamadı.")
                     return@read
                 }
-                val input = TranslationInput(original, listOf("A patrol car has been following us since the bridge."))
+                val input = TranslationInput(original)
                 translator.translate(input) { result ->
                     if (demoTranslator !== translator) return@translate
                     val text = result.text
                     if (text.isNullOrBlank()) completeDemo(result.issue ?: "Örnek altyazı çevrilemedi.")
                     else completeDemo("Örnek altyazı çevrildi.",
-                        Caption(original, formatDialogue(text), googleAttribution = engine == TranslationEngine.OFFLINE))
+                        Caption(original, formatDialogue(text), googleAttribution = result.googleAttribution))
                 }
             }
         }
@@ -830,5 +865,6 @@ class MainActivity : Activity() {
         private const val OVERLAY = 10
         private const val NOTIFICATION = 11
         private const val PROJECTION = 12
+        private const val GAME_PACK = 13
     }
 }

@@ -4,15 +4,15 @@ PlayStation Portal’da oynarken PS5’in **Paylaşımlı Ekran** videosunu Andr
 
 **Android 10 ve üzeri.** Android 14 ve üzeri, yalnızca seçtiğiniz uygulamayı paylaşmanıza izin verir. Portal yan paneli deneysel. Gerçek bir PS5 ve Portal oturumunda sabitleme henüz doğrulanmadı.
 
-## v0.3.1 · Doğal Türkçe altyazı
+## v0.3.2 · GameTranslator çevirisi
 
-1. **Çeviri motoru → Doğal Türkçe · Gemini** seç. [Google AI Studio](https://aistudio.google.com/app/apikey) içinde Gemini API anahtarı oluştur ve uygulamadaki alana yapıştır.
-2. **Örnek altyazıyı çevir** düğmesiyle anahtarı ve çeviriyi kontrol et. Oyun diyaloğu için **Çevrilecek alan → Altyazı bölgesi** seç.
-3. Canlı altyazıyı başlat. Uygulama her replikle birlikte bir önceki en fazla üç repliği Gemini’ye gönderir. Gemini bu bağlamı kullanarak güncel repliğin Türkçesini döndürür. Telefon ve Portal paneli uzun altyazıları iki satıra böler.
+1. **Çeviri motoru → GameTranslator · Otomatik** seç. Bu seçenek için hesap veya API anahtarı gerekmez.
+2. İstersen **Oyun paketi ekle** seçeneğinden yüklü GameTranslator’ın paketlerinden birini al veya GameTranslator biçimindeki .json ya da .json.gz dosyasını seç.
+3. **Örnek altyazıyı çevir** ile hazır repliği dene. Oyun diyaloğu için **Çevrilecek alan → Altyazı bölgesi** seç ve canlı altyazıyı başlat.
 
-Gemini seçeneği internet ve kullanıcıya ait API anahtarı gerektirir. Anahtar Android Keystore ile korunur. Gemini’ye yalnızca OCR metni ve kısa replik bağlamı gönderilir. Kullanım sınırı ve fiyatlandırma Gemini projesine bağlıdır. [Gemini API anahtarları](https://ai.google.dev/gemini-api/docs/api-key) · [Gemini fiyatlandırması](https://ai.google.dev/gemini-api/docs/pricing)
+DraBornTranslate önce GameTranslator biçimindeki seçili pakette eşleşen Türkçe satırı arar. Yaygın oyun replikleri için hazır Türkçe karşılıklar da bulunur. Diğer satırları GameTranslator’ın kaynak kodundaki anahtarsız Google motoru çevirir. Çevrimiçi motor yanıt vermezse cihazdaki dil modeli kullanılır. Terim sözlüğü oyun adlarını ve terimlerini korur.
 
-**Google Çeviri · Çevrimdışı** modu ilk dil modeli indirmesinden sonra cihazda çalışır. Google’ın çeviri atfı bu modun çıktısında yer alır. [ML Kit atıf kuralları](https://developers.google.com/ml-kit/language/translation/translation-terms)
+**Yalnızca cihazda** modunda hazır paketler ve cihazdaki dil modeli kullanılır. Dil modeli ilk kullanımda internetten indirilir. **Otomatik** modun çevrimiçi kısmı yalnızca okunan metni çeviri motoruna gönderir. Google atfı Google motorlarından gelen sonuçlarda gösterilir. [ML Kit atıf kuralları](https://developers.google.com/ml-kit/language/translation/translation-terms)
 
 ## Portal’da oyna, Türkçe çeviriyi dinle
 
@@ -81,7 +81,7 @@ Panel sadece oturum açıkken, telefonun özel yerel ağ adresinden hizmet verir
 - Portal modu, PS5’in ayrı **Paylaşımlı Ekran** yayınını kullanır. Telefonda ikinci bir Remote Play oturumu açma. Sony’nin **Paylaşımlı Oyun** özelliği farklıdır. PS5 Pro’nun 8K çıkışında Sony, Paylaşımlı Ekran ile Uzaktan Oynama’nın birlikte kullanımını kısıtlar. [Sony Uzaktan Oynama kısıtlamaları](https://remoteplay.dl.playstation.net/remoteplay/lang/en/#restrictions)
 - Portal’ın ayrı **Bulut Akışı** modu bir PS5 Paylaşımlı Ekran yayını sağlamaz. Bulut Akışı sırasında bu uygulamanın Portal yan paneli kullanılamaz.
 - Android kaynak videonun görüntüsünü paylaşmaya izin vermelidir. Video ekran paylaşımında siyah kalırsa oyun, PlayStation App veya cihaz ekran yakalamayı sınırlıyor olabilir.
-- Uygulama ekrandaki İngilizce yazıları cihazda tanır. Çevrimdışı mod ilk kullanımda çeviri modelini indirir. Uygulama oyun karelerini veya altyazı metnini diske kaydetmez. Portal paneli, Türkçe metni oturuma özel bağlantıyı açan tarayıcıya sunar. [ML Kit veri açıklaması](https://developers.google.com/ml-kit/terms#data_disclosure)
+- Uygulama ekrandaki İngilizce yazıları cihazda tanır. Oyun kareleri ve canlı oturumda çevrilen altyazılar diske kaydedilmez. İçe aktarılan oyun paketi uygulama içinde saklanır. Portal paneli, Türkçe metni oturuma özel bağlantıyı açan tarayıcıya sunar. [ML Kit veri açıklaması](https://developers.google.com/ml-kit/terms#data_disclosure)
 
 ## Android derlemesi
 
@@ -95,6 +95,6 @@ ARM64 telefonlara kurulabilir önizleme `app/build/outputs/apk/debug/app-debug.a
 
 ## Kaynak ve lisans
 
-Bu Android sürümü [GameTranslator v1.8.48](https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.48) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) kaynaklarındaki OCR temizleme, altyazı eşleştirme ve sabitleme kodunu kullanır. Android MediaProjection, Portal kurulum akışı ve telefondaki Türkçe altyazı katmanı 20 Kasım 2026 tarihinde DraBornTranslate için eklendi.
+Bu Android sürümü [GameTranslator v1.8.48](https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.48) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) kaynaklarındaki OCR temizleme, altyazı sabitleme, terim sözlüğü ve oyun paketi eşleştirmesini kullanır. Anahtarsız çevrimiçi motor ve cihazda çeviri sırası GameTranslator’dan uyarlandı.
 
 © Sinan Yorulmaz ve Sefflex. [GNU AGPL v3](LICENSE) · [Orijinal telif bildirimi](NOTICE) · [Üçüncü taraf bileşenler](THIRD-PARTY-NOTICES.md).
