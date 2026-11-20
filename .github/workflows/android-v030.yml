@@ -1,0 +1,30 @@
+name: DraBornTranslate v0.3.0 Android
+on:
+  push:
+    branches: [build/draborntranslate-v0.3.0]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build and check ARM64 APK
+        run: |
+          bash ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/DraBornTranslate-v0.3.0-Android-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs dist/DraBornTranslate-v0.3.0-Android-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/DraBornTranslate-v0.3.0-Android-arm64.apk | grep -E '^package:|^native-code:'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DraBornTranslate-v0.3.0-Android-arm64
+          path: dist/DraBornTranslate-v0.3.0-Android-arm64.apk
+          if-no-files-found: error
+          retention-days: 30
