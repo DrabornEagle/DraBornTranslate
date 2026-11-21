@@ -18,7 +18,6 @@ import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import java.nio.ByteBuffer
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.roundToInt
 
 internal enum class FrameSource { WAITING, VISIBLE, DARK }
@@ -29,8 +28,7 @@ internal class ScreenFrames(
     private val settings: CaptureSettings,
     private val reserveFrame: () -> Boolean,
     private val discardFrame: () -> Unit,
-    private val onFrame: (Bitmap, Long) -> Unit,
-    private val onEmptyFrame: (Long) -> Unit,
+    private val onFrame: (Bitmap) -> Unit,
     private val onSource: (FrameSource) -> Unit,
     private val onEnded: (String) -> Unit,
 ) : AutoCloseable {
@@ -46,10 +44,6 @@ internal class ScreenFrames(
     private var video = Pixels(0, 0, 0, 0)
     private var scan = Pixels(0, 0, 0, 0)
     private var scanBuffer: ByteBuffer? = null
-    private val reusableBitmap = AtomicReference<Bitmap?>()
-    private var pendingImage: Image? = null
-    private var pendingImageAt = 0L
-    private val deliverLatest = Runnable { readLatest() }
     private var lastSampleAt = 0L
     private var darkSince = 0L
     private var signal = FrameSource.WAITING
@@ -67,10 +61,7 @@ internal class ScreenFrames(
         override fun onCapturedContentVisibilityChanged(isVisible: Boolean) {
             visible = isVisible
             darkSince = 0L
-            if (!isVisible) {
-                discardPendingImage()
-                setSignal(FrameSource.WAITING)
-            }
+            if (!isVisible) setSignal(FrameSource.WAITING)
         }
     }
 
@@ -109,8 +100,7 @@ internal class ScreenFrames(
     }
 
     private fun attachReader(width: Int, height: Int, session: MediaProjection) {
-        val captureWidth = 1920f
-        val scale = minOf(1f, captureWidth / maxOf(width, height))
+        val scale = minOf(1f, 1600f / maxOf(width, height))
         val scaledWidth = (width * scale).roundToInt().coerceAtLeast(2)
         val scaledHeight = (height * scale).roundToInt().coerceAtLeast(2)
         val previous = reader
@@ -118,8 +108,7 @@ internal class ScreenFrames(
 
         val nextVideo = videoArea(scaledWidth, scaledHeight)
         val nextScan = settings.scanArea(nextVideo)
-        // One held frame and two slots for acquireLatestImage to discard intermediate frames.
-        val nextReader = ImageReader.newInstance(scaledWidth, scaledHeight, PixelFormat.RGBA_8888, 3)
+        val nextReader = ImageReader.newInstance(scaledWidth, scaledHeight, PixelFormat.RGBA_8888, 2)
         try {
             nextReader.setOnImageAvailableListener(::onImage, handler)
             val density = context.resources.configuration.densityDpi
@@ -147,7 +136,6 @@ internal class ScreenFrames(
             nextReader.close()
             throw error
         }
-        discardPendingImage()
         reader = nextReader
         video = nextVideo
         scan = nextScan
@@ -165,51 +153,26 @@ internal class ScreenFrames(
         } catch (error: IllegalStateException) {
             return
         } ?: return
-        if (!visible) {
-            image.close()
-            return
-        }
-        lastFrameAt = SystemClock.elapsedRealtime()
-        pendingImage?.close()
-        pendingImage = image
-        pendingImageAt = lastFrameAt
-        readLatest()
-    }
-
-    fun requestLatestFrame() {
-        if (!closed) handler.post(deliverLatest)
-    }
-
-    private fun readLatest() {
-        if (closed || !visible) return
-        val image = pendingImage ?: return
-        val now = SystemClock.elapsedRealtime()
-        val wait = lastSampleAt + settings.readingArea.sampleIntervalMs - now
-        if (wait > 0) {
-            if (!handler.hasCallbacks(deliverLatest)) handler.postDelayed(deliverLatest, wait)
-            return
-        }
-        if (!reserveFrame()) return
-        pendingImage = null
-        val frameAt = pendingImageAt
-        lastSampleAt = now
         image.use {
-            val plane = image.planes.firstOrNull()
-            if (plane == null || plane.pixelStride != 4 || plane.rowStride < image.width * 4) {
-                discardFrame()
-                return
-            }
+            if (!visible) return
+            val now = SystemClock.elapsedRealtime()
+            lastFrameAt = now
+            if (now - lastSampleAt < settings.readingArea.sampleIntervalMs) return
+            lastSampleAt = now
+
+            val plane = image.planes.firstOrNull() ?: return
             val rgba = plane.buffer
             val rowStride = plane.rowStride
+            if (plane.pixelStride != 4 || rowStride < image.width * 4) return
 
             if (isDark(rgba, rowStride)) {
                 if (darkSince == 0L) darkSince = now
                 if (now - darkSince >= 2700L) setSignal(FrameSource.DARK)
-                onEmptyFrame(frameAt)
                 return
             }
             darkSince = 0L
             setSignal(FrameSource.VISIBLE)
+            if (!reserveFrame()) return
             val bitmap = try {
                 copyScanArea(rgba, rowStride)
             } catch (error: RuntimeException) {
@@ -217,14 +180,8 @@ internal class ScreenFrames(
                 onEnded("Oyun karesi okunamadı. Kaynağı açıp yeniden dene.")
                 return
             }
-            if (bitmap == null) discardFrame() else onFrame(bitmap, frameAt)
+            if (bitmap == null) discardFrame() else onFrame(bitmap)
         }
-    }
-
-    private fun discardPendingImage() {
-        handler.removeCallbacks(deliverLatest)
-        pendingImage?.close()
-        pendingImage = null
     }
 
     private fun isDark(pixels: ByteBuffer, stride: Int): Boolean {
@@ -243,8 +200,8 @@ internal class ScreenFrames(
             }
         }
         // Karanlık bir sahnede okuma alanında açık renkli yazı varsa OCR'a devam et.
-        for (y in scan.y until scan.y + scan.height step 4) {
-            for (x in scan.x until scan.x + scan.width step 6) {
+        for (y in scan.y until scan.y + scan.height step 5) {
+            for (x in scan.x until scan.x + scan.width step 8) {
                 val index = pixels.position() + y * stride + x * 4
                 if (index + 2 >= pixels.limit()) continue
                 if ((pixels.get(index).toInt() and 255) > 70 ||
@@ -270,24 +227,9 @@ internal class ScreenFrames(
             output.put(input)
         }
         output.flip()
-        val previous = reusableBitmap.getAndSet(null)
-        val bitmap = if (previous?.width == scan.width && previous.height == scan.height) previous else {
-            previous?.recycle()
-            Bitmap.createBitmap(scan.width, scan.height, Bitmap.Config.ARGB_8888)
+        return Bitmap.createBitmap(scan.width, scan.height, Bitmap.Config.ARGB_8888).also {
+            it.copyPixelsFromBuffer(output)
         }
-        try {
-            bitmap.copyPixelsFromBuffer(output)
-        } catch (error: RuntimeException) {
-            bitmap.recycle()
-            throw error
-        }
-        return bitmap
-    }
-
-    /** OCR returns ownership once ML Kit has finished reading this bitmap. */
-    fun releaseFrame(bitmap: Bitmap) {
-        reusableBitmap.getAndSet(bitmap)?.recycle()
-        if (closed) reusableBitmap.getAndSet(null)?.recycle()
     }
 
     private fun setSignal(next: FrameSource) {
@@ -312,13 +254,11 @@ internal class ScreenFrames(
         if (closed) return
         closed = true
         handler.post {
-            discardPendingImage()
             display?.release()
             reader?.close()
             projection?.unregisterCallback(callback)
             projection?.stop()
             scanBuffer = null
-            reusableBitmap.getAndSet(null)?.recycle()
             thread.quitSafely()
         }
     }

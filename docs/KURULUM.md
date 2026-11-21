@@ -1,12 +1,10 @@
 # DraBornTranslate kurulum rehberi
 
-DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.5 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.5) indir. Uygulamanın içindeki çevrimdışı modeli **Çeviriyi dene** ile kontrol et. 806 MB’lık gelişmiş modeli istersen **Gelişmiş modeli indir** ile ekleyebilirsin. Aynı imzalı önceki sürümün üzerine güncelleme yapıldığında daha önce indirilen model kullanılabilir.
+DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.6 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.6) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
 
 Çeviri cihazda çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
 
-**Altyazı bölgesi** modunda uygulama net replikleri ilk kareden alır, belirsiz okumaları sonraki kareyle doğrular. İlk çeviri hazır olduğunda görünür. Uygulama kaynak repliğin değiştiğini veya kaybolduğunu algıladığında Türkçe satırı kaldırır. İlk görünme anını telefonun ekran okuma ve çeviri hızı belirler.
-
-Canlı oturumda **Son çeviri** kartındaki **Kare → Türkçe** değeri, telefonda yakalanan kare ile ilk Türkçe sonuç arasındaki süreyi milisaniye olarak gösterir. Portal ekranındaki toplam gecikmeyi, PlayStation App yayınının telefona ulaşma süresi ve panel bağlantısı da etkiler.
+**Altyazı bölgesi** modu, v0.3.3’teki ekran okuma ve replik takibiyle çalışır. Türkçe repliğin ilk görünme süresi telefonun ekran okuma ve çeviri hızına bağlıdır. Portal ekranındaki toplam gecikmeyi, PlayStation App yayınının telefona ulaşma süresi ve panel bağlantısı da etkiler.
 
 ## PlayStation App yayınını hazırla
 
@@ -50,6 +48,6 @@ Portal’ın **Bulut Akışı** modunda PS5 Paylaşımlı Ekran yayını sağlan
 
 ## PS App menüsü ve telefonda oyun
 
-- **Çevrilecek alan → Tüm oyun metinleri** menüleri ve görev metinlerini okur. Çevirmek istediğin ekranı yazılar okunana kadar açık tut. Yeni sonuçlar her satır çevrildikçe eklenir. Telefonda uzun listeler sırayla gösterilir. **Son çeviri** kartından listenin tamamını okuyabilir ve kopyalayabilirsin.
+- **Çevrilecek alan → Tüm oyun metinleri** menüleri ve görev metinlerini okur. Çevirmek istediğin ekranı yazılar okunana kadar açık tut. Uygulama algıladığı sabit metinleri birlikte çevirir. **Son çeviri** kartından sonucu okuyabilir ve kopyalayabilirsin.
 - **Telefonda oyna** seçeneğinde PS Remote Play ile oyunu aç. Android paylaşım ekranında **PS Remote Play**’i seç.
 - **Sesli Türkçe** için **Türkçe sesi dene** düğmesini kullan. Gerekirse Android metin okuma ayarlarında Türkçe ses verisini yükle.

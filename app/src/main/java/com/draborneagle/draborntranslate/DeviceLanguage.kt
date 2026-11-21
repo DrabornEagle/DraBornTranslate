@@ -5,48 +5,52 @@ import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlin.math.abs
 
 internal interface CaptionTranslator : AutoCloseable {
     fun prepare(done: (Boolean) -> Unit) = done(true)
     fun translate(input: TranslationInput, done: (TranslationReply) -> Unit)
-    fun cancelCurrent() {}
 }
 
-internal class SubtitleReader(
-    private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
-    private val preferLower: Boolean = false,
-) : AutoCloseable {
+internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-    fun read(bitmap: Bitmap, release: (Bitmap) -> Unit = Bitmap::recycle, done: (TextReading?) -> Unit) {
+    fun read(bitmap: Bitmap, done: (List<String>?) -> Unit) {
         val width = bitmap.width
         val height = bitmap.height
-        val recognition = try {
-            recognizer.process(InputImage.fromBitmap(bitmap, 0))
-        } catch (_: RuntimeException) {
-            release(bitmap)
-            done(null)
-            return
-        }
-        recognition.addOnCompleteListener { task ->
-            release(bitmap)
+        recognizer.process(InputImage.fromBitmap(bitmap, 0)).addOnCompleteListener { task ->
+            bitmap.recycle()
             if (!task.isSuccessful) {
                 done(null)
                 return@addOnCompleteListener
             }
             val lines = task.result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
                 val box = line.boundingBox ?: return@mapNotNull null
-                if (line.text.count(Char::isLetter) < 2 || box.height() < 6) return@mapNotNull null
-                RecognizedLine(line.text.trim(), box.left, box.top, box.right, box.bottom, line.confidence)
+                if (line.text.count(Char::isLetter) < 2 || box.height() < 7) return@mapNotNull null
+                line.text.trim() to box
             }
             if (readingArea == ReadingArea.GAME_TEXT) {
-                val readable = lines.filter { it.confidence == 0f || it.confidence >= 0.35f }
-                done(TextReading(joinSubtitleFragments(readable).sortedWith(compareBy({ it.top / 10 }, { it.left }))
-                    .map { it.text }
-                    .distinct()))
+                done(lines.sortedWith(compareBy({ it.second.top / 10 }, { it.second.left }))
+                    .map { it.first.take(100) }
+                    .distinct()
+                    .take(24))
                 return@addOnCompleteListener
             }
-            done(selectSubtitleLines(lines, width, height, preferLower))
+            // Altyazı bölgesinde ortadaki satır grubuna öncelik ver.
+            val anchor = lines.minByOrNull { (_, box) ->
+                abs(box.exactCenterX() / width - 0.5f) + abs(box.exactCenterY() / height - 0.5f) * 0.35f
+            }
+            if (anchor == null) {
+                done(emptyList())
+                return@addOnCompleteListener
+            }
+            val center = anchor.second
+            val group = lines.filter { (_, box) ->
+                abs(box.exactCenterY() - center.exactCenterY()) <= center.height() * 2.1f &&
+                    abs(box.exactCenterX() - center.exactCenterX()) <= width * 0.32f &&
+                    box.height() in (center.height() * 0.5f).toInt()..(center.height() * 2f).toInt()
+            }.sortedWith(compareBy({ it.second.top }, { it.second.left }))
+            done(group.take(3).map { it.first })
         }
     }
 

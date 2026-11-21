@@ -35,7 +35,7 @@ class CaptureService : Service() {
     private var source = FrameSource.WAITING
     private var readingArea = ReadingArea.SUBTITLES
     private var epoch = 0
-    private var modelReady = false
+    @Volatile private var modelReady = false
     private var ended = false
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -105,7 +105,7 @@ class CaptureService : Service() {
             },
             portalIssue = panelIssue,
         ))
-        ocr = SubtitleReader(readingArea, preferLower = config.bandTop == CaptureSettings.DEFAULT_BAND_TOP)
+        ocr = SubtitleReader(readingArea)
         if (config.showOnPhone) overlay = CaptionOverlay(this, config)
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
             if (!ended) {
@@ -116,31 +116,15 @@ class CaptureService : Service() {
         captions = CaptionSession(
             translate = language::translate,
             show = ::showCaption,
-            onFailure = ::updateTranslationIssue,
-            onRead = { recognized ->
-                if (!ended) {
-                    SessionState.update(SessionState.current.copy(recognizedSource = recognized, translationIssue = null))
-                }
-            },
-            cancelTranslation = language::cancelCurrent,
-            cancelRefinement = language::cancelRefinement,
-            translateKnown = language::translateKnown,
-            refine = language::refine,
-            translationAvailable = { modelReady },
+            onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
         )
         frames = ScreenFrames(
             context = this,
             settings = config,
-            reserveFrame = { ocrPending.compareAndSet(false, true) },
+            reserveFrame = { modelReady && ocrPending.compareAndSet(false, true) },
             discardFrame = { ocrPending.set(false) },
-            onFrame = { bitmap, frameAt -> main.post { recognize(bitmap, frameAt) } },
-            onEmptyFrame = { frameAt ->
-                main.post {
-                    if (!ended) captions?.read(emptyList(), frameAt = frameAt)
-                    requestNextFrame()
-                }
-            },
+            onFrame = { bitmap -> main.post { recognize(bitmap) } },
             onSource = { value -> main.post { sourceChanged(value) } },
             onEnded = { message -> main.post { finish(message) } },
         ).also { it.start(Activity.RESULT_OK, grant) }
@@ -154,7 +138,6 @@ class CaptureService : Service() {
             }
             modelReady = true
             sourceChanged(source)
-            captions?.onModelReady()
             main.post(checkFrames)
         }
         return START_NOT_STICKY
@@ -204,65 +187,43 @@ class CaptureService : Service() {
         if (overlay != null && current != null) showCaption(current)
     }
 
-    private fun recognize(bitmap: Bitmap, frameAt: Long) {
+    private fun recognize(bitmap: Bitmap) {
         val reader = ocr
         if (ended || reader == null) {
             bitmap.recycle()
-            requestNextFrame()
+            ocrPending.set(false)
             return
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
-        val capturedBy = frames
-        reader.read(bitmap, release = { capturedBy?.releaseFrame(it) ?: it.recycle() }) { result ->
-            try {
-                if (ended || frameEpoch != epoch) return@read
-                if (result == null) {
-                    if (modelReady) updateStatus("Yazı tanıma yanıtı alınamadı.")
-                } else {
-                    if (modelReady) updateStatus(when {
-                        result.lines.isEmpty() -> waitingForText()
-                        readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
-                        else -> "İngilizce altyazı okunuyor."
-                    })
-                    captions?.read(result.lines, result.confident, frameAt)
-                }
-            } finally {
-                requestNextFrame()
+        reader.read(bitmap) { lines ->
+            ocrPending.set(false)
+            if (ended || frameEpoch != epoch) return@read
+            if (lines == null) {
+                updateStatus("Yazı tanıma yanıtı alınamadı.")
+            } else {
+                updateStatus(when {
+                    lines.isEmpty() -> waitingForText()
+                    readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
+                    else -> "İngilizce altyazı okunuyor."
+                })
+                captions?.read(lines)
             }
         }
-    }
-
-    private fun requestNextFrame() {
-        ocrPending.set(false)
-        frames?.requestLatestFrame()
     }
 
     private fun showCaption(caption: Caption?) {
         if (ended) return
         val state = SessionState.current
         if (state.portalPanel?.previewing != true) publishCaption(caption)
-        if (caption == null && state.caption != null && readingArea == ReadingArea.SUBTITLES) voice?.pause()
-        if (caption != null && caption != state.caption &&
-            (readingArea == ReadingArea.GAME_TEXT || caption.source != state.caption?.source)
-        ) {
-            val spoken = if (readingArea == ReadingArea.GAME_TEXT) {
-                val previous = state.caption?.turkish?.lines().orEmpty().toSet()
-                caption.turkish.lines().filterNot(previous::contains).joinToString("\n")
-            } else caption.turkish
-            voice?.speak(spoken, latestOnly = readingArea == ReadingArea.SUBTITLES)
-        }
+        voice?.speak(caption?.turkish)
         try {
             overlay?.show(caption)
         } catch (error: RuntimeException) {
             main.post { finish("Altyazı katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
             return
         }
-        SessionState.update(SessionState.current.copy(
-            caption = caption,
-            lastCaption = caption ?: state.lastCaption,
-            subtitleDelayMs = if (caption != null) captions?.subtitleDelayMs else null,
-        ))
+        SessionState.update(SessionState.current.copy(caption = caption, lastCaption = caption ?: state.lastCaption))
         if (caption != null) updateTranslationIssue(null)
     }
 
@@ -310,14 +271,10 @@ class CaptureService : Service() {
     private fun sourceChanged(value: FrameSource) {
         if (ended) return
         if (source != value) {
-            val previous = source
             source = value
             epoch++
-            if (value == FrameSource.WAITING) voice?.pause()
-            when {
-                value == FrameSource.WAITING || previous == FrameSource.WAITING -> captions?.reset()
-                value == FrameSource.DARK -> captions?.blankFrame()
-            }
+            if (value != FrameSource.VISIBLE) voice?.pause()
+            captions?.reset()
         }
         if (!modelReady) return
         updateStatus(when (value) {
@@ -442,7 +399,7 @@ class CaptureService : Service() {
             if (ended) return
             val arrived = frames?.lastFrameAt ?: 0L
             if (arrived == 0L || SystemClock.elapsedRealtime() - arrived > 5000L) {
-                updateStatus("${sourceName} üzerinde tam ekran oyun görüntüsünü aç.")
+                sourceChanged(FrameSource.WAITING)
             }
             main.postDelayed(this, 1000L)
         }

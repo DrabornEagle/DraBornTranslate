@@ -4,32 +4,19 @@ plugins {
 }
 
 def targetAbi = providers.gradleProperty('targetAbi').getOrElse('arm64-v8a')
-def llamaSourceDir = providers.gradleProperty('llamaSourceDir').orNull
 def modelDir = layout.buildDirectory.dir('generated/toz/assets')
 
 android {
     namespace 'com.draborneagle.draborntranslate'
     compileSdk 35
-    ndkVersion '28.2.13676358'
 
     defaultConfig {
         applicationId 'com.draborneagle.draborntranslate'
         minSdk 29
         targetSdk 35
-        versionCode 14
-        versionName '0.4.5'
+        versionCode 15
+        versionName '0.4.6'
         ndk { abiFilters targetAbi }
-        externalNativeBuild {
-            cmake {
-                arguments '-DANDROID_STL=c++_shared'
-                if (llamaSourceDir != null) arguments "-DLLAMA_SOURCE_DIR=${file(llamaSourceDir).absolutePath}"
-            }
-        }
-    }
-
-    packaging {
-        // ggml selects a CPU backend from the installed native library directory.
-        jniLibs { useLegacyPackaging = true }
     }
 
     compileOptions {
@@ -37,12 +24,6 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     sourceSets.main.assets.srcDir(modelDir)
-    externalNativeBuild {
-        cmake {
-            path 'src/main/cpp/CMakeLists.txt'
-            version '3.22.1'
-        }
-    }
 }
 
 kotlin {
@@ -58,6 +39,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20250517'
 }
+
 def modelRevision = '6476d3e0b4b189891fcc07a262ec2d6473c69ae2'
 def modelFiles = [
     'onnx/encoder_q8.onnx': '4441e1d09a42968d1402a5e317911b10e6e95981f248fc7e9bf3381ab34cec31',

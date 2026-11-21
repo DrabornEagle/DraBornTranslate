@@ -45,10 +45,4 @@ class CaptureSettingsTest {
         val config = CaptureSettings(readingArea = ReadingArea.GAME_TEXT)
         assertEquals(area, config.scanArea(area))
     }
-
-    @Test
-    fun defaultCropIncludesTheBottomEdgeAndBothEndsOfWrappedCaptions() {
-        val area = videoArea(1600, 720)
-        assertEquals(Pixels(160, 403, 1280, 317), CaptureSettings().scanArea(area))
-    }
 }

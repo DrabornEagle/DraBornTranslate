@@ -33,6 +33,7 @@ import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -87,8 +88,6 @@ class MainActivity : Activity() {
     private lateinit var recognizedLabel: TextView
     private lateinit var copySource: Button
     private lateinit var copyTurkish: Button
-    private lateinit var modelLabel: TextView
-    private lateinit var modelButton: Button
     private lateinit var bandPreview: BandPreview
     private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
@@ -98,13 +97,6 @@ class MainActivity : Activity() {
 
     private val observe: (SessionState.State) -> Unit = { render() }
     private val main = Handler(Looper.getMainLooper())
-    private var modelState = OfflineModelStore.State(OfflineModelStore.Stage.MISSING, "")
-    private val checkModel = object : Runnable {
-        override fun run() {
-            updateModelState()
-            main.postDelayed(this, 1000)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,7 +114,6 @@ class MainActivity : Activity() {
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
         buildUi()
-        updateModelState()
         render()
     }
 
@@ -138,12 +129,10 @@ class MainActivity : Activity() {
     override fun onStart() {
         super.onStart()
         SessionState.observe(observe)
-        main.post(checkModel)
     }
 
     override fun onStop() {
         SessionState.remove(observe)
-        main.removeCallbacks(checkModel)
         super.onStop()
     }
 
@@ -198,6 +187,16 @@ class MainActivity : Activity() {
             addView(label("DraBornTranslate", 23, WHITE, bold = true).apply { isAccessibilityHeading = true })
             append(label("Oyunlar için canlı Türkçe", 14, MUTED), 3)
         }, LinearLayout.LayoutParams(0, -2, 1f))
+        hero.addView(ImageButton(this).apply {
+            val background = android.util.TypedValue()
+            theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, background, true)
+            setBackgroundResource(background.resourceId)
+            setImageResource(android.R.drawable.ic_menu_info_details)
+            setColorFilter(LAVENDER)
+            contentDescription = "Hakkında"
+            tooltipText = contentDescription
+            setOnClickListener { showAbout() }
+        }, LinearLayout.LayoutParams(dp(48), dp(48)))
         content.append(hero, 0)
 
         content.append(label("Oyun kaynağı", 15, LAVENDER, bold = true), 18)
@@ -215,11 +214,6 @@ class MainActivity : Activity() {
         capture.append(displayChoice, 10)
         readingChoice = button("") { selectReadingArea() }
         capture.append(readingChoice, 6)
-        modelLabel = label("", 14, MUTED)
-        capture.append(modelLabel, 12)
-        modelButton = button("") { changeModelDownload() }
-        styleButton(modelButton, primary = true)
-        capture.append(modelButton, 8)
 
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
         styleButton(startStop, primary = true)
@@ -300,7 +294,6 @@ class MainActivity : Activity() {
         content.append(testButton, 12)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
         content.append(voiceButton, 6)
-        content.append(button("Kaynak kod ve lisans") { showLicense() }, 8)
     }
 
     private fun render() {
@@ -339,16 +332,6 @@ class MainActivity : Activity() {
         bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
-        val modelReady = modelState.stage == OfflineModelStore.Stage.READY
-        modelLabel.text = if (modelReady) "Çevrimdışı çeviri ve gelişmiş model hazır."
-        else modelState.message
-        modelButton.visibility = if (modelReady) View.GONE else View.VISIBLE
-        modelButton.isEnabled = modelState.stage != OfflineModelStore.Stage.VERIFYING
-        modelButton.text = when (modelState.stage) {
-            OfflineModelStore.Stage.DOWNLOADING -> "İndirmeyi durdur"
-            OfflineModelStore.Stage.VERIFYING -> "Dosya doğrulanıyor…"
-            else -> "Gelişmiş modeli indir · ${OfflineModelStore.MODEL_SIZE}"
-        }
         startStop.isEnabled = !pending && demoTranslator == null && !packLoading
         startStop.text = if (state.active) "Canlı çeviriyi durdur" else "Canlı çeviriyi başlat"
         testButton.isEnabled = controlsAvailable && demoTranslator == null
@@ -358,10 +341,8 @@ class MainActivity : Activity() {
         val recognized = recognizedText()
         val source = caption?.source
         val differentReading = recognized?.takeUnless { it == source }
-        status.text = if (state.active || panelTesting) {
-            val message = state.voiceIssue ?: state.translationIssue ?: state.status
-            state.subtitleDelayMs?.let { "$message\nKare → Türkçe · $it ms" } ?: message
-        } else demoMessage ?: state.status
+        status.text = if (state.active || panelTesting) state.voiceIssue ?: state.translationIssue ?: state.status
+        else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = source?.let { "Çevirinin İngilizce metni\n$it" }.orEmpty()
         recognizedLabel.text = differentReading?.let { "Okunan İngilizce\n$it" }.orEmpty()
@@ -376,39 +357,7 @@ class MainActivity : Activity() {
         if (demoMessage != null) demoCaption else SessionState.current.let { if (it.active) it.caption else it.lastCaption }
 
     private fun recognizedText(): String? =
-        if (demoMessage != null) demoSource
-        else SessionState.current.let { it.recognizedSource ?: displayedCaption()?.source }
-
-    private fun updateModelState() {
-        val current = runCatching { OfflineModelStore.status(this) }.getOrElse {
-            OfflineModelStore.State(OfflineModelStore.Stage.MISSING, "Model indirmesi şu anda açılmıyor.")
-        }
-        if (modelState == current) return
-        modelState = current
-        render()
-    }
-
-    private fun changeModelDownload() {
-        if (modelState.stage == OfflineModelStore.Stage.DOWNLOADING) {
-            runCatching { OfflineModelStore.cancel(this) }
-            updateModelState()
-            return
-        }
-        if (modelState.stage != OfflineModelStore.Stage.MISSING) return
-        AlertDialog.Builder(this)
-            .setTitle("Gelişmiş çevrimdışı model")
-            .setMessage("${OfflineModelStore.MODEL_NAME} için bir defalık ${OfflineModelStore.MODEL_SIZE} indirme yapılır. " +
-                "Uygulama, ekranda duran repliklerde bu modeli ek bir kalite denetimi için kullanır.")
-            .setNeutralButton("Model lisansı") { _, _ -> openLink(OfflineModelStore.TERMS) }
-            .setNegativeButton("Vazgeç", null)
-            .setPositiveButton("İndir") { _, _ ->
-                runCatching { OfflineModelStore.start(this) }.onFailure { error ->
-                    Toast.makeText(this, error.message ?: "İndirme başlatılamadı.", Toast.LENGTH_LONG).show()
-                }
-                updateModelState()
-            }
-            .show()
-    }
+        if (demoMessage != null) demoSource else displayedCaption()?.source
 
     private fun select(value: Source) {
         config = config.copy(source = value)
@@ -814,7 +763,7 @@ class MainActivity : Activity() {
     }
 
     private fun runDemo(typed: String? = null) {
-        val translator = GameTranslatorEngine(this, preferQuality = true)
+        val translator = GameTranslatorEngine(this)
         demoTranslator = translator
         demoMessage = "Telefondaki çeviri modeli hazırlanıyor…"
         demoCaption = null
@@ -833,9 +782,9 @@ class MainActivity : Activity() {
             demoMessage = "Örnek görseldeki İngilizce altyazı okunuyor…"
             render()
             val reader = SubtitleReader().also { demoReader = it }
-            reader.read(exampleBitmap()) { result ->
+            reader.read(exampleBitmap()) { lines ->
                 if (demoTranslator !== translator) return@read
-                val original = result?.lines.orEmpty().joinToString("\n").trim()
+                val original = lines.orEmpty().joinToString("\n").trim()
                 if (original.isEmpty()) {
                     completeDemo("Örnek görseldeki yazı okunamadı.")
                     return@read
@@ -887,15 +836,15 @@ class MainActivity : Activity() {
         return bitmap
     }
 
-    private fun showLicense() {
+    private fun showAbout() {
         AlertDialog.Builder(this)
             .setTitle("DraBornTranslate ${packageManager.getPackageInfo(packageName, 0).versionName}")
             .setMessage("GameTranslator v1.8.48 ve CouchSubs kaynaklarından yararlanır.\n" +
-                "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n\n" +
-                "${OfflineModelStore.MODEL_NAME} · ${OfflineModelStore.MODEL_LICENSE}\n" +
-                "llama.cpp · MIT\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
+                "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n" +
+                "Bu uygulama GNU AGPL v3 koşullarıyla paylaşılabilir. Garanti verilmez.\n\n" +
+                "Töz-Çevir-1 · Apache 2.0\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
             .setPositiveButton("GitHub") { _, _ -> openLink("https://github.com/DrabornEagle/DraBornTranslate") }
-            .setNegativeButton("Model lisansı") { _, _ -> openLink(OfflineModelStore.TERMS) }
+            .setNegativeButton("Model lisansı") { _, _ -> openLink("https://huggingface.co/TozAI/Toz-Cevir-1") }
             .setNeutralButton("Lisans metni") { _, _ ->
                 val terms = assets.open("LICENSE").bufferedReader().use { it.readText() }
                 AlertDialog.Builder(this).setTitle("GNU AGPL v3").setMessage(terms).setPositiveButton("Kapat", null).show()
@@ -987,10 +936,12 @@ class MainActivity : Activity() {
 
     private fun LinearLayout.addDetails(title: String): LinearLayout {
         val container = card()
-        val body = column().apply { visibility = View.GONE }
+        val body = column()
         val heading = button(title)
         heading.gravity = Gravity.CENTER_VERTICAL or Gravity.START
         heading.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_disclosure, 0)
+        heading.isSelected = true
+        if (Build.VERSION.SDK_INT >= 30) heading.stateDescription = "Açık"
         heading.setOnClickListener {
             val expanded = body.visibility != View.VISIBLE
             body.visibility = if (expanded) View.VISIBLE else View.GONE

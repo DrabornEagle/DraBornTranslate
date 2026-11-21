@@ -49,14 +49,14 @@ object SubtitleSegmenter {
     fun labelName(piece: Piece): String? =
         if (!piece.translate && piece.text.endsWith(": ")) piece.text.dropLast(2) else null
 
-    fun split(text: String, preserveSpeakers: Boolean = true, keepSpeakerTurns: Boolean = false): List<Piece> {
+    fun split(text: String, preserveSpeakers: Boolean = true): List<Piece> {
         val pieces = mutableListOf<Piece>()
         val block = StringBuilder()
         var pendingSeparator = ""
         fun flushBlock() {
             if (block.isEmpty()) return
             if (pendingSeparator.isNotEmpty()) pieces.add(Piece(pendingSeparator, false))
-            addBlock(pieces, block.toString(), preserveSpeakers, keepSpeakerTurns)
+            addBlock(pieces, block.toString(), preserveSpeakers)
             block.clear()
             pendingSeparator = "\n"
         }
@@ -64,9 +64,7 @@ object SubtitleSegmenter {
             val line = raw.trim()
             if (line.isEmpty()) continue
             // Etiketli ya da tireli satır yeni bir konuşmadır; diğer satırlar sarmadır, birleştirilir.
-            if ((preserveSpeakers && speakerLabel(line) != null) || dialogueDash.containsMatchIn(line) ||
-                closedCaption(line) || closedCaption(block)
-            ) flushBlock()
+            if ((preserveSpeakers && speakerLabel(line) != null) || dialogueDash.containsMatchIn(line)) flushBlock()
             if (block.isNotEmpty()) block.append(' ')
             block.append(line)
         }
@@ -74,46 +72,25 @@ object SubtitleSegmenter {
         return pieces
     }
 
-    private fun closedCaption(text: CharSequence): Boolean = text.startsWith('[') && text.endsWith(']')
-
-    private fun addBlock(
-        pieces: MutableList<Piece>,
-        original: String,
-        preserveSpeakers: Boolean,
-        keepSpeakerTurns: Boolean,
-    ) {
+    private fun addBlock(pieces: MutableList<Piece>, original: String, preserveSpeakers: Boolean) {
         var block = whitespace.replace(original, " ")
         dialogueDash.find(block)?.let { dash ->
             pieces.add(Piece(dash.groups["dash"]!!.value + " ", false))
             block = block.substring(dash.value.length)
         }
-        val sentences = splitSentences(block)
-        val turns = if (keepSpeakerTurns) groupSpeakerTurns(sentences) else sentences
-        for ((index, sentence) in turns.withIndex()) {
-            if (index > 0) pieces.add(Piece(if (keepSpeakerTurns) "\n" else " ", false))
+        var first = true
+        for (sentence in splitSentences(block)) {
+            if (!first) pieces.add(Piece(" ", false))
+            first = false
             var body = sentence
-            dialogueDash.find(body)?.let { dash ->
-                pieces.add(Piece(dash.groups["dash"]!!.value + " ", false))
-                body = body.substring(dash.value.length)
-            }
-            if (preserveSpeakers) speakerLabel(body)?.let { label ->
-                pieces.add(Piece(label.groups["label"]!!.value + " ", false))
-                body = body.substring(label.value.length)
+            if (preserveSpeakers) {
+                speakerLabel(body)?.let { label ->
+                    pieces.add(Piece(label.groups["label"]!!.value + " ", false))
+                    body = body.substring(label.value.length)
+                }
             }
             if (body.isNotEmpty()) pieces.add(Piece(body, body.any { it.isLetter() }))
         }
-    }
-
-    private fun groupSpeakerTurns(sentences: List<String>): List<String> {
-        val turns = mutableListOf<String>()
-        for (sentence in sentences) {
-            if (turns.isEmpty() || speakerLabel(sentence) != null || dialogueDash.containsMatchIn(sentence)) {
-                turns.add(sentence)
-            } else {
-                turns[turns.lastIndex] += " $sentence"
-            }
-        }
-        return turns
     }
 
     private fun splitSentences(block: String): List<String> {
@@ -156,8 +133,7 @@ object SubtitleSegmenter {
         fun flushWord() {
             if (word.isEmpty()) return
             val lower = word.toString().lowercase(Locale.ROOT)
-            val stem = lower.substringBefore('\'').substringBefore('’')
-            val capital = startOfSentence || stem == "i" || stem in names
+            val capital = startOfSentence || lower == "i" || lower in names
             output.append(if (capital) lower[0].uppercaseChar() + lower.substring(1) else lower)
             startOfSentence = false
             word.clear()

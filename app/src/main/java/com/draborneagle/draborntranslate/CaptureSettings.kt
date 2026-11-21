@@ -16,8 +16,8 @@ internal enum class SubtitleDisplay(val label: String, val phone: Boolean, val p
 }
 
 internal enum class ReadingArea(val label: String, val sampleIntervalMs: Long) {
-    SUBTITLES("Altyazı bölgesi", 75L),
-    GAME_TEXT("Tüm oyun metinleri", 400L),
+    SUBTITLES("Altyazı bölgesi", 340L),
+    GAME_TEXT("Tüm oyun metinleri", 650L),
 }
 
 internal data class CaptureSettings(
@@ -31,14 +31,7 @@ internal data class CaptureSettings(
     val showOnPhone: Boolean get() = source == Source.MOBILE || display.phone
     val showOnPortal: Boolean get() = source == Source.PORTAL && display.portal
     val speakOnPhone: Boolean get() = source == Source.PORTAL && display == SubtitleDisplay.VOICE
-    fun scanArea(video: Pixels): Pixels = when {
-        readingArea == ReadingArea.GAME_TEXT -> video
-        bandTop == DEFAULT_BAND_TOP -> {
-            val from = (video.height * 0.56f).roundToInt()
-            Pixels(video.x, video.y + from, video.width, (video.height - from).coerceAtLeast(1))
-        }
-        else -> subtitleBand(video, bandTop)
-    }
+    fun scanArea(video: Pixels): Pixels = if (readingArea == ReadingArea.GAME_TEXT) video else subtitleBand(video, bandTop)
 
     companion object {
         const val DEFAULT_BAND_TOP = 65

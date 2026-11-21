@@ -6,8 +6,8 @@
 <p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı</strong></p>
 <p align="center">DrabornEagle ekosisteminin Android canlı oyun çevirisi uygulaması.</p>
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.5/DraBornTranslate-v0.4.5-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
-  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.5">Sürüm notları</a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.6/DraBornTranslate-v0.4.6-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
+  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.6">Sürüm notları</a>
   · <a href="docs/KURULUM.md">Kurulum rehberi</a>
 </p>
 
@@ -15,10 +15,10 @@
 
 | Güncel sürüm | Cihaz | Çeviri |
 | --- | --- | --- |
-| **v0.4.5** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
+| **v0.4.6** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
 
-1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin ve daha önce indirdiğin model korunur.
-2. Çeviri modeli APK’ya dahildir ve telefonda çevrimdışı çalışır. **Gelişmiş modeli indir** seçeneğiyle 806 MB’lık modeli isteğe bağlı olarak ekleyebilirsin.
+1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin.
+2. Çeviri modeli APK’ya dahildir ve telefonda çevrimdışı çalışır.
 3. **Çeviriyi dene** ile ilk sonucu al. **Son çeviri** kartında Türkçeyi ve uygulamanın okuduğu İngilizceyi birlikte görebilirsin.
 
 ## Oyunda kullan
@@ -32,17 +32,17 @@
 
 PS Portal için sürmekte olan oyun görüntüsünü **PlayStation App** üzerinden Android telefonda aç ve **Canlı çeviriyi başlat** seçeneğine dokun. Türkçe çeviri telefon ekranında, Türkçe ses olarak veya deneysel Portal yan panelinde gösterilebilir. PlayStation App, yayın ve panel adımları [kurulum rehberinde](docs/KURULUM.md) yer alıyor.
 
-## v0.4.5’te neler değişti?
+## v0.4.6’da neler değişti?
 
-- Yerleşimi ve metni net olan altyazılar tek karede kabul edilebiliyor. Varsayılan tarama alanı, görüntünün altındaki diyalog satırlarına öncelik veriyor.
-- Yazı tanıma meşgulken en güncel kare tutuluyor. Önceki tarama tamamlandığında bu kare işlenebiliyor.
-- Çevrimdışı model, sayı, özel ad ve anlam denetimlerinden geçen birinci çeviri adayını hazır olduğunda döndürüyor. **Son çeviri** kartındaki **Kare → Türkçe** değeri telefonun işlem süresini gösteriyor.
+- Canlı altyazı v0.3.3’ün ekran okuma, replik takibi ve çevrimdışı çeviri akışına döndü.
+- Oyun deyimleri, yön tarifleri ve menüler için Türkçe karşılıklar iyileştirildi. Kayıt yuvası, envanter adedi ve çözünürlük gibi değerler korunuyor.
+- **Bağlantı ve ekran paylaşımı** ile **Görünüm ve oyun paketi** ilk açılışta açık geliyor. Lisans bilgilerine üstteki **Hakkında** simgesinden erişilebilir.
 
 ## DrabornEagle kaynak kodu
 
 Bu depo, DrabornEagle ekosistemindeki **DraBornTranslate** uygulamasının Android kaynak kodunu ve Portal panelini içerir. Proje DrabornEagle tarafından geliştiriliyor ve sürdürülüyor. Diğer projeler için [DrabornEagle GitHub profiline](https://github.com/DrabornEagle) bakabilirsin.
 
-Derleme için JDK 17, Android SDK 35, NDK 28.2.13676358 ve CMake 3.22.1 kullanılır.
+Derleme için JDK 17 ve Android SDK 35 kullanılır.
 
 ```bash
 ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:assembleDebug
