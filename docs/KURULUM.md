@@ -1,10 +1,10 @@
 # DraBornTranslate kurulum rehberi
 
-DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.4 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.4) indir. Uygulamanın içindeki çevrimdışı modeli **Çeviriyi dene** ile kontrol et. 806 MB’lık gelişmiş modeli istersen **Gelişmiş modeli indir** ile ekleyebilirsin. Aynı imzalı önceki sürümün üzerine güncelleme yapıldığında daha önce indirilen model kullanılabilir.
+DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.5 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.5) indir. Uygulamanın içindeki çevrimdışı modeli **Çeviriyi dene** ile kontrol et. 806 MB’lık gelişmiş modeli istersen **Gelişmiş modeli indir** ile ekleyebilirsin. Aynı imzalı önceki sürümün üzerine güncelleme yapıldığında daha önce indirilen model kullanılabilir.
 
 Çeviri cihazda çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
 
-**Altyazı bölgesi** modunda Türkçe satır, ilk çeviri hazır olduğunda görünür ve İngilizce replik ekrandayken kalır. Uygulama kaynak repliğin değiştiğini veya kaybolduğunu algıladığında eski Türkçe satırı kaldırır. İlk görünme anını telefonun ekran okuma ve çeviri hızı belirler.
+**Altyazı bölgesi** modunda uygulama net replikleri ilk kareden alır, belirsiz okumaları sonraki kareyle doğrular. İlk çeviri hazır olduğunda görünür. Uygulama kaynak repliğin değiştiğini veya kaybolduğunu algıladığında Türkçe satırı kaldırır. İlk görünme anını telefonun ekran okuma ve çeviri hızı belirler.
 
 Canlı oturumda **Son çeviri** kartındaki **Kare → Türkçe** değeri, telefonda yakalanan kare ile ilk Türkçe sonuç arasındaki süreyi milisaniye olarak gösterir. Portal ekranındaki toplam gecikmeyi, PlayStation App yayınının telefona ulaşma süresi ve panel bağlantısı da etkiler.
 

@@ -9,6 +9,7 @@ import org.junit.Test
 
 class CaptionSessionTest {
     private var now = 100L
+    private var modelAvailable = true
     private var cancelCount = 0
     private var recognized: String? = null
     private var caption: Caption? = null
@@ -31,6 +32,7 @@ class CaptionSessionTest {
         cancelTranslation = { cancelCount++ },
         translateKnown = known,
         refine = { source, answer -> refine && refinements.add(source to answer) },
+        translationAvailable = { modelAvailable },
         readingArea = area,
         clock = { now },
     )
@@ -133,6 +135,36 @@ class CaptionSessionTest {
         dialogue.read(listOf(source), frameAt = 145)
         assertEquals(Caption(source, "Peşimden ayrılma."), caption)
         assertEquals(101L, dialogue.subtitleDelayMs)
+        assertTrue(requests.isEmpty())
+    }
+
+    @Test
+    fun aSingleCredibleOcrReadCanBeTranslatedWithoutASecondImage() {
+        val dialogue = session()
+        val text = "Can you hear me?"
+        val reading = selectSubtitleLines(
+            listOf(RecognizedLine(text, 350, 210, 650, 235, 0.64f)), 1000, 280, preferLower = true,
+        )
+        dialogue.read(reading.lines, reading.confident)
+        now += 150
+        answer(text, "Beni duyuyor musun?")
+        assertEquals(Caption(text, "Beni duyuyor musun?"), caption)
+        assertEquals(150L, dialogue.subtitleDelayMs)
+    }
+
+    @Test
+    fun modelWarmupKeepsTheLatestReadAndLetsKnownPhrasesAppearImmediately() {
+        modelAvailable = false
+        val dialogue = session(known = { input -> GamePhrases.direct(input.text, input.readingArea) })
+        dialogue.read(listOf("Run!"), confident = true)
+        assertEquals("Koş!", caption?.turkish)
+        dialogue.read(listOf("Stay close to the fence."), confident = true)
+        dialogue.read(listOf("Can you hear me?"), confident = true)
+        assertTrue(requests.isEmpty())
+        modelAvailable = true
+        dialogue.onModelReady()
+        answer("Can you hear me?", "Beni duyuyor musun?")
+        assertEquals("Beni duyuyor musun?", caption?.turkish)
         assertTrue(requests.isEmpty())
     }
 

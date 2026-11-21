@@ -47,6 +47,9 @@ internal class ScreenFrames(
     private var scan = Pixels(0, 0, 0, 0)
     private var scanBuffer: ByteBuffer? = null
     private val reusableBitmap = AtomicReference<Bitmap?>()
+    private var pendingImage: Image? = null
+    private var pendingImageAt = 0L
+    private val deliverLatest = Runnable { readLatest() }
     private var lastSampleAt = 0L
     private var darkSince = 0L
     private var signal = FrameSource.WAITING
@@ -64,7 +67,10 @@ internal class ScreenFrames(
         override fun onCapturedContentVisibilityChanged(isVisible: Boolean) {
             visible = isVisible
             darkSince = 0L
-            if (!isVisible) setSignal(FrameSource.WAITING)
+            if (!isVisible) {
+                discardPendingImage()
+                setSignal(FrameSource.WAITING)
+            }
         }
     }
 
@@ -112,7 +118,8 @@ internal class ScreenFrames(
 
         val nextVideo = videoArea(scaledWidth, scaledHeight)
         val nextScan = settings.scanArea(nextVideo)
-        val nextReader = ImageReader.newInstance(scaledWidth, scaledHeight, PixelFormat.RGBA_8888, 2)
+        // One held frame and two slots for acquireLatestImage to discard intermediate frames.
+        val nextReader = ImageReader.newInstance(scaledWidth, scaledHeight, PixelFormat.RGBA_8888, 3)
         try {
             nextReader.setOnImageAvailableListener(::onImage, handler)
             val density = context.resources.configuration.densityDpi
@@ -140,6 +147,7 @@ internal class ScreenFrames(
             nextReader.close()
             throw error
         }
+        discardPendingImage()
         reader = nextReader
         video = nextVideo
         scan = nextScan
@@ -157,28 +165,51 @@ internal class ScreenFrames(
         } catch (error: IllegalStateException) {
             return
         } ?: return
-        image.use {
-            if (!visible) return
-            val now = SystemClock.elapsedRealtime()
-            lastFrameAt = now
-            if (now - lastSampleAt < settings.readingArea.sampleIntervalMs) return
+        if (!visible) {
+            image.close()
+            return
+        }
+        lastFrameAt = SystemClock.elapsedRealtime()
+        pendingImage?.close()
+        pendingImage = image
+        pendingImageAt = lastFrameAt
+        readLatest()
+    }
 
-            val plane = image.planes.firstOrNull() ?: return
+    fun requestLatestFrame() {
+        if (!closed) handler.post(deliverLatest)
+    }
+
+    private fun readLatest() {
+        if (closed || !visible) return
+        val image = pendingImage ?: return
+        val now = SystemClock.elapsedRealtime()
+        val wait = lastSampleAt + settings.readingArea.sampleIntervalMs - now
+        if (wait > 0) {
+            if (!handler.hasCallbacks(deliverLatest)) handler.postDelayed(deliverLatest, wait)
+            return
+        }
+        if (!reserveFrame()) return
+        pendingImage = null
+        val frameAt = pendingImageAt
+        lastSampleAt = now
+        image.use {
+            val plane = image.planes.firstOrNull()
+            if (plane == null || plane.pixelStride != 4 || plane.rowStride < image.width * 4) {
+                discardFrame()
+                return
+            }
             val rgba = plane.buffer
             val rowStride = plane.rowStride
-            if (plane.pixelStride != 4 || rowStride < image.width * 4) return
 
             if (isDark(rgba, rowStride)) {
-                lastSampleAt = now
                 if (darkSince == 0L) darkSince = now
                 if (now - darkSince >= 2700L) setSignal(FrameSource.DARK)
-                if (reserveFrame()) onEmptyFrame(now)
+                onEmptyFrame(frameAt)
                 return
             }
             darkSince = 0L
             setSignal(FrameSource.VISIBLE)
-            if (!reserveFrame()) return
-            lastSampleAt = now
             val bitmap = try {
                 copyScanArea(rgba, rowStride)
             } catch (error: RuntimeException) {
@@ -186,8 +217,14 @@ internal class ScreenFrames(
                 onEnded("Oyun karesi okunamadı. Kaynağı açıp yeniden dene.")
                 return
             }
-            if (bitmap == null) discardFrame() else onFrame(bitmap, now)
+            if (bitmap == null) discardFrame() else onFrame(bitmap, frameAt)
         }
+    }
+
+    private fun discardPendingImage() {
+        handler.removeCallbacks(deliverLatest)
+        pendingImage?.close()
+        pendingImage = null
     }
 
     private fun isDark(pixels: ByteBuffer, stride: Int): Boolean {
@@ -275,6 +312,7 @@ internal class ScreenFrames(
         if (closed) return
         closed = true
         handler.post {
+            discardPendingImage()
             display?.release()
             reader?.close()
             projection?.unregisterCallback(callback)

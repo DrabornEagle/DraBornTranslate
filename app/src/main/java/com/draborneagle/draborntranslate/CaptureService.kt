@@ -105,7 +105,7 @@ class CaptureService : Service() {
             },
             portalIssue = panelIssue,
         ))
-        ocr = SubtitleReader(readingArea)
+        ocr = SubtitleReader(readingArea, preferLower = config.bandTop == CaptureSettings.DEFAULT_BAND_TOP)
         if (config.showOnPhone) overlay = CaptionOverlay(this, config)
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
             if (!ended) {
@@ -126,6 +126,7 @@ class CaptureService : Service() {
             cancelRefinement = language::cancelRefinement,
             translateKnown = language::translateKnown,
             refine = language::refine,
+            translationAvailable = { modelReady },
             readingArea = readingArea,
         )
         frames = ScreenFrames(
@@ -136,8 +137,8 @@ class CaptureService : Service() {
             onFrame = { bitmap, frameAt -> main.post { recognize(bitmap, frameAt) } },
             onEmptyFrame = { frameAt ->
                 main.post {
-                    ocrPending.set(false)
-                    if (!ended && modelReady) captions?.read(emptyList(), frameAt = frameAt)
+                    if (!ended) captions?.read(emptyList(), frameAt = frameAt)
+                    requestNextFrame()
                 }
             },
             onSource = { value -> main.post { sourceChanged(value) } },
@@ -153,6 +154,7 @@ class CaptureService : Service() {
             }
             modelReady = true
             sourceChanged(source)
+            captions?.onModelReady()
             main.post(checkFrames)
         }
         return START_NOT_STICKY
@@ -206,26 +208,34 @@ class CaptureService : Service() {
         val reader = ocr
         if (ended || reader == null) {
             bitmap.recycle()
-            ocrPending.set(false)
+            requestNextFrame()
             return
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
         val capturedBy = frames
         reader.read(bitmap, release = { capturedBy?.releaseFrame(it) ?: it.recycle() }) { result ->
-            ocrPending.set(false)
-            if (ended || frameEpoch != epoch) return@read
-            if (result == null) {
-                updateStatus("Yazı tanıma yanıtı alınamadı.")
-            } else if (modelReady) {
-                updateStatus(when {
-                    result.lines.isEmpty() -> waitingForText()
-                    readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
-                    else -> "İngilizce altyazı okunuyor."
-                })
-                captions?.read(result.lines, result.confident, frameAt)
+            try {
+                if (ended || frameEpoch != epoch) return@read
+                if (result == null) {
+                    if (modelReady) updateStatus("Yazı tanıma yanıtı alınamadı.")
+                } else {
+                    if (modelReady) updateStatus(when {
+                        result.lines.isEmpty() -> waitingForText()
+                        readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
+                        else -> "İngilizce altyazı okunuyor."
+                    })
+                    captions?.read(result.lines, result.confident, frameAt)
+                }
+            } finally {
+                requestNextFrame()
             }
         }
+    }
+
+    private fun requestNextFrame() {
+        ocrPending.set(false)
+        frames?.requestLatestFrame()
     }
 
     private fun showCaption(caption: Caption?) {

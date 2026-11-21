@@ -42,4 +42,31 @@ class SubtitleLayoutTest {
             }.reversed()
         assertEquals(lines.reversed().map(RecognizedLine::text), selectSubtitleLines(lines, 1000, 240).lines)
     }
+
+    @Test
+    fun acceptsCenteredSpeechOnTheFirstReadWhenTheScoreIsUnavailable() {
+        val lines = listOf(RecognizedLine("We need to get out", 386, 213, 614, 237, 0f))
+        assertEquals(TextReading(listOf("We need to get out"), confident = true),
+            selectSubtitleLines(lines, 1000, 280, preferLower = true))
+    }
+
+    @Test
+    fun prefersLowerDialogueOverAHigherConfidenceHudBanner() {
+        val lines = listOf(
+            RecognizedLine("CHECKPOINT", 417, 115, 583, 139, 0.98f),
+            RecognizedLine("Can you hear me?", 387, 213, 613, 237, 0.65f),
+            RecognizedLine("+120 XP", 646, 216, 714, 241, 0.97f),
+        )
+        assertEquals(TextReading(listOf("Can you hear me?"), confident = true),
+            selectSubtitleLines(lines, 1000, 280, preferLower = true))
+    }
+
+    @Test
+    fun aShortKnownRepliqueCanPassImmediatelyButAWeakOneStillNeedsConfirmation() {
+        fun read(text: String, confidence: Float) = selectSubtitleLines(
+            listOf(RecognizedLine(text, 452, 188, 548, 212, confidence)), 1000, 280, preferLower = true,
+        )
+        assertEquals(TextReading(listOf("Run!"), confident = true), read("Run!", 0.64f))
+        assertEquals(TextReading(listOf("What did you do?")), read("What did you do?", 0.43f))
+    }
 }

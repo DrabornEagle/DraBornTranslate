@@ -19,6 +19,7 @@ internal class CaptionSession(
     private val cancelRefinement: () -> Unit = {},
     private val translateKnown: (TranslationInput) -> String? = { null },
     private val refine: (TranslationInput, (TranslationReply) -> Unit) -> Boolean = { _, _ -> false },
+    private val translationAvailable: () -> Boolean = { true },
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
     private val clock: () -> Long = SystemClock::elapsedRealtime,
 ) {
@@ -180,7 +181,7 @@ internal class CaptionSession(
     }
 
     private fun translateNext() {
-        if (closed || inFlight != null) return
+        if (closed || inFlight != null || !translationAvailable()) return
         val input = when (readingArea) {
             ReadingArea.SUBTITLES -> (tentativeSubtitle ?: currentSubtitle)?.takeIf { it.reply == null }?.input
             ReadingArea.GAME_TEXT -> screen.firstOrNull { it !in screenResults }
@@ -211,6 +212,8 @@ internal class CaptionSession(
             refineVisibleSubtitle()
         }
     }
+
+    fun onModelReady() = translateNext()
 
     private fun refineVisibleSubtitle() {
         val cue = currentSubtitle ?: return

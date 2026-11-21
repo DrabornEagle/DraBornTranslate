@@ -29,6 +29,7 @@ internal class GameTranslatorEngine(
     private var qualityModel: LocalTranslationModel? = null
     private var quickReady = false
     private var qualityReady = false
+    private var optionalModel: File? = null
     @Volatile private var closed = false
 
     fun translateKnown(input: TranslationInput): String? = known?.translate(input.copy(allowPartial = false))?.text
@@ -42,8 +43,14 @@ internal class GameTranslatorEngine(
             }
         } else {
             loadQuick { ready ->
-                if (ready || file == null) done(ready)
-                if (file != null) loadQuality(file) { if (!ready) done(it) }
+                if (ready) {
+                    optionalModel = file.takeUnless { preferQuality }
+                    done(true)
+                } else if (file != null) {
+                    loadQuality(file, done)
+                } else {
+                    done(false)
+                }
             }
         }
     }
@@ -89,8 +96,15 @@ internal class GameTranslatorEngine(
         main.post { if (!closed) done(TranslationReply(issue = "Çevrimdışı çeviri henüz hazır değil.")) }
     }
 
-    fun refine(input: TranslationInput, done: (TranslationReply) -> Unit): Boolean =
-        quickReady && qualityReady && !preferQuality && submit(input, true, done)
+    fun refine(input: TranslationInput, done: (TranslationReply) -> Unit): Boolean {
+        if (!quickReady || preferQuality) return false
+        if (qualityReady) return submit(input, true, done)
+        optionalModel?.let { file ->
+            optionalModel = null
+            loadQuality(file) {}
+        }
+        return false
+    }
 
     private fun submit(input: TranslationInput, useQuality: Boolean, done: (TranslationReply) -> Unit): Boolean {
         if (closed) return false
@@ -102,9 +116,9 @@ internal class GameTranslatorEngine(
             if (closed) return@execute
             val pipeline = GameTranslationPipeline(
                 packLookup = { text -> PackTranslation.match(text, packs::findWithPack) },
-                candidates = { query ->
-                    if (useQuality) listOfNotNull(qualityModel?.translate(query, cancellation))
-                    else quickModel?.candidates(query.text, cancellation::get).orEmpty()
+                selectCandidate = { query, accept ->
+                    if (useQuality) qualityModel?.translate(query, cancellation)?.let(accept)
+                    else quickModel?.select(query.text, cancellation::get, accept)
                 },
                 canceled = cancellation::get,
             )

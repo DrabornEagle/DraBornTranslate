@@ -19,7 +19,7 @@ internal data class TranslationReply(val text: String? = null, val issue: String
 /** Sends full speaker turns to the local model and keeps menu labels in their original order. */
 internal class GameTranslationPipeline(
     private val packLookup: (String) -> PackMatch?,
-    private val candidates: ((TranslationInput) -> List<String>)? = null,
+    private val selectCandidate: ((TranslationInput, (String) -> String?) -> String?)? = null,
     private val canceled: () -> Boolean = { false },
 ) {
     fun translate(input: TranslationInput): TranslationReply {
@@ -123,7 +123,7 @@ internal class GameTranslationPipeline(
     }
 
     private fun translatePiece(source: String, area: ReadingArea, speakerNames: List<String>, sentenceCount: Int): String? {
-        val model = candidates ?: return null
+        val select = selectCandidate ?: return null
         if (looksDamaged(source) || canceled()) return null
         val sound = source.startsWith('[') && source.endsWith(']')
         val body = if (sound) source.substring(1, source.length - 1) else source
@@ -148,12 +148,12 @@ internal class GameTranslationPipeline(
         val protector = TermProtector(gameTerms, modelSource)
         val (prepared, slots) = protector.protect(modelSource)
         val withTerms = if (slots.isNotEmpty()) {
-            model(TranslationInput(prepared, area, preservePlaceholders = true)).firstNotNullOfOrNull {
+            select(TranslationInput(prepared, area, preservePlaceholders = true)) {
                 checked(TermProtector.restore(it, slots, protector.allSlots))
             }
         } else null
         if (canceled()) return null
-        val candidate = withTerms ?: model(TranslationInput(modelSource, area)).firstNotNullOfOrNull(::checked)
+        val candidate = withTerms ?: select(TranslationInput(modelSource, area), ::checked)
             ?: return null
         val result = restoreEnding(body, candidate)
         return if (sound) "[${result.trim('[', ']')}]" else result

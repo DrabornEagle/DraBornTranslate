@@ -173,8 +173,8 @@ class GameTranslationPipelineTest {
 
     @Test
     fun triesAnotherCompleteCandidateWhenTheBestGuessChangesTheCountOrNegation() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, candidates = {
-            listOf("3 kapıyı açma.", "4 kapıyı aç.", "4 kapıyı sakın açma.")
+        val pipeline = GameTranslationPipeline(packLookup = { null }, selectCandidate = { _, accept ->
+            listOf("3 kapıyı açma.", "4 kapıyı aç.", "4 kapıyı sakın açma.").firstNotNullOfOrNull(accept)
         })
         assertEquals("4 kapıyı sakın açma.",
             pipeline.translate(TranslationInput("Don't open the 4 doors.")).text)
@@ -194,4 +194,4 @@ class GameTranslationPipelineTest {
 private fun testedPipeline(
     packLookup: (String) -> com.gametranslator.gametranslator_mobile.core.PackMatch?,
     translateModel: (TranslationInput) -> String?,
-) = GameTranslationPipeline(packLookup, candidates = { listOfNotNull(translateModel(it)) })
+) = GameTranslationPipeline(packLookup, selectCandidate = { input, accept -> translateModel(input)?.let(accept) })

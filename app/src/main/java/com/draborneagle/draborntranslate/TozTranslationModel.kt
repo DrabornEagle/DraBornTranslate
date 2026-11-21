@@ -32,21 +32,21 @@ internal class TozTranslationModel(model: File) : AutoCloseable {
         environment.createSession(file.absolutePath, options)
     }
 
-    fun candidates(text: String, canceled: () -> Boolean = { false }): List<String> {
-        if (canceled()) return emptyList()
+    fun select(text: String, canceled: () -> Boolean = { false }, accept: (String) -> String?): String? {
+        if (canceled()) return null
         val source = tokenizer.encode(text)
-        if (source.isEmpty() || source.size > MAX_INPUT_TOKENS) return emptyList()
+        if (source.isEmpty() || source.size > MAX_INPUT_TOKENS) return null
         val ids = (listOf(tokenizer.turkish) + source + EOS).map(Int::toLong).toLongArray()
         return ints(ids, longArrayOf(1, ids.size.toLong())).use { input ->
             encoder.run(mapOf("src" to input)).use { cross ->
-                decode(cross, minOf(2 * source.size + 10, MAX_INPUT_TOKENS), source.size, canceled)
+                decode(cross, minOf(2 * source.size + 10, MAX_INPUT_TOKENS), source.size, canceled, accept)
             }
         }
     }
 
     private fun decode(
-        cross: OrtSession.Result, steps: Int, sourceLength: Int, canceled: () -> Boolean,
-    ): List<String> {
+        cross: OrtSession.Result, steps: Int, sourceLength: Int, canceled: () -> Boolean, accept: (String) -> String?,
+    ): String? {
         val emptyShape = longArrayOf(6, 1, 8, 0, 64)
         return OnnxTensor.createTensor(environment, FloatBuffer.allocate(0), emptyShape).use { empty ->
             var previous: OrtSession.Result? = null
@@ -58,7 +58,7 @@ internal class TozTranslationModel(model: File) : AutoCloseable {
                 val extraSteps = (sourceLength / 3).coerceIn(4, 12)
                 val logitsRow = FloatArray(VOCABULARY)
                 for (step in 0 until steps) {
-                    if (canceled()) return emptyList()
+                    if (canceled()) return null
                     val current = advance(beams, step, previous, cross, empty)
                     previous?.close()
                     previous = current
@@ -74,22 +74,30 @@ internal class TozTranslationModel(model: File) : AutoCloseable {
                             next.add(Beam(prefix + candidate.token, candidate.score, candidate.parent))
                         }
                     }
-                    // Preserve the ordinary beam winner and also collect complete alternatives for validation.
-                    if (preferred == null && finished.size >= BEAM_WIDTH) preferred = finished.maxByOrNull(Finished::score)
+                    // This winner always ranked first. Search further only if validation rejects it.
+                    if (preferred == null && finished.size >= BEAM_WIDTH) {
+                        val winner = finished.maxBy(Finished::score)
+                        preferred = winner
+                        if (canceled()) return null
+                        text(winner).takeIf(String::isNotBlank)?.let(accept)?.let { return it }
+                    }
                     if (next.isEmpty() || finished.size >= BEAM_WIDTH && step >= firstEnd + extraSteps) break
                     beams = next
                 }
                 (listOfNotNull(preferred) + finished.sortedByDescending(Finished::score)).asSequence()
-                    .map { tokenizer.decode(it.tokens.copyOfRange(1, it.tokens.size)) }
+                    .map(::text)
                     .filter(String::isNotBlank)
                     .distinct()
                     .take(MAX_CANDIDATES)
-                    .toList()
+                    .firstNotNullOfOrNull { if (canceled()) null else accept(it) }
             } finally {
                 previous?.close()
             }
         }
     }
+
+    private fun text(finished: Finished): String =
+        tokenizer.decode(finished.tokens.copyOfRange(1, finished.tokens.size))
 
     private fun advance(
         beams: List<Beam>, step: Int, past: OrtSession.Result?, cross: OrtSession.Result, empty: OnnxTensor,

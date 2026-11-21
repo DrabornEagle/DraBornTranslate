@@ -12,7 +12,10 @@ internal interface CaptionTranslator : AutoCloseable {
     fun cancelCurrent() {}
 }
 
-internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {
+internal class SubtitleReader(
+    private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
+    private val preferLower: Boolean = false,
+) : AutoCloseable {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     fun read(bitmap: Bitmap, release: (Bitmap) -> Unit = Bitmap::recycle, done: (TextReading?) -> Unit) {
@@ -43,7 +46,7 @@ internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea
                     .distinct()))
                 return@addOnCompleteListener
             }
-            done(selectSubtitleLines(lines, width, height))
+            done(selectSubtitleLines(lines, width, height, preferLower))
         }
     }
 
