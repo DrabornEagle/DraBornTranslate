@@ -4,6 +4,7 @@ package com.draborneagle.draborntranslate
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -16,6 +17,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
 import android.graphics.drawable.StateListDrawable
@@ -29,6 +31,8 @@ import android.provider.Settings
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
@@ -36,6 +40,8 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
+import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -66,6 +72,8 @@ class MainActivity : Activity() {
     private var packLoading = false
     private var tunnelAddress = ""
     private var tunnelSession: String? = null
+    private var aboutDialog: Dialog? = null
+    private var renderAboutUpdate: ((UpdateState) -> Unit)? = null
 
     private lateinit var portal: Button
     private lateinit var phone: Button
@@ -96,6 +104,10 @@ class MainActivity : Activity() {
     private lateinit var voiceButton: Button
 
     private val observe: (SessionState.State) -> Unit = { render() }
+    private val observeUpdate: (UpdateState) -> Unit = { state ->
+        renderAboutUpdate?.invoke(state)
+        AppUpdater.continueInstall(this)
+    }
     private val main = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,6 +127,7 @@ class MainActivity : Activity() {
         tunnelSession = savedInstanceState?.getString("tunnelSession")
         buildUi()
         render()
+        if (savedInstanceState?.getBoolean("aboutOpen") == true) showAbout()
     }
 
     private fun removeOldTranslationCredentials() {
@@ -136,14 +149,26 @@ class MainActivity : Activity() {
         super.onStop()
     }
 
+    override fun onResume() {
+        super.onResume()
+        AppUpdater.observe(observeUpdate)
+    }
+
+    override fun onPause() {
+        AppUpdater.remove(observeUpdate)
+        super.onPause()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean("pending", pending)
         outState.putString("tunnelAddress", tunnelAddress)
         outState.putString("tunnelSession", tunnelSession)
+        outState.putBoolean("aboutOpen", aboutDialog?.isShowing == true)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
+        aboutDialog?.dismiss()
         finishDemo()
         voicePreview?.close()
         super.onDestroy()
@@ -191,11 +216,11 @@ class MainActivity : Activity() {
             val background = android.util.TypedValue()
             theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, background, true)
             setBackgroundResource(background.resourceId)
-            setImageResource(android.R.drawable.ic_menu_info_details)
+            setImageResource(R.drawable.ic_more_vert)
             setColorFilter(LAVENDER)
-            contentDescription = "Hakkında"
+            contentDescription = "Uygulama menüsü"
             tooltipText = contentDescription
-            setOnClickListener { showAbout() }
+            setOnClickListener { showAppMenu(it) }
         }, LinearLayout.LayoutParams(dp(48), dp(48)))
         content.append(hero, 0)
 
@@ -836,19 +861,121 @@ class MainActivity : Activity() {
         return bitmap
     }
 
+    private fun showAppMenu(anchor: View) {
+        PopupMenu(this, anchor, Gravity.END).apply {
+            menu.add("Hakkında").setOnMenuItemClickListener {
+                showAbout()
+                true
+            }
+            menu.add("Yasal bildirimler").setOnMenuItemClickListener {
+                showLegalNotices()
+                true
+            }
+            show()
+        }
+    }
+
     private fun showAbout() {
+        if (aboutDialog?.isShowing == true) return
+        val dialog = Dialog(this).apply { requestWindowFeature(Window.FEATURE_NO_TITLE) }
+        aboutDialog = dialog
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        val surface = column().apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR, 0xFF24214B.toInt(), PANEL, 28)
+                .apply { setStroke(dp(1), 0xFF56528F.toInt()) }
+            setPadding(dp(20), dp(16), dp(20), dp(20))
+        }
+        val header = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
+        header.addView(ImageView(this).apply {
+            setImageResource(R.drawable.brand_mark)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(52), dp(52)).apply { marginEnd = dp(12) })
+        header.addView(column().apply {
+            addView(label("DrabornEagle", 13, LAVENDER, bold = true))
+            append(label("DraBornTranslate", 20, WHITE, bold = true).apply { isAccessibilityHeading = true }, 2)
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        header.addView(ImageButton(this).apply {
+            background = RippleDrawable(ColorStateList.valueOf(0x33B6A8FF), shape(PANEL, OUTLINE, 14), null)
+            setImageResource(R.drawable.ic_close)
+            setColorFilter(LAVENDER)
+            contentDescription = "Kapat"
+            tooltipText = contentDescription
+            setOnClickListener { dialog.dismiss() }
+        }, LinearLayout.LayoutParams(dp(48), dp(48)).apply { marginStart = dp(6) })
+        surface.addView(header)
+        surface.append(
+            label("İngilizce oyun metinlerini oynarken canlı olarak Türkçeye çevirir. Çeviri çevrimdışı ve ücretsizdir.", 14, MUTED)
+                .apply { setLineSpacing(dp(3).toFloat(), 1f) },
+            16,
+        )
+        surface.append(label("Sürüm $version", 14, WHITE, bold = true).apply {
+            background = shape(0xFF191D36.toInt(), OUTLINE, 12)
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+        }, 16)
+
+        val check = button("Yeni sürüm kontrolü") {
+            if (AppUpdater.state is UpdateState.Ready) AppUpdater.continueInstall(this, requested = true)
+            else AppUpdater.check(this)
+        }
+        styleButton(check, primary = true)
+        surface.append(check, 12)
+        val progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            progressTintList = ColorStateList.valueOf(ACCENT)
+            progressBackgroundTintList = ColorStateList.valueOf(OUTLINE)
+            max = 100
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        surface.append(progress, 8)
+        val message = label("", 14, MUTED).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
+        surface.append(message, 6)
+
+        val updateUi: (UpdateState) -> Unit = { state ->
+            check.isEnabled = state == UpdateState.Idle || state == UpdateState.Current ||
+                state is UpdateState.Ready || state is UpdateState.Message
+            check.text = if (state is UpdateState.Ready) "Kurulum iznini aç" else "Yeni sürüm kontrolü"
+            progress.visibility = if (state is UpdateState.Downloading) View.VISIBLE else View.GONE
+            if (state is UpdateState.Downloading) progress.progress = state.percent
+            message.text = when (state) {
+                UpdateState.Idle -> ""
+                UpdateState.Checking -> "GitHub’da yeni sürüm aranıyor…"
+                UpdateState.Current -> "En güncel sürümü kullanıyorsun."
+                is UpdateState.Downloading -> "v${state.version} indiriliyor · %${state.percent}"
+                is UpdateState.Ready -> "v${state.version} indirildi. Android’de bu uygulama için kurulum izni ver."
+                UpdateState.Installing, is UpdateState.Confirm -> "Güncelleme Android’e gönderiliyor…"
+                is UpdateState.Message -> state.text
+            }
+            message.visibility = if (message.text.isEmpty()) View.GONE else View.VISIBLE
+        }
+        updateUi(AppUpdater.state)
+        renderAboutUpdate = updateUi
+        dialog.setOnDismissListener {
+            if (aboutDialog === dialog) {
+                aboutDialog = null
+                renderAboutUpdate = null
+            }
+        }
+        dialog.setContentView(ScrollView(this).apply { addView(surface) })
+        dialog.show()
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(dp(minOf(420, (resources.configuration.screenWidthDp - 32).coerceAtLeast(200))),
+                WindowManager.LayoutParams.WRAP_CONTENT)
+            setDimAmount(0.65f)
+        }
+    }
+
+    private fun showLegalNotices() {
         AlertDialog.Builder(this)
-            .setTitle("DraBornTranslate ${packageManager.getPackageInfo(packageName, 0).versionName}")
-            .setMessage("GameTranslator v1.8.48 ve CouchSubs kaynaklarından yararlanır.\n" +
-                "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n" +
+            .setTitle("Yasal bildirimler")
+            .setMessage("GameTranslator v1.8.48 ve CouchSubs · © Sinan Yorulmaz ve Sefflex\n" +
                 "Bu uygulama GNU AGPL v3 koşullarıyla paylaşılabilir. Garanti verilmez.\n\n" +
                 "Töz-Çevir-1 · Apache 2.0\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
-            .setPositiveButton("GitHub") { _, _ -> openLink("https://github.com/DrabornEagle/DraBornTranslate") }
-            .setNegativeButton("Model lisansı") { _, _ -> openLink("https://huggingface.co/TozAI/Toz-Cevir-1") }
-            .setNeutralButton("Lisans metni") { _, _ ->
+            .setPositiveButton("GNU AGPL v3") { _, _ ->
                 val terms = assets.open("LICENSE").bufferedReader().use { it.readText() }
                 AlertDialog.Builder(this).setTitle("GNU AGPL v3").setMessage(terms).setPositiveButton("Kapat", null).show()
             }
+            .setNeutralButton("Model lisansı") { _, _ -> openLink("https://huggingface.co/TozAI/Toz-Cevir-1") }
+            .setNegativeButton("Kapat", null)
             .show()
     }
 

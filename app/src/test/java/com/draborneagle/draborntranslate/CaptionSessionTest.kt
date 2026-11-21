@@ -138,6 +138,17 @@ class CaptionSessionTest {
     }
 
     @Test
+    fun directionalCorrectionGetsThePassageFromThePreviousSubtitle() {
+        val passage = "Take the left door."
+        session.read(listOf(passage))
+        requests.removeFirst().second(TranslationReply("Soldaki kapıdan geç."))
+        now += 340
+        val correction = "Actually, take the right one."
+        session.read(listOf(correction))
+        assertEquals(TranslationInput(correction, previousSubtitle = passage), requests.removeFirst().first)
+    }
+
+    @Test
     fun similarSubtitlesUpdateWhenTwoReadingsConfirmTheNewMeaning() {
         val transitions = listOf(
             "Wait by the garage at Gate 7." to "Wait by the garage at Gate 9.",

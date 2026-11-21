@@ -119,6 +119,8 @@ private fun shortAnswer(source: String, previous: String?): String? {
 private val directionalPassage = Regex("""\b(?:take|use|go through) the (left|right)(?:-hand)? (door|exit)\b""", RegexOption.IGNORE_CASE)
 private val passageReference = Regex("""((?:actually, )?)(?:take|use|go through) the (left|right) one([.!]?)""", RegexOption.IGNORE_CASE)
 
+internal fun refersToPreviousPassage(sentence: String): Boolean = passageReference.matches(sentence)
+
 private fun resolveDirection(source: String, previous: String?): String {
     val (lead, side, punctuation) = passageReference.matchEntire(source)?.destructured ?: return source
     val passage = previous?.let(directionalPassage::find)?.groupValues?.get(2) ?: return source
@@ -134,7 +136,11 @@ private fun normalizeTime(text: String): String = clockTime.replace(text) { matc
     "${hour24.toString().padStart(2, '0')}:${minute.ifEmpty { "00" }}"
 }
 
-private val names = listOf("Vice City", "Leonida", "Los Santos", "Liberty City", "San Andreas", "Lucia", "Jason")
+private val names = listOf(
+    "Vice City", "Leonida", "Leonida Keys", "Port Gellhorn", "Grassrivers", "Ambrosia",
+    "Los Santos", "Liberty City", "San Andreas", "Lucia", "Jason", "Lucia Caminos", "Jason Duval",
+    "Cal Hampton", "Boobie Ike", "Dre'Quan Priest", "Dre'Quan", "Real Dimez", "Raul Bautista", "Brian Heder",
+)
 private val knownNames = names.flatMap { it.lowercase(Locale.ROOT).split(' ') }.toSet()
 private val GAME_TERMS = Glossary.of(
     terms = mapOf(
@@ -149,6 +155,9 @@ private val GAME_TERMS = Glossary.of(
         "title screen" to "başlangıç ekranı",
         "glove compartment" to "torpido gözü",
         "call button" to "çağrı düğmesi",
+        "hideout" to "sığınak",
+        "the lookout" to "gözcü",
+        "lookout tower" to "gözetleme kulesi",
     ),
     keep = names,
 )
@@ -183,6 +192,9 @@ private val commonLines = mapOf(
     "Got it." to "Anladım.",
     "I got this." to "Ben hallederim.",
     "Something's off." to "Bir terslik var.",
+    "There's a catch." to "Bu işte bir bit yeniği var.",
+    "There's gotta be a catch." to "Bu işte bir bit yeniği olmalı.",
+    "There has to be a catch." to "Bu işte bir bit yeniği olmalı.",
     "I don't buy it." to "Buna inanmıyorum.",
     "I'm not buying it." to "Buna inanmıyorum.",
     "Keep still." to "Kıpırdama.",
@@ -286,6 +298,63 @@ private val objectPronouns = mapOf(
 )
 
 private val idioms = listOf(
+    idiom("lemme", "let me"),
+    idiom("gimme", "give me"),
+    idiom("dunno", "don't know"),
+    idiom("coulda", "could have"),
+    idiom("shoulda", "should have"),
+    idiom("woulda", "would have"),
+    idiom("come clean about", "tell the truth about"),
+    idiom("came clean about", "told the truth about"),
+    idiom("drop me a line", "send me a message"),
+    idiom("drop us a line", "send us a message"),
+    idiom("keep a low profile", "avoid drawing attention"),
+    idiom("call off the search", "stop searching"),
+    idiom("called off the search", "stopped searching"),
+    idiom("don't get cold feet", "don't give up out of fear"),
+    idiom("take the fall", "take the blame"),
+    idiom("laying low", "staying hidden"),
+    idiom("^lose the tail", "escape from whoever is following you"),
+    idiom("without alerting the guards", "without the security guards noticing"),
+    idiom("what went down", "what happened"),
+    Regex("""\b(keeps?|kept|keeping) (me|you|him|her|us|them) in the dark about\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult ->
+            val (verb, person) = match.destructured
+            val action = when (verb.lowercase(Locale.ROOT)) {
+                "kept" -> "didn't tell"
+                "keeping" -> "not telling"
+                "keeps" -> "doesn't tell"
+                else -> "don't tell"
+            }
+            "$action $person about"
+        },
+    Regex("""\b(giv(?:e|es|ing)|gave) (me|you|him|her|us|them) the runaround\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult ->
+            val (verb, person) = match.destructured
+            val action = when (verb.lowercase(Locale.ROOT)) {
+                "gave" -> "stalled"
+                "giving" -> "stalling"
+                "gives" -> "stalls"
+                else -> "stall"
+            }
+            "$action $person"
+        },
+    Regex("""\bput a price on (my|your|his|her|our|their) heads?\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "put up a reward for anyone who catches " + objectPronouns.getValue(match.groupValues[1].lowercase(Locale.ROOT)) },
+    Regex("""\b(left|leave|leaves) (me|you|him|her|us|them) high and dry\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult ->
+            val (verb, person) = match.destructured
+            val action = when (verb.lowercase(Locale.ROOT)) {
+                "left" -> "abandoned"
+                "leaves" -> "abandons"
+                else -> "abandon"
+            }
+            "$action $person"
+        },
+    Regex("""\bhang (me|you|him|her|us|them) out to dry\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "abandon ${match.groupValues[1]}" },
+    Regex("""\bput (me|you|him|her|us|them) on the spot\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "put ${match.groupValues[1]} in a difficult position" },
     idiom("sit this one out", "skip this one"),
     idiom("sit the next round out", "skip the next round"),
     idiom("stick around(?=[.!?,]|$| until | and | for | to )", "stay here"),

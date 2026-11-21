@@ -158,6 +158,56 @@ class GameTranslationPipelineTest {
     }
 
     @Test
+    fun ellipticalAnswersKeepTheActionAndItsTense() {
+        val cases = listOf(
+            Triple("Have you seen the envelope?", "Not yet.", "I haven't seen the envelope yet."),
+            Triple("Did you call the driver?", "Already did.", "I already did call the driver."),
+            Triple("Have you checked the back seat?", "I have.", "I have checked the back seat."),
+            Triple("Did he take the money?", "He must have.", "He must have taken the money."),
+            Triple("I didn't see your brother.", "Neither did I.", "I didn't see him either."),
+            Triple("Is the bridge blocked?", "Not anymore.", "It is not closed anymore."),
+            Triple("Did you see what happened to my car?", "No, I didn't.", "No, I didn't see what happened."),
+            Triple("Are you all right?", "I will be.", "I will be all right."),
+        )
+        for ((prior, reply, expected) in cases) {
+            assertEquals(expected, DialogueContext.expand(reply, prior))
+        }
+        assertEquals("Not yet.", DialogueContext.expand("Not yet.", "The envelope is gone."))
+        assertEquals("Not anymore.", DialogueContext.expand("Not anymore.", "Are they awake?"))
+        assertEquals("So am I.", DialogueContext.expand("So am I.", "The door is locked."))
+    }
+
+    @Test
+    fun slangAndIdiomsDoNotChangeTheirLiteralCounterparts() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "Let me see the receipt." -> "Fişi bir göreyim."
+                "Send me a message when you arrive." -> "Varınca bana haber ver."
+                "The price went down, but the crate was still too heavy." -> "Fiyat düştü ama kasa hâlâ çok ağırdı."
+                "He was alerting the guards." -> "Muhafızları uyarıyordu."
+                else -> error(text)
+            }
+        })
+        assertEquals(
+            "Fişi bir göreyim. Varınca bana haber ver.",
+            pipeline.translate(TranslationInput("Lemme see the receipt. Drop me a line when you arrive.")).text,
+        )
+        assertEquals(
+            "Fiyat düştü ama kasa hâlâ çok ağırdı. Muhafızları uyarıyordu.",
+            pipeline.translate(TranslationInput("The price went down, but the crate was still too heavy. He was alerting the guards.")).text,
+        )
+    }
+
+    @Test
+    fun cityNamesUseThePronouncedTurkishSuffix() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            assertEquals("Go to Zarmon.", text)
+            "Zarmon'a git."
+        })
+        assertEquals("Vice City'ye git.", pipeline.translate(TranslationInput("Go to Vice City.")).text)
+    }
+
+    @Test
     fun dialogueIdiomsAreClarifiedBeforeModelTranslation() {
         val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
             when (text) {

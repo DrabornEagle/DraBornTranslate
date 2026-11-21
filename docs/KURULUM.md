@@ -1,8 +1,10 @@
 # DraBornTranslate kurulum rehberi
 
-DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.8 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.8) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
+DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.9 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.9) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
 
 Çeviri cihazda çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
+
+**Uygulama menüsü → Hakkında → Yeni sürüm kontrolü**, v0.4.9 ve sonrasında internet üzerinden resmi GitHub sürümünü kontrol eder. Daha yeni APK’yı indirip doğruladığında kurulumu başlatır. Android uygulama kurma izni veya onay gösterirse ekrandaki adımları tamamla.
 
 **Altyazı bölgesi** modu, v0.3.3’teki ekran okuma ve replik takibiyle çalışır. Türkçe repliğin ilk görünme süresi telefonun ekran okuma ve çeviri hızına bağlıdır. Portal ekranındaki toplam gecikmeyi, PlayStation App yayınının telefona ulaşma süresi ve panel bağlantısı da etkiler.
 
