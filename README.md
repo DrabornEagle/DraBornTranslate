@@ -1,75 +1,55 @@
-# DraBornTranslate
+<p align="center">
+  <img src="app/src/main/res/drawable-nodpi/brand_mark.webp" width="96" height="96" alt="DraBornTranslate logosu">
+</p>
 
-PlayStation Portal’da oyun oynarken PS5’in **Paylaşımlı Ekran** videosundaki İngilizce altyazıyı Android telefonda okur ve Türkçeye çevirir. Türkçe metni telefondaki yayının üzerine yazabilir, telefonun hoparlöründen okuyabilir veya deneysel bir web paneline verebilir.
+<h1 align="center">DraBornTranslate</h1>
+<p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı</strong></p>
+<p align="center">DrabornEagle ekosisteminin Android canlı oyun çevirisi uygulaması.</p>
+<p align="center">
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.2/DraBornTranslate-v0.4.2-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
+  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.2">Sürüm notları</a>
+  · <a href="docs/KURULUM.md">Kurulum rehberi</a>
+</p>
 
-**Android 10 ve üzeri, ARM64.** [Sürümler](https://github.com/DrabornEagle/DraBornTranslate/releases)
+## İndir ve kur
 
-## v0.4.2 çeviri
+| Güncel sürüm | Cihaz | Çeviri |
+| --- | --- | --- |
+| **v0.4.2** | Android 10 ve üzeri, ARM64 | Türkçe, ücretsiz ve API’siz |
 
-1. APK’yı kur ve **Türkçe modeli indir** seçeneğini aç. Uygulama MiLMMT-46 1B modelini bir defa indirir (806 MB) ve dosyanın özetini doğrular. Çeviri telefonun işlemcisinde çalışır. Hesap, API anahtarı veya abonelik gerekmez.
-2. **Çeviriyi dene** ile örnek görseldeki yazıyı okut veya İngilizce metin gir. **Son çeviri** kartında Türkçe metni ve ona karşılık gelen İngilizceyi görebilirsin. Yeni algılanan metin henüz çevrilmediyse **Okunan İngilizce** altında görünür.
-3. **Canlı çeviriyi başlat** ile PlayStation yayınına dön. Çeviri ekrandaki güncel altyazıya öncelik verir ve hazır olduğu anda gösterilir. Bilinen oyun ifadeleri doğrudan gösterilir. Yeni cümleler Türkçe konuşma diline uygun biçimde çevrilir. Güvenilir bir çevirisi bulunamayan replik bölümü `[…]` ile işaretlenir.
+1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin ve daha önce indirdiğin model korunur.
+2. İlk kurulumda **Türkçe modeli indir** ile 806 MB’lık modeli cihaza al. Sonraki çeviriler telefonda çevrimdışı çalışır.
+3. **Çeviriyi dene** ile ilk sonucu al. **Son çeviri** kartında Türkçeyi ve uygulamanın okuduğu İngilizceyi birlikte görebilirsin.
 
-Çevirinin ekrana gelme süresi telefonun işlemcisine, replik uzunluğuna ve yayın kalitesine bağlıdır. Uygulama Android işlemcisinin desteklediği llama.cpp hesaplama yolunu otomatik seçer. Daha önce indirilen MiLMMT modeli güncellemeden sonra kullanılmaya devam eder.
+## Oyunda kullan
 
-**Görünüm ve oyun paketi → Oyun paketi ekle** ile GameTranslator biçimindeki `.json` veya `.json.gz` paketini seçebilirsin. Kaynak cümle pakette eşleşirse paketin Türkçesi kullanılır.
-
-Model indirildikten sonra çeviri çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
-
-## PlayStation App yayınını hazırla
-
-1. Uzak PS5’te **Ayarlar → Sistem → Uzaktan Oynama → Uzaktan Oynama’yı Etkinleştir** ayarını aç. Dinlenme modundan bağlanacaksan **Sistem → Güç Tasarrufu → Dinlenme Modunda Kullanılabilen Özellikler** altında internet bağlantısını ve ağdan açmayı etkinleştir.
-2. Portal’da oyunun olduğu hesapla PS5’e **Uzaktan Oynama** üzerinden bağlan. Oyunun dilini İngilizce seç ve altyazıyı aç.
-3. Telefonda **PlayStation App**’e ikinci hesabınla giriş yap. Ana hesabınla aynı Game Base sesli sohbetine katıl. PS5’te **PS düğmesi → Game Base → sesli sohbet → Paylaşımlı Ekran’ı Başlat** yolunu kullan.
-4. Telefonda takım kartındaki oyun önizlemesine dokun. Oyunun canlı görüntüsünü yatay tam ekrana al. Ekranda İngilizce repliği görebildiğini doğrula.
-5. DraBornTranslate’te **PS Portal → Çevrilecek alan → Altyazı bölgesi** seç. **Çeviri çıkışı** seçeneklerinden okumak veya dinlemek istediğin yeri seç.
-
-[PS Portal Uzaktan Oynama](https://www.playstation.com/tr-tr/support/hardware/playstation-remote-play-on-psportal/) · [Paylaşımlı Ekran](https://www.playstation.com/tr-tr/support/games/ps5-share-screen/) · [PlayStation App](https://www.playstation.com/tr-tr/support/games/playstation-app-features/)
-
-## PS5 uzaktaysa Portal yan panelini dene
-
-Portal yan paneli deneysel. Oyunun yanında görünmesi, PS5’in panel bağlantısını açmasına ve sabitlenmiş sayfayı Uzaktan Oynama’ya aktarmasına bağlı. Bu davranış fiziksel bir PS Portal oturumunda doğrulanmadı.
-
-1. DraBornTranslate’te **Çeviri çıkışı → Portal yan paneli (deneysel)** seç. PS App yayını hazırsa **Canlı çeviriyi başlat** ve Android 14 ve üzerinde **Tek uygulama → PlayStation App** seç. Android 10–13’te tüm ekran izni kullanılır.
-2. PS5’e gönderilecek bağlantı için DraBornTranslate’e dön. **PS5 uzakta · Bağlantıyı hazırla → Komutu kopyala ve Termux’u aç** seç. Eski bir tünel açıksa Termux’ta `Ctrl+C` ile durdur ve yeni kopyalanan komutu yapıştırıp çalıştır. Komut, telefonun güncel IP’sini ve portunu içerir.
-3. Termux’ta görünen güncel `https://…trycloudflare.com` adresini kopyala. Termux’u çalışır bırak. DraBornTranslate’teki bağlantı sihirbazına dön, adresi yapıştır ve **Dış bağlantıyı kontrol et** seçeneğine dokun.
-4. Dış bağlantı kontrolü başarılı olunca **Tam Portal bağlantısını kopyala** seç. Uygulama adresin sonuna mevcut oturumun özel yolunu ekler. Tam bağlantıyı PlayStation App’te ikinci hesabından ana hesabına mesajla gönder.
-5. DraBornTranslate’te **Portal’da örnek yazı göster** seç. Portal’da **PS düğmesi → Game Base → gelen mesaj → bağlantı** yolunu izle. Web sayfası açılır ve **Options → Yana Sabitle** görünürse seçip oyuna dön. Örnek Türkçe metnin oyunun yanında değişmeye devam ettiğini kontrol et.
-6. Telefonda **Canlı çeviriye dön** seç. PlayStation App’teki yatay canlı yayını tekrar öne getir ve ekranı açık tut. Oyunda İngilizce altyazı çıktığında, okunan Türkçe satır panele gönderilir.
-
-**Önce kısa deneme yapmak için** **Portal bağlantısını test et** seç. Bu seçenek ekran paylaşımı izni istemeden iki örnek yazı gösterir. Test açıkken uzak PS5 için tünel sihirbazını da kullanabilirsin. Test 2,5 dakika sürer. Süre dolmadan canlı altyazıya geçersen panel bağlantın korunur. Test kapanırsa yeni oturumdan güncel bağlantıyı al.
-
-**PS5 aynı yerel ağdaysa** tünel adımlarını atlayıp **Panel bağlantısını kopyala** ile yerel adresi aynı şekilde mesajla PS5’e gönder. Telefonun ve Portal’ın aynı Wi-Fi’da olması, başka ağdaki PS5’in yerel adrese erişmesi için yeterli değildir.
-
-[Tünel komutu ve geçici adresler](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/)
-
-## Takıldığında
-
-| Belirti | Kontrol |
+| İhtiyacın | Uygulamadaki seçim |
 | --- | --- |
-| Termux’ta kırmızı satırlar var | `Registered tunnel connection` göründükten sonra asıl kontrolü uygulamadaki **Dış bağlantıyı kontrol et** ile yap. |
-| Bağlantı yanıt vermiyor | Termux’un çalıştığını ve sihirbazdaki komutla o oturumdan aldığın güncel adresi kullandığını kontrol et. Oturum veya tünel değişince yeni bağlantı hazırla. |
-| Telefon tarayıcısında panel var, Portal’da yok | Telefondaki açılış yalnızca paneli doğrular. Portal’da **Game Base** mesajını ve **Yana Sabitle** seçeneğini ayrıca kontrol et. Seçenek yoksa veya sayfa oyuna dönünce kapanıyorsa Portal ekranında bu yöntemle altyazı gösterilemez. |
-| Portal’da örnek yazı var, oyun yazısı yok | **Canlı çeviriye dön**, telefonda PS App yayınını yatay tam ekranda bırak ve oyunda İngilizce altyazının çıktığını kontrol et. **Altyazı hizası** bandını repliğe ayarla. |
-| Telefonda yayın karanlık | PS App’te izlediğin yayını tekrar aç ve Android ekran paylaşımında PS App’i seç. Bazı oyun sahneleri ve korumalı görüntüler ekran paylaşımına yansımayabilir. |
-| Portal’da sabitleme çıkmıyor | **Çeviri çıkışı → Telefon** Türkçeyi PS App videosu üzerinde gösterir. İlk kullanımda üstte gösterme iznini aç. **Sesli Türkçe** seçeneği telefonundan okur ve Termux istemez. |
+| Oyun diyaloglarını takip etmek | **Çevrilecek alan → Altyazı bölgesi** |
+| Menüleri ve görev metinlerini okumak | **Çevrilecek alan → Tüm oyun metinleri** |
+| Telefonda oyun oynarken altyazı görmek | **Telefonda oyna** ve **PS Remote Play** |
+| PS Portal’da oynarken çeviriyi görmek veya dinlemek | **PS Portal** ve **Çeviri çıkışı** |
 
-Portal’ın **Bulut Akışı** modunda PS5 Paylaşımlı Ekran yayını sağlanmadığı için bu kurulum **Uzaktan Oynama** ile kullanılır. Oturumu bitirince DraBornTranslate’te **Canlı çeviriyi durdur** seç ve Termux’ta tüneli `Ctrl+C` ile kapat. Özel panel bağlantısını yalnızca kullandığın hesaplar arasında paylaş.
+PS Portal için sürmekte olan oyun görüntüsünü **PlayStation App** üzerinden Android telefonda aç ve **Canlı çeviriyi başlat** seçeneğine dokun. Türkçe çeviri telefon ekranında, Türkçe ses olarak veya deneysel Portal yan panelinde gösterilebilir. PlayStation App, yayın ve panel adımları [kurulum rehberinde](docs/KURULUM.md) yer alıyor.
 
-## PS App menüsü ve telefonda oyun
+## v0.4.2’de neler değişti?
 
-- **Çevrilecek alan → Tüm oyun metinleri** menüleri ve görev metinlerini okur. Çevirmek istediğin ekranı yazılar okunana kadar açık tut. Yeni sonuçlar her satır çevrildikçe eklenir. Telefonda uzun listeler sırayla gösterilir. **Son çeviri** kartından listenin tamamını okuyabilir ve kopyalayabilirsin.
-- **Telefonda oyna** seçeneğinde PS Remote Play ile oyunu aç. Android paylaşım ekranında **PS Remote Play**’i seç.
-- **Sesli Türkçe** için **Türkçe sesi dene** düğmesini kullan. Gerekirse Android metin okuma ayarlarında Türkçe ses verisini yükle.
+- Canlı çeviri, ekrandaki güncel repliğe öncelik veriyor ve sonucu hazır olduğu anda gösteriyor.
+- Yaygın oyun ifadeleri doğrudan Türkçeye aktarılıyor. Yeni repliklerde konuşma dili ve deyimler için çeviri iyileştirildi.
+- Portal yan paneli yeni metni daha sık kontrol ediyor. Altyazının ekrana gelme süresi telefonun işlemcisine, repliğin uzunluğuna ve yayın kalitesine bağlı.
 
-## Derleme ve kaynaklar
+## DrabornEagle kaynak kodu
 
-JDK 17, Android SDK 35, NDK 28.2.13676358 ve CMake 3.22.1 ile derle.
+Bu depo, DrabornEagle ekosistemindeki **DraBornTranslate** uygulamasının Android kaynak kodunu ve Portal panelini içerir. Proje DrabornEagle tarafından geliştiriliyor ve sürdürülüyor. Diğer projeler için [DrabornEagle GitHub profiline](https://github.com/DrabornEagle) bakabilirsin.
+
+Derleme için JDK 17, Android SDK 35, NDK 28.2.13676358 ve CMake 3.22.1 kullanılır.
 
 ```bash
-./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:assembleDebug
 ```
 
-CMake, [llama.cpp](https://github.com/ggml-org/llama.cpp/tree/b1b770d90d94cad9e9ea5b993bdbc383a522fb28) kaynaklarını sabit revizyondan alır ve arşiv özetini doğrular. APK, `app/build/outputs/apk/debug/app-debug.apk` yolunda oluşturulur.
+Çıktı `app/build/outputs/apk/debug/app-debug.apk` yoluna yazılır. Hata ve önerileri [Sorunlar](https://github.com/DrabornEagle/DraBornTranslate/issues) sayfasından paylaşabilirsin.
 
-Uygulama [GameTranslator v1.8.48](https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.48) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) kaynaklarındaki OCR temizleme, altyazı sabitleme, terim sözlüğü ve paket eşleştirme kodlarından yararlanır. MiLMMT-46 1B modeli Xiaomi Research tarafından yayımlanmıştır. [GNU AGPL v3](LICENSE) · [Telif bildirimi](NOTICE) · [Üçüncü taraf bileşenler](THIRD-PARTY-NOTICES.md)
+## Lisans
+
+DraBornTranslate [GNU AGPL v3](LICENSE) kapsamında yayımlanır. [Telif bildirimleri](NOTICE) ve [üçüncü taraf bileşen lisansları](THIRD-PARTY-NOTICES.md) depoda yer alır.
