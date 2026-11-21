@@ -55,7 +55,9 @@ object OcrNoise {
             else if (trail.isNotEmpty() && kept.isNotEmpty()) kept[kept.size - 1] = kept.last() + trail
         }
         // Altyazının yanındaki göstergenin sayısı satırın başına yapışıyor ("9? We'll lose"): sayı atılır.
-        if (kept.size >= 3 && leadingNumber.matches(kept[0]) && kept[1][0].isUpperCase()) kept.removeAt(0)
+        if (kept.size >= 3 && kept[0].last() in "?!:;" && leadingNumber.matches(kept[0]) && kept[1][0].isUpperCase()) {
+            kept.removeAt(0)
+        }
         return kept.joinToString(" ")
     }
 
@@ -113,6 +115,14 @@ object OcrNoise {
 
     /** Sözcüğün kendisi; null ise tamamen çöptür. */
     private fun cleanCore(core: String): String? {
+        when (core) {
+            "D0n't", "D0n’t" -> return "Don't"
+            "d0n't", "d0n’t" -> return "don't"
+            "Ieft" -> return "left"
+            "n0" -> return "no"
+            "r0ad" -> return "road"
+            "sec0nd" -> return "second"
+        }
         val letters = core.count { it.isLetter() }
         val digits = core.count { isNumber(it) }
         val hasSymbol = core.any { it in SYMBOLS }

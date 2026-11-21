@@ -6,6 +6,7 @@ import com.gametranslator.gametranslator_mobile.core.GlossaryTranslator
 import com.gametranslator.gametranslator_mobile.core.PackKey
 import com.gametranslator.gametranslator_mobile.core.PackMatch
 import com.gametranslator.gametranslator_mobile.core.SubtitleSegmenter
+import com.gametranslator.gametranslator_mobile.core.TextMatch
 import com.gametranslator.gametranslator_mobile.core.TextTranslator
 import java.util.Locale
 
@@ -57,6 +58,7 @@ internal class GameTranslationPipeline(
         val pieces = SubtitleSegmenter.split(text, preserveSpeakers = preserveSpeakers)
         if (pieces.none { it.translate }) return null
         return buildString {
+            var previous: String? = null
             for (piece in pieces) {
                 if (!piece.translate) {
                     append(piece.text)
@@ -64,16 +66,18 @@ internal class GameTranslationPipeline(
                 }
                 val source = piece.text
                 val direct = PackKey.key(source)?.let(commonLines::get)?.takeIf { preservesQuestion(source, it) }
-                val translation = findPack(source) ?: direct ?: translateSentence(source)
+                val translation = findPack(source) ?: direct ?: shortAnswer(source, previous)
+                    ?: translateSentence(resolveDirection(source, previous))
                 if (translation.isNullOrBlank()) return null
                 append(translation)
+                previous = source
             }
         }.trim().takeIf(String::isNotEmpty)
     }
 
     private fun translateSentence(source: String): String? {
         val sentence = SubtitleSegmenter.normalizeCase(source, knownNames).replace('’', '\'')
-        val input = idioms.fold(sentence) { text, (phrase, replacement) ->
+        val input = idioms.fold(normalizeTime(sentence)) { text, (phrase, replacement) ->
             phrase.replace(text) { match ->
                 replacement(match).replaceFirstChar { if (match.value[0].isUpperCase()) it.uppercaseChar() else it }
             }
@@ -90,17 +94,53 @@ internal class GameTranslationPipeline(
 }
 
 private fun preservesQuestion(source: String, translation: String): Boolean =
-    !source.trimEnd('"', '”').endsWith('?') || translation.trimEnd('"', '”').endsWith('?')
+    TextMatch.endsQuestion(source) == TextMatch.endsQuestion(translation)
+
+private val possessionQuestion = Regex(
+    """^who(?: (?:has(?: got)?|holds|is holding)|['’]s got) (?:it|them|one|(?:the|a|an|your|my|his|her|our|their|this|that|these|those) .+)\?$""",
+    RegexOption.IGNORE_CASE,
+)
+private val actionQuestion = Regex("""^who (?:opened|closed|locked|unlocked|moved|took|called|sent|left|broke|told|put|gave|drove|said) .+\?$""", RegexOption.IGNORE_CASE)
+
+private fun shortAnswer(source: String, previous: String?): String? {
+    val question = previous?.trim() ?: return null
+    val answer = when (source.trimEnd('.', '!').lowercase(Locale.ROOT)) {
+        "i do" -> "Bende".takeIf { possessionQuestion.matches(question) }
+        "i did" -> "Ben".takeIf { actionQuestion.matches(question) }
+        else -> null
+    } ?: return null
+    return answer + if (source.endsWith('!')) "!" else "."
+}
+
+private val directionalPassage = Regex("""\b(?:take|use|go through) the (left|right)(?:-hand)? (door|exit)\b""", RegexOption.IGNORE_CASE)
+private val passageReference = Regex("""((?:actually, )?)(?:take|use|go through) the (left|right) one([.!]?)""", RegexOption.IGNORE_CASE)
+
+private fun resolveDirection(source: String, previous: String?): String {
+    val (lead, side, punctuation) = passageReference.matchEntire(source)?.destructured ?: return source
+    val passage = previous?.let(directionalPassage::find)?.groupValues?.get(2) ?: return source
+    val verb = if (lead.isEmpty()) "Go" else "go"
+    return "$lead$verb through the $passage on the $side$punctuation"
+}
+
+private val clockTime = Regex("""\b(0?[1-9]|1[0-2])(?::([0-5]\d))?\s*([ap])\.?m\b""", RegexOption.IGNORE_CASE)
+
+private fun normalizeTime(text: String): String = clockTime.replace(text) { match ->
+    val (hour, minute, period) = match.destructured
+    val hour24 = hour.toInt() % 12 + if (period.equals("p", ignoreCase = true)) 12 else 0
+    "${hour24.toString().padStart(2, '0')}:${minute.ifEmpty { "00" }}"
+}
 
 private val names = listOf("Vice City", "Leonida", "Los Santos", "Liberty City", "San Andreas", "Lucia", "Jason")
 private val knownNames = names.flatMap { it.lowercase(Locale.ROOT).split(' ') }.toSet()
 private val GAME_TERMS = Glossary.of(
     terms = mapOf(
+        "my wanted level" to "aranma seviyem",
         "wanted level" to "aranma seviyesi",
         "side mission" to "yan görev",
         "safe house" to "sığınak",
         "save point" to "kayıt noktası",
         "fast travel" to "hızlı seyahat",
+        "my health bar" to "can çubuğum",
         "health bar" to "can çubuğu",
         "glove compartment" to "torpido gözü",
         "call button" to "çağrı düğmesi",
@@ -114,6 +154,8 @@ private val commonLines = mapOf(
     "We're being tailed." to "Takip ediliyoruz.",
     "They're on our tail." to "Peşimizdeler.",
     "Take cover!" to "Siper al!",
+    "Take your time." to "Acele etme.",
+    "Not everyone made it out." to "Bazıları dışarı çıkamadı.",
     "Get in the car!" to "Arabaya bin!",
     "Stay out of sight." to "Görünme.",
     "Hold your fire!" to "Ateş etme!",
@@ -228,6 +270,13 @@ private fun idiom(phrase: String, replacement: String): Pair<Regex, (MatchResult
     Regex("""\b$phrase\b""", RegexOption.IGNORE_CASE) to { replacement }
 
 private val idioms = listOf(
+    idiom("keep the engine running", "keep the engine switched on"),
+    idiom("get our story straight", "agree on what to say"),
+    Regex("""\b((?:the|this|our|their) deal) fell through\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> match.groupValues[1] + " failed" },
+    directionalPassage to { match: MatchResult -> "go through the ${match.groupValues[2]} on the ${match.groupValues[1]}" },
+    Regex("""\b(?:go|head|turn) (left|right)(?= (?:after|at) (?:the |that |next )?(?:intersection|junction|traffic lights?|roundabout|corner|bridge)\b)""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "turn to the " + match.groupValues[1] },
     Regex("""\b((?:I|we|you) (?:don't|do not)) buy ((?:that|this|his|her|their|your) story)\b""", RegexOption.IGNORE_CASE) to
         { match: MatchResult -> match.groupValues[1] + " believe " + match.groupValues[2] },
     Regex("""\bblow (my|your|his|her|our|their) cover\b""", RegexOption.IGNORE_CASE) to

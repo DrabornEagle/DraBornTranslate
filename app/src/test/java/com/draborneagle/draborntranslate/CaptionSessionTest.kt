@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
+import com.gametranslator.gametranslator_mobile.core.OcrNoise
+import com.gametranslator.gametranslator_mobile.core.StabilizerAction
 import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -120,6 +122,43 @@ class CaptionSessionTest {
         assertEquals(TranslationInput("Go!"), next.first)
         next.second(TranslationReply("Bas gaza!"))
         assertEquals(Caption("Go!", "Bas gaza!"), caption)
+    }
+
+    @Test
+    fun similarSubtitlesUpdateWhenTwoReadingsConfirmTheNewMeaning() {
+        val transitions = listOf(
+            "Wait by the garage at Gate 7." to "Wait by the garage at Gate 9.",
+            "I can open the back door for you." to "I can't open the back door for you.",
+            "Go to the left side of the tunnel." to "Go to the right side of the tunnel.",
+            "Adam left the van near the warehouse." to "Martin left the van near the warehouse.",
+            "We're safe now." to "We're safe now?",
+        )
+        for ((before, after) in transitions) {
+            val tracker = SubtitleStabilizer(clock = { now }, acceptCompletedSentence = false)
+            assertEquals(StabilizerAction.None, tracker.feed(before))
+            assertEquals(StabilizerAction.translate(before), tracker.feed(before))
+            assertEquals(StabilizerAction.None, tracker.feed(after))
+            assertEquals(StabilizerAction.translate(after), tracker.feed(after))
+        }
+    }
+
+    @Test
+    fun aMisspelledWordDoesNotReplaceASubtitle() {
+        val tracker = SubtitleStabilizer(clock = { now }, acceptCompletedSentence = false)
+        val original = "Meet me near the parking garage."
+        tracker.feed(original)
+        assertEquals(StabilizerAction.translate(original), tracker.feed(original))
+        repeat(3) {
+            assertEquals(StabilizerAction.None, tracker.feed(OcrNoise.clean("Meet me near the parking garag3.")))
+        }
+    }
+
+    @Test
+    fun subtitleCleaningKeepsCriticalWordsAndLeadingQuantities() {
+        assertEquals("Don't show him my phone.", OcrNoise.clean("D0n't show him my phone."))
+        assertEquals("Don't turn left at the light.", OcrNoise.clean("Don't turn Ieft at the light."))
+        assertEquals("5 More cars are coming.", OcrNoise.clean("5 More cars are coming."))
+        assertEquals("Open the gate now.", OcrNoise.clean("9? Open the gate now."))
     }
 
     @Test

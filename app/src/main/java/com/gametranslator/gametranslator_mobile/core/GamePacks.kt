@@ -370,6 +370,7 @@ class GamePackLibrary(
         }
         val pack = chosen?.let { current.getOrNull(it)?.first }?.takeIf { it.id !in disabled } ?: return null
         corrected(text, pack, current)?.let { return it }
+        if (!PackFuzzy.damaged(text)) return null
         val key = pack.fuzzy?.nearest(text) { lookup(current, it)?.text } ?: return null
         return lookup(current, key)
     }

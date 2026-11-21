@@ -10,6 +10,13 @@ import kotlin.math.min
  * Windows'taki GameTranslator.Core/TextMatch.cs ile aynı kurallar.
  */
 object TextMatch {
+    private val meaningMarkers = Regex(
+        """\b(?:[a-z]*\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|left|right|no|not|never|cannot|(?:can|won|[a-z]+n) t)\b""",
+    )
+
+    fun endsQuestion(text: String): Boolean =
+        text.trimEnd().trimEnd('"', '\'', '”', '’', '»', ')', ']', '!').endsWith('?')
+
     /** Küçük harf, yalnız harf/rakam, tek boşluk. */
     fun normalize(s: String): String {
         val builder = StringBuilder(s.length)
@@ -35,6 +42,33 @@ object TextMatch {
     /** Satırları ayrı ayrı sadeleştirip alt alta birleştirir; [isSameSubtitle] kaçırılan satırı bundan anlar. */
     fun normalizeRows(s: String): String =
         s.replace("\r\n", "\n").split('\n').map { normalize(it) }.filter { it.isNotEmpty() }.joinToString("\n")
+
+    /** A confirmed change can replace a similar cue without treating a one-letter OCR error as dialogue. */
+    fun hasMeaningfulChange(reread: String, sent: String): Boolean {
+        val previous = sent.replace('\n', ' ')
+        if (reread == previous || previous.isEmpty()) return false
+        fun markers(text: String) = meaningMarkers.findAll(text).map(MatchResult::value).toList()
+        if (markers(reread) != markers(previous)) return true
+
+        val currentWords = reread.split(' ')
+        val previousWords = previous.split(' ')
+        val commonSize = min(currentWords.size, previousWords.size)
+        var start = 0
+        while (start < commonSize && currentWords[start] == previousWords[start]) start++
+        var tail = 0
+        while (start + tail < commonSize && currentWords[currentWords.lastIndex - tail] == previousWords[previousWords.lastIndex - tail]) {
+            tail++
+        }
+        val currentChange = currentWords.subList(start, currentWords.size - tail)
+        val previousChange = previousWords.subList(start, previousWords.size - tail)
+        if (currentChange.isEmpty() || previousChange.isEmpty()) return false
+        if (currentChange.size != previousChange.size) return true
+        return currentChange.indices.any { index ->
+            val current = currentChange[index]
+            val old = previousChange[index]
+            !isSimilar(current, old, 1 - 1.0 / max(current.length, old.length))
+        }
+    }
 
     /**
      * Yeni okuma, gönderilmiş altyazının yeniden okuması mı. Başına ya da sonuna sözcük eklenmiş metin yenidir;

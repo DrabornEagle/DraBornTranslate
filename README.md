@@ -6,8 +6,8 @@
 <p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı</strong></p>
 <p align="center">DrabornEagle ekosisteminin Android canlı oyun çevirisi uygulaması.</p>
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.6/DraBornTranslate-v0.4.6-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
-  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.6">Sürüm notları</a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.7/DraBornTranslate-v0.4.7-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
+  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.7">Sürüm notları</a>
   · <a href="docs/KURULUM.md">Kurulum rehberi</a>
 </p>
 
@@ -15,7 +15,7 @@
 
 | Güncel sürüm | Cihaz | Çeviri |
 | --- | --- | --- |
-| **v0.4.6** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
+| **v0.4.7** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
 
 1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin.
 2. Çeviri modeli APK’ya dahildir ve telefonda çevrimdışı çalışır.
@@ -32,11 +32,11 @@
 
 PS Portal için sürmekte olan oyun görüntüsünü **PlayStation App** üzerinden Android telefonda aç ve **Canlı çeviriyi başlat** seçeneğine dokun. Türkçe çeviri telefon ekranında, Türkçe ses olarak veya deneysel Portal yan panelinde gösterilebilir. PlayStation App, yayın ve panel adımları [kurulum rehberinde](docs/KURULUM.md) yer alıyor.
 
-## v0.4.6’da neler değişti?
+## v0.4.7’de neler değişti?
 
-- Canlı altyazı v0.3.3’ün ekran okuma, replik takibi ve çevrimdışı çeviri akışına döndü.
-- Oyun deyimleri, yön tarifleri ve menüler için Türkçe karşılıklar iyileştirildi. Kayıt yuvası, envanter adedi ve çözünürlük gibi değerler korunuyor.
-- **Bağlantı ve ekran paylaşımı** ile **Görünüm ve oyun paketi** ilk açılışta açık geliyor. Lisans bilgilerine üstteki **Hakkında** simgesinden erişilebilir.
+- Benzer repliklerde sayı, olumsuzluk, soru ve kelime değişiklikleri doğrulandığında yeni Türkçe satır gösteriliyor.
+- Ekran okuma düzeltmeleri, yönleri ve emirlerin anlamını değiştirebilen yaygın okuma hatalarını gideriyor.
+- Kısa yanıtlar önceki cümleden yararlanıyor. Oyun deyimleri, saatler ve Türkçe iyelik ekleri için yeni çeviri kuralları eklendi.
 
 ## DrabornEagle kaynak kodu
 

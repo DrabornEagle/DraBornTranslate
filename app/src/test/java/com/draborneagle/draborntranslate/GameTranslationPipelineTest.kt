@@ -104,6 +104,68 @@ class GameTranslationPipelineTest {
     }
 
     @Test
+    fun statementsDoNotUseAPackMatchThatIsAQuestion() {
+        val pipeline = GameTranslationPipeline(
+            packLookup = { PackMatch("Şimdi çıkıyor muyuz?") },
+            model = { "Şimdi çıkıyoruz." },
+        )
+        assertEquals("Şimdi çıkıyoruz.", pipeline.translate(TranslationInput("We're leaving now.")).text)
+    }
+
+    @Test
+    fun shortAnswersUseTheQuestionInTheSameSubtitle() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "Who's got the keys?" -> "Anahtarlar kimde?"
+                "Who opened the door?" -> "Kapıyı kim açtı?"
+                "Who has to drive?" -> "Kim sürmek zorunda?"
+                "I do." -> "Ben sürmeliyim."
+                else -> error(text)
+            }
+        })
+        assertEquals("Anahtarlar kimde? Bende.", pipeline.translate(TranslationInput("Who's got the keys? I do.")).text)
+        assertEquals("Kim sürmek zorunda? Ben sürmeliyim.", pipeline.translate(TranslationInput("Who has to drive? I do.")).text)
+        assertEquals(
+            "LUCIA: Kapıyı kim açtı?\nJASON: Ben.",
+            pipeline.translate(TranslationInput("LUCIA: Who opened the door?\nJASON: I did.")).text,
+        )
+    }
+
+    @Test
+    fun directionalReferencesKeepTheDoorAndSide() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "Go through the door on the left." -> "Soldaki kapıdan geç."
+                "Actually, go through the door on the right." -> "Daha doğrusu sağdaki kapıdan geç."
+                else -> error(text)
+            }
+        })
+        assertEquals(
+            "Soldaki kapıdan geç. Daha doğrusu sağdaki kapıdan geç.",
+            pipeline.translate(TranslationInput("Take the left door. Actually, take the right one.")).text,
+        )
+    }
+
+    @Test
+    fun meridiemAndPossessiveGameTermsStayUnambiguous() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "The call is at 00:30." -> "Arama saat 00.30'da."
+                "Zarmon is almost empty." -> "Zarmon neredeyse boş."
+                else -> error(text)
+            }
+        })
+        assertEquals(
+            "Arama saat 00.30'da.",
+            pipeline.translate(TranslationInput("The call is at 12:30 a.m.")).text,
+        )
+        assertEquals(
+            "Can çubuğum neredeyse boş.",
+            pipeline.translate(TranslationInput("My health bar is almost empty.")).text,
+        )
+    }
+
+    @Test
     fun doesNotDisplayOnlyFirstSentenceOfAMultiSentenceSubtitleWhenTheModelFails() {
         val pipeline = GameTranslationPipeline(packLookup = { null }, model = { null })
         assertNull(pipeline.translate(TranslationInput("Take cover! I will look for a way around the building.")).text)
