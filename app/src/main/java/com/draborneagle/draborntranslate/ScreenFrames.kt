@@ -29,6 +29,7 @@ internal class ScreenFrames(
     private val reserveFrame: () -> Boolean,
     private val discardFrame: () -> Unit,
     private val onFrame: (Bitmap) -> Unit,
+    private val onEmptyFrame: () -> Unit,
     private val onSource: (FrameSource) -> Unit,
     private val onEnded: (String) -> Unit,
 ) : AutoCloseable {
@@ -169,6 +170,7 @@ internal class ScreenFrames(
                 lastSampleAt = now
                 if (darkSince == 0L) darkSince = now
                 if (now - darkSince >= 2700L) setSignal(FrameSource.DARK)
+                if (reserveFrame()) onEmptyFrame()
                 return
             }
             darkSince = 0L

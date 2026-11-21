@@ -3,6 +3,7 @@ package com.draborneagle.draborntranslate
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CaptionSessionTest {
@@ -12,10 +13,12 @@ class CaptionSessionTest {
     private var caption: Caption? = null
     private val delivered = mutableListOf<String>()
     private val requests = ArrayDeque<Pair<TranslationInput, (TranslationReply) -> Unit>>()
+    private val refinements = ArrayDeque<Pair<TranslationInput, (TranslationReply) -> Unit>>()
 
     private fun session(
         area: ReadingArea = ReadingArea.SUBTITLES,
         known: (TranslationInput) -> String? = { null },
+        refine: Boolean = false,
     ) = CaptionSession(
         translate = { source, answer -> requests.addLast(source to answer) },
         show = {
@@ -26,6 +29,7 @@ class CaptionSessionTest {
         onRead = { recognized = it },
         cancelTranslation = { cancelCount++ },
         translateKnown = known,
+        refine = { source, answer -> refine && refinements.add(source to answer) },
         readingArea = area,
         clock = { now },
     )
@@ -45,7 +49,7 @@ class CaptionSessionTest {
         }
 
         assertEquals(1, requests.size)
-        assertEquals(1, cancelCount)
+        assertEquals(0, cancelCount)
         answer("Get to the bridge!", "Köprüye git!")
         assertNull(caption)
         assertEquals("Stop!", recognized)
@@ -73,7 +77,7 @@ class CaptionSessionTest {
         val dialogue = session()
         dialogue.read(listOf("Follow me."), confident = true)
         dialogue.blankFrame()
-        assertEquals(1, cancelCount)
+        assertEquals(0, cancelCount)
         answer("Follow me.", "Beni takip et.")
         assertNull(caption)
     }
@@ -90,12 +94,12 @@ class CaptionSessionTest {
     }
 
     @Test
-    fun aKnownRepliqueAppearsWhileAnObsoleteModelRequestIsStillReturning() {
+    fun aKnownCueAppearsWhileAnObsoleteModelRequestIsStillReturning() {
         val dialogue = session(known = { if (it.text == "Go!") "Git!" else null })
         dialogue.read(listOf("Walk across the bridge."), confident = true)
         dialogue.read(listOf("Go!"), confident = true)
         assertEquals(Caption("Go!", "Git!"), caption)
-        assertEquals(1, cancelCount)
+        assertEquals(0, cancelCount)
         answer("Walk across the bridge.", "Köprüden geç.")
         assertEquals("Git!", caption?.turkish)
         assertEquals(listOf("Go!"), delivered)
@@ -103,17 +107,92 @@ class CaptionSessionTest {
     }
 
     @Test
-    fun aReturningCueCanBeTranslatedAfterItsFirstRequestWasCanceled() {
+    fun aReturningCueCanUseItsOriginalInFlightTranslation() {
         val dialogue = session()
         dialogue.read(listOf("Follow me."), confident = true)
         dialogue.read(listOf("Go!"), confident = true)
         dialogue.read(listOf("Follow me."), confident = true)
-        val (first, finish) = requests.removeFirst()
-        assertEquals("Follow me.", first.text)
-        finish(TranslationReply(issue = "Canceled"))
         answer("Follow me.", "Beni takip et.")
         assertEquals("Beni takip et.", caption?.turkish)
         assertEquals(listOf("Follow me."), delivered)
+        assertTrue(requests.isEmpty())
+    }
+
+    @Test
+    fun shortAndLongCuesKeepTheirOwnLifetimes() {
+        val dialogue = session()
+        for ((source, target, frames) in listOf(
+            Triple("We lost them.", "İzlerini kaybettirdik.", 3),
+            Triple("Wait here until I come back.", "Dönene kadar burada bekle.", 45),
+            Triple("Take the next exit.", "Sıradaki çıkıştan çık.", 3),
+        )) {
+            dialogue.read(listOf(source), confident = true)
+            assertNull(caption)
+            now += 95
+            answer(source, target)
+            val expected = Caption(source, target)
+            assertEquals(expected, caption)
+            repeat(frames - 1) {
+                now += 180
+                dialogue.read(listOf(source), confident = true)
+                assertEquals(expected, caption)
+                assertTrue(requests.isEmpty())
+            }
+            now += 85
+        }
+        dialogue.read(emptyList())
+        assertEquals("Take the next exit.", caption?.source)
+        now += 180
+        dialogue.read(emptyList())
+        assertNull(caption)
+        assertNull(recognized)
+    }
+
+    @Test
+    fun repeatedOcrPunctuationAndCaseDoNotRemoveTheTranslation() {
+        val dialogue = session()
+        dialogue.read(listOf("We should wait."), confident = true)
+        answer("We should wait.", "Beklemeliyiz.")
+        for (read in listOf("WE SHOULD WAIT!", "We should wait", "We should wait…")) {
+            now += 180
+            dialogue.read(listOf(read), confident = true)
+            assertEquals("Beklemeliyiz.", caption?.turkish)
+            assertTrue(requests.isEmpty())
+        }
+    }
+
+    @Test
+    fun refinementOnlyUpdatesItsOwnVisibleCueAndIsRemembered() {
+        val dialogue = session(refine = true)
+        dialogue.read(listOf("We lost them."), confident = true)
+        answer("We lost them.", "Onları kaybettik.")
+        val (first, finishFirst) = refinements.removeFirst()
+        assertEquals("We lost them.", first.text)
+        dialogue.read(listOf("We'll sort it out."), confident = true)
+        answer("We'll sort it out.", "Bunu çözeceğiz.")
+        finishFirst(TranslationReply("İzlerini kaybettirdik."))
+        assertEquals("Bunu çözeceğiz.", caption?.turkish)
+        assertEquals(listOf("We lost them.", "We'll sort it out."), delivered)
+        val (second, finishSecond) = refinements.removeFirst()
+        assertEquals("We'll sort it out.", second.text)
+        finishSecond(TranslationReply("Bir yolunu buluruz."))
+        assertEquals("Bir yolunu buluruz.", caption?.turkish)
+        dialogue.read(listOf("We lost them."), confident = true)
+        assertEquals("İzlerini kaybettirdik.", caption?.turkish)
+        assertTrue(requests.isEmpty())
+        assertTrue(refinements.isEmpty())
+    }
+
+    @Test
+    fun resetDoesNotReuseAnInFlightResultFromThePreviousSource() {
+        val dialogue = session()
+        dialogue.read(listOf("I got you."), confident = true)
+        dialogue.reset()
+        dialogue.read(listOf("I got you."), confident = true)
+        answer("I got you.", "Seni yakaladım.")
+        assertNull(caption)
+        answer("I got you.", "Arkandayım.")
+        assertEquals("Arkandayım.", caption?.turkish)
     }
 
     @Test
@@ -182,7 +261,7 @@ class CaptionSessionTest {
         repeat(2) { game.read(listOf("Settings", "Exit")) }
         answer("Settings", "Ayarlar")
         repeat(2) { game.read(listOf("Settings", "Resume")) }
-        assertEquals(1, cancelCount)
+        assertEquals(0, cancelCount)
         answer("Exit", "Çıkış")
         assertEquals("Ayarlar", caption?.turkish)
         answer("Resume", "Oyuna dön")

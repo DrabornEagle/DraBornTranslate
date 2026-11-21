@@ -124,6 +124,7 @@ class CaptureService : Service() {
             },
             cancelTranslation = language::cancelCurrent,
             translateKnown = language::translateKnown,
+            refine = language::refine,
             readingArea = readingArea,
         )
         frames = ScreenFrames(
@@ -132,6 +133,12 @@ class CaptureService : Service() {
             reserveFrame = { ocrPending.compareAndSet(false, true) },
             discardFrame = { ocrPending.set(false) },
             onFrame = { bitmap -> main.post { recognize(bitmap) } },
+            onEmptyFrame = {
+                main.post {
+                    ocrPending.set(false)
+                    if (!ended && modelReady) captions?.read(emptyList())
+                }
+            },
             onSource = { value -> main.post { sourceChanged(value) } },
             onEnded = { message -> main.post { finish(message) } },
         ).also { it.start(Activity.RESULT_OK, grant) }
@@ -208,14 +215,12 @@ class CaptureService : Service() {
             if (ended || frameEpoch != epoch) return@read
             if (result == null) {
                 updateStatus("Yazı tanıma yanıtı alınamadı.")
-            } else {
-                if (modelReady) {
-                    updateStatus(when {
-                        result.lines.isEmpty() -> waitingForText()
-                        readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
-                        else -> "İngilizce altyazı okunuyor."
-                    })
-                }
+            } else if (modelReady) {
+                updateStatus(when {
+                    result.lines.isEmpty() -> waitingForText()
+                    readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
+                    else -> "İngilizce altyazı okunuyor."
+                })
                 captions?.read(result.lines, result.confident)
             }
         }
@@ -225,7 +230,10 @@ class CaptureService : Service() {
         if (ended) return
         val state = SessionState.current
         if (state.portalPanel?.previewing != true) publishCaption(caption)
-        if (caption != null && caption != state.caption) {
+        if (caption == null && state.caption != null && readingArea == ReadingArea.SUBTITLES) voice?.pause()
+        if (caption != null && caption != state.caption &&
+            (readingArea == ReadingArea.GAME_TEXT || caption.source != state.caption?.source)
+        ) {
             val spoken = if (readingArea == ReadingArea.GAME_TEXT) {
                 val previous = state.caption?.turkish?.lines().orEmpty().toSet()
                 caption.turkish.lines().filterNot(previous::contains).joinToString("\n")

@@ -340,18 +340,18 @@ class MainActivity : Activity() {
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
         val modelReady = modelState.stage == OfflineModelStore.Stage.READY
-        modelLabel.text = modelState.message
+        modelLabel.text = if (modelReady) "Çevrimdışı çeviri ve gelişmiş model hazır."
+        else modelState.message
         modelButton.visibility = if (modelReady) View.GONE else View.VISIBLE
         modelButton.isEnabled = modelState.stage != OfflineModelStore.Stage.VERIFYING
         modelButton.text = when (modelState.stage) {
             OfflineModelStore.Stage.DOWNLOADING -> "İndirmeyi durdur"
             OfflineModelStore.Stage.VERIFYING -> "Dosya doğrulanıyor…"
-            else -> "Türkçe modeli indir · ${OfflineModelStore.MODEL_SIZE}"
+            else -> "Gelişmiş modeli indir · ${OfflineModelStore.MODEL_SIZE}"
         }
-        startStop.visibility = if (state.active || modelReady) View.VISIBLE else View.GONE
         startStop.isEnabled = !pending && demoTranslator == null && !packLoading
         startStop.text = if (state.active) "Canlı çeviriyi durdur" else "Canlı çeviriyi başlat"
-        testButton.isEnabled = modelReady && controlsAvailable && demoTranslator == null
+        testButton.isEnabled = controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
         val caption = displayedCaption()
@@ -371,7 +371,7 @@ class MainActivity : Activity() {
     }
 
     private fun displayedCaption(): Caption? =
-        if (demoMessage != null) demoCaption else SessionState.current.let { it.caption ?: it.lastCaption }
+        if (demoMessage != null) demoCaption else SessionState.current.let { if (it.active) it.caption else it.lastCaption }
 
     private fun recognizedText(): String? =
         if (demoMessage != null) demoSource
@@ -394,9 +394,9 @@ class MainActivity : Activity() {
         }
         if (modelState.stage != OfflineModelStore.Stage.MISSING) return
         AlertDialog.Builder(this)
-            .setTitle("Çevrimdışı Türkçe modeli")
+            .setTitle("Gelişmiş çevrimdışı model")
             .setMessage("${OfflineModelStore.MODEL_NAME} için bir defalık ${OfflineModelStore.MODEL_SIZE} indirme yapılır. " +
-                "Sonraki çeviriler telefonunda çalışır.")
+                "Uygulama, ekranda duran repliklerde bu modeli ek bir kalite denetimi için kullanır.")
             .setNeutralButton("Model lisansı") { _, _ -> openLink(OfflineModelStore.TERMS) }
             .setNegativeButton("Vazgeç", null)
             .setPositiveButton("İndir") { _, _ ->
@@ -812,7 +812,7 @@ class MainActivity : Activity() {
     }
 
     private fun runDemo(typed: String? = null) {
-        val translator = GameTranslatorEngine(this)
+        val translator = GameTranslatorEngine(this, preferQuality = true)
         demoTranslator = translator
         demoMessage = "Telefondaki çeviri modeli hazırlanıyor…"
         demoCaption = null

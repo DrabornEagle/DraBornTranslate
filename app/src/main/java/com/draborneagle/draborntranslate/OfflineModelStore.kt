@@ -68,7 +68,7 @@ internal object OfflineModelStore {
         val prefs = preferences(context)
         val id = prefs.getLong(downloadKey, -1)
         if (id < 0) return State(Stage.MISSING, prefs.getString(messageKey, null)
-            ?: "$MODEL_NAME modelini bir kez indir. Sonraki çeviriler çevrimdışı çalışır.")
+            ?: "Canlı çeviri çevrimdışı çalışır. İstersen gelişmiş modeli de ekleyebilirsin.")
         if (verifying == id) return State(Stage.VERIFYING, "Model dosyası doğrulanıyor…")
         val downloads = manager(context)
         downloads.query(DownloadManager.Query().setFilterById(id))?.use { row ->

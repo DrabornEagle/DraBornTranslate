@@ -14,12 +14,12 @@ internal data class TranslationInput(
     val allowPartial: Boolean = false,
     val preservePlaceholders: Boolean = false,
 )
-internal data class TranslationReply(val text: String? = null, val issue: String? = null)
+internal data class TranslationReply(val text: String? = null, val issue: String? = null, val refined: Boolean = false)
 
 /** Sends full speaker turns to the local model and keeps menu labels in their original order. */
 internal class GameTranslationPipeline(
     private val packLookup: (String) -> PackMatch?,
-    private val translateModel: ((TranslationInput) -> String?)? = null,
+    private val candidates: ((TranslationInput) -> List<String>)? = null,
     private val canceled: () -> Boolean = { false },
 ) {
     fun translate(input: TranslationInput): TranslationReply {
@@ -88,12 +88,15 @@ internal class GameTranslationPipeline(
             val sentences = if (known == null && splitOnFailure) {
                 SubtitleSegmenter.split(source, preserveSpeakers = false)
             } else emptyList()
-            val canSplit = sentences.count { it.translate } >= 2
+            val sentenceCount = sentences.count { it.translate }
+            val canSplit = sentenceCount >= 2
             val hasVerifiedSentence = canSplit && sentences.any {
                 it.translate && (GamePhrases.direct(it.text, area) != null || findPack(it.text) != null)
             }
             // Keep confirmed idiomatic meanings when a turn also contains a new sentence.
-            val direct = known ?: if (!hasVerifiedSentence) translatePiece(source, area, speakerNames) else null
+            val direct = known ?: if (!hasVerifiedSentence) {
+                translatePiece(source, area, speakerNames, sentenceCount)
+            } else null
             if (direct != null) {
                 translatedAny = true
                 result.append(direct)
@@ -119,8 +122,8 @@ internal class GameTranslationPipeline(
         return text.takeIf { preservesSubtitleNumbers(source, it) }
     }
 
-    private fun translatePiece(source: String, area: ReadingArea, speakerNames: List<String>): String? {
-        val model = translateModel ?: return null
+    private fun translatePiece(source: String, area: ReadingArea, speakerNames: List<String>, sentenceCount: Int): String? {
+        val model = candidates ?: return null
         if (looksDamaged(source) || canceled()) return null
         val sound = source.startsWith('[') && source.endsWith(']')
         val body = if (sound) source.substring(1, source.length - 1) else source
@@ -138,16 +141,20 @@ internal class GameTranslationPipeline(
                     !protected.find(it).map { match -> match.turkish }.containsAll(namesInSource) ||
                     (englishProhibition.containsMatchIn(body) && !turkishProhibition.containsMatchIn(it)) ||
                     (englishNeverSaid.containsMatchIn(body) && !turkishDeniedSaying.containsMatchIn(it)) ||
+                    (sentenceCount > 1 && SubtitleSegmenter.split(it, preserveSpeakers = false).count { it.translate } < sentenceCount) ||
                     (englishFunctionWords.containsMatchIn(body) && TextMatch.normalize(body) == TextMatch.normalize(it))
             }
         }
         val protector = TermProtector(gameTerms, modelSource)
         val (prepared, slots) = protector.protect(modelSource)
-        val withTerms = if (slots.isNotEmpty()) model(TranslationInput(prepared, area, preservePlaceholders = true))?.let {
-            checked(TermProtector.restore(it, slots, protector.allSlots))
+        val withTerms = if (slots.isNotEmpty()) {
+            model(TranslationInput(prepared, area, preservePlaceholders = true)).firstNotNullOfOrNull {
+                checked(TermProtector.restore(it, slots, protector.allSlots))
+            }
         } else null
         if (canceled()) return null
-        val candidate = withTerms ?: checked(model(TranslationInput(modelSource, area))) ?: return null
+        val candidate = withTerms ?: model(TranslationInput(modelSource, area)).firstNotNullOfOrNull(::checked)
+            ?: return null
         val result = restoreEnding(body, candidate)
         return if (sound) "[${result.trim('[', ']')}]" else result
     }

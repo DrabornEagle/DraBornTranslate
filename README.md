@@ -6,8 +6,8 @@
 <p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı</strong></p>
 <p align="center">DrabornEagle ekosisteminin Android canlı oyun çevirisi uygulaması.</p>
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.2/DraBornTranslate-v0.4.2-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
-  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.2">Sürüm notları</a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.3/DraBornTranslate-v0.4.3-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
+  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.3">Sürüm notları</a>
   · <a href="docs/KURULUM.md">Kurulum rehberi</a>
 </p>
 
@@ -15,10 +15,10 @@
 
 | Güncel sürüm | Cihaz | Çeviri |
 | --- | --- | --- |
-| **v0.4.2** | Android 10 ve üzeri, ARM64 | Türkçe, ücretsiz ve API’siz |
+| **v0.4.3** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
 
 1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin ve daha önce indirdiğin model korunur.
-2. İlk kurulumda **Türkçe modeli indir** ile 806 MB’lık modeli cihaza al. Sonraki çeviriler telefonda çevrimdışı çalışır.
+2. Çeviri modeli APK’ya dahildir ve telefonda çevrimdışı çalışır. **Gelişmiş modeli indir** seçeneğiyle 806 MB’lık modeli isteğe bağlı olarak ekleyebilirsin.
 3. **Çeviriyi dene** ile ilk sonucu al. **Son çeviri** kartında Türkçeyi ve uygulamanın okuduğu İngilizceyi birlikte görebilirsin.
 
 ## Oyunda kullan
@@ -32,11 +32,11 @@
 
 PS Portal için sürmekte olan oyun görüntüsünü **PlayStation App** üzerinden Android telefonda aç ve **Canlı çeviriyi başlat** seçeneğine dokun. Türkçe çeviri telefon ekranında, Türkçe ses olarak veya deneysel Portal yan panelinde gösterilebilir. PlayStation App, yayın ve panel adımları [kurulum rehberinde](docs/KURULUM.md) yer alıyor.
 
-## v0.4.2’de neler değişti?
+## v0.4.3’te neler değişti?
 
-- Canlı çeviri, ekrandaki güncel repliğe öncelik veriyor ve sonucu hazır olduğu anda gösteriyor.
-- Yaygın oyun ifadeleri doğrudan Türkçeye aktarılıyor. Yeni repliklerde konuşma dili ve deyimler için çeviri iyileştirildi.
-- Portal yan paneli yeni metni daha sık kontrol ediyor. Altyazının ekrana gelme süresi telefonun işlemcisine, repliğin uzunluğuna ve yayın kalitesine bağlı.
+- Türkçe altyazı, ait olduğu İngilizce replik ekrandayken gösteriliyor. İngilizce replik değiştiğinde ya da kaybolduğunda Türkçe altyazı da güncelleniyor.
+- Kısa replikler için APK içindeki hızlı model kullanılıyor. Gelişmiş model kuruluysa ekrandaki repliğin çevirisini ayrıca iyileştirebiliyor.
+- Çeviri seçilirken sayılar, özel adlar ve olumsuz komutlar kontrol ediliyor. Birden fazla cümle içeren repliklerde eksik kalan cümleler ayrı çevriliyor. İlk sonucun gelme süresi telefonun işlemcisine, repliğin uzunluğuna ve yayın kalitesine bağlı.
 
 ## DrabornEagle kaynak kodu
 

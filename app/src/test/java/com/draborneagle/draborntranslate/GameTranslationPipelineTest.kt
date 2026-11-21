@@ -20,7 +20,7 @@ class GameTranslationPipelineTest {
                 .put(checkNotNull(PackKey.key("Go downstairs.")), "Aşağı in.")
                 .put(checkNotNull(PackKey.key("Shut the window!")), "Pencereyi kapat!"))
         val library = GamePackLibrary({ listOf("sample.json" to { pack.toString().toByteArray() }) }, null)
-        val pipeline = GameTranslationPipeline(
+        val pipeline = testedPipeline(
             packLookup = { PackTranslation.match(it, library::findWithPack) },
             translateModel = { error("Pack hits must not call the model") },
         )
@@ -31,7 +31,7 @@ class GameTranslationPipelineTest {
     @Test
     fun keepsSentencesFromTheSameSpeakerTogetherButPreservesAttribution() {
         val calls = mutableListOf<String>()
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             calls.add(request.text)
             when (request.text) {
                 "We need more fuel. The truck is empty." -> "Biraz daha yakıt lazım. Kamyonun deposu boş."
@@ -47,7 +47,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun fallsBackBySentenceIfAWholeTurnLosesAQuantity() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             when (request.text) {
                 "We've got 20 minutes. Don't start without me." -> "On iki dakikamız var. Bensiz başlama."
                 "We've got 20 minutes." -> "Yirmi dakikamız var."
@@ -57,6 +57,20 @@ class GameTranslationPipelineTest {
         })
         assertEquals("Yirmi dakikamız var. Ben olmadan başlama.",
             pipeline.translate(TranslationInput("We've got twenty minutes. Don't start without me.")).text)
+    }
+
+    @Test
+    fun restoresASecondInstructionThatTheWholeTurnModelDropped() {
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
+            when (request.text) {
+                "The guard has left. Take the service stairs." -> "Nöbetçi gitti."
+                "The guard has left." -> "Nöbetçi gitti."
+                "Take the service stairs." -> "Servis merdivenlerini kullan."
+                else -> error(request.text)
+            }
+        })
+        assertEquals("Nöbetçi gitti. Servis merdivenlerini kullan.",
+            pipeline.translate(TranslationInput("The guard has left. Take the service stairs.")).text)
     }
 
     @Test
@@ -72,7 +86,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun alsoTranslatesMenusWithoutChangingTheirOrder() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             assertEquals(TranslationInput("Change the radio station", ReadingArea.GAME_TEXT), request)
             "Radyo istasyonunu değiştir"
         })
@@ -86,13 +100,13 @@ class GameTranslationPipelineTest {
 
     @Test
     fun doesNotPublishAnIncompleteTurnIfTheModelFails() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { null })
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { null })
         assertNull(pipeline.translate(TranslationInput("Take cover! I will look for a way around the building.")).text)
     }
 
     @Test
     fun liveDialogueKeepsVerifiedSentencesAndMarksAMissingOne() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             if (request.text == "We have 20 minutes.") "On iki dakikamız var." else null
         })
         val reply = pipeline.translate(TranslationInput("Take cover! We have 20 minutes.", allowPartial = true))
@@ -102,7 +116,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun rejectsAnAlteredNameOrAReversedNegativeCommand() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             when (request.text) {
                 "Meet Lucia at pier 7." -> "Lucy ile 7. iskelede buluş."
                 "Do not open the gate." -> "Kapıyı aç."
@@ -115,7 +129,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun ignoresAStatementStoredUnderTheSamePackKeyAsAQuestion() {
-        val pipeline = GameTranslationPipeline(
+        val pipeline = testedPipeline(
             packLookup = { PackMatch("Güvendeyiz.") },
             translateModel = { "Güvende miyiz" },
         )
@@ -130,7 +144,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun translatesAnInvitationToMeetAsAnInvitationRatherThanAnInstructionToGreet() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             assertEquals("Let's meet by the bridge.", request.text)
             "Köprünün yanında buluşalım."
         })
@@ -140,7 +154,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun aVerifiedIdiomRetainsItsMeaningInsideALongerDialogueCue() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             assertEquals("We should hear him out.", request.text)
             "Sözünü bitirene kadar onu dinleyelim."
         })
@@ -151,15 +165,24 @@ class GameTranslationPipelineTest {
     @Test
     fun aDenialCannotBecomeAnAdmission() {
         val input = TranslationInput("I never said she stole the money.")
-        val wrong = GameTranslationPipeline(packLookup = { null }, translateModel = { "Parayı çaldığını söyledim." })
-        val right = GameTranslationPipeline(packLookup = { null }, translateModel = { "Parayı çaldığını hiç söylemedim." })
+        val wrong = testedPipeline(packLookup = { null }, translateModel = { "Parayı çaldığını söyledim." })
+        val right = testedPipeline(packLookup = { null }, translateModel = { "Parayı çaldığını hiç söylemedim." })
         assertNull(wrong.translate(input).text)
         assertEquals("Parayı çaldığını hiç söylemedim.", right.translate(input).text)
     }
 
     @Test
+    fun triesAnotherCompleteCandidateWhenTheBestGuessChangesTheCountOrNegation() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, candidates = {
+            listOf("3 kapıyı açma.", "4 kapıyı aç.", "4 kapıyı sakın açma.")
+        })
+        assertEquals("4 kapıyı sakın açma.",
+            pipeline.translate(TranslationInput("Don't open the 4 doors.")).text)
+    }
+
+    @Test
     fun keepsTheRecipientAndSpeakerRolesInAQuestion() {
-        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+        val pipeline = testedPipeline(packLookup = { null }, translateModel = { request ->
             assertEquals("Before he left, what did you tell Kratos?", request.text)
             "Kratos'a gitmeden önce ne söyledin?"
         })
@@ -167,3 +190,8 @@ class GameTranslationPipelineTest {
             pipeline.translate(TranslationInput("What did you say to Kratos before he left?")).text)
     }
 }
+
+private fun testedPipeline(
+    packLookup: (String) -> com.gametranslator.gametranslator_mobile.core.PackMatch?,
+    translateModel: (TranslationInput) -> String?,
+) = GameTranslationPipeline(packLookup, candidates = { listOfNotNull(translateModel(it)) })
