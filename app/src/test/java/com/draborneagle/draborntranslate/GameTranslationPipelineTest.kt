@@ -51,11 +51,11 @@ class GameTranslationPipelineTest {
             when (request.text) {
                 "We've got 20 minutes. Don't start without me." -> "On iki dakikamız var. Bensiz başlama."
                 "We've got 20 minutes." -> "Yirmi dakikamız var."
-                "Don't start without me." -> "Bensiz başlama."
+                "Don't start without me." -> "Benim olmadan başlama."
                 else -> error(request.text)
             }
         })
-        assertEquals("Yirmi dakikamız var. Bensiz başlama.",
+        assertEquals("Yirmi dakikamız var. Ben olmadan başlama.",
             pipeline.translate(TranslationInput("We've got twenty minutes. Don't start without me.")).text)
     }
 

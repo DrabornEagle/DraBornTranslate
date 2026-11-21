@@ -109,7 +109,7 @@ internal class GameTranslationPipeline(
         val normalized = SubtitleSegmenter.normalizeCase(body, wordsToKeep)
         val modelSource = GamePhrases.contextualize(digitizeSubtitleQuantities(normalized), area)
         fun checked(output: String?): String? {
-            val text = output?.trim()?.takeIf(String::isNotBlank) ?: return null
+            val text = output?.trim()?.takeIf(String::isNotBlank)?.let(::correctWithoutPronoun) ?: return null
             return text.takeUnless {
                 looksDamaged(it) || '\uFFFD' in it ||
                     !preservesSubtitleNumbers(body, it) ||
@@ -149,6 +149,21 @@ private val turkishProhibition = Regex(
     """\b(?:sakın|asla|kaçın\p{L}*|yasak\p{L}*|\p{L}{2,}m[ae](?:y[ıi]n(?:[ıi]z)?|s[ıi]n(?:[ıi]z)?|l[ıi](?:s[ıi]n(?:[ıi]z)?)?)?)\b""",
     RegexOption.IGNORE_CASE,
 )
+private val turkishLocale = Locale.forLanguageTag("tr")
+private val possessives = mapOf(
+    "benim" to "ben", "senin" to "sen", "onun" to "o",
+    "bizim" to "biz", "sizin" to "siz", "onların" to "onlar",
+)
+private val possessiveWithout = Regex(
+    "\\b(${possessives.keys.joinToString("|")})(?= olmadan\\b)", RegexOption.IGNORE_CASE,
+)
+
+private fun correctWithoutPronoun(text: String): String = possessiveWithout.replace(text) { match ->
+    val pronoun = possessives[match.value.lowercase(turkishLocale)]
+        ?: possessives[match.value.lowercase(Locale.ROOT)]
+        ?: return@replace match.value
+    pronoun.replaceFirstChar { if (match.value.first().isUpperCase()) it.uppercaseChar() else it }
+}
 
 private fun ending(text: String): String? = endMark.find(text.trimEnd())?.groupValues?.get(1)
 
