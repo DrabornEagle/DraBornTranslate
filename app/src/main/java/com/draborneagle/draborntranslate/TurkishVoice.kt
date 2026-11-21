@@ -73,13 +73,20 @@ internal class TurkishVoice(context: Context, private val onIssue: (String) -> U
         speakNext()
     }
 
-    fun speak(text: String?) {
+    fun speak(text: String?, latestOnly: Boolean = false) {
         if (closed) return
         val line = text?.replace('\n', ' ')?.trim()?.takeIf(String::isNotEmpty) ?: return
         val now = SystemClock.elapsedRealtime()
         if (line == lastText && now - lastSpokenAt < 3500L) return
         lastText = line
         lastSpokenAt = now
+        if (latestOnly) {
+            pending.clear()
+            if (utterance != null) {
+                utterance = null
+                engine?.stop()
+            }
+        }
         if (pending.size == 8) pending.removeFirst()
         pending.addLast(line)
         speakNext()

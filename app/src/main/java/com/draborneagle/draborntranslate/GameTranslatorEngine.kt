@@ -15,16 +15,24 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
     private val main = Handler(Looper.getMainLooper())
     private val executor = Executors.newSingleThreadExecutor()
     private val packs = ImportedGamePack.library(app)
+    private val known = if (ImportedGamePack.hasPack(app)) null else GameTranslationPipeline(packLookup = { null })
     private val current = AtomicReference<AtomicBoolean>()
     private var model: LocalTranslationModel? = null
     @Volatile private var closed = false
+
+    fun translateKnown(input: TranslationInput): String? = known?.translate(input.copy(allowPartial = false))?.text
 
     override fun prepare(done: (Boolean) -> Unit) {
         if (closed) return
         executor.execute {
             if (closed) return@execute
             val ready = runCatching {
-                if (model == null) model = LocalTranslationModel(checkNotNull(OfflineModelStore.installedFile(app)))
+                if (model == null) {
+                    model = LocalTranslationModel(
+                        checkNotNull(OfflineModelStore.installedFile(app)),
+                        app.applicationInfo.nativeLibraryDir,
+                    )
+                }
             }.onFailure { Log.w(TAG, "Yerel çeviri modeli açılamadı", it) }.isSuccess
             main.post { if (!closed) done(ready) }
         }

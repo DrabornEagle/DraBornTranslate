@@ -123,6 +123,7 @@ class CaptureService : Service() {
                 }
             },
             cancelTranslation = language::cancelCurrent,
+            translateKnown = language::translateKnown,
             readingArea = readingArea,
         )
         frames = ScreenFrames(
@@ -145,7 +146,6 @@ class CaptureService : Service() {
             modelReady = true
             sourceChanged(source)
             main.post(checkFrames)
-            main.post(captionTick)
         }
         return START_NOT_STICKY
     }
@@ -230,7 +230,7 @@ class CaptureService : Service() {
                 val previous = state.caption?.turkish?.lines().orEmpty().toSet()
                 caption.turkish.lines().filterNot(previous::contains).joinToString("\n")
             } else caption.turkish
-            voice?.speak(spoken)
+            voice?.speak(spoken, latestOnly = readingArea == ReadingArea.SUBTITLES)
         }
         try {
             overlay?.show(caption)
@@ -354,7 +354,6 @@ class CaptureService : Service() {
         modelReady = false
         main.removeCallbacks(modelTimeout)
         main.removeCallbacks(checkFrames)
-        main.removeCallbacks(captionTick)
         main.removeCallbacks(panelTestTick)
         main.removeCallbacks(panelTestTimeout)
         main.removeCallbacks(endPanelPreview)
@@ -422,14 +421,6 @@ class CaptureService : Service() {
                 updateStatus("${sourceName} üzerinde tam ekran oyun görüntüsünü aç.")
             }
             main.postDelayed(this, 1000L)
-        }
-    }
-
-    private val captionTick = object : Runnable {
-        override fun run() {
-            if (ended) return
-            captions?.tick()
-            main.postDelayed(this, 120L)
         }
     }
 

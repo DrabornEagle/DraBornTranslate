@@ -28,10 +28,13 @@ bool end_of_reply(const std::string & text) {
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_draborneagle_draborntranslate_LocalTranslationModel_nativeOpen(
-        JNIEnv * env, jobject, jstring path, jint threads) {
+        JNIEnv * env, jobject, jstring path, jstring backend_dir, jint threads) {
     try {
-        std::call_once(backend, [] {
-            ggml_backend_load_all();
+        std::call_once(backend, [&] {
+            const char * directory = backend_dir != nullptr
+                ? env->GetStringUTFChars(backend_dir, nullptr) : nullptr;
+            ggml_backend_load_all_from_path(directory);
+            if (directory != nullptr) env->ReleaseStringUTFChars(backend_dir, directory);
             llama_backend_init();
         });
         auto translator = std::make_unique<LocalTranslator>();

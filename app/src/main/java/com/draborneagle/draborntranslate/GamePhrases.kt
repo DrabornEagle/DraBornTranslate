@@ -60,6 +60,23 @@ internal object GamePhrases {
         "Don't move." to "Kıpırdama.",
         "Don't shoot!" to "Ateş etme!",
         "Keep your hands where I can see them." to "Ellerini görebileceğim yerde tut.",
+        "Stick with me." to "Yanımdan ayrılma.",
+        "Don't let go." to "Bırakma.",
+        "I couldn't have done it without you." to "Sen olmasaydın bunu başaramazdım.",
+        "We're in over our heads." to "Bu iş boyumuzu aştı.",
+        "We're in over our heads this time." to "Bu sefer iş boyumuzu aştı.",
+        "We're running out of time." to "Vaktimiz daralıyor.",
+        "We're safe." to "Güvendeyiz.",
+        "We're good to go." to "Hazırız, gidebiliriz.",
+        "I'll be right back." to "Hemen döneceğim.",
+        "Do you copy?" to "Beni duyuyor musun?",
+        "Copy that." to "Anlaşıldı.",
+        "Start the engine." to "Motoru çalıştır.",
+        "Get the engine started." to "Motoru çalıştır.",
+        "Cut the engine." to "Motoru kapat.",
+        "I couldn't hear you over the engine." to "Motorun sesinden seni duyamadım.",
+        "I can't hear you over the engine." to "Motorun sesinden seni duyamıyorum.",
+        "They've got the wrong guy." to "Yanlış kişiyi yakaladılar.",
     ).mapKeys { (english, _) -> key(english) }
 
     private val menu = mapOf(
@@ -73,6 +90,7 @@ internal object GamePhrases {
         "controls" to "Kontroller",
         "difficulty" to "Zorluk",
         "display" to "Görüntü",
+        "display resolution" to "Ekran çözünürlüğü",
         "exit" to "Çıkış",
         "exit to desktop" to "Masaüstüne dön",
         "exit to main menu" to "Ana menüye dön",
@@ -84,6 +102,7 @@ internal object GamePhrases {
         "hold r2 to accelerate" to "Hızlanmak için R2'yi basılı tut",
         "hold to skip" to "Atlamak için basılı tut",
         "inventory" to "Envanter",
+        "language" to "Dil",
         "load game" to "Oyun yükle",
         "map" to "Harita",
         "mission complete" to "Görev tamamlandı",
@@ -91,12 +110,14 @@ internal object GamePhrases {
         "missions" to "Görevler",
         "new game" to "Yeni oyun",
         "new game+" to "Yeni Oyun+",
+        "new objective" to "Yeni hedef",
         "no" to "Hayır",
         "objective" to "Hedef",
         "objectives" to "Hedefler",
         "off" to "Kapalı",
         "on" to "Açık",
         "pause menu" to "Duraklatma menüsü",
+        "photo mode" to "Fotoğraf modu",
         "reload checkpoint" to "Son kontrol noktasını yükle",
         "restart mission" to "Görevi yeniden başlat",
         "resume" to "Oyuna dön",
@@ -180,10 +201,18 @@ internal object GamePhrases {
     private val menuPrompt = Regex("^hold (?=(?:[LR][1-3]|[△○×□]|the (?:button|trigger))\\b)", RegexOption.IGNORE_CASE)
     private val controllerTap = Regex("^tap (?=[LR][1-3]\\b)", RegexOption.IGNORE_CASE)
     private val groupReference = Regex("\\$([1-9])")
+    private val recipientBeforeLeaving = Regex(
+        """^what did you say to ([\p{L} '-]{1,50}) before (he|she|they) left([?!.]?)$""",
+        RegexOption.IGNORE_CASE,
+    )
 
     fun contextualize(text: String, area: ReadingArea): String {
         if (area == ReadingArea.GAME_TEXT) {
             return menuPrompt.replace(controllerTap.replace(text, "Press "), "Press and hold ")
+        }
+        recipientBeforeLeaving.matchEntire(text)?.let { match ->
+            val (recipient, person, end) = match.destructured
+            return "Before $person left, what did you tell $recipient$end"
         }
         return idioms.fold(text) { current, (phrase, replacement) ->
             phrase.replace(current) { match ->

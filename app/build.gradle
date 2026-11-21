@@ -15,16 +15,20 @@ android {
         applicationId 'com.draborneagle.draborntranslate'
         minSdk 29
         targetSdk 35
-        versionCode 10
-        versionName '0.4.1'
+        versionCode 11
+        versionName '0.4.2'
         ndk { abiFilters targetAbi }
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_STL=c++_static'
+                arguments '-DANDROID_STL=c++_shared'
                 if (llamaSourceDir != null) arguments "-DLLAMA_SOURCE_DIR=${file(llamaSourceDir).absolutePath}"
-                targets 'draborn_local'
             }
         }
+    }
+
+    packaging {
+        // ggml selects a CPU backend from the installed native library directory.
+        jniLibs { useLegacyPackaging = true }
     }
 
     compileOptions {

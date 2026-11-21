@@ -55,7 +55,7 @@
       completed = true;
       var testing = ok && request.getResponseHeader("X-DraBorn-Panel") === "test";
       display(ok ? request.responseText : "", ok, testing);
-      window.setTimeout(poll, ok ? 500 : 1200);
+      window.setTimeout(poll, ok ? 140 : 1200);
     }
 
     request.open("GET", "caption.txt", true);

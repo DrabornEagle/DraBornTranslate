@@ -12,13 +12,14 @@ internal data class TranslationInput(
     val text: String,
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
     val allowPartial: Boolean = false,
+    val preservePlaceholders: Boolean = false,
 )
 internal data class TranslationReply(val text: String? = null, val issue: String? = null)
 
 /** Sends full speaker turns to the local model and keeps menu labels in their original order. */
 internal class GameTranslationPipeline(
     private val packLookup: (String) -> PackMatch?,
-    private val translateModel: (TranslationInput) -> String?,
+    private val translateModel: ((TranslationInput) -> String?)? = null,
     private val canceled: () -> Boolean = { false },
 ) {
     fun translate(input: TranslationInput): TranslationReply {
@@ -83,16 +84,22 @@ internal class GameTranslationPipeline(
                 continue
             }
             val source = piece.text
-            val translated = findPack(source) ?: GamePhrases.direct(source, area)
-                ?: if (splitOnFailure) translateKnownTurn(source, area) else null
-            val direct = translated ?: translatePiece(source, area, speakerNames)
+            val known = findPack(source) ?: GamePhrases.direct(source, area)
+            val sentences = if (known == null && splitOnFailure) {
+                SubtitleSegmenter.split(source, preserveSpeakers = false)
+            } else emptyList()
+            val canSplit = sentences.count { it.translate } >= 2
+            val hasVerifiedSentence = canSplit && sentences.any {
+                it.translate && (GamePhrases.direct(it.text, area) != null || findPack(it.text) != null)
+            }
+            // Keep confirmed idiomatic meanings when a turn also contains a new sentence.
+            val direct = known ?: if (!hasVerifiedSentence) translatePiece(source, area, speakerNames) else null
             if (direct != null) {
                 translatedAny = true
                 result.append(direct)
                 continue
             }
-            val sentences = if (splitOnFailure) SubtitleSegmenter.split(source, preserveSpeakers = false) else emptyList()
-            val fallback = if (sentences.count { it.translate } >= 2) {
+            val fallback = if (canSplit) {
                 renderPieces(sentences, area, speakerNames, splitOnFailure = false, allowPartial = allowPartial)
             } else TranslationReply()
             if (fallback.text == null && !allowPartial) return TranslationReply()
@@ -105,17 +112,6 @@ internal class GameTranslationPipeline(
             if (incomplete) "Repliğin bir bölümü çevrilemedi." else null)
     }
 
-    private fun translateKnownTurn(source: String, area: ReadingArea): String? {
-        val sentences = SubtitleSegmenter.split(source, preserveSpeakers = false)
-        if (sentences.count { it.translate } < 2) return null
-        return buildString {
-            for (sentence in sentences) {
-                if (!sentence.translate) append(sentence.text)
-                else append(findPack(sentence.text) ?: GamePhrases.direct(sentence.text, area) ?: return null)
-            }
-        }
-    }
-
     private fun findPack(source: String): String? {
         val text = runCatching { packLookup(source)?.text?.trim()?.takeIf(String::isNotEmpty) }.getOrNull() ?: return null
         // Package keys ignore punctuation, so a statement and an incredulous question may share a key.
@@ -124,6 +120,7 @@ internal class GameTranslationPipeline(
     }
 
     private fun translatePiece(source: String, area: ReadingArea, speakerNames: List<String>): String? {
+        val model = translateModel ?: return null
         if (looksDamaged(source) || canceled()) return null
         val sound = source.startsWith('[') && source.endsWith(']')
         val body = if (sound) source.substring(1, source.length - 1) else source
@@ -140,16 +137,17 @@ internal class GameTranslationPipeline(
                     !preservesSubtitleNumbers(body, it) ||
                     !protected.find(it).map { match -> match.turkish }.containsAll(namesInSource) ||
                     (englishProhibition.containsMatchIn(body) && !turkishProhibition.containsMatchIn(it)) ||
+                    (englishNeverSaid.containsMatchIn(body) && !turkishDeniedSaying.containsMatchIn(it)) ||
                     (englishFunctionWords.containsMatchIn(body) && TextMatch.normalize(body) == TextMatch.normalize(it))
             }
         }
         val protector = TermProtector(gameTerms, modelSource)
         val (prepared, slots) = protector.protect(modelSource)
-        val withTerms = if (slots.isNotEmpty()) translateModel(TranslationInput(prepared, area))?.let {
+        val withTerms = if (slots.isNotEmpty()) model(TranslationInput(prepared, area, preservePlaceholders = true))?.let {
             checked(TermProtector.restore(it, slots, protector.allSlots))
         } else null
         if (canceled()) return null
-        val candidate = withTerms ?: checked(translateModel(TranslationInput(modelSource, area))) ?: return null
+        val candidate = withTerms ?: checked(model(TranslationInput(modelSource, area))) ?: return null
         val result = restoreEnding(body, candidate)
         return if (sound) "[${result.trim('[', ']')}]" else result
     }
@@ -170,6 +168,11 @@ private val endMark = Regex("""([?!…]+)(["”'’»\)\]]*)$""")
 private val endClosers = setOf('"', '”', '\'', '’', '»', ')', ']')
 private val englishFunctionWords = Regex("""\b(?:the|you|your|we|they|is|are|was|were|have|will|with|must|could|don't|can't)\b""", RegexOption.IGNORE_CASE)
 private val englishProhibition = Regex("""^(?:please +)?(?:don't|do not|never)\b""", RegexOption.IGNORE_CASE)
+private val englishNeverSaid = Regex("""^I (?:never said|didn't say|did not say)\b""", RegexOption.IGNORE_CASE)
+private val turkishDeniedSaying = Regex(
+    """\b(?:söylemedim|demedim|iddia etmedim|söylemiş değilim|demiş değilim|ağzımdan çıkmadı)\b""",
+    RegexOption.IGNORE_CASE,
+)
 private val turkishProhibition = Regex(
     """\b(?:sakın|asla|kaçın\p{L}*|yasak\p{L}*|\p{L}{2,}m[ae](?:y[ıi]n(?:[ıi]z)?|s[ıi]n(?:[ıi]z)?|l[ıi](?:s[ıi]n(?:[ıi]z)?)?)?)\b""",
     RegexOption.IGNORE_CASE,
@@ -180,7 +183,8 @@ private val possessives = mapOf(
     "bizim" to "biz", "sizin" to "siz", "onların" to "onlar",
 )
 private val possessiveWithout = Regex(
-    "\\b(${possessives.keys.joinToString("|")})(?= olmadan\\b)", RegexOption.IGNORE_CASE,
+    "\\b(${possessives.keys.joinToString("|")})(?= (?:olmadan|olmasa(?:m|n|k|nız|lar|yd[ıi]\\p{L}*)?)\\b)",
+    RegexOption.IGNORE_CASE,
 )
 
 private fun correctWithoutPronoun(text: String): String = possessiveWithout.replace(text) { match ->

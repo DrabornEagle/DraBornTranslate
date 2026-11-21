@@ -137,4 +137,33 @@ class GameTranslationPipelineTest {
         assertEquals("LUCIA: Köprünün yanında buluşalım.",
             pipeline.translate(TranslationInput("LUCIA: Meet me by the bridge.")).text)
     }
+
+    @Test
+    fun aVerifiedIdiomRetainsItsMeaningInsideALongerDialogueCue() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+            assertEquals("We should hear him out.", request.text)
+            "Sözünü bitirene kadar onu dinleyelim."
+        })
+        assertEquals("Bir bakıma haklı. Sözünü bitirene kadar onu dinleyelim.",
+            pipeline.translate(TranslationInput("He's got a point. We should hear him out.")).text)
+    }
+
+    @Test
+    fun aDenialCannotBecomeAnAdmission() {
+        val input = TranslationInput("I never said she stole the money.")
+        val wrong = GameTranslationPipeline(packLookup = { null }, translateModel = { "Parayı çaldığını söyledim." })
+        val right = GameTranslationPipeline(packLookup = { null }, translateModel = { "Parayı çaldığını hiç söylemedim." })
+        assertNull(wrong.translate(input).text)
+        assertEquals("Parayı çaldığını hiç söylemedim.", right.translate(input).text)
+    }
+
+    @Test
+    fun keepsTheRecipientAndSpeakerRolesInAQuestion() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+            assertEquals("Before he left, what did you tell Kratos?", request.text)
+            "Kratos'a gitmeden önce ne söyledin?"
+        })
+        assertEquals("Kratos'a gitmeden önce ne söyledin?",
+            pipeline.translate(TranslationInput("What did you say to Kratos before he left?")).text)
+    }
 }

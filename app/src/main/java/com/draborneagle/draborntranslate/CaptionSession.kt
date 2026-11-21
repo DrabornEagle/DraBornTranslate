@@ -15,27 +15,28 @@ internal class CaptionSession(
     private val onFailure: (String?) -> Unit,
     private val onRead: (String?) -> Unit = {},
     private val cancelTranslation: () -> Unit = {},
+    private val translateKnown: (TranslationInput) -> String? = { null },
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
-    private val clock: () -> Long = SystemClock::elapsedRealtime,
+    clock: () -> Long = SystemClock::elapsedRealtime,
     private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(
         clock = clock,
         exactText = true,
         acceptCompletedSentence = false,
         minTextLength = 2,
         isGarbled = ::looksDamaged,
-        clearAfterMs = 1400,
+        clearAfterMs = 650,
     ),
 ) {
     private val cache = object : LinkedHashMap<TranslationInput, String>(128, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TranslationInput, String>?) = size > 128
     }
-    private val dialogue = ArrayDeque<TranslationInput>()
-    private var inFlight: TranslationInput? = null
+    private data class Work(val input: TranslationInput, var canceled: Boolean = false)
+
+    private var inFlight: Work? = null
     private var generation = 0
     private var closed = false
     private var currentSubtitle: TranslationInput? = null
-    private var readySubtitle: Pair<Caption, String?>? = null
-    private var visibleUntil = 0L
+    private var pendingSubtitle: TranslationInput? = null
     private var shown: Caption? = null
     private var previousRows = emptySet<TranslationInput>()
     private var screen = emptyList<TranslationInput>()
@@ -49,28 +50,7 @@ internal class CaptionSession(
 
         if (readingArea == ReadingArea.GAME_TEXT) readScreen(source)
         else readSubtitle(source.joinToString("\n"), confident && source.size == lines.size)
-        tick()
-    }
-
-    fun tick() {
-        if (closed) return
-        presentSubtitle()
         translateNext()
-    }
-
-    /** Retain every confirmed short cue long enough for the browser panel to read it. */
-    private fun presentSubtitle() {
-        if (readingArea != ReadingArea.SUBTITLES || clock() < visibleUntil) return
-        val ready = readySubtitle
-        if (ready != null) {
-            readySubtitle = null
-            val (caption, issue) = ready
-            visibleUntil = clock() + (caption.turkish.length * 27L).coerceIn(950L, 2200L)
-            publish(caption)
-            onFailure(issue)
-        } else if (inFlight == null && dialogue.isEmpty() && shown?.source != currentSubtitle?.text) {
-            publish(null)
-        }
     }
 
     private fun readSubtitle(text: String, confident: Boolean) {
@@ -81,13 +61,18 @@ internal class CaptionSession(
             StabilizerKind.RESTORE, StabilizerKind.TRANSLATE -> {
                 val source = action.text ?: return
                 val input = TranslationInput(source, allowPartial = true)
+                if (currentSubtitle == input) return
                 currentSubtitle = input
+                pendingSubtitle = null
                 onRead(source)
-                if (shown?.source == source && dialogue.isEmpty() && inFlight == null && readySubtitle == null) return
-                if (input == inFlight || input.text == readySubtitle?.first?.source || input in dialogue) return
-                // A sustained backlog eventually becomes too old to follow the game.
-                if (dialogue.size == MAX_PENDING_SUBTITLES) dialogue.removeFirst()
-                dialogue.addLast(input)
+                val ready = immediate(input)
+                if (ready != null) {
+                    accept(input, ready, null)
+                } else {
+                    publish(null)
+                    if (inFlight?.let { !it.canceled && it.input == input } != true) pendingSubtitle = input
+                }
+                cancelObsolete()
             }
         }
     }
@@ -100,11 +85,14 @@ internal class CaptionSession(
             stabilizer.reset()
             clearReadSubtitle()
         }
-        tick()
+        translateNext()
     }
 
     private fun clearReadSubtitle() {
         currentSubtitle = null
+        pendingSubtitle = null
+        cancelObsolete()
+        publish(null)
         onRead(null)
     }
 
@@ -113,23 +101,28 @@ internal class CaptionSession(
         val stable = rows.filter { it in previousRows || it in screenResults }
         previousRows = rows.toSet()
         if (stable == screen) return
+        val previousScreen = screen.toSet()
         screen = stable
         screenResults.keys.retainAll(screen.toSet())
         onRead(screen.joinToString("\n", transform = TranslationInput::text).ifBlank { null })
+        for (input in screen) {
+            if (input in screenResults || input in previousScreen) continue
+            val ready = immediate(input) ?: continue
+            screenResults[input] = changedTranslation(input, ready)
+        }
+        cancelObsolete()
         renderScreen()
     }
 
     fun reset() {
         generation++
-        dialogue.clear()
         currentSubtitle = null
-        readySubtitle = null
-        visibleUntil = 0L
+        pendingSubtitle = null
         stabilizer.reset()
         previousRows = emptySet()
         screen = emptyList()
         screenResults.clear()
-        if (inFlight != null) cancelTranslation()
+        cancelObsolete()
         publish(null)
         onRead(null)
     }
@@ -141,48 +134,60 @@ internal class CaptionSession(
     }
 
     private fun nextInput(): TranslationInput? = when (readingArea) {
-        ReadingArea.SUBTITLES -> dialogue.removeFirstOrNull()
+        ReadingArea.SUBTITLES -> pendingSubtitle.also { pendingSubtitle = null }
         ReadingArea.GAME_TEXT -> screen.firstOrNull { it !in screenResults }
     }
 
+    private fun immediate(input: TranslationInput): String? =
+        cache[input] ?: translateKnown(input)?.also { cache[input] = it }
+
+    private fun stillVisible(input: TranslationInput): Boolean = when (readingArea) {
+        ReadingArea.SUBTITLES -> currentSubtitle == input
+        ReadingArea.GAME_TEXT -> input in screen
+    }
+
+    private fun cancelObsolete() {
+        val work = inFlight ?: return
+        if (!work.canceled && !stillVisible(work.input)) {
+            work.canceled = true
+            cancelTranslation()
+        }
+    }
+
     private fun translateNext() {
-        if (closed || inFlight != null || readySubtitle != null) return
-        while (true) {
-            val input = nextInput() ?: return
-            val cached = cache[input]
-            if (cached == null) {
-                val started = generation
-                inFlight = input
-                translate(input) { reply ->
-                    inFlight = null
-                    if (started == generation && !closed) {
-                        val turkish = reply.text?.trim()?.takeIf(String::isNotBlank)
-                        if (turkish != null && reply.issue == null) cache[input] = turkish
-                        accept(input, turkish, reply.issue)
-                    }
-                    tick()
+        if (closed || inFlight != null) return
+        val input = nextInput() ?: return
+        val started = generation
+        val work = Work(input)
+        inFlight = work
+        translate(input) { reply ->
+            inFlight = null
+            if (started == generation && !closed) {
+                val turkish = reply.text?.trim()?.takeIf(String::isNotBlank)
+                if (turkish != null && reply.issue == null) cache[input] = turkish
+                if (stillVisible(input) && (turkish != null || !work.canceled)) {
+                    if (input == pendingSubtitle) pendingSubtitle = null
+                    accept(input, turkish, reply.issue)
                 }
-                return
             }
-            accept(input, cached, null)
-            presentSubtitle()
-            if (readySubtitle != null) return
+            translateNext()
         }
     }
 
     private fun accept(input: TranslationInput, turkish: String?, issue: String?) {
-        val changed = turkish?.takeUnless { TextMatch.literal(input.text).equals(TextMatch.literal(it), ignoreCase = true) }
+        val changed = changedTranslation(input, turkish)
         if (readingArea == ReadingArea.GAME_TEXT) {
-            if (input !in screen) return
             screenResults[input] = changed
             renderScreen()
             if (turkish == null) onFailure(issue ?: "Bu oyun satırı çevrilemedi.")
-        } else if (changed != null) {
-            readySubtitle = Caption(input.text, formatDialogue(changed)) to issue
-        } else if (turkish == null && (currentSubtitle == input || dialogue.isEmpty())) {
-            onFailure(issue ?: "Bu replik çevrilemedi.")
+        } else {
+            publish(changed?.let { Caption(input.text, formatDialogue(it)) })
+            onFailure(issue ?: if (turkish == null) "Bu replik çevrilemedi." else null)
         }
     }
+
+    private fun changedTranslation(input: TranslationInput, turkish: String?): String? =
+        turkish?.takeUnless { TextMatch.literal(input.text).equals(TextMatch.literal(it), ignoreCase = true) }
 
     private fun renderScreen() {
         val translated = screen.mapNotNull { input -> screenResults[input]?.let { input.text to it } }
@@ -195,10 +200,6 @@ internal class CaptionSession(
         if (shown == caption) return
         shown = caption
         show(caption)
-    }
-
-    private companion object {
-        const val MAX_PENDING_SUBTITLES = 16
     }
 }
 

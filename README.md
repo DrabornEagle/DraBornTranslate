@@ -4,11 +4,13 @@ PlayStation Portal’da oyun oynarken PS5’in **Paylaşımlı Ekran** videosund
 
 **Android 10 ve üzeri, ARM64.** [Sürümler](https://github.com/DrabornEagle/DraBornTranslate/releases)
 
-## v0.4.1 çeviri
+## v0.4.2 çeviri
 
 1. APK’yı kur ve **Türkçe modeli indir** seçeneğini aç. Uygulama MiLMMT-46 1B modelini bir defa indirir (806 MB) ve dosyanın özetini doğrular. Çeviri telefonun işlemcisinde çalışır. Hesap, API anahtarı veya abonelik gerekmez.
 2. **Çeviriyi dene** ile örnek görseldeki yazıyı okut veya İngilizce metin gir. **Son çeviri** kartında Türkçe metni ve ona karşılık gelen İngilizceyi görebilirsin. Yeni algılanan metin henüz çevrilmediyse **Okunan İngilizce** altında görünür.
-3. **Canlı çeviriyi başlat** ile PlayStation yayınına dön. Kısa ve net replikler tek kareden alınabilir. Doğrulanan replikler sırayla çevrilir. Aynı konuşmacının cümleleri bağlam için bir arada çevrilir. Konuşmacı adları, sayılar, soru işaretleri ve belirgin olumsuz komutlar korunur. Güvenilir bir çevirisi bulunamayan replik bölümü `[…]` ile işaretlenir.
+3. **Canlı çeviriyi başlat** ile PlayStation yayınına dön. Çeviri ekrandaki güncel altyazıya öncelik verir ve hazır olduğu anda gösterilir. Bilinen oyun ifadeleri doğrudan gösterilir. Yeni cümleler Türkçe konuşma diline uygun biçimde çevrilir. Güvenilir bir çevirisi bulunamayan replik bölümü `[…]` ile işaretlenir.
+
+Çevirinin ekrana gelme süresi telefonun işlemcisine, replik uzunluğuna ve yayın kalitesine bağlıdır. Uygulama Android işlemcisinin desteklediği llama.cpp hesaplama yolunu otomatik seçer. Daha önce indirilen MiLMMT modeli güncellemeden sonra kullanılmaya devam eder.
 
 **Görünüm ve oyun paketi → Oyun paketi ekle** ile GameTranslator biçimindeki `.json` veya `.json.gz` paketini seçebilirsin. Kaynak cümle pakette eşleşirse paketin Türkçesi kullanılır.
 
