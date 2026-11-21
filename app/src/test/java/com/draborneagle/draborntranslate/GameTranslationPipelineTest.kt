@@ -148,7 +148,7 @@ class GameTranslationPipelineTest {
 
     @Test
     fun contextDoesNotChangeWhoIsBeingDiscussed() {
-        val earlier = "Did you tell her where I live?"
+        val earlier = "Did you show him where I live?"
         assertEquals("No, I didn’t.", DialogueContext.expand("No, I didn’t.", earlier))
         assertEquals("He can drive.", DialogueContext.expand("He can drive.", "Could you call her?"))
         assertEquals(
@@ -168,6 +168,13 @@ class GameTranslationPipelineTest {
             Triple("Is the bridge blocked?", "Not anymore.", "It is not closed anymore."),
             Triple("Did you see what happened to my car?", "No, I didn't.", "No, I didn't see what happened."),
             Triple("Are you all right?", "I will be.", "I will be all right."),
+            Triple("Could you carry the crate on your own?", "I could.", "I could carry the crate alone."),
+            Triple("Did you tell her where I live?", "No, I didn't.", "No, I didn't tell her."),
+            Triple("Is Raul coming?", "He said he was.", "He said he was coming."),
+            Triple("Who took the keys?", "Cal did.", "Cal took the keys."),
+            Triple("Didn't you see him?", "I did.", "I did see him."),
+            Triple("Can you wait for me at the dock?", "I can.", "I can wait at the dock."),
+            Triple("The gate's supposed to be locked.", "It isn't.", "It isn't locked."),
         )
         for ((prior, reply, expected) in cases) {
             assertEquals(expected, DialogueContext.expand(reply, prior))
@@ -175,6 +182,7 @@ class GameTranslationPipelineTest {
         assertEquals("Not yet.", DialogueContext.expand("Not yet.", "The envelope is gone."))
         assertEquals("Not anymore.", DialogueContext.expand("Not anymore.", "Are they awake?"))
         assertEquals("So am I.", DialogueContext.expand("So am I.", "The door is locked."))
+        assertEquals("He said she was.", DialogueContext.expand("He said she was.", "Is Lucia coming?"))
     }
 
     @Test
@@ -196,6 +204,42 @@ class GameTranslationPipelineTest {
             "Fiyat düştü ama kasa hâlâ çok ağırdı. Muhafızları uyarıyordu.",
             pipeline.translate(TranslationInput("The price went down, but the crate was still too heavy. He was alerting the guards.")).text,
         )
+    }
+
+    @Test
+    fun keepsNegationWhenASpeakerWarnsAgainstRevealingThePlan() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            assertEquals("Don't reveal that we're meeting at the diner.", text)
+            "Lokantada buluşacağımızı söyleme."
+        })
+        val cue = TranslationInput("Don't let it slip that we're meeting at the diner.")
+        assertEquals("Lokantada buluşacağımızı söyleme.", pipeline.translate(cue).text)
+    }
+
+    @Test
+    fun clarifiesAnAlarmStartingAndKeepsTheLightsTurningOff() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "The alarm started ringing." -> "Alarm çaldı."
+                "The lights went off." -> "Işıklar söndü."
+                else -> error(text)
+            }
+        })
+        val cue = TranslationInput("The alarm went off. The lights went off.")
+        assertEquals("Alarm çaldı. Işıklar söndü.", pipeline.translate(cue).text)
+    }
+
+    @Test
+    fun keepsDockNumbersAndTheQuantityOfMissingItems() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "Pick up the keys at the pier numbered 7." -> "Anahtarları 7 numaralı iskeleden al."
+                "Find the two missing keys." -> "Kayıp iki anahtarı bul."
+                else -> error(text)
+            }
+        })
+        val cue = TranslationInput("Objective: Pick up the keys at Dock 7. Find both missing keys.", ReadingArea.GAME_TEXT)
+        assertEquals("Hedef: Anahtarları 7 numaralı iskeleden al. Kayıp iki anahtarı bul.", pipeline.translate(cue).text)
     }
 
     @Test

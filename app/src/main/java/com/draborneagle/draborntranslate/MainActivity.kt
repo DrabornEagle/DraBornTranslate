@@ -40,7 +40,6 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.SeekBar
@@ -58,6 +57,11 @@ private const val WHITE = 0xFFF5F7FF.toInt()
 private const val MUTED = 0xFFB8C0D9.toInt()
 private const val ACCENT = 0xFF79E5FF.toInt()
 private const val LAVENDER = 0xFFB6A8FF.toInt()
+private const val MINT = 0xFF73E5BE.toInt()
+private const val PEACH = 0xFFFFC298.toInt()
+private const val ROSE = 0xFFFFA5BB.toInt()
+private const val PORTAL_START = "Portal Bağlantısını Başlat"
+private const val PORTAL_STOP = "Portal Bağlantısını Durdur"
 
 class MainActivity : Activity() {
     private val prefs by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
@@ -72,8 +76,10 @@ class MainActivity : Activity() {
     private var packLoading = false
     private var tunnelAddress = ""
     private var tunnelSession: String? = null
+    private val popups = mutableSetOf<Dialog>()
     private var aboutDialog: Dialog? = null
     private var renderAboutUpdate: ((UpdateState) -> Unit)? = null
+    private var updateResultPending = false
 
     private lateinit var portal: Button
     private lateinit var phone: Button
@@ -106,6 +112,10 @@ class MainActivity : Activity() {
     private val observe: (SessionState.State) -> Unit = { render() }
     private val observeUpdate: (UpdateState) -> Unit = { state ->
         renderAboutUpdate?.invoke(state)
+        if (updateResultPending && state != UpdateState.Checking) {
+            updateResultPending = false
+            if (state == UpdateState.Current && aboutDialog?.isShowing == true) showCurrentVersion()
+        }
         AppUpdater.continueInstall(this)
     }
     private val main = Handler(Looper.getMainLooper())
@@ -125,6 +135,7 @@ class MainActivity : Activity() {
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
+        updateResultPending = savedInstanceState?.getBoolean("updateResultPending") ?: false
         buildUi()
         render()
         if (savedInstanceState?.getBoolean("aboutOpen") == true) showAbout()
@@ -164,11 +175,12 @@ class MainActivity : Activity() {
         outState.putString("tunnelAddress", tunnelAddress)
         outState.putString("tunnelSession", tunnelSession)
         outState.putBoolean("aboutOpen", aboutDialog?.isShowing == true)
+        outState.putBoolean("updateResultPending", updateResultPending)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
-        aboutDialog?.dismiss()
+        popups.toList().forEach(Dialog::dismiss)
         finishDemo()
         voicePreview?.close()
         super.onDestroy()
@@ -218,9 +230,9 @@ class MainActivity : Activity() {
             setBackgroundResource(background.resourceId)
             setImageResource(R.drawable.ic_more_vert)
             setColorFilter(LAVENDER)
-            contentDescription = "Uygulama menüsü"
+            contentDescription = "Hakkında"
             tooltipText = contentDescription
-            setOnClickListener { showAppMenu(it) }
+            setOnClickListener { showAbout() }
         }, LinearLayout.LayoutParams(dp(48), dp(48)))
         content.append(hero, 0)
 
@@ -241,7 +253,7 @@ class MainActivity : Activity() {
         capture.append(readingChoice, 6)
 
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
-        styleButton(startStop, primary = true)
+        styleButton(startStop, ACCENT to LAVENDER)
         capture.append(startStop, 10)
         openSource = button("") { openSourceApp(config.source, offerInstall = true) }
         capture.append(openSource, 6)
@@ -278,10 +290,14 @@ class MainActivity : Activity() {
         }
         panelCard.append(testPanel, 6)
         tunnelWizard = button("PS5 uzakta · Bağlantıyı hazırla") { showTunnelWizard() }
+        styleButton(tunnelWizard, LAVENDER to PEACH)
+        actionIcon(tunnelWizard, R.drawable.ic_portal_link)
         panelCard.append(tunnelWizard, 6)
         previewPanel = button("Portal’da örnek yazı göster") { CaptureService.togglePreview(this) }
         panelCard.append(previewPanel, 6)
-        launchPanelTest = button("Portal bağlantısını test et") { togglePanelTest() }
+        launchPanelTest = button(PORTAL_START) { togglePanelTest() }
+        styleButton(launchPanelTest, MINT to ACCENT, activated = PEACH to ROSE)
+        actionIcon(launchPanelTest, R.drawable.ic_portal_play, activeIcon = R.drawable.ic_portal_stop)
         panelCard.append(launchPanelTest, 6)
         panelCard.append(button("Portal’da paneli açma adımları") { showPortalHelp() }, 6)
 
@@ -315,6 +331,12 @@ class MainActivity : Activity() {
         settings.addView(sizeControl)
         packButton = button("") { showPackMenu() }
         settings.append(packButton, 8)
+        settings.append(button("Açık kaynak lisansı") { showLegalNotices() }.apply {
+            background = RippleDrawable(ColorStateList.valueOf(0x22B6A8FF), null, shape(WHITE, WHITE, 12))
+            gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            setTextColor(LAVENDER)
+            textSize = 13f
+        }, 4)
         testButton = button("Çeviriyi dene") { showTranslationTest() }
         content.append(testButton, 12)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
@@ -506,15 +528,16 @@ class MainActivity : Activity() {
         previewPanel.text = if (panel?.previewing == true) "Canlı çeviriye dön" else "Portal’da örnek yazı göster"
         launchPanelTest.visibility = if (state.active) View.GONE else View.VISIBLE
         launchPanelTest.isEnabled = !pending && demoTranslator == null
-        launchPanelTest.text = if (panel?.testing == true) "Portal testini durdur" else "Portal bağlantısını test et"
+        launchPanelTest.isActivated = panel?.testing == true
+        launchPanelTest.text = if (launchPanelTest.isActivated) PORTAL_STOP else PORTAL_START
         panelStatus.text = state.portalIssue ?: when {
             panel?.previewing == true -> "Örnek yazı 3 dakika gösterilir. Portal’da oyuna dönüp yazının değiştiğini kontrol et."
-            panel?.testing == true && panel.opened -> "Test paneli açıldı. Oyuna dönüp metnin Portal ekranında değiştiğini kontrol et."
-            panel?.testing == true -> "Test bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
+            panel?.testing == true && panel.opened -> "Panel açıldı. Oyuna dönüp örnek yazının Portal ekranında değiştiğini kontrol et."
+            panel?.testing == true -> "Portal bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
             panel?.opened == true -> "Bir tarayıcı altyazıyı alıyor. Portal’da Yana Sabitle görünüyorsa seç."
             panel != null -> "PS5 evdeki ağdaysa yerel bağlantıyı kullan. PS5 uzaktaysa dış bağlantıyı hazırla."
             state.active -> "Portal bağlantısı hazırlanıyor…"
-            else -> "Örnek yazıyla bağlantıyı test et veya canlı altyazıyı başlat. PS5 uzaktaysa dış bağlantıyı hazırla."
+            else -> "Bağlantıyı başlatıp Portal’da örnek yazıyı gör. Canlı çeviriye aynı panelden geçebilirsin."
         }
     }
 
@@ -529,7 +552,7 @@ class MainActivity : Activity() {
         try {
             CaptureService.testPanel(this, config.textSize)
         } catch (_: RuntimeException) {
-            showIdle("Portal bağlantı testi açılamadı. Uygulama açıkken yeniden dene.")
+            showIdle("Portal bağlantısı açılamadı. Uygulama açıkken yeniden dene.")
         }
         render()
     }
@@ -549,64 +572,77 @@ class MainActivity : Activity() {
 
     private fun showTunnelWizard() {
         val panel = SessionState.current.portalPanel ?: return
-        val fields = column().apply { setPadding(dp(20), dp(8), dp(20), dp(12)) }
-        val scroll = ScrollView(this).apply { addView(fields) }
-        fields.addView(label("1. Komutu Termux’a yapıştır ve çalıştır. Termux açık kalsın.", 15, WHITE))
-        fields.append(button("Komutu kopyala ve Termux’u aç") {
-            copyText("Cloudflare tünel komutu", portalTunnelCommand(panel.url))
-            val termux = packageManager.getLaunchIntentForPackage("com.termux")
-            if (termux != null) startActivity(termux)
-            else Toast.makeText(this, "Komut kopyalandı. Termux’u açıp yapıştır.", Toast.LENGTH_LONG).show()
-        }, 6)
-        fields.append(label("2. Termux’taki trycloudflare.com HTTPS adresini buraya yapıştır.", 15, WHITE), 12)
-        val address = EditText(this).apply {
-            hint = "https://…trycloudflare.com"
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
-            setText(tunnelAddress)
-            maxLines = 2
-        }
-        fields.append(address, 4)
-        val result = label("", 14, ACCENT).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
-        val dialog = AlertDialog.Builder(this).setTitle("Uzak PS5 bağlantısı").setView(scroll)
-            .setNegativeButton("Kapat", null).create()
-        fun publicLink(): String? {
-            if (SessionState.current.portalPanel?.url != panel.url) {
-                result.text = "Panel oturumu değişti. Canlı altyazı ekranından yeni bağlantıyı hazırla."
-                return null
+        showPopup("Uzak PS5 bağlantısı", R.drawable.ic_portal_link, LAVENDER) { dialog ->
+            val terminal = popupStep(1, "Tüneli başlat", "Komutu Termux’a yapıştırıp çalıştır. Tünel açık kalsın.")
+            terminal.append(button("Komutu kopyala ve Termux’u aç") {
+                copyText("Cloudflare tünel komutu", portalTunnelCommand(panel.url))
+                val termux = packageManager.getLaunchIntentForPackage("com.termux")
+                if (termux != null) startActivity(termux)
+                else Toast.makeText(this@MainActivity, "Komut kopyalandı. Termux’u açıp yapıştır.", Toast.LENGTH_LONG).show()
+            }.apply { styleButton(this, LAVENDER to PEACH) }, 10)
+
+            val connection = popupStep(2, "Dış adresi kontrol et", "Termux’taki trycloudflare.com HTTPS adresini yapıştır.")
+            val address = EditText(this@MainActivity).apply {
+                hint = "https://…trycloudflare.com"
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                setText(tunnelAddress)
+                setTextColor(WHITE)
+                setHintTextColor(MUTED)
+                textSize = 14f
+                minHeight = dp(50)
+                maxLines = 2
+                setPadding(dp(12), dp(9), dp(12), dp(9))
+                background = StateListDrawable().apply {
+                    addState(intArrayOf(android.R.attr.state_focused), shape(BACKGROUND, ACCENT, 12))
+                    addState(intArrayOf(), shape(BACKGROUND, OUTLINE, 12))
+                }
             }
-            val link = portalPublicLink(panel.url, address.text.toString())
-            if (link == null) {
-                address.error = "Termux’un verdiği HTTPS adresini yapıştır."
-            } else {
-                tunnelAddress = "https://${URI(link).host}"
+            val result = label("", 14, ACCENT).apply {
+                accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+                visibility = View.GONE
             }
-            return link
-        }
-        val test = button("Dış bağlantıyı kontrol et") {}.apply {
-            setOnClickListener {
-                val link = publicLink() ?: return@setOnClickListener
-                isEnabled = false
-                result.text = "Panel bağlantısı kontrol ediliyor…"
-                checkTunnelLink(link) { message ->
-                    if (dialog.isShowing) {
-                        isEnabled = true
-                        result.text = if (SessionState.current.portalPanel?.url == panel.url) message
-                        else "Panel oturumu değişti. Yeni bağlantıyı hazırla."
+            fun showResult(message: String) {
+                result.text = message
+                result.visibility = View.VISIBLE
+            }
+            fun publicLink(): String? {
+                if (SessionState.current.portalPanel?.url != panel.url) {
+                    showResult("Panel oturumu değişti. Yeni bağlantıyı hazırla.")
+                    return null
+                }
+                val link = portalPublicLink(panel.url, address.text.toString())
+                if (link == null) address.error = "Termux’un verdiği HTTPS adresini yapıştır."
+                else tunnelAddress = "https://${URI(link).host}"
+                return link
+            }
+            connection.append(address, 10)
+            val test = button("Dış bağlantıyı kontrol et").apply {
+                setOnClickListener {
+                    val link = publicLink() ?: return@setOnClickListener
+                    isEnabled = false
+                    showResult("Panel bağlantısı kontrol ediliyor…")
+                    checkTunnelLink(link) { message ->
+                        if (dialog.isShowing) {
+                            isEnabled = true
+                            showResult(when {
+                                SessionState.current.portalPanel?.url != panel.url -> "Panel oturumu değişti. Yeni bağlantıyı hazırla."
+                                portalPublicLink(panel.url, address.text.toString()) != link -> "Adres değişti. Yeni adresi kontrol et."
+                                else -> message
+                            })
+                        }
                     }
                 }
             }
+            connection.append(test, 8)
+            connection.append(result, 8)
+
+            val share = popupStep(3, "Portal’da aç", "Tam bağlantıyı Game Base mesajıyla ana hesabına gönder. Portal’da aç ve Yana Sabitle görünüyorsa seç.")
+            share.append(button("Tam Portal bağlantısını kopyala") {
+                val link = publicLink() ?: return@button
+                copyText("Portal HTTPS paneli", link)
+                showResult("Bağlantı kopyalandı. Mesajı gönderdikten sonra PlayStation App yayınını tam ekranda açık bırak.")
+            }.apply { styleButton(this, MINT to ACCENT) }, 10)
         }
-        fields.append(test, 4)
-        fields.append(result, 6)
-        fields.append(label("3. Tam bağlantıyı Game Base mesajında ana hesabına gönder. Portal’da aç ve varsa Yana Sabitle’yi seç.", 15, WHITE), 10)
-        fields.append(button("Tam Portal bağlantısını kopyala") {
-            val link = publicLink() ?: return@button
-            copyText("Portal HTTPS paneli", link)
-            result.text = "Bağlantı kopyalandı. Mesajı gönderdikten sonra PS App yayınını tam ekranda açık bırak."
-        }, 6)
-        fields.isFocusableInTouchMode = true
-        fields.requestFocus()
-        dialog.show()
     }
 
     private fun checkTunnelLink(link: String, complete: (String) -> Unit) {
@@ -637,18 +673,13 @@ class MainActivity : Activity() {
     }
 
     private fun showPortalHelp() {
-        AlertDialog.Builder(this)
-            .setTitle("Portal yan paneli")
-            .setMessage(
-                "1. Portal bağlantı testini başlat. PS5 uzaktaysa PS5 uzakta · Bağlantıyı hazırla ile HTTPS adresi al.\n\n" +
-                    "2. Panel bağlantısını kopyala ve PlayStation App’te kendi PS5 hesabına Game Base mesajıyla gönder.\n\n" +
-                    "3. Portal’da PS düğmesine basıp Game Base mesajındaki bağlantıyı aç. Options menüsünde Yana Sabitle görünüyorsa seçip oyuna dön. Test metninin ekranda değiştiğini kontrol et.\n\n" +
-                    "4. Test açıkken PlayStation App’te Paylaşımlı Ekran yayınına dön ve DraBornTranslate’te canlı altyazıyı başlat. Panel bağlantın korunur.\n\n" +
-                    "Kısa test sona ererse canlı altyazıyı başlat ve bağlantıyı yeniden hazırla.\n\n" +
-                    "Yana Sabitle görünmezse bu Portal oturumunda sayfayı oyunun yanında açık tutamazsın.",
-            )
-            .setPositiveButton("Tamam", null)
-            .show()
+        showPopup("Portal panelini açma adımları", R.drawable.ic_portal_steps, ACCENT) {
+            popupStep(1, "Bağlantıyı başlat", "$PORTAL_START düğmesine dokun. Bağlantı 2,5 dakika boyunca örnek yazı gösterir.")
+            popupStep(2, "Bağlantıyı gönder", "PS5 aynı ağdaysa panel bağlantısını kopyala. Uzaktaysa PS5 uzakta · Bağlantıyı hazırla ile HTTPS adresi al. PlayStation App’te adresi Game Base mesajıyla ana hesabına gönder.")
+            popupStep(3, "Portal’da paneli aç", "PS düğmesi → Game Base yoluyla mesajdaki adresi aç. Options menüsünde Yana Sabitle görünüyorsa seç ve oyuna dön. Örnek yazının güncellendiğini kontrol et.")
+            popupStep(4, "Canlı çeviriyi başlat", "Örnek yazı açıkken PlayStation App’te Paylaşımlı Ekran yayınına dön ve DraBornTranslate’te canlı çeviriyi başlat. Süre dolduysa yeni panel bağlantısı al.")
+            append(label("Yana Sabitle seçeneği yoksa çeviriyi telefon ekranında takip edebilirsin.", 13, ACCENT), 12)
+        }
     }
 
     private fun beginOrStop() {
@@ -861,38 +892,94 @@ class MainActivity : Activity() {
         return bitmap
     }
 
-    private fun showAppMenu(anchor: View) {
-        PopupMenu(this, anchor, Gravity.END).apply {
-            menu.add("Hakkında").setOnMenuItemClickListener {
-                showAbout()
-                true
+    private fun showAbout() {
+        if (aboutDialog?.isShowing == true) return
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        showPopup("DraBornTranslate", R.drawable.brand_mark, overline = "DrabornEagle") { dialog ->
+            aboutDialog = dialog
+            append(
+                label("İngilizce oyun metinlerini oynarken canlı olarak Türkçeye çevirir. Çeviri çevrimdışı ve ücretsizdir.", 14, MUTED)
+                    .apply { setLineSpacing(dp(3).toFloat(), 1f) },
+                16,
+            )
+            append(label("Sürüm $version", 14, WHITE, bold = true).apply {
+                background = shape(0xFF191D36.toInt(), OUTLINE, 12)
+                setPadding(dp(12), dp(10), dp(12), dp(10))
+            }, 16)
+
+            val check = button("Yeni sürüm kontrolü") {
+                if (AppUpdater.state is UpdateState.Ready) AppUpdater.continueInstall(this@MainActivity, requested = true)
+                else {
+                    updateResultPending = true
+                    AppUpdater.check(this@MainActivity)
+                }
             }
-            menu.add("Yasal bildirimler").setOnMenuItemClickListener {
-                showLegalNotices()
-                true
+            styleButton(check, ACCENT to LAVENDER)
+            append(check, 12)
+            val progress = ProgressBar(this@MainActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
+                progressTintList = ColorStateList.valueOf(ACCENT)
+                progressBackgroundTintList = ColorStateList.valueOf(OUTLINE)
+                max = 100
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
             }
-            show()
+            append(progress, 8)
+            val message = label("", 14, MUTED).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
+            append(message, 6)
+
+            val updateUi: (UpdateState) -> Unit = { state ->
+                check.isEnabled = state == UpdateState.Idle || state == UpdateState.Current ||
+                    state is UpdateState.Ready || state is UpdateState.Message
+                check.text = if (state is UpdateState.Ready) "Kurulum iznini aç" else "Yeni sürüm kontrolü"
+                progress.visibility = if (state is UpdateState.Downloading) View.VISIBLE else View.GONE
+                if (state is UpdateState.Downloading) progress.progress = state.percent
+                message.text = when (state) {
+                    UpdateState.Idle, UpdateState.Current -> ""
+                    UpdateState.Checking -> "GitHub’da yeni sürüm aranıyor…"
+                    is UpdateState.Downloading -> "v${state.version} indiriliyor · %${state.percent}"
+                    is UpdateState.Ready -> "v${state.version} indirildi. Android’de bu uygulama için kurulum izni ver."
+                    UpdateState.Installing, is UpdateState.Confirm -> "Güncelleme Android’e gönderiliyor…"
+                    is UpdateState.Message -> state.text
+                }
+                message.visibility = if (message.text.isEmpty()) View.GONE else View.VISIBLE
+            }
+            updateUi(AppUpdater.state)
+            renderAboutUpdate = updateUi
         }
     }
 
-    private fun showAbout() {
-        if (aboutDialog?.isShowing == true) return
+    private fun showCurrentVersion() {
+        showPopup("Sürüm kontrolü", R.drawable.ic_portal_check, MINT) {
+            append(label("En güncel sürümü kullanıyorsun.", 16, WHITE, bold = true), 16)
+        }
+    }
+
+    private fun showPopup(
+        title: String,
+        icon: Int,
+        accent: Int = LAVENDER,
+        overline: String? = null,
+        content: LinearLayout.(Dialog) -> Unit,
+    ) {
         val dialog = Dialog(this).apply { requestWindowFeature(Window.FEATURE_NO_TITLE) }
-        aboutDialog = dialog
-        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
         val surface = column().apply {
             background = gradient(GradientDrawable.Orientation.TL_BR, 0xFF24214B.toInt(), PANEL, 28)
                 .apply { setStroke(dp(1), 0xFF56528F.toInt()) }
             setPadding(dp(20), dp(16), dp(20), dp(20))
+            isFocusableInTouchMode = true
         }
         val header = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
         header.addView(ImageView(this).apply {
-            setImageResource(R.drawable.brand_mark)
+            setImageResource(icon)
+            if (icon != R.drawable.brand_mark) {
+                background = shape(0xFF252944.toInt(), OUTLINE, 15)
+                setColorFilter(accent)
+                setPadding(dp(12), dp(12), dp(12), dp(12))
+            }
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }, LinearLayout.LayoutParams(dp(52), dp(52)).apply { marginEnd = dp(12) })
         header.addView(column().apply {
-            addView(label("DrabornEagle", 13, LAVENDER, bold = true))
-            append(label("DraBornTranslate", 20, WHITE, bold = true).apply { isAccessibilityHeading = true }, 2)
+            if (overline != null) addView(label(overline, 13, accent, bold = true))
+            append(label(title, 20, WHITE, bold = true).apply { isAccessibilityHeading = true }, if (overline != null) 2 else 0)
         }, LinearLayout.LayoutParams(0, -2, 1f))
         header.addView(ImageButton(this).apply {
             background = RippleDrawable(ColorStateList.valueOf(0x33B6A8FF), shape(PANEL, OUTLINE, 14), null)
@@ -903,65 +990,42 @@ class MainActivity : Activity() {
             setOnClickListener { dialog.dismiss() }
         }, LinearLayout.LayoutParams(dp(48), dp(48)).apply { marginStart = dp(6) })
         surface.addView(header)
-        surface.append(
-            label("İngilizce oyun metinlerini oynarken canlı olarak Türkçeye çevirir. Çeviri çevrimdışı ve ücretsizdir.", 14, MUTED)
-                .apply { setLineSpacing(dp(3).toFloat(), 1f) },
-            16,
-        )
-        surface.append(label("Sürüm $version", 14, WHITE, bold = true).apply {
-            background = shape(0xFF191D36.toInt(), OUTLINE, 12)
-            setPadding(dp(12), dp(10), dp(12), dp(10))
-        }, 16)
-
-        val check = button("Yeni sürüm kontrolü") {
-            if (AppUpdater.state is UpdateState.Ready) AppUpdater.continueInstall(this, requested = true)
-            else AppUpdater.check(this)
-        }
-        styleButton(check, primary = true)
-        surface.append(check, 12)
-        val progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-            progressTintList = ColorStateList.valueOf(ACCENT)
-            progressBackgroundTintList = ColorStateList.valueOf(OUTLINE)
-            max = 100
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-        }
-        surface.append(progress, 8)
-        val message = label("", 14, MUTED).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
-        surface.append(message, 6)
-
-        val updateUi: (UpdateState) -> Unit = { state ->
-            check.isEnabled = state == UpdateState.Idle || state == UpdateState.Current ||
-                state is UpdateState.Ready || state is UpdateState.Message
-            check.text = if (state is UpdateState.Ready) "Kurulum iznini aç" else "Yeni sürüm kontrolü"
-            progress.visibility = if (state is UpdateState.Downloading) View.VISIBLE else View.GONE
-            if (state is UpdateState.Downloading) progress.progress = state.percent
-            message.text = when (state) {
-                UpdateState.Idle -> ""
-                UpdateState.Checking -> "GitHub’da yeni sürüm aranıyor…"
-                UpdateState.Current -> "En güncel sürümü kullanıyorsun."
-                is UpdateState.Downloading -> "v${state.version} indiriliyor · %${state.percent}"
-                is UpdateState.Ready -> "v${state.version} indirildi. Android’de bu uygulama için kurulum izni ver."
-                UpdateState.Installing, is UpdateState.Confirm -> "Güncelleme Android’e gönderiliyor…"
-                is UpdateState.Message -> state.text
-            }
-            message.visibility = if (message.text.isEmpty()) View.GONE else View.VISIBLE
-        }
-        updateUi(AppUpdater.state)
-        renderAboutUpdate = updateUi
+        surface.content(dialog)
+        popups.add(dialog)
         dialog.setOnDismissListener {
+            popups.remove(dialog)
             if (aboutDialog === dialog) {
                 aboutDialog = null
                 renderAboutUpdate = null
+                updateResultPending = false
             }
         }
         dialog.setContentView(ScrollView(this).apply { addView(surface) })
+        surface.requestFocus()
         dialog.show()
         dialog.window?.apply {
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setLayout(dp(minOf(420, (resources.configuration.screenWidthDp - 32).coerceAtLeast(200))),
                 WindowManager.LayoutParams.WRAP_CONTENT)
+            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
             setDimAmount(0.65f)
         }
+    }
+
+    private fun LinearLayout.popupStep(number: Int, title: String, description: String): LinearLayout {
+        val step = card()
+        val heading = LinearLayout(this@MainActivity).apply { gravity = Gravity.CENTER_VERTICAL }
+        heading.addView(label(number.toString(), 14, BACKGROUND, bold = true).apply {
+            gravity = Gravity.CENTER
+            contentDescription = "$number. adım"
+            background = gradient(GradientDrawable.Orientation.TL_BR, ACCENT, LAVENDER, 9)
+        }, LinearLayout.LayoutParams(dp(28), dp(28)).apply { marginEnd = dp(10) })
+        heading.addView(label(title, 15, WHITE, bold = true).apply { isAccessibilityHeading = true },
+            LinearLayout.LayoutParams(0, -2, 1f))
+        step.addView(heading)
+        step.append(label(description, 14, MUTED).apply { setLineSpacing(dp(2).toFloat(), 1f) }, 8)
+        append(step, 10)
+        return step
     }
 
     private fun showLegalNotices() {
@@ -1006,26 +1070,39 @@ class MainActivity : Activity() {
         stateListAnimator = null
         minimumHeight = dp(48)
         if (action != null) setOnClickListener { action() }
-        styleButton(this, false)
+        styleButton(this)
     }
 
-    private fun styleButton(button: Button, primary: Boolean) {
+    private fun styleButton(button: Button, colors: Pair<Int, Int>? = null, activated: Pair<Int, Int>? = null) {
         val disabled = intArrayOf(-android.R.attr.state_enabled)
         val selected = intArrayOf(android.R.attr.state_selected)
         val shaped = StateListDrawable().apply {
             addState(disabled, shape(0xFF1B2038.toInt(), OUTLINE, 14))
             addState(selected, shape(0xFF332F63.toInt(), LAVENDER, 14))
-            addState(intArrayOf(), if (primary) {
-                gradient(GradientDrawable.Orientation.LEFT_RIGHT, ACCENT, LAVENDER, 14)
-            } else shape(0xFF242A4B.toInt(), OUTLINE, 14))
+            if (activated != null) addState(intArrayOf(android.R.attr.state_activated),
+                gradient(GradientDrawable.Orientation.LEFT_RIGHT, activated.first, activated.second, 14))
+            addState(intArrayOf(), colors?.let {
+                gradient(GradientDrawable.Orientation.LEFT_RIGHT, it.first, it.second, 14)
+            } ?: shape(0xFF242A4B.toInt(), OUTLINE, 14))
         }
         button.backgroundTintList = null
         button.background = RippleDrawable(ColorStateList.valueOf(0x3389C5FF), shaped, null)
         button.setPadding(dp(12), dp(10), dp(12), dp(10))
         button.setTextColor(ColorStateList(
             arrayOf(disabled, selected, intArrayOf()),
-            intArrayOf(0xFF909AB8.toInt(), WHITE, if (primary) BACKGROUND else WHITE),
+            intArrayOf(0xFF909AB8.toInt(), WHITE, if (colors != null) BACKGROUND else WHITE),
         ))
+    }
+
+    private fun actionIcon(button: Button, icon: Int, activeIcon: Int? = null) {
+        val icons = StateListDrawable().apply {
+            if (activeIcon != null) addState(intArrayOf(android.R.attr.state_activated), getDrawable(activeIcon)?.mutate())
+            addState(intArrayOf(), getDrawable(icon)?.mutate())
+            setTintList(ColorStateList(arrayOf(intArrayOf(-android.R.attr.state_enabled), intArrayOf()),
+                intArrayOf(0xFF909AB8.toInt(), BACKGROUND)))
+        }
+        button.compoundDrawablePadding = dp(8)
+        button.setCompoundDrawablesRelativeWithIntrinsicBounds(icons, null, null, null)
     }
 
     private fun slider(description: String, limit: Int, value: Int, changed: (Int) -> Unit) = SeekBar(this).apply {

@@ -1,10 +1,10 @@
 # DraBornTranslate kurulum rehberi
 
-DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.9 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.9) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
+DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.10 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.10) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
 
 Çeviri cihazda çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
 
-**Uygulama menüsü → Hakkında → Yeni sürüm kontrolü**, v0.4.9 ve sonrasında internet üzerinden resmi GitHub sürümünü kontrol eder. Daha yeni APK’yı indirip doğruladığında kurulumu başlatır. Android uygulama kurma izni veya onay gösterirse ekrandaki adımları tamamla.
+Sağ üstteki üç noktadan **Hakkında** penceresini aç ve **Yeni sürüm kontrolü** düğmesine dokun. Uygulama daha yeni APK’yı indirip doğruladığında kurulumu başlatır. Android uygulama kurma izni veya onay gösterirse ekrandaki adımları tamamla.
 
 **Altyazı bölgesi** modu, v0.3.3’teki ekran okuma ve replik takibiyle çalışır. Türkçe repliğin ilk görünme süresi telefonun ekran okuma ve çeviri hızına bağlıdır. Portal ekranındaki toplam gecikmeyi, PlayStation App yayınının telefona ulaşma süresi ve panel bağlantısı da etkiler.
 
@@ -29,7 +29,7 @@ Portal yan paneli deneysel. Oyunun yanında görünmesi, PS5’in panel bağlant
 5. DraBornTranslate’te **Portal’da örnek yazı göster** seç. Portal’da **PS düğmesi → Game Base → gelen mesaj → bağlantı** yolunu izle. Web sayfası açılır ve **Options → Yana Sabitle** görünürse seçip oyuna dön. Örnek Türkçe metnin oyunun yanında değişmeye devam ettiğini kontrol et.
 6. Telefonda **Canlı çeviriye dön** seç. PlayStation App’teki yatay canlı yayını tekrar öne getir ve ekranı açık tut. Oyunda İngilizce altyazı çıktığında, okunan Türkçe satır panele gönderilir.
 
-**Önce kısa deneme yapmak için** **Portal bağlantısını test et** seç. Bu seçenek ekran paylaşımı izni istemeden iki örnek yazı gösterir. Test açıkken uzak PS5 için tünel sihirbazını da kullanabilirsin. Test 2,5 dakika sürer. Süre dolmadan canlı altyazıya geçersen panel bağlantın korunur. Test kapanırsa yeni oturumdan güncel bağlantıyı al.
+**Örnek yazıyla başlamak için Portal Bağlantısını Başlat** seç. Örnek yazı ekran paylaşımı izni gerektirmeden 2,5 dakika boyunca gösterilir. Bu sırada uzak PS5 bağlantısını da hazırlayabilirsin. Süre dolmadan canlı altyazıya geçersen panel bağlantın korunur. Örnek yazıyı kapatmak için **Portal Bağlantısını Durdur** seç.
 
 **PS5 aynı yerel ağdaysa** tünel adımlarını atlayıp **Panel bağlantısını kopyala** ile yerel adresi aynı şekilde mesajla PS5’e gönder. Telefonun ve Portal’ın aynı Wi-Fi’da olması, başka ağdaki PS5’in yerel adrese erişmesi için yeterli değildir.
 

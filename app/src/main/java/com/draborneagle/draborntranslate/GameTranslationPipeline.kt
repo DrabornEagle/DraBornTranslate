@@ -81,7 +81,11 @@ internal class GameTranslationPipeline(
 
     private fun translateSentence(source: String): String? {
         val sentence = SubtitleSegmenter.normalizeCase(source, knownNames).replace('’', '\'')
-        val input = idioms.fold(normalizeTime(sentence)) { text, (phrase, replacement) ->
+        val normalized = numberedDock.replace(normalizeTime(sentence)) { match ->
+            val article = if (match.range.first == 0) "The" else "the"
+            "$article pier numbered ${match.groupValues[1]}"
+        }
+        val input = idioms.fold(normalized) { text, (phrase, replacement) ->
             phrase.replace(text) { match ->
                 replacement(match).replaceFirstChar { if (match.value[0].isUpperCase()) it.uppercaseChar() else it }
             }
@@ -104,7 +108,7 @@ private val possessionQuestion = Regex(
     """^who(?: (?:has(?: got)?|holds|is holding)|['’]s got) (?:it|them|one|(?:the|a|an|your|my|his|her|our|their|this|that|these|those) .+)\?$""",
     RegexOption.IGNORE_CASE,
 )
-private val actionQuestion = Regex("""^who (?:opened|closed|locked|unlocked|moved|took|called|sent|left|broke|told|put|gave|drove|said|turned|cut) .+\?$""", RegexOption.IGNORE_CASE)
+internal val actionQuestion = Regex("""who ((?:opened|closed|locked|unlocked|moved|took|called|sent|left|broke|told|put|gave|drove|said|turned|cut) .+)\?""", RegexOption.IGNORE_CASE)
 
 private fun shortAnswer(source: String, previous: String?): String? {
     val question = previous?.trim() ?: return null
@@ -129,6 +133,7 @@ private fun resolveDirection(source: String, previous: String?): String {
 }
 
 private val clockTime = Regex("""\b(0?[1-9]|1[0-2])(?::([0-5]\d))?\s*([ap])\.?m\b""", RegexOption.IGNORE_CASE)
+private val numberedDock = Regex("""\b(?:the )?dock (\d{1,3})\b""", RegexOption.IGNORE_CASE)
 
 private fun normalizeTime(text: String): String = clockTime.replace(text) { match ->
     val (hour, minute, period) = match.destructured
@@ -195,6 +200,8 @@ private val commonLines = mapOf(
     "There's a catch." to "Bu işte bir bit yeniği var.",
     "There's gotta be a catch." to "Bu işte bir bit yeniği olmalı.",
     "There has to be a catch." to "Bu işte bir bit yeniği olmalı.",
+    "Need a ride?" to "Seni bırakayım mı?",
+    "Want a ride?" to "Seni bırakayım mı?",
     "I don't buy it." to "Buna inanmıyorum.",
     "I'm not buying it." to "Buna inanmıyorum.",
     "Keep still." to "Kıpırdama.",
@@ -296,7 +303,6 @@ private fun idiom(phrase: String, replacement: String): Pair<Regex, (MatchResult
 private val objectPronouns = mapOf(
     "my" to "me", "your" to "you", "his" to "him", "her" to "her", "our" to "us", "their" to "them",
 )
-
 private val idioms = listOf(
     idiom("lemme", "let me"),
     idiom("gimme", "give me"),
@@ -304,6 +310,34 @@ private val idioms = listOf(
     idiom("coulda", "could have"),
     idiom("shoulda", "should have"),
     idiom("woulda", "would have"),
+    idiom("picked up on the fact that", "noticed that"),
+    idiom("let it slip that", "reveal that"),
+    idiom("the second things get ugly", "as soon as trouble starts"),
+    idiom("call in a favo[u]?r", "ask for a favor in return"),
+    idiom("call it a day", "stop for today"),
+    idiom("hold down the fort(?= while)", "keep things running here"),
+    idiom("""dodged a bullet(?= when (?:you|we|he|she|they) (?:left|quit|called off)\b)""", "avoided serious trouble"),
+    idiom("got away with it(?= this time)", "did it without getting caught"),
+    Regex("""\bthrow (me|you|him|her|us|them) off(?= by (?:changing the subject|asking|talking))""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "distract ${match.groupValues[1]}" },
+    Regex("""\bbeating (myself|yourself|himself|herself|ourselves|themselves) up about\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "blaming ${match.groupValues[1]} for" },
+    Regex("""\bstick (my|your|his|her|our|their) neck out\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "risk ${match.groupValues[1]} own safety" },
+    Regex("""\b(you|we|they) had (?:your|our|their) eye on (the (?:van|car|truck))(?=,? not the (?:driver|passenger)\b)""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "${match.groupValues[1]} were watching ${match.groupValues[2]}" },
+    Regex("""\b(his|her) (?:boot|shoe) slipped(?= (?:when|as) (?:he|she) (?:climbed|stepped|walked)\b)""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> if (match.groupValues[1].equals("his", ignoreCase = true)) "he slipped" else "she slipped" },
+    Regex("""\bwent back for (the (?:cash|money|keys|envelope|bag))\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "went back to get ${match.groupValues[1]}" },
+    Regex("""\bgive (me|you|him|her|us|them) a head start\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "let ${match.groupValues[1]} start earlier" },
+    Regex("""\b((?:the|an|our|their) alarm) went off\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "${match.groupValues[1]} started ringing" },
+    Regex("""^tail the (car|van|truck|vehicle) without being seen\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "follow the ${match.groupValues[1]} without anyone seeing you" },
+    Regex("""\bboth ((?:(?:missing|spare|remaining) )?(?:keys|packages|files|doors|guards))\b""", RegexOption.IGNORE_CASE) to
+        { match: MatchResult -> "the two ${match.groupValues[1]}" },
     idiom("come clean about", "tell the truth about"),
     idiom("came clean about", "told the truth about"),
     idiom("drop me a line", "send me a message"),

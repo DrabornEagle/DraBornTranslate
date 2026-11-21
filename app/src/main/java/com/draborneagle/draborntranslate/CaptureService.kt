@@ -146,20 +146,20 @@ class CaptureService : Service() {
     private fun startPanelTest(textSize: Int) {
         val type = if (Build.VERSION.SDK_INT >= 34) ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
         else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
-        val message = "Portal bağlantı testi açık · 2,5 dakika"
+        val message = "Portal bağlantısı açık · Örnek yazı 2,5 dakika"
         try {
             startForeground(NOTIFICATION_ID, notification(message), type)
         } catch (_: IllegalStateException) {
-            finish("Portal testini uygulama açıkken yeniden başlat.")
+            finish("Portal bağlantısını uygulama açıkken yeniden başlat.")
             return
         } catch (_: SecurityException) {
-            finish("Android Portal testini başlatmaya izin vermedi.")
+            finish("Android Portal bağlantısını başlatmaya izin vermedi.")
             return
         }
         val issue = ensurePanel(textSize)
         val server = panel
         if (server == null) {
-            finish(issue ?: "Portal test paneli açılamadı.")
+            finish(issue ?: "Portal paneli açılamadı.")
             return
         }
         SessionState.update(SessionState.State(
@@ -314,7 +314,7 @@ class CaptureService : Service() {
     }
 
     private fun stopMessage() = if (SessionState.current.portalPanel?.testing == true) {
-        "Portal bağlantı testi durduruldu."
+        "Portal bağlantısı durduruldu."
     } else {
         "Canlı altyazı durduruldu."
     }
@@ -354,7 +354,7 @@ class CaptureService : Service() {
     }
 
     private val panelTestTimeout = Runnable {
-        if (SessionState.current.portalPanel?.testing == true) finish("Portal bağlantı testi sona erdi.")
+        if (SessionState.current.portalPanel?.testing == true) finish("Portal örnek yazı oturumu sona erdi.")
     }
 
     private val endPanelPreview = Runnable { setPanelPreview(false) }

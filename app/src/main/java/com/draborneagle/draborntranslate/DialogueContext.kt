@@ -14,7 +14,7 @@ internal object DialogueContext {
         """((?:yes|no),? )?($PRONOUN) ($AUXILIARY|$NEGATIVE)(?:,? ((?:until|before) .+?))?([.!]?)""",
         RegexOption.IGNORE_CASE,
     )
-    private val question = Regex("""($AUXILIARY) ($PRONOUN) (.+)\?""", RegexOption.IGNORE_CASE)
+    private val question = Regex("""($AUXILIARY|$NEGATIVE) ($PRONOUN) (.+)\?""", RegexOption.IGNORE_CASE)
     private val negativeAuxiliary = Regex(NEGATIVE, RegexOption.IGNORE_CASE)
     private val stateQuestion = Regex(
         """is (it|he|she|(?:the|that|this) (?:[a-z-]+ ){0,3}[a-z-]+) ($STATES)\?""",
@@ -26,6 +26,7 @@ internal object DialogueContext {
         """\b(?:am|is|are|was|were) ($STATES|going to .+|the one who .+)$""",
         RegexOption.IGNORE_CASE,
     )
+    private val expectedState = Regex("""\b(?:is|are|'s) (?:supposed|meant) to be ($STATES)$""", RegexOption.IGNORE_CASE)
     private val statedObject = Regex(
         """\b(?:the|a|an|this|that) ((?:[a-z-]+ ){0,2}[a-z-]+) (?:is|was) ($STATES)$""",
         RegexOption.IGNORE_CASE,
@@ -34,11 +35,21 @@ internal object DialogueContext {
     private val speakerDependent = Regex("""\b(?:i|me|my|mine|you|your|yours|we|us|our|ours)\b""", RegexOption.IGNORE_CASE)
     private val observedEvent = Regex("""(see|hear|notice) what happened to (?:my|your|our) .+""", RegexOption.IGNORE_CASE)
     private val observedPerson = Regex("""(see|hear|notice) (?:my|your|our) (brother|sister|father|mother|parents|kids)""", RegexOption.IGNORE_CASE)
+    private val standalone = Regex("""\bon your own$""", RegexOption.IGNORE_CASE)
+    private val reportedDetail = Regex("""(tell (?:him|her|them)) (?:where|what|when|why|how) .+""", RegexOption.IGNORE_CASE)
+    private val waitForSpeaker = Regex("""wait for me((?: (?:at|by|near|outside) .+)?)""", RegexOption.IGNORE_CASE)
     private val handledObject = Regex("""(open|close|lock|unlock) the (?:safe|door|gate|window)""", RegexOption.IGNORE_CASE)
     private val shortResponse = Regex("""(not yet|already did|not anymore|i will be|so am i)([.!]?)""", RegexOption.IGNORE_CASE)
     private val alignedBelief = Regex("""i (thought|figured|assumed|expected) (.+)""", RegexOption.IGNORE_CASE)
     private val matchingBelief = Regex("""so did i([.!]?)""", RegexOption.IGNORE_CASE)
     private val mustHave = Regex("""(he|she|they) must have([.!]?)""", RegexOption.IGNORE_CASE)
+    private val reportedAction = Regex("""(he|she|they) said (he|she|they) (was|were)([.!]?)""", RegexOption.IGNORE_CASE)
+    private const val NAME = """\p{Lu}[\p{L}'-]+(?: \p{Lu}[\p{L}'-]+){0,2}"""
+    private val personName = Regex(NAME)
+    private val ongoingActionQuestion = Regex(
+        """(?i:is|are) ($NAME|(?i:he|she|they)) ((?i:coming|leaving|waiting|driving|staying)(?: .+)?)\?""",
+    )
+    private val namedAnswer = Regex("""($NAME) (?i:did)([.!]?)""")
     private val pastParticiples = mapOf(
         "take" to "taken", "see" to "seen", "leave" to "left", "go" to "gone", "put" to "put",
         "drive" to "driven", "get" to "gotten", "call" to "called", "lock" to "locked", "open" to "opened",
@@ -48,7 +59,8 @@ internal object DialogueContext {
     fun mightNeedPrevious(text: String): Boolean {
         val first = SubtitleSegmenter.split(text).firstOrNull { it.translate }?.text?.replace('’', '\'') ?: return false
         return answer.matches(first) || neither.matches(first) || shortResponse.matches(first) ||
-            matchingBelief.matches(first) || mustHave.matches(first) || stateReference.containsMatchIn(first) ||
+            matchingBelief.matches(first) || mustHave.matches(first) || reportedAction.matches(first) ||
+            namedAnswer.matches(first) || stateReference.containsMatchIn(first) ||
             refersToPreviousPassage(first)
     }
 
@@ -85,7 +97,7 @@ internal object DialogueContext {
         val complement = when {
             precedingQuestion != null && family(precedingQuestion.groupValues[1]) == auxiliaryFamily -> precedingQuestion.groupValues[3]
             precedingQuestion == null && (auxiliaryFamily == "be" || auxiliaryFamily == "past be") ->
-                state.find(priorBody)?.groupValues?.get(1)
+                (state.find(priorBody) ?: expectedState.find(priorBody))?.groupValues?.get(1)
             else -> null
         }?.let(::retainAction) ?: return text
         val tail = if (condition.isEmpty()) "" else " $condition"
@@ -98,6 +110,13 @@ internal object DialogueContext {
     }
 
     private fun expandShortResponse(source: String, prior: String, question: MatchResult?): String? {
+        reportedAction.matchEntire(source)?.destructured?.let { (speaker, subject, auxiliary, ending) ->
+            val (askedSubject, action) = ongoingActionQuestion.matchEntire(prior)?.destructured ?: return null
+            if (!speaker.equals(subject, ignoreCase = true)) return null
+            val named = personName.matches(askedSubject)
+            if (!named && !subject.equals(askedSubject, ignoreCase = true)) return null
+            return retainAction(action)?.let { "$speaker said $subject $auxiliary $it$ending" }
+        }
         shortResponse.matchEntire(source)?.destructured?.let { (response, ending) ->
             val auxiliary = question?.groupValues?.get(1).orEmpty()
             val subject = question?.groupValues?.get(2).orEmpty()
@@ -130,6 +149,10 @@ internal object DialogueContext {
                     ?.let { "I am $it too$ending" }
             }
         }
+        namedAnswer.matchEntire(source)?.destructured?.let { (name, ending) ->
+            val action = actionQuestion.matchEntire(prior)?.groupValues?.get(1) ?: return null
+            return retainAction(action)?.let { "$name $it$ending" }
+        }
         matchingBelief.matchEntire(source)?.let { response ->
             val (verb, action) = alignedBelief.matchEntire(prior.trimEnd('.', '!'))?.destructured ?: return null
             return retainAction(action)?.let { "I $verb so too${response.groupValues[1]}" }
@@ -147,6 +170,8 @@ internal object DialogueContext {
 
     private fun retainAction(action: String): String? {
         // Drop a viewpoint-dependent modifier only when the shared event/person remains unambiguous.
+        if (standalone.containsMatchIn(action)) return standalone.replace(action, "alone").takeUnless(speakerDependent::containsMatchIn)
+        waitForSpeaker.matchEntire(action)?.let { return "wait${it.groupValues[1]}" }
         observedEvent.matchEntire(action)?.let { return "${it.groupValues[1]} what happened" }
         observedPerson.matchEntire(action)?.destructured?.let { (verb, relative) ->
             val person = when (relative.lowercase(Locale.ROOT)) {
@@ -156,7 +181,8 @@ internal object DialogueContext {
             }
             return "$verb $person"
         }
-        return action.takeUnless(speakerDependent::containsMatchIn)
+        if (!speakerDependent.containsMatchIn(action)) return action
+        return reportedDetail.matchEntire(action)?.groupValues?.get(1)
     }
 
     private fun family(auxiliary: String): String = when (val form = auxiliary.lowercase(Locale.ROOT)) {
