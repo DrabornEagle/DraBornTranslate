@@ -12,6 +12,8 @@ internal class CaptionSession(
     private val translate: (TranslationInput, (TranslationReply) -> Unit) -> Unit,
     private val show: (Caption?) -> Unit,
     private val onFailure: (String?) -> Unit,
+    private val onRead: (String?) -> Unit = {},
+    private val cancelTranslation: () -> Unit = {},
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
     private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(
         stableFrames = if (readingArea == ReadingArea.GAME_TEXT) 1 else 2,
@@ -19,6 +21,7 @@ internal class CaptionSession(
         acceptCompletedSentence = false,
         minTextLength = 2,
         isGarbled = ::looksDamaged,
+        clearAfterMs = 1400,
     ),
 ) {
     private data class Request(
@@ -47,7 +50,7 @@ internal class CaptionSession(
             StabilizerKind.CLEAR -> clearCaption()
             StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
                 val source = action.text ?: return
-                clearCaption(hide = readingArea == ReadingArea.GAME_TEXT)
+                clearCaption(source)
                 val input = TranslationInput(source, readingArea)
                 val cached = cache[input]
                 if (cached != null) {
@@ -79,10 +82,12 @@ internal class CaptionSession(
         return steady
     }
 
-    private fun clearCaption(hide: Boolean = true) {
+    private fun clearCaption(source: String? = null) {
         number++
         waiting = null
-        if (hide) show(null)
+        if (busy) cancelTranslation()
+        show(null)
+        onRead(source)
     }
 
     private fun translateNext() {

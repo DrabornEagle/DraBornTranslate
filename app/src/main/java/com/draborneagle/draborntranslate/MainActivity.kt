@@ -21,6 +21,8 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.text.InputType
 import android.view.Gravity
@@ -51,6 +53,7 @@ class MainActivity : Activity() {
     private var pending = false
     private var demoMessage: String? = null
     private var demoCaption: Caption? = null
+    private var demoSource: String? = null
     private var demoTranslator: CaptionTranslator? = null
     private var demoReader: SubtitleReader? = null
     private var voicePreview: TurkishVoice? = null
@@ -76,7 +79,9 @@ class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var captionLabel: TextView
     private lateinit var sourceLabel: TextView
-    private lateinit var googleTranslate: Button
+    private lateinit var copySource: Button
+    private lateinit var modelLabel: TextView
+    private lateinit var modelButton: Button
     private lateinit var bandPreview: BandPreview
     private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
@@ -85,6 +90,14 @@ class MainActivity : Activity() {
     private lateinit var voiceButton: Button
 
     private val observe: (SessionState.State) -> Unit = { render() }
+    private val main = Handler(Looper.getMainLooper())
+    private var modelState = OfflineModelStore.State(OfflineModelStore.Stage.MISSING, "")
+    private val checkModel = object : Runnable {
+        override fun run() {
+            updateModelState()
+            main.postDelayed(this, 1000)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +115,7 @@ class MainActivity : Activity() {
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
         buildUi()
+        updateModelState()
         render()
     }
 
@@ -117,10 +131,12 @@ class MainActivity : Activity() {
     override fun onStart() {
         super.onStart()
         SessionState.observe(observe)
+        main.post(checkModel)
     }
 
     override fun onStop() {
         SessionState.remove(observe)
+        main.removeCallbacks(checkModel)
         super.onStop()
     }
 
@@ -182,6 +198,13 @@ class MainActivity : Activity() {
         openSource = button("") { openSourceApp(config.source, offerInstall = true) }
         guide.append(openSource, 14)
 
+        val modelSetup = card()
+        content.append(modelSetup, 14)
+        modelLabel = label("", 14, MUTED)
+        modelSetup.addView(modelLabel)
+        modelButton = button("") { changeModelDownload() }
+        modelSetup.append(modelButton, 8)
+
         startStop = button("Canlı altyazıyı başlat") { beginOrStop() }
         styleButton(startStop, true)
         content.append(startStop, 14)
@@ -213,18 +236,10 @@ class MainActivity : Activity() {
         live.append(captionLabel, 9)
         sourceLabel = label("", 14, MUTED)
         live.append(sourceLabel, 4)
-        googleTranslate = button("İngilizceyi Google Çeviri’de aç") {
-            (SessionState.current.caption ?: demoCaption)?.let { caption ->
-                val uri = Uri.parse("https://translate.google.com/").buildUpon()
-                    .appendQueryParameter("sl", "en")
-                    .appendQueryParameter("tl", "tr")
-                    .appendQueryParameter("text", caption.source)
-                    .appendQueryParameter("op", "translate")
-                    .build()
-                openLink(uri.toString())
-            }
+        copySource = button("Okunan İngilizceyi kopyala") {
+            recognizedText()?.let { copyText("İngilizce altyazı", it) }
         }
-        live.append(googleTranslate, 8)
+        live.append(copySource, 8)
 
         val settings = card()
         content.append(settings, 18)
@@ -251,7 +266,7 @@ class MainActivity : Activity() {
             sizeLabel.text = "Altyazı boyutu · $size"
         }
         settings.addView(sizeControl)
-        testButton = button("Örnek altyazıyı çevir") { runDemo() }
+        testButton = button("Çeviriyi dene") { showTranslationTest() }
         content.append(testButton, 14)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
         content.append(voiceButton, 6)
@@ -296,20 +311,64 @@ class MainActivity : Activity() {
         bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
-        startStop.isEnabled = !pending && demoTranslator == null && !packLoading
+        val modelReady = modelState.stage == OfflineModelStore.Stage.READY
+        modelLabel.text = modelState.message
+        modelButton.visibility = if (modelReady) View.GONE else View.VISIBLE
+        modelButton.isEnabled = modelState.stage != OfflineModelStore.Stage.VERIFYING
+        modelButton.text = when (modelState.stage) {
+            OfflineModelStore.Stage.DOWNLOADING -> "İndirmeyi durdur"
+            OfflineModelStore.Stage.VERIFYING -> "Dosya doğrulanıyor…"
+            else -> "Türkçe modeli indir · ${OfflineModelStore.MODEL_SIZE}"
+        }
+        startStop.isEnabled = (state.active || modelReady) && !pending && demoTranslator == null && !packLoading
         startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Canlı altyazıyı başlat"
-        testButton.isEnabled = controlsAvailable && demoTranslator == null
+        testButton.isEnabled = modelReady && controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
-        val caption = state.caption ?: demoCaption
+        val caption = if (state.active) state.caption else demoCaption
+        val source = recognizedText()
         status.text = if (state.active || panelTesting) state.voiceIssue ?: state.translationIssue ?: state.status
         else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
-        sourceLabel.text = caption?.source.orEmpty()
-        listOf(captionLabel, sourceLabel).forEach {
-            it.visibility = if (caption == null) View.GONE else View.VISIBLE
+        sourceLabel.text = source?.let { "Okunan İngilizce\n$it" }.orEmpty()
+        captionLabel.visibility = if (caption == null) View.GONE else View.VISIBLE
+        sourceLabel.visibility = if (source == null) View.GONE else View.VISIBLE
+        copySource.visibility = sourceLabel.visibility
+    }
+
+    private fun recognizedText(): String? = SessionState.current.let { state ->
+        if (state.active) state.recognizedSource else demoSource
+    }
+
+    private fun updateModelState() {
+        val current = runCatching { OfflineModelStore.status(this) }.getOrElse {
+            OfflineModelStore.State(OfflineModelStore.Stage.MISSING, "Model indirmesi şu anda açılmıyor.")
         }
-        googleTranslate.visibility = if (caption == null) View.GONE else View.VISIBLE
+        if (modelState == current) return
+        modelState = current
+        render()
+    }
+
+    private fun changeModelDownload() {
+        if (modelState.stage == OfflineModelStore.Stage.DOWNLOADING) {
+            runCatching { OfflineModelStore.cancel(this) }
+            updateModelState()
+            return
+        }
+        if (modelState.stage != OfflineModelStore.Stage.MISSING) return
+        AlertDialog.Builder(this)
+            .setTitle("Çevrimdışı Türkçe modeli")
+            .setMessage("${OfflineModelStore.MODEL_NAME} için bir defalık ${OfflineModelStore.MODEL_SIZE} indirme yapılır. " +
+                "Sonraki çeviriler telefonunda çalışır.")
+            .setNeutralButton("Model lisansı") { _, _ -> openLink(OfflineModelStore.TERMS) }
+            .setNegativeButton("Vazgeç", null)
+            .setPositiveButton("İndir") { _, _ ->
+                runCatching { OfflineModelStore.start(this) }.onFailure { error ->
+                    Toast.makeText(this, error.message ?: "İndirme başlatılamadı.", Toast.LENGTH_LONG).show()
+                }
+                updateModelState()
+            }
+            .show()
     }
 
     private fun select(value: Source) {
@@ -678,16 +737,58 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun runDemo() {
+    private fun showTranslationTest() {
+        AlertDialog.Builder(this)
+            .setTitle("Çeviriyi dene")
+            .setItems(arrayOf("Örnek görseldeki altyazıyı oku", "İngilizce metni gir")) { _, index ->
+                if (index == 0) runDemo() else showTextTest()
+            }
+            .setNegativeButton("Kapat", null)
+            .show()
+    }
+
+    private fun showTextTest() {
+        val input = EditText(this).apply {
+            hint = "İngilizce repliği yapıştır"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setLines(4)
+            setSelection(text.length)
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("İngilizce metni çevir")
+            .setView(input)
+            .setNegativeButton("Vazgeç", null)
+            .setPositiveButton("Çevir", null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val original = input.text.toString().trim()
+                if (original.isEmpty()) {
+                    input.error = "İngilizce metni gir."
+                    return@setOnClickListener
+                }
+                dialog.dismiss()
+                runDemo(original)
+            }
+        }
+        dialog.show()
+    }
+
+    private fun runDemo(typed: String? = null) {
         val translator = GameTranslatorEngine(this)
         demoTranslator = translator
         demoMessage = "Telefondaki çeviri modeli hazırlanıyor…"
         demoCaption = null
+        demoSource = typed
         render()
         translator.prepare { ready ->
             if (demoTranslator !== translator) return@prepare
             if (!ready) {
                 completeDemo("Çeviri modeli açılamadı. Telefonda boş yer kontrolü yapıp yeniden dene.")
+                return@prepare
+            }
+            if (typed != null) {
+                translateDemo(translator, typed)
                 return@prepare
             }
             demoMessage = "Örnek görseldeki İngilizce altyazı okunuyor…"
@@ -700,15 +801,20 @@ class MainActivity : Activity() {
                     completeDemo("Örnek görseldeki yazı okunamadı.")
                     return@read
                 }
-                val input = TranslationInput(original)
-                translator.translate(input) { result ->
-                    if (demoTranslator !== translator) return@translate
-                    val text = result.text
-                    if (text.isNullOrBlank()) completeDemo(result.issue ?: "Örnek altyazı çevrilemedi.")
-                    else completeDemo("Örnek altyazı çevrildi.",
-                        Caption(original, formatDialogue(text)))
-                }
+                translateDemo(translator, original)
             }
+        }
+    }
+
+    private fun translateDemo(translator: CaptionTranslator, original: String) {
+        demoSource = original
+        demoMessage = "İngilizce metin çevriliyor…"
+        render()
+        translator.translate(TranslationInput(original)) { result ->
+            if (demoTranslator !== translator) return@translate
+            val text = result.text
+            if (text.isNullOrBlank()) completeDemo(result.issue ?: "Metin çevrilemedi.")
+            else completeDemo("Türkçe çeviri", Caption(original, formatDialogue(text)))
         }
     }
 
@@ -737,8 +843,8 @@ class MainActivity : Activity() {
             textAlign = Paint.Align.CENTER
             typeface = Typeface.DEFAULT_BOLD
         }
-        canvas.drawText("Don't blow your cover.", 480f, 76f, paint)
-        canvas.drawText("Just act like you belong here.", 480f, 132f, paint)
+        canvas.drawText("We've got twenty minutes.", 480f, 76f, paint)
+        canvas.drawText("Don't start without me.", 480f, 132f, paint)
         return bitmap
     }
 
@@ -747,17 +853,14 @@ class MainActivity : Activity() {
             .setTitle("DraBornTranslate ${packageManager.getPackageInfo(packageName, 0).versionName}")
             .setMessage("GameTranslator v1.8.48 ve CouchSubs kaynaklarından yararlanır.\n" +
                 "© Sinan Yorulmaz ve Sefflex · GNU AGPL v3\n\n" +
-                "Töz AI · Töz-Çevir-1 · Apache License 2.0\nONNX Runtime · MIT\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
+                "${OfflineModelStore.MODEL_NAME} · ${OfflineModelStore.MODEL_LICENSE}\n" +
+                "llama.cpp · MIT\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
             .setPositiveButton("GitHub") { _, _ -> openLink("https://github.com/DrabornEagle/DraBornTranslate") }
-            .setNegativeButton("Töz lisansı") { _, _ ->
-                val terms = assets.open("toz/LICENSE").bufferedReader().use { it.readText() }
-                AlertDialog.Builder(this).setTitle("Apache License 2.0").setMessage(terms).setPositiveButton("Kapat", null).show()
-            }
+            .setNegativeButton("Model lisansı") { _, _ -> openLink(OfflineModelStore.TERMS) }
             .setNeutralButton("Lisans metni") { _, _ ->
                 val terms = assets.open("LICENSE").bufferedReader().use { it.readText() }
                 AlertDialog.Builder(this).setTitle("GNU AGPL v3").setMessage(terms).setPositiveButton("Kapat", null).show()
             }
-            .setNegativeButton("Kapat", null)
             .show()
     }
 

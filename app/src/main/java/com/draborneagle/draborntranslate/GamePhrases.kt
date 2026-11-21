@@ -116,6 +116,10 @@ internal object GamePhrases {
         "((?:I|We|You) (?:don't|do not)) buy (that story|this story|your story|his story|her story|that excuse)" to "$1 believe $2",
         "blow (my|your|his|her|our|their) cover" to "reveal $1 real identity",
         "shoot (?:my|your|his|her|our|their) way out" to "shoot to get out",
+        "((?:they're|they are|he's|he is|she's|she is) (?:not )?)after (me|you|him|her|us|them)" to "$1trying to catch $2",
+        "cover for (me|us)(?= until (?:i|we) (?:get|come) back)" to "take the place of $1",
+        "don't hang up(?=[.!?…]|$)" to "don't end the phone call",
+        "before anyone gets hurt" to "before someone is injured",
         "lay low" to "stay hidden",
         "until the heat dies down" to "until things calm down",
         "until things cool off" to "until things calm down",
@@ -152,7 +156,7 @@ internal object GamePhrases {
     private val controllerTap = Regex("^tap (?=[LR][1-3]\\b)", RegexOption.IGNORE_CASE)
     private val groupReference = Regex("\\$([1-9])")
 
-    fun forModel(text: String, area: ReadingArea): String {
+    fun contextualize(text: String, area: ReadingArea): String {
         if (area == ReadingArea.GAME_TEXT) {
             return menuPrompt.replace(controllerTap.replace(text, "Press "), "Press and hold ")
         }

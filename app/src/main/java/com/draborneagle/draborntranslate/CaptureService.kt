@@ -117,6 +117,12 @@ class CaptureService : Service() {
             translate = language::translate,
             show = ::showCaption,
             onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
+            onRead = { recognized ->
+                if (!ended) {
+                    SessionState.update(SessionState.current.copy(recognizedSource = recognized, translationIssue = null))
+                }
+            },
+            cancelTranslation = language::cancelCurrent,
             readingArea = readingArea,
         )
         frames = ScreenFrames(

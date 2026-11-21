@@ -6,6 +6,15 @@ import org.junit.Test
 
 class SubtitleLayoutTest {
     @Test
+    fun joinsASpeakerLabelAndTextOnTheSameBaseline() {
+        val lines = listOf(
+            RecognizedLine("DANA:", 285, 104, 350, 130, 0.91f),
+            RecognizedLine("The gate is still locked.", 367, 105, 656, 131, 0.92f),
+            RecognizedLine("12 XP", 745, 106, 805, 128, 0.93f),
+        )
+        assertEquals(listOf("DANA: The gate is still locked."), selectSubtitleLines(lines, 960, 180))
+    }
+    @Test
     fun keepsWrappedSubtitlesAndOmitsHudTextOnTheSameRow() {
         val lines = listOf(
             RecognizedLine("New message", 200, 143, 303, 166, 0.94f),

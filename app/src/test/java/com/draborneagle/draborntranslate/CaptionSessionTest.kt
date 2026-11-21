@@ -97,11 +97,13 @@ class CaptionSessionTest {
     }
 
     @Test
-    fun keepsPreviousDialogueWhileTheNextLineIsTranslated() {
+    fun clearsThePreviousTranslationWhenTheNewSourceIsConfirmed() {
+        var recognized: String? = null
         val dialogue = CaptionSession(
             translate = { input, answer -> requests.addLast(input to answer) },
             show = { caption = it },
             onFailure = {},
+            onRead = { recognized = it },
             stabilizer = SubtitleStabilizer(clock = { now }, acceptCompletedSentence = false, minTextLength = 2),
         )
         dialogue.read(listOf("The cops are after us."))
@@ -115,7 +117,8 @@ class CaptionSessionTest {
         dialogue.read(listOf("Go!"))
         now += 340
         dialogue.read(listOf("Go!"))
-        assertEquals(previous, caption)
+        assertNull(caption)
+        assertEquals("Go!", recognized)
         val next = requests.removeFirst()
         assertEquals(TranslationInput("Go!"), next.first)
         next.second(TranslationReply("Bas gaza!"))

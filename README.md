@@ -4,15 +4,15 @@ PlayStation Portal’da oyun oynarken PS5’in **Paylaşımlı Ekran** videosund
 
 **Android 10 ve üzeri, ARM64.** [Sürümler](https://github.com/DrabornEagle/DraBornTranslate/releases)
 
-## v0.3.4 çeviri
+## v0.4.0 çeviri
 
-- **Töz-Çevir-1** İngilizce–Türkçe modeli APK’ya dahildir. İlk açılışta telefonda hazırlanır. Çeviri için hesap, API anahtarı, abonelik veya ek model indirmesi gerekmez.
-- Altyazı bölgesinde art arda gelen, aynı okunan kareler doğrulanır. Alt satıra kayan cümleler birleştirilir. Noktalama ve sayılar değiştiğinde yeni çeviri yapılır.
-- Oyun deyimleri, Türkçe menü etiketleri ve yer adları çeviride dikkate alınır. Modelin tamamladığı seçenekler içinden kaynakta görülen sayıları ve tanınan özel adları koruyan sonuç kullanılır.
-- **Oyun paketi ekle** ile GameTranslator biçimindeki `.json` veya `.json.gz` paketini seçebilirsin. Kaynak cümle pakette eşleşirse paketin Türkçesi kullanılır. Oyun paketi isteğe bağlıdır.
-- **Örnek altyazıyı çevir** ile PS5 bağlantısı kurmadan iki cümleli bir görselde metin tanımayı ve çeviriyi dene. Sonucun altında okunan İngilizceyi görürsün. **İngilizceyi Google Çeviri’de aç** seçeneği, seçtiğin metni Google Çeviri sayfasında açar.
+1. APK’yı kur ve **Türkçe modeli indir** seçeneğini aç. Uygulama MiLMMT-46 1B modelini bir defa indirir (806 MB) ve dosyanın özetini doğrular. Çeviri telefonun işlemcisinde çalışır. Hesap, API anahtarı veya abonelik gerekmez.
+2. **Çeviriyi dene** ile örnek görseldeki yazıyı okut veya İngilizce metin gir. **Okunan İngilizce** alanında uygulamanın aldığı metni kontrol edebilirsin. Bu alan, Türkçe sonuç çıkmadığında da görünür.
+3. **Canlı altyazıyı başlat** ile PlayStation yayınına dön. Aynı konuşmacının cümleleri bağlam için bir arada çevrilir. Konuşmacı etiketleri korunur. Tanınan özel adlar, sayılar ve belirgin olumsuz komutlar kontrol edilir. Yeni replik doğrulanınca eski çeviri ekrandan kalkar.
 
-Canlı çeviri telefonda tamamlanır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
+**Oyun paketi ekle** ile GameTranslator biçimindeki `.json` veya `.json.gz` paketini seçebilirsin. Kaynak cümle pakette eşleşirse paketin Türkçesi kullanılır.
+
+Model indirildikten sonra çeviri çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
 
 ## PlayStation App yayınını hazırla
 
@@ -62,12 +62,12 @@ Portal’ın **Bulut Akışı** modunda PS5 Paylaşımlı Ekran yayını sağlan
 
 ## Derleme ve kaynaklar
 
-JDK 17 ve Android SDK 35 ile derle.
+JDK 17, Android SDK 35, NDK 28.2.13676358 ve CMake 3.22.1 ile derle.
 
 ```bash
 ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
 ```
 
-Gradle, [Töz-Çevir-1](https://huggingface.co/TozAI/Toz-Cevir-1/tree/6476d3e0b4b189891fcc07a262ec2d6473c69ae2) dosyalarını sabit revizyondan indirir ve SHA-256 değerlerini kontrol eder. APK, `app/build/outputs/apk/debug/app-debug.apk` yolunda oluşturulur.
+CMake, [llama.cpp](https://github.com/ggml-org/llama.cpp/tree/b1b770d90d94cad9e9ea5b993bdbc383a522fb28) kaynaklarını sabit revizyondan alır ve arşiv özetini doğrular. APK, `app/build/outputs/apk/debug/app-debug.apk` yolunda oluşturulur.
 
-Uygulama [GameTranslator v1.8.48](https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.48) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) kaynaklarındaki OCR temizleme, altyazı sabitleme, terim sözlüğü ve paket eşleştirme kodlarından yararlanır. Model Töz AI tarafından yayımlanmıştır. [GNU AGPL v3](LICENSE) · [Telif bildirimi](NOTICE) · [Üçüncü taraf bileşenler](THIRD-PARTY-NOTICES.md)
+Uygulama [GameTranslator v1.8.48](https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.48) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) kaynaklarındaki OCR temizleme, altyazı sabitleme, terim sözlüğü ve paket eşleştirme kodlarından yararlanır. MiLMMT-46 1B modeli Xiaomi Research tarafından yayımlanmıştır. [GNU AGPL v3](LICENSE) · [Telif bildirimi](NOTICE) · [Üçüncü taraf bileşenler](THIRD-PARTY-NOTICES.md)

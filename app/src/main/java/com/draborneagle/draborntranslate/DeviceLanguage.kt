@@ -9,6 +9,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 internal interface CaptionTranslator : AutoCloseable {
     fun prepare(done: (Boolean) -> Unit) = done(true)
     fun translate(input: TranslationInput, done: (TranslationReply) -> Unit)
+    fun cancelCurrent() {}
 }
 
 internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {
