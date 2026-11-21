@@ -49,7 +49,3 @@ Derleme için JDK 17, Android SDK 35, NDK 28.2.13676358 ve CMake 3.22.1 kullanı
 ```
 
 Çıktı `app/build/outputs/apk/debug/app-debug.apk` yoluna yazılır. Hata ve önerileri [Sorunlar](https://github.com/DrabornEagle/DraBornTranslate/issues) sayfasından paylaşabilirsin.
-
-## Lisans
-
-DraBornTranslate [GNU AGPL v3](LICENSE) kapsamında yayımlanır. [Telif bildirimleri](NOTICE) ve [üçüncü taraf bileşen lisansları](THIRD-PARTY-NOTICES.md) depoda yer alır.
