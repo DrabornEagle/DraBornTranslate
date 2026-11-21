@@ -18,6 +18,7 @@ import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.roundToInt
 
 internal enum class FrameSource { WAITING, VISIBLE, DARK }
@@ -28,8 +29,8 @@ internal class ScreenFrames(
     private val settings: CaptureSettings,
     private val reserveFrame: () -> Boolean,
     private val discardFrame: () -> Unit,
-    private val onFrame: (Bitmap) -> Unit,
-    private val onEmptyFrame: () -> Unit,
+    private val onFrame: (Bitmap, Long) -> Unit,
+    private val onEmptyFrame: (Long) -> Unit,
     private val onSource: (FrameSource) -> Unit,
     private val onEnded: (String) -> Unit,
 ) : AutoCloseable {
@@ -45,6 +46,7 @@ internal class ScreenFrames(
     private var video = Pixels(0, 0, 0, 0)
     private var scan = Pixels(0, 0, 0, 0)
     private var scanBuffer: ByteBuffer? = null
+    private val reusableBitmap = AtomicReference<Bitmap?>()
     private var lastSampleAt = 0L
     private var darkSince = 0L
     private var signal = FrameSource.WAITING
@@ -170,7 +172,7 @@ internal class ScreenFrames(
                 lastSampleAt = now
                 if (darkSince == 0L) darkSince = now
                 if (now - darkSince >= 2700L) setSignal(FrameSource.DARK)
-                if (reserveFrame()) onEmptyFrame()
+                if (reserveFrame()) onEmptyFrame(now)
                 return
             }
             darkSince = 0L
@@ -184,7 +186,7 @@ internal class ScreenFrames(
                 onEnded("Oyun karesi okunamadı. Kaynağı açıp yeniden dene.")
                 return
             }
-            if (bitmap == null) discardFrame() else onFrame(bitmap)
+            if (bitmap == null) discardFrame() else onFrame(bitmap, now)
         }
     }
 
@@ -231,9 +233,24 @@ internal class ScreenFrames(
             output.put(input)
         }
         output.flip()
-        return Bitmap.createBitmap(scan.width, scan.height, Bitmap.Config.ARGB_8888).also {
-            it.copyPixelsFromBuffer(output)
+        val previous = reusableBitmap.getAndSet(null)
+        val bitmap = if (previous?.width == scan.width && previous.height == scan.height) previous else {
+            previous?.recycle()
+            Bitmap.createBitmap(scan.width, scan.height, Bitmap.Config.ARGB_8888)
         }
+        try {
+            bitmap.copyPixelsFromBuffer(output)
+        } catch (error: RuntimeException) {
+            bitmap.recycle()
+            throw error
+        }
+        return bitmap
+    }
+
+    /** OCR returns ownership once ML Kit has finished reading this bitmap. */
+    fun releaseFrame(bitmap: Bitmap) {
+        reusableBitmap.getAndSet(bitmap)?.recycle()
+        if (closed) reusableBitmap.getAndSet(null)?.recycle()
     }
 
     private fun setSignal(next: FrameSource) {
@@ -263,6 +280,7 @@ internal class ScreenFrames(
             projection?.unregisterCallback(callback)
             projection?.stop()
             scanBuffer = null
+            reusableBitmap.getAndSet(null)?.recycle()
             thread.quitSafely()
         }
     }

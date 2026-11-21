@@ -4,12 +4,15 @@ package com.draborneagle.draborntranslate
 import java.net.HttpURLConnection
 import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.Socket
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -90,6 +93,31 @@ class PortalPanelServerTest {
     }
 
     @Test
+    fun anOpenPanelRequestReceivesTheNewCaptionWithoutPollingAgain() {
+        PortalPanelServer(loopback, "panel", 22) {}.use { server ->
+            val endpoint = URL(server.url + "caption.txt")
+            val initial = get(endpoint.toString())
+            val revision = initial.revision!!.toLong()
+            Socket(loopback, endpoint.port).use { client ->
+                client.soTimeout = 100
+                client.getOutputStream().write(
+                    "GET ${endpoint.path}?after=$revision HTTP/1.1\r\nHost: localhost\r\n\r\n".toByteArray(),
+                )
+                assertThrows(SocketTimeoutException::class.java) { client.getInputStream().read() }
+                server.publish("Hemen dön.")
+                client.soTimeout = 450
+                val response = client.getInputStream().bufferedReader(Charsets.UTF_8).readText()
+                assertTrue(response.contains("X-DraBorn-Revision: ${revision + 1}"))
+                assertTrue(response.endsWith("Hemen dön."))
+            }
+            server.publish(null)
+            val cleared = get("$endpoint?after=${revision + 1}")
+            assertEquals("", cleared.body)
+            assertEquals((revision + 2).toString(), cleared.revision)
+        }
+    }
+
+    @Test
     fun panelLinkStillOpensIfTheChatDropsTheTrailingSlash() {
         PortalPanelServer(loopback, "panel", 22) {}.use { server ->
             val response = get(server.url.dropLast(1), followRedirects = false)
@@ -115,6 +143,7 @@ class PortalPanelServerTest {
                 connection.getHeaderField("X-DraBorn-Panel"),
                 connection.getHeaderField("Location"),
                 connection.getHeaderField("X-DraBorn-Translation"),
+                connection.getHeaderField("X-DraBorn-Revision"),
             )
         } finally {
             connection.disconnect()
@@ -129,5 +158,6 @@ class PortalPanelServerTest {
         val panelMode: String?,
         val location: String?,
         val translation: String?,
+        val revision: String?,
     )
 }

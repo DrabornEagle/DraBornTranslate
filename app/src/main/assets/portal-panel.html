@@ -36,6 +36,7 @@
   var title = document.getElementById("title");
   var status = document.getElementById("status");
   var caption = document.getElementById("caption");
+  var revision = null;
 
   function display(text, connected, testing) {
     title.textContent = testing ? "Portal bağlantı testi" : "DraBornTranslate";
@@ -55,11 +56,18 @@
       completed = true;
       var testing = ok && request.getResponseHeader("X-DraBorn-Panel") === "test";
       display(ok ? request.responseText : "", ok, testing);
-      window.setTimeout(poll, ok ? 140 : 1200);
+      if (ok) {
+        revision = request.getResponseHeader("X-DraBorn-Revision");
+        if (revision !== null) poll();
+        else window.setTimeout(poll, 140);
+      } else {
+        revision = null;
+        window.setTimeout(poll, 400);
+      }
     }
 
-    request.open("GET", "caption.txt", true);
-    request.timeout = 1800;
+    request.open("GET", revision === null ? "caption.txt" : "caption.txt?after=" + revision, true);
+    request.timeout = 3000;
     request.onreadystatechange = function () {
       if (request.readyState === 4) finish(request.status === 200);
     };

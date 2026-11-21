@@ -16,10 +16,11 @@ internal class CaptionSession(
     private val onFailure: (String?) -> Unit,
     private val onRead: (String?) -> Unit = {},
     private val cancelTranslation: () -> Unit = {},
+    private val cancelRefinement: () -> Unit = {},
     private val translateKnown: (TranslationInput) -> String? = { null },
     private val refine: (TranslationInput, (TranslationReply) -> Unit) -> Boolean = { _, _ -> false },
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
-    clock: () -> Long = SystemClock::elapsedRealtime,
+    private val clock: () -> Long = SystemClock::elapsedRealtime,
 ) {
     private val stabilizer = SubtitleStabilizer(
         clock = clock,
@@ -27,15 +28,16 @@ internal class CaptionSession(
         acceptCompletedSentence = false,
         minTextLength = 2,
         isGarbled = { false }, // The unmodified OCR text is checked before feeding its comparison key.
-        clearAfterMs = 170,
+        clearAfterMs = 65,
     )
     private data class Cue(
         val input: TranslationInput,
         val key: TranslationInput,
-        var primaryFinished: Boolean = false,
+        val firstSeenAt: Long,
+        var reply: TranslationReply? = null,
         var refinementStarted: Boolean = false,
     )
-    private data class Work(val key: TranslationInput, val generation: Int)
+    private data class Work(val key: TranslationInput, val generation: Int, var canceled: Boolean = false)
 
     private val cache = object : LinkedHashMap<TranslationInput, TranslationReply>(128, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TranslationInput, TranslationReply>?) = size > 128
@@ -44,46 +46,66 @@ internal class CaptionSession(
     private var generation = 0
     private var closed = false
     private var currentSubtitle: Cue? = null
-    private var pendingSubtitle: Cue? = null
+    private var tentativeSubtitle: Cue? = null
     private var shown: Caption? = null
+    var subtitleDelayMs: Long? = null
+        private set
     private var previousRows = emptySet<TranslationInput>()
     private var screen = emptyList<TranslationInput>()
     private val screenResults = mutableMapOf<TranslationInput, String?>()
 
-    fun read(lines: List<String>, confident: Boolean = false) {
+    fun read(lines: List<String>, confident: Boolean = false, frameAt: Long = clock()) {
         if (closed) return
         val clean = lines.map(::cleanOcrLine).filter { it.isNotBlank() && !looksDamaged(it) }
         if (readingArea == ReadingArea.GAME_TEXT) {
             val output = shown?.turkish?.lines().orEmpty().map(TextMatch::literal).toSet()
             readScreen(clean.filterNot { TextMatch.literal(it) in output })
         } else {
-            readSubtitle(clean.joinToString("\n"), confident && clean.size == lines.size)
+            readSubtitle(clean.joinToString("\n"), confident && clean.size == lines.size, frameAt)
         }
         translateNext()
         refineVisibleSubtitle()
     }
 
-    private fun readSubtitle(text: String, confident: Boolean) {
+    private fun readSubtitle(text: String, confident: Boolean, frameAt: Long) {
         val input = TranslationInput(text, allowPartial = true)
         val key = cacheKey(input)
         when (stabilizer.feed(key.text, confident).kind) {
-            StabilizerKind.NONE -> Unit
             StabilizerKind.CLEAR -> clearReadSubtitle()
             StabilizerKind.RESTORE, StabilizerKind.TRANSLATE -> {
-                if (currentSubtitle?.key == key) return
-                val cue = Cue(input, key)
+                val cue = observedCue(input, key, frameAt)
                 currentSubtitle = cue
-                pendingSubtitle = null
+                tentativeSubtitle = null
+                cancelObsoleteWork(key)
                 onRead(text)
-                val ready = immediate(input, key)
-                if (ready != null) {
-                    cue.primaryFinished = true
-                    displaySubtitle(cue, ready)
+                cue.reply?.let { displaySubtitle(cue, it) } ?: publish(null)
+            }
+            StabilizerKind.NONE -> {
+                val current = currentSubtitle
+                if (key.text.length < 2 || current?.key == key) {
+                    tentativeSubtitle = null
+                    if (current == null) cancelObsoleteWork(null)
+                    if (current?.key == key && shown?.source != current.input.text) {
+                        current.reply?.takeIf { it.text != null }?.let { displaySubtitle(current, it) }
+                    }
                 } else {
-                    publish(null)
-                    if (inFlight != Work(key, generation)) pendingSubtitle = cue
+                    // Start translating the first plausible read while the next frame confirms it.
+                    tentativeSubtitle = observedCue(input, key, frameAt)
                 }
             }
+        }
+    }
+
+    private fun observedCue(input: TranslationInput, key: TranslationInput, frameAt: Long): Cue =
+        tentativeSubtitle?.takeIf { it.key == key } ?: Cue(input, key, frameAt, immediate(input, key))
+
+    private fun cancelObsoleteWork(next: TranslationInput?) {
+        val work = inFlight
+        if (work != null && work.key != next && !work.canceled) {
+            work.canceled = true
+            cancelTranslation()
+        } else {
+            cancelRefinement()
         }
     }
 
@@ -99,7 +121,8 @@ internal class CaptionSession(
 
     private fun clearReadSubtitle() {
         currentSubtitle = null
-        pendingSubtitle = null
+        tentativeSubtitle = null
+        cancelObsoleteWork(null)
         publish(null)
         onRead(null)
     }
@@ -124,9 +147,9 @@ internal class CaptionSession(
     fun reset() {
         generation++
         // Ignore old replies, but allow the worker to drain before submitting new text.
-        if (inFlight != null || currentSubtitle?.refinementStarted == true) cancelTranslation()
+        cancelObsoleteWork(null)
         currentSubtitle = null
-        pendingSubtitle = null
+        tentativeSubtitle = null
         stabilizer.reset()
         previousRows = emptySet()
         screen = emptyList()
@@ -159,7 +182,7 @@ internal class CaptionSession(
     private fun translateNext() {
         if (closed || inFlight != null) return
         val input = when (readingArea) {
-            ReadingArea.SUBTITLES -> pendingSubtitle?.input.also { pendingSubtitle = null }
+            ReadingArea.SUBTITLES -> (tentativeSubtitle ?: currentSubtitle)?.takeIf { it.reply == null }?.input
             ReadingArea.GAME_TEXT -> screen.firstOrNull { it !in screenResults }
         } ?: return
         val key = cacheKey(input)
@@ -167,7 +190,7 @@ internal class CaptionSession(
         inFlight = work
         translate(input) { reply ->
             inFlight = null
-            if (work.generation == generation && !closed) {
+            if (work.generation == generation && !closed && (!work.canceled || reply.text != null)) {
                 remember(key, reply)
                 if (readingArea == ReadingArea.GAME_TEXT) {
                     if (input in screen) {
@@ -176,9 +199,11 @@ internal class CaptionSession(
                         if (reply.text == null) onFailure(reply.issue ?: "Bu oyun satırı çevrilemedi.")
                     }
                 } else {
-                    currentSubtitle?.takeIf { it.key == key }?.let { cue ->
-                        cue.primaryFinished = true
-                        displaySubtitle(cue, cache[key] ?: reply)
+                    val result = cache[key] ?: reply
+                    tentativeSubtitle?.takeIf { it.key == key }?.reply = result
+                    currentSubtitle?.takeIf { it.key == key }?.let {
+                        it.reply = result
+                        if (tentativeSubtitle == null) displaySubtitle(it, result)
                     }
                 }
             }
@@ -189,19 +214,27 @@ internal class CaptionSession(
 
     private fun refineVisibleSubtitle() {
         val cue = currentSubtitle ?: return
-        if (closed || !cue.primaryFinished || cue.refinementStarted || cache[cue.key]?.refined == true) return
+        if (closed || tentativeSubtitle != null || cue.reply == null || cue.refinementStarted ||
+            cache[cue.key]?.refined == true || clock() - cue.firstSeenAt < REFINEMENT_AGE_MS
+        ) return
         val started = generation
         cue.refinementStarted = refine(cue.input) { reply ->
             if (started != generation || closed || reply.issue != null ||
                 changedTranslation(cue.input, reply.text) == null) return@refine
             val refined = reply.copy(refined = true)
             remember(cue.key, refined)
-            currentSubtitle?.takeIf { it.key == cue.key }?.let { displaySubtitle(it, refined) }
+            currentSubtitle?.takeIf { it.key == cue.key }?.let {
+                it.reply = refined
+                if (tentativeSubtitle == null) displaySubtitle(it, refined)
+            }
         }
     }
 
     private fun displaySubtitle(cue: Cue, reply: TranslationReply) {
         val turkish = changedTranslation(cue.input, reply.text)
+        if (turkish != null && shown?.source != cue.input.text) {
+            subtitleDelayMs = (clock() - cue.firstSeenAt).coerceAtLeast(0)
+        }
         publish(turkish?.let { Caption(cue.input.text, formatDialogue(it)) })
         onFailure(reply.issue ?: if (reply.text == null) "Bu replik çevrilemedi." else null)
     }
@@ -219,9 +252,14 @@ internal class CaptionSession(
     }
 
     private fun publish(caption: Caption?) {
+        if (caption == null) subtitleDelayMs = null
         if (shown == caption) return
         shown = caption
         show(caption)
+    }
+
+    private companion object {
+        const val REFINEMENT_AGE_MS = 650L
     }
 }
 

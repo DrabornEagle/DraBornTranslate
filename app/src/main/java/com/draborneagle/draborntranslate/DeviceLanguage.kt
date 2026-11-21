@@ -15,11 +15,18 @@ internal interface CaptionTranslator : AutoCloseable {
 internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-    fun read(bitmap: Bitmap, done: (TextReading?) -> Unit) {
+    fun read(bitmap: Bitmap, release: (Bitmap) -> Unit = Bitmap::recycle, done: (TextReading?) -> Unit) {
         val width = bitmap.width
         val height = bitmap.height
-        recognizer.process(InputImage.fromBitmap(bitmap, 0)).addOnCompleteListener { task ->
-            bitmap.recycle()
+        val recognition = try {
+            recognizer.process(InputImage.fromBitmap(bitmap, 0))
+        } catch (_: RuntimeException) {
+            release(bitmap)
+            done(null)
+            return
+        }
+        recognition.addOnCompleteListener { task ->
+            release(bitmap)
             if (!task.isSuccessful) {
                 done(null)
                 return@addOnCompleteListener

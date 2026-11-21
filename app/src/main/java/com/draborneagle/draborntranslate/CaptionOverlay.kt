@@ -10,6 +10,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -35,11 +36,15 @@ internal class CaptionOverlay(
 
     fun show(cue: Caption?) {
         if (cue == null) {
-            close()
+            main.removeCallbacks(advance)
+            pages = emptyList()
+            page = 0
+            panel?.visibility = View.INVISIBLE
             return
         }
         label?.let {
             showText(it, cue.turkish)
+            panel?.visibility = View.VISIBLE
             return
         }
         val margin = context.dp(14)

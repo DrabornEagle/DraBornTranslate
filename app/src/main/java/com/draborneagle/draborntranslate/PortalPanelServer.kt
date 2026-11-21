@@ -2,6 +2,7 @@
 package com.draborneagle.draborntranslate
 
 import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.Inet4Address
 import java.net.InetSocketAddress
@@ -9,9 +10,12 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.security.SecureRandom
 import java.util.Base64
+import java.util.Collections
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 
 /** Serves one temporary browser panel on the chosen interface. */
 internal class PortalPanelServer(
@@ -35,13 +39,18 @@ internal class PortalPanelServer(
 
     private val closed = AtomicBoolean(false)
     private val viewed = AtomicBoolean(false)
-    private val currentClient = AtomicReference<Socket?>()
+    private val clients = Collections.synchronizedSet(mutableSetOf<Socket>())
+    private val workers = ThreadPoolExecutor(0, 6, 15, TimeUnit.SECONDS, SynchronousQueue()) { work ->
+        Thread(work, "DraBornTranslate-panel-client").apply { isDaemon = true }
+    }
+    private val change = Object()
     private data class CaptionFrame(
+        val revision: Long,
         val body: ByteArray,
         val testing: Boolean = false,
     )
 
-    @Volatile private var caption = CaptionFrame(ByteArray(0))
+    @Volatile private var caption = CaptionFrame(0, ByteArray(0))
 
     private val thread = Thread(::listen, "DraBornTranslate-panel").apply {
         isDaemon = true
@@ -49,9 +58,12 @@ internal class PortalPanelServer(
     }
 
     fun publish(text: String?, testing: Boolean = false) {
-        if (!closed.get()) caption = CaptionFrame(
-            text.orEmpty().toByteArray(Charsets.UTF_8), testing,
-        )
+        val body = text.orEmpty().toByteArray(Charsets.UTF_8)
+        synchronized(change) {
+            if (closed.get() || caption.testing == testing && caption.body.contentEquals(body)) return
+            caption = CaptionFrame(caption.revision + 1, body, testing)
+            change.notifyAll()
+        }
     }
 
     private fun listen() {
@@ -61,16 +73,31 @@ internal class PortalPanelServer(
             } catch (error: IOException) {
                 break
             }
-            currentClient.set(client)
-            try {
-                client.use {
-                    if (!closed.get()) respond(it)
+            synchronized(clients) {
+                if (closed.get()) {
+                    runCatching { client.close() }
+                    return
                 }
-            } catch (_: IOException) {
-                // Browsers can cancel a request midway when changing tabs.
-            } finally {
-                currentClient.compareAndSet(client, null)
+                clients.add(client)
             }
+            try {
+                workers.execute { handle(client) }
+            } catch (_: RejectedExecutionException) {
+                clients.remove(client)
+                runCatching { client.close() }
+            }
+        }
+    }
+
+    private fun handle(client: Socket) {
+        try {
+            client.use { if (!closed.get()) respond(it) }
+        } catch (_: IOException) {
+            // Browsers can cancel a request midway when changing tabs.
+        } catch (_: InterruptedException) {
+            Thread.currentThread().interrupt()
+        } finally {
+            clients.remove(client)
         }
     }
 
@@ -104,12 +131,27 @@ internal class PortalPanelServer(
                     "X-DraBorn-Panel: ready\r\n")
             }
             "${prefix}caption.txt" -> {
-                val frame = caption
+                val after = request[1].substringAfter("?after=", "").toLongOrNull()
+                val frame = waitForCaption(if (headOnly) null else after)
                 val mode = if (frame.testing) "X-DraBorn-Panel: test\r\n" else ""
-                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly, mode)
+                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly,
+                    "X-DraBorn-Revision: ${frame.revision}\r\n$mode")
                 if (!headOnly && viewed.compareAndSet(false, true)) onViewed()
             }
             else -> send(client, "404 Not Found", "text/plain", ByteArray(0), headOnly)
+        }
+    }
+
+    private fun waitForCaption(after: Long?): CaptionFrame {
+        if (after == null) return caption
+        val deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(LONG_POLL_MS)
+        synchronized(change) {
+            while (!closed.get() && caption.revision == after) {
+                val remainingNanos = deadline - System.nanoTime()
+                if (remainingNanos <= 0) break
+                TimeUnit.NANOSECONDS.timedWait(change, remainingNanos)
+            }
+            return caption
         }
     }
 
@@ -140,7 +182,7 @@ internal class PortalPanelServer(
             "X-Content-Type-Options: nosniff\r\n" +
             "Referrer-Policy: no-referrer\r\n" +
             extraHeaders + "\r\n"
-        client.getOutputStream().apply {
+        BufferedOutputStream(client.getOutputStream()).apply {
             write(headers.toByteArray(Charsets.US_ASCII))
             if (!headOnly) write(body)
             flush()
@@ -149,15 +191,23 @@ internal class PortalPanelServer(
 
     override fun close() {
         if (!closed.compareAndSet(false, true)) return
-        caption = CaptionFrame(ByteArray(0))
+        synchronized(change) {
+            caption = CaptionFrame(caption.revision + 1, ByteArray(0))
+            change.notifyAll()
+        }
         try {
             listener.close()
         } finally {
-            currentClient.get()?.close()
+            synchronized(clients) {
+                clients.forEach { runCatching { it.close() } }
+            }
+            workers.shutdownNow()
         }
     }
 
     private companion object {
+        const val LONG_POLL_MS = 900L
+
         fun newToken(): String {
             val bytes = ByteArray(16)
             SecureRandom().nextBytes(bytes)

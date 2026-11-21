@@ -16,7 +16,7 @@ internal enum class SubtitleDisplay(val label: String, val phone: Boolean, val p
 }
 
 internal enum class ReadingArea(val label: String, val sampleIntervalMs: Long) {
-    SUBTITLES("Altyazı bölgesi", 180L),
+    SUBTITLES("Altyazı bölgesi", 75L),
     GAME_TEXT("Tüm oyun metinleri", 400L),
 }
 

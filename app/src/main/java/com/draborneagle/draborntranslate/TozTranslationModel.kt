@@ -56,6 +56,7 @@ internal class TozTranslationModel(model: File) : AutoCloseable {
                 var preferred: Finished? = null
                 var firstEnd = steps
                 val extraSteps = (sourceLength / 3).coerceIn(4, 12)
+                val logitsRow = FloatArray(VOCABULARY)
                 for (step in 0 until steps) {
                     if (canceled()) return emptyList()
                     val current = advance(beams, step, previous, cross, empty)
@@ -63,7 +64,7 @@ internal class TozTranslationModel(model: File) : AutoCloseable {
                     previous = current
                     val logits = (current[0] as OnnxTensor).floatBuffer
                     val next = ArrayList<Beam>(BEAM_WIDTH)
-                    for (candidate in bestCandidates(beams, logits)) {
+                    for (candidate in bestCandidates(beams, logits, logitsRow)) {
                         val prefix = beams[candidate.parent].tokens
                         if (candidate.token == EOS) {
                             if (prefix.size == 1) continue
@@ -116,10 +117,9 @@ internal class TozTranslationModel(model: File) : AutoCloseable {
     private fun ints(values: LongArray, shape: LongArray): OnnxTensor =
         OnnxTensor.createTensor(environment, LongBuffer.wrap(values), shape)
 
-    private fun bestCandidates(beams: List<Beam>, logits: FloatBuffer): List<Candidate> {
+    private fun bestCandidates(beams: List<Beam>, logits: FloatBuffer, row: FloatArray): List<Candidate> {
         val limit = 2 * BEAM_WIDTH
         val best = ArrayList<Candidate>(limit)
-        val row = FloatArray(VOCABULARY)
         for ((parent, beam) in beams.withIndex()) {
             logits.get(row)
             val maximum = row.max()

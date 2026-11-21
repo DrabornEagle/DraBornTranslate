@@ -358,8 +358,10 @@ class MainActivity : Activity() {
         val recognized = recognizedText()
         val source = caption?.source
         val differentReading = recognized?.takeUnless { it == source }
-        status.text = if (state.active || panelTesting) state.voiceIssue ?: state.translationIssue ?: state.status
-        else demoMessage ?: state.status
+        status.text = if (state.active || panelTesting) {
+            val message = state.voiceIssue ?: state.translationIssue ?: state.status
+            state.subtitleDelayMs?.let { "$message\nKare → Türkçe · $it ms" } ?: message
+        } else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = source?.let { "Çevirinin İngilizce metni\n$it" }.orEmpty()
         recognizedLabel.text = differentReading?.let { "Okunan İngilizce\n$it" }.orEmpty()

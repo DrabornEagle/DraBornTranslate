@@ -4,6 +4,7 @@ package com.draborneagle.draborntranslate
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.os.Process
 import android.util.Log
 import com.gametranslator.gametranslator_mobile.core.PackTranslation
 import java.io.File
@@ -65,8 +66,10 @@ internal class GameTranslatorEngine(
 
     private fun loadQuality(file: File, done: (Boolean) -> Unit) {
         if (closed) return
+        val background = quickReady && !preferQuality
         qualityWorker.execute {
             if (closed) return@execute
+            if (background) Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)
             val ready = runCatching {
                 qualityModel = LocalTranslationModel(file, app.applicationInfo.nativeLibraryDir)
             }.onFailure { Log.w(TAG, "Gelişmiş yerel çeviri modeli açılamadı", it) }.isSuccess
@@ -121,6 +124,10 @@ internal class GameTranslatorEngine(
     override fun cancelCurrent() {
         quickRequest.get()?.set(true)
         qualityRequest.get()?.set(true)
+    }
+
+    fun cancelRefinement() {
+        if (quickReady && !preferQuality) qualityRequest.get()?.set(true)
     }
 
     override fun close() {

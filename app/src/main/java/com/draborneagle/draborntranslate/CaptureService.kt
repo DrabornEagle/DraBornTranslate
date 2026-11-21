@@ -123,6 +123,7 @@ class CaptureService : Service() {
                 }
             },
             cancelTranslation = language::cancelCurrent,
+            cancelRefinement = language::cancelRefinement,
             translateKnown = language::translateKnown,
             refine = language::refine,
             readingArea = readingArea,
@@ -132,11 +133,11 @@ class CaptureService : Service() {
             settings = config,
             reserveFrame = { ocrPending.compareAndSet(false, true) },
             discardFrame = { ocrPending.set(false) },
-            onFrame = { bitmap -> main.post { recognize(bitmap) } },
-            onEmptyFrame = {
+            onFrame = { bitmap, frameAt -> main.post { recognize(bitmap, frameAt) } },
+            onEmptyFrame = { frameAt ->
                 main.post {
                     ocrPending.set(false)
-                    if (!ended && modelReady) captions?.read(emptyList())
+                    if (!ended && modelReady) captions?.read(emptyList(), frameAt = frameAt)
                 }
             },
             onSource = { value -> main.post { sourceChanged(value) } },
@@ -201,7 +202,7 @@ class CaptureService : Service() {
         if (overlay != null && current != null) showCaption(current)
     }
 
-    private fun recognize(bitmap: Bitmap) {
+    private fun recognize(bitmap: Bitmap, frameAt: Long) {
         val reader = ocr
         if (ended || reader == null) {
             bitmap.recycle()
@@ -210,7 +211,8 @@ class CaptureService : Service() {
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
-        reader.read(bitmap) { result ->
+        val capturedBy = frames
+        reader.read(bitmap, release = { capturedBy?.releaseFrame(it) ?: it.recycle() }) { result ->
             ocrPending.set(false)
             if (ended || frameEpoch != epoch) return@read
             if (result == null) {
@@ -221,7 +223,7 @@ class CaptureService : Service() {
                     readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
                     else -> "İngilizce altyazı okunuyor."
                 })
-                captions?.read(result.lines, result.confident)
+                captions?.read(result.lines, result.confident, frameAt)
             }
         }
     }
@@ -246,7 +248,11 @@ class CaptureService : Service() {
             main.post { finish("Altyazı katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
             return
         }
-        SessionState.update(SessionState.current.copy(caption = caption, lastCaption = caption ?: state.lastCaption))
+        SessionState.update(SessionState.current.copy(
+            caption = caption,
+            lastCaption = caption ?: state.lastCaption,
+            subtitleDelayMs = if (caption != null) captions?.subtitleDelayMs else null,
+        ))
         if (caption != null) updateTranslationIssue(null)
     }
 

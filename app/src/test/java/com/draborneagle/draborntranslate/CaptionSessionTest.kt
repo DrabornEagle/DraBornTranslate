@@ -2,6 +2,7 @@
 package com.draborneagle.draborntranslate
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -49,7 +50,7 @@ class CaptionSessionTest {
         }
 
         assertEquals(1, requests.size)
-        assertEquals(0, cancelCount)
+        assertEquals(1, cancelCount)
         answer("Get to the bridge!", "Köprüye git!")
         assertNull(caption)
         assertEquals("Stop!", recognized)
@@ -77,7 +78,7 @@ class CaptionSessionTest {
         val dialogue = session()
         dialogue.read(listOf("Follow me."), confident = true)
         dialogue.blankFrame()
-        assertEquals(0, cancelCount)
+        assertEquals(1, cancelCount)
         answer("Follow me.", "Beni takip et.")
         assertNull(caption)
     }
@@ -99,7 +100,7 @@ class CaptionSessionTest {
         dialogue.read(listOf("Walk across the bridge."), confident = true)
         dialogue.read(listOf("Go!"), confident = true)
         assertEquals(Caption("Go!", "Git!"), caption)
-        assertEquals(0, cancelCount)
+        assertEquals(1, cancelCount)
         answer("Walk across the bridge.", "Köprüden geç.")
         assertEquals("Git!", caption?.turkish)
         assertEquals(listOf("Go!"), delivered)
@@ -116,6 +117,70 @@ class CaptionSessionTest {
         assertEquals("Beni takip et.", caption?.turkish)
         assertEquals(listOf("Follow me."), delivered)
         assertTrue(requests.isEmpty())
+    }
+
+    @Test
+    fun startsUncertainTranslationOnTheFirstFrameAndShowsItOnConfirmation() {
+        val dialogue = session()
+        val source = "Stay close behind me."
+        dialogue.read(listOf(source), frameAt = 70)
+        assertEquals(1, requests.size)
+        assertNull(recognized)
+        now = 146
+        answer(source, "Peşimden ayrılma.")
+        assertNull(caption)
+        now = 171
+        dialogue.read(listOf(source), frameAt = 145)
+        assertEquals(Caption(source, "Peşimden ayrılma."), caption)
+        assertEquals(101L, dialogue.subtitleDelayMs)
+        assertTrue(requests.isEmpty())
+    }
+
+    @Test
+    fun lateResultIsHeldWhenANewerUncertainCaptionIsConfirmed() {
+        val dialogue = session()
+        dialogue.read(listOf("Check the back seat."), confident = true)
+        now += 75
+        dialogue.read(listOf("Did you bring the keys?"))
+        assertEquals(0, cancelCount)
+        answer("Check the back seat.", "Arka koltuğa bak.")
+        assertNull(caption)
+        now += 75
+        dialogue.read(listOf("Did you bring the keys?"))
+        answer("Did you bring the keys?", "Anahtarları getirdin mi?")
+        assertEquals(listOf("Did you bring the keys?"), delivered)
+    }
+
+    @Test
+    fun lateResultIsRestoredWhenTheNewReadingWasOnlyAnOcrError() {
+        val dialogue = session()
+        dialogue.read(listOf("Check the back seat."), confident = true)
+        now += 75
+        dialogue.read(listOf("Check the back seal."))
+        answer("Check the back seat.", "Arka koltuğa bak.")
+        assertNull(caption)
+        now += 75
+        dialogue.read(emptyList())
+        assertNull(caption)
+        now += 75
+        dialogue.read(listOf("Check the back seat."))
+        assertEquals(Caption("Check the back seat.", "Arka koltuğa bak."), caption)
+        answer("Check the back seal.", "Arka contayı kontrol et.")
+        assertEquals(listOf("Check the back seat."), delivered)
+    }
+
+    @Test
+    fun canceledResultDoesNotPreventTheSameCueFromReappearing() {
+        val dialogue = session()
+        dialogue.read(listOf("Follow me."), confident = true)
+        dialogue.read(listOf("Go!"), confident = true)
+        dialogue.read(listOf("Follow me."), confident = true)
+        assertEquals(1, cancelCount)
+        val (input, canceledReply) = requests.removeFirst()
+        assertEquals("Follow me.", input.text)
+        canceledReply(TranslationReply(issue = "Canceled"))
+        answer("Follow me.", "Beni takip et.")
+        assertEquals(listOf("Follow me."), delivered)
     }
 
     @Test
@@ -166,6 +231,9 @@ class CaptionSessionTest {
         val dialogue = session(refine = true)
         dialogue.read(listOf("We lost them."), confident = true)
         answer("We lost them.", "Onları kaybettik.")
+        assertTrue(refinements.isEmpty())
+        now += 700
+        dialogue.read(listOf("We lost them."), confident = true)
         val (first, finishFirst) = refinements.removeFirst()
         assertEquals("We lost them.", first.text)
         dialogue.read(listOf("We'll sort it out."), confident = true)
@@ -173,6 +241,8 @@ class CaptionSessionTest {
         finishFirst(TranslationReply("İzlerini kaybettirdik."))
         assertEquals("Bunu çözeceğiz.", caption?.turkish)
         assertEquals(listOf("We lost them.", "We'll sort it out."), delivered)
+        now += 700
+        dialogue.read(listOf("We'll sort it out."), confident = true)
         val (second, finishSecond) = refinements.removeFirst()
         assertEquals("We'll sort it out.", second.text)
         finishSecond(TranslationReply("Bir yolunu buluruz."))
@@ -288,8 +358,9 @@ class CaptionSessionTest {
             "We need 4 more cars?" to "4 araba daha mı gerekiyor?",
         )) {
             dialogue.read(listOf(source))
-            assertEquals(0, requests.size)
-            now += 220
+            assertEquals(1, requests.size)
+            assertNotEquals(source, recognized)
+            now += 75
             dialogue.read(listOf(source))
             answer(source, turkish)
             assertEquals(Caption(source, turkish), caption)
