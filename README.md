@@ -6,8 +6,8 @@
 <p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı</strong></p>
 <p align="center">DrabornEagle ekosisteminin Android canlı oyun çevirisi uygulaması.</p>
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.7/DraBornTranslate-v0.4.7-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
-  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.7">Sürüm notları</a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.8/DraBornTranslate-v0.4.8-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
+  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.8">Sürüm notları</a>
   · <a href="docs/KURULUM.md">Kurulum rehberi</a>
 </p>
 
@@ -15,7 +15,7 @@
 
 | Güncel sürüm | Cihaz | Çeviri |
 | --- | --- | --- |
-| **v0.4.7** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
+| **v0.4.8** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
 
 1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin.
 2. Çeviri modeli APK’ya dahildir ve telefonda çevrimdışı çalışır.
@@ -32,11 +32,11 @@
 
 PS Portal için sürmekte olan oyun görüntüsünü **PlayStation App** üzerinden Android telefonda aç ve **Canlı çeviriyi başlat** seçeneğine dokun. Türkçe çeviri telefon ekranında, Türkçe ses olarak veya deneysel Portal yan panelinde gösterilebilir. PlayStation App, yayın ve panel adımları [kurulum rehberinde](docs/KURULUM.md) yer alıyor.
 
-## v0.4.7’de neler değişti?
+## v0.4.8’de neler değişti?
 
-- Benzer repliklerde sayı, olumsuzluk, soru ve kelime değişiklikleri doğrulandığında yeni Türkçe satır gösteriliyor.
-- Ekran okuma düzeltmeleri, yönleri ve emirlerin anlamını değiştirebilen yaygın okuma hatalarını gideriyor.
-- Kısa yanıtlar önceki cümleden yararlanıyor. Oyun deyimleri, saatler ve Türkçe iyelik ekleri için yeni çeviri kuralları eklendi.
+- Kısa cevaplar, önceki altyazıda geçen soru veya eylemden yararlanıyor.
+- Yaygın oyun deyimleri, konuşma kalıpları ve yol tarifleri anlamı korunarak Türkçeleştiriliyor.
+- Motor, çeviri adayları arasından sayıları ve kapı kodu gibi değerleri koruyan sonucu tercih ediyor.
 
 ## DrabornEagle kaynak kodu
 

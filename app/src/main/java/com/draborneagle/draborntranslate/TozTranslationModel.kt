@@ -8,6 +8,7 @@ import com.gametranslator.gametranslator_mobile.core.TextTranslator
 import java.io.File
 import java.nio.FloatBuffer
 import java.nio.LongBuffer
+import java.util.Locale
 import kotlin.math.exp
 import kotlin.math.ln
 
@@ -38,12 +39,12 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
         val ids = (listOf(tokenizer.turkish) + source + EOS).map(Int::toLong).toLongArray()
         return ints(ids, longArrayOf(1, ids.size.toLong())).use { input ->
             encoder.run(mapOf("src" to input)).use { cross ->
-                decode(cross, minOf(2 * source.size + 10, MAX_INPUT_TOKENS))
+                decode(cross, minOf(2 * source.size + 10, MAX_INPUT_TOKENS), numberFacts(text))
             }
         }
     }
 
-    private fun decode(cross: OrtSession.Result, steps: Int): String? {
+    private fun decode(cross: OrtSession.Result, steps: Int, expectedNumbers: List<String>): String? {
         val emptyShape = longArrayOf(6, 1, 8, 0, 64)
         return OnnxTensor.createTensor(environment, FloatBuffer.allocate(0), emptyShape).use { empty ->
             var previous: OrtSession.Result? = null
@@ -51,6 +52,8 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
                 var beams = listOf(Beam(intArrayOf(BOS), 0f, 0))
                 var bestFinished: Beam? = null
                 var bestFinishedScore = Float.NEGATIVE_INFINITY
+                var numberPreservingText: String? = null
+                var numberPreservingScore = Float.NEGATIVE_INFINITY
                 var finished = 0
                 for (step in 0 until steps) {
                     val current = advance(beams, step, previous, cross, empty)
@@ -67,6 +70,13 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
                                 bestFinishedScore = score
                                 bestFinished = Beam(prefix, candidate.score, candidate.parent)
                             }
+                            if (expectedNumbers.isNotEmpty() && score > numberPreservingScore) {
+                                val text = tokenizer.decode(prefix.copyOfRange(1, prefix.size))
+                                if (numberFacts(text) == expectedNumbers) {
+                                    numberPreservingText = text
+                                    numberPreservingScore = score
+                                }
+                            }
                             finished++
                         } else if (next.size < BEAM_WIDTH) {
                             next.add(Beam(prefix + candidate.token, candidate.score, candidate.parent))
@@ -75,6 +85,7 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
                     if (next.isEmpty() || finished >= BEAM_WIDTH) break
                     beams = next
                 }
+                numberPreservingText?.let { return@use it }
                 val output = (bestFinished ?: beams.first()).tokens
                 tokenizer.decode(output.copyOfRange(1, output.size)).takeIf(String::isNotBlank)
             } finally {
@@ -145,5 +156,10 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
         private const val EOS = 3
         private const val MAX_INPUT_TOKENS = 254
         private const val VOCABULARY = 32_000
+        private val numberOrCode = Regex("""(?<![\p{L}\d])([a-z]{1,4}\d+|\d+(?:[.,:]\d+)*)(?:st|nd|rd|th)?(?![\p{L}\d])""", RegexOption.IGNORE_CASE)
+
+        private fun numberFacts(text: String): List<String> = numberOrCode.findAll(text).map { match ->
+            match.groupValues[1].lowercase(Locale.ROOT).filter(Char::isLetterOrDigit).trimStart('0').ifEmpty { "0" }
+        }.sorted().toList()
     }
 }

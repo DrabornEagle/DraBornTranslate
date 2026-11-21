@@ -36,6 +36,7 @@ internal class CaptionSession(
     private var busy = false
     private var closed = false
     private var previousGameLines = emptySet<String>()
+    private var previousSubtitle: TranslationInput? = null
 
     fun read(lines: List<String>) {
         if (closed) return
@@ -48,11 +49,14 @@ internal class CaptionSession(
         val action = stabilizer.feed(text)
         when (action.kind) {
             StabilizerKind.NONE -> Unit
-            StabilizerKind.CLEAR -> clearCaption()
+            StabilizerKind.CLEAR -> {
+                previousSubtitle = null
+                clearCaption()
+            }
             StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
                 val source = action.text ?: return
                 clearCaption(hide = readingArea == ReadingArea.GAME_TEXT)
-                val input = TranslationInput(source, readingArea)
+                val input = subtitleInput(source, action.kind)
                 val cached = cache[input]
                 if (cached != null) {
                     deliver(source, cached)
@@ -66,6 +70,7 @@ internal class CaptionSession(
 
     fun reset() {
         previousGameLines = emptySet()
+        previousSubtitle = null
         stabilizer.reset()
         clearCaption()
     }
@@ -81,6 +86,18 @@ internal class CaptionSession(
         val steady = current.filterKeys(previousGameLines::contains).values.take(6)
         previousGameLines = current.keys
         return steady
+    }
+
+    private fun subtitleInput(source: String, kind: StabilizerKind): TranslationInput {
+        if (readingArea == ReadingArea.GAME_TEXT) return TranslationInput(source, readingArea)
+        val previous = previousSubtitle
+        val restored = if (kind == StabilizerKind.RESTORE) cache.keys.lastOrNull { it.text == source } else null
+        val input = restored ?: previous?.takeIf { it.text == source } ?: TranslationInput(
+            text = source,
+            previousSubtitle = previous?.text?.takeIf { DialogueContext.mightNeedPrevious(source) },
+        )
+        previousSubtitle = input
+        return input
     }
 
     private fun clearCaption(hide: Boolean = true) {

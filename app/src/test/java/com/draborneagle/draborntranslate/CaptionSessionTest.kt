@@ -125,6 +125,19 @@ class CaptionSessionTest {
     }
 
     @Test
+    fun shortAnswerGetsThePrecedingSubtitleAfterAnOcrUpdate() {
+        val question = "Did you lock the side door?"
+        session.read(listOf(question))
+        requests.removeFirst().second(TranslationReply("Yan kapıyı kilitledin mi?"))
+        now += 340
+        session.read(listOf("Yes, I did."))
+        val answer = requests.removeFirst()
+        assertEquals(TranslationInput("Yes, I did.", previousSubtitle = question), answer.first)
+        answer.second(TranslationReply("Evet, kilitledim."))
+        assertEquals(Caption("Yes, I did.", "Evet, kilitledim."), caption)
+    }
+
+    @Test
     fun similarSubtitlesUpdateWhenTwoReadingsConfirmTheNewMeaning() {
         val transitions = listOf(
             "Wait by the garage at Gate 7." to "Wait by the garage at Gate 9.",

@@ -132,6 +132,51 @@ class GameTranslationPipelineTest {
     }
 
     @Test
+    fun briefAnswerExpandsTheActionFromTheQuestion() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "Did you tell her what happened?" -> "Ona olanları anlattın mı?"
+                "No, I didn't tell her what happened." -> "Hayır, anlatmadım."
+                else -> error(text)
+            }
+        })
+        val together = TranslationInput("Did you tell her what happened? No, I didn’t.")
+        val separate = TranslationInput("No, I didn’t.", previousSubtitle = "Did you tell her what happened?")
+        assertEquals("Ona olanları anlattın mı? Hayır, anlatmadım.", pipeline.translate(together).text)
+        assertEquals("Hayır, anlatmadım.", pipeline.translate(separate).text)
+    }
+
+    @Test
+    fun contextDoesNotChangeWhoIsBeingDiscussed() {
+        val earlier = "Did you tell her where I live?"
+        assertEquals("No, I didn’t.", DialogueContext.expand("No, I didn’t.", earlier))
+        assertEquals("He can drive.", DialogueContext.expand("He can drive.", "Could you call her?"))
+        assertEquals(
+            "The light stays on even when the garage is empty.",
+            DialogueContext.expand("The light stays on even when it is.", "The garage is empty."),
+        )
+    }
+
+    @Test
+    fun dialogueIdiomsAreClarifiedBeforeModelTranslation() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "He needs some help carrying the boxes." -> "Kutuları taşımak için yardıma ihtiyacı var."
+                "It is unlikely to work, but we have to try." -> "İşe yarama ihtimali düşük ama denemeliyiz."
+                else -> error(text)
+            }
+        })
+        assertEquals(
+            "Kutuları taşımak için yardıma ihtiyacı var.",
+            pipeline.translate(TranslationInput("He could use a hand carrying the boxes.")).text,
+        )
+        assertEquals(
+            "İşe yarama ihtimali düşük ama denemeliyiz.",
+            pipeline.translate(TranslationInput("It's a long shot, but we have to try.")).text,
+        )
+    }
+
+    @Test
     fun directionalReferencesKeepTheDoorAndSide() {
         val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
             when (text) {
