@@ -17,6 +17,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
+import android.graphics.drawable.StateListDrawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
@@ -31,6 +33,7 @@ import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
@@ -41,11 +44,13 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.security.KeyStore
 
-private const val BACKGROUND = 0xFF0B111C.toInt()
-private const val PANEL = 0xFF131E30.toInt()
-private const val WHITE = 0xFFF3F6FB.toInt()
-private const val MUTED = 0xFFAEBBD1.toInt()
-private const val ACCENT = 0xFF7CF0D2.toInt()
+private const val BACKGROUND = 0xFF0C0F22.toInt()
+private const val PANEL = 0xFF161A34.toInt()
+private const val OUTLINE = 0xFF343B63.toInt()
+private const val WHITE = 0xFFF5F7FF.toInt()
+private const val MUTED = 0xFFB8C0D9.toInt()
+private const val ACCENT = 0xFF79E5FF.toInt()
+private const val LAVENDER = 0xFFB6A8FF.toInt()
 
 class MainActivity : Activity() {
     private val prefs by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
@@ -79,7 +84,9 @@ class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var captionLabel: TextView
     private lateinit var sourceLabel: TextView
+    private lateinit var recognizedLabel: TextView
     private lateinit var copySource: Button
+    private lateinit var copyTurkish: Button
     private lateinit var modelLabel: TextView
     private lateinit var modelButton: Button
     private lateinit var bandPreview: BandPreview
@@ -103,7 +110,7 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         removeOldTranslationCredentials()
         config = CaptureSettings(
-            prefs.getInt("band", 65).coerceIn(0, CaptureSettings.MAX_TOP),
+            prefs.getInt("band", CaptureSettings.DEFAULT_BAND_TOP).coerceIn(0, CaptureSettings.MAX_TOP),
             prefs.getInt("size", 22).coerceIn(CaptureSettings.MIN_SIZE, CaptureSettings.MAX_SIZE),
             if (prefs.getBoolean("mobile", false)) Source.MOBILE else Source.PORTAL,
             SubtitleDisplay.entries.firstOrNull { it.name == prefs.getString("display", null) }
@@ -154,7 +161,9 @@ class MainActivity : Activity() {
     }
 
     private fun buildUi() {
-        val viewport = FrameLayout(this).apply { setBackgroundColor(BACKGROUND) }
+        val viewport = FrameLayout(this).apply {
+            background = gradient(GradientDrawable.Orientation.TOP_BOTTOM, 0xFF1B1438.toInt(), BACKGROUND, 0)
+        }
         viewport.setOnApplyWindowInsetsListener { view, insets ->
             if (Build.VERSION.SDK_INT >= 30) {
                 val safe = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
@@ -166,7 +175,7 @@ class MainActivity : Activity() {
         val scroll = ScrollView(this).apply { isFillViewport = true }
         viewport.addView(scroll)
         val content = column().apply {
-            setPadding(dp(20), dp(22), dp(20), dp(24))
+            setPadding(dp(16), dp(16), dp(16), dp(24))
             layoutParams = FrameLayout.LayoutParams(
                 minOf(resources.displayMetrics.widthPixels, dp(610)),
                 FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -174,44 +183,73 @@ class MainActivity : Activity() {
             )
         }
         scroll.addView(content)
-        content.addView(label("DraBornTranslate", 32, WHITE, bold = true))
-        content.append(label("Canlı Türkçe oyun altyazısı", 16, MUTED), 6)
+        val hero = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(16), dp(17), dp(16), dp(17))
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF392269.toInt(), 0xFF192643.toInt(), 24).apply { setStroke(dp(1), 0xFF56528F.toInt()) }
+        }
+        hero.addView(ImageView(this).apply {
+            setImageResource(R.drawable.brand_mark)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, LinearLayout.LayoutParams(dp(58), dp(58)).apply { marginEnd = dp(12) })
+        hero.addView(column().apply {
+            addView(label("DraBornTranslate", 23, WHITE, bold = true).apply { isAccessibilityHeading = true })
+            append(label("Oyunlar için canlı Türkçe", 14, MUTED), 3)
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        content.append(hero, 0)
 
+        content.append(label("Oyun kaynağı", 15, LAVENDER, bold = true), 18)
         val inputs = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         portal = button("PS Portal") { select(Source.PORTAL) }
         phone = button("Telefonda oyna") { select(Source.MOBILE) }
-        inputs.addView(portal, LinearLayout.LayoutParams(0, dp(50), 1f).apply { marginEnd = dp(6) })
-        inputs.addView(phone, LinearLayout.LayoutParams(0, dp(50), 1f).apply { marginStart = dp(6) })
-        content.append(inputs, 22)
+        inputs.addView(portal, LinearLayout.LayoutParams(0, -1, 1f).apply { marginEnd = dp(5) })
+        inputs.addView(phone, LinearLayout.LayoutParams(0, -1, 1f).apply { marginStart = dp(5) })
+        content.append(inputs, 8)
 
+        val capture = card()
+        content.append(capture, 14)
+        capture.addView(sectionTitle("Canlı çeviri"))
         displayChoice = button("") { selectDisplay() }
-        content.append(displayChoice, 14)
+        capture.append(displayChoice, 10)
         readingChoice = button("") { selectReadingArea() }
-        content.append(readingChoice, 6)
-        packButton = button("") { showPackMenu() }
-        content.append(packButton, 6)
-
-        val guide = card()
-        content.append(guide, 14)
-        instructions = label("", 15, MUTED).apply { setLineSpacing(dp(4).toFloat(), 1f) }
-        guide.addView(instructions)
-        openSource = button("") { openSourceApp(config.source, offerInstall = true) }
-        guide.append(openSource, 14)
-
-        val modelSetup = card()
-        content.append(modelSetup, 14)
+        capture.append(readingChoice, 6)
         modelLabel = label("", 14, MUTED)
-        modelSetup.addView(modelLabel)
+        capture.append(modelLabel, 12)
         modelButton = button("") { changeModelDownload() }
-        modelSetup.append(modelButton, 8)
+        styleButton(modelButton, primary = true)
+        capture.append(modelButton, 8)
 
-        startStop = button("Canlı altyazıyı başlat") { beginOrStop() }
-        styleButton(startStop, true)
-        content.append(startStop, 14)
+        startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
+        styleButton(startStop, primary = true)
+        capture.append(startStop, 10)
+        openSource = button("") { openSourceApp(config.source, offerInstall = true) }
+        capture.append(openSource, 6)
+
+        val live = card(highlight = true)
+        content.append(live, 14)
+        live.addView(sectionTitle("Son çeviri"))
+        status = label("", 14, ACCENT, bold = true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
+        live.append(status, 7)
+        captionLabel = label("", 22, WHITE, bold = true).apply { setLineSpacing(dp(3).toFloat(), 1f) }
+        live.append(captionLabel, 10)
+        sourceLabel = label("", 14, MUTED).apply { setLineSpacing(dp(2).toFloat(), 1f) }
+        live.append(sourceLabel, 8)
+        recognizedLabel = label("", 14, LAVENDER).apply { setLineSpacing(dp(2).toFloat(), 1f) }
+        live.append(recognizedLabel, 8)
+        copyTurkish = button("Türkçeyi kopyala") {
+            displayedCaption()?.let { copyText("Türkçe çeviri", it.turkish) }
+        }
+        live.append(copyTurkish, 8)
+        copySource = button("İngilizceyi kopyala") {
+            recognizedText()?.let { copyText("Okunan İngilizce", it) }
+        }
+        live.append(copySource, 6)
 
         panelCard = card()
         content.append(panelCard, 14)
-        panelCard.addView(label("Portal yan paneli", 17, WHITE, bold = true))
+        panelCard.addView(sectionTitle("Portal yan paneli"))
         panelStatus = label("", 14, MUTED)
         panelCard.append(panelStatus, 6)
         copyPanel = button("Panel bağlantısını kopyala") { copyPanelLink() }
@@ -228,25 +266,15 @@ class MainActivity : Activity() {
         panelCard.append(launchPanelTest, 6)
         panelCard.append(button("Portal’da paneli açma adımları") { showPortalHelp() }, 6)
 
-        val live = card()
-        content.append(live, 14)
-        status = label("", 14, ACCENT, bold = true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
-        live.addView(status)
-        captionLabel = label("", 23, WHITE, bold = true)
-        live.append(captionLabel, 9)
-        sourceLabel = label("", 14, MUTED)
-        live.append(sourceLabel, 4)
-        copySource = button("Okunan İngilizceyi kopyala") {
-            recognizedText()?.let { copyText("İngilizce altyazı", it) }
-        }
-        live.append(copySource, 8)
+        val guide = content.addDetails("Bağlantı ve ekran paylaşımı")
+        instructions = label("", 15, MUTED).apply { setLineSpacing(dp(4).toFloat(), 1f) }
+        guide.append(instructions, 10)
 
-        val settings = card()
-        content.append(settings, 18)
+        val settings = content.addDetails("Görünüm ve oyun paketi")
         bandSettings = column()
-        settings.addView(bandSettings)
-        bandSettings.addView(label("Altyazı hizası", 17, WHITE, bold = true))
-        bandSettings.append(label("Yeşil bandı oyundaki İngilizce altyazı hizasına getir.", 14, MUTED), 4)
+        settings.append(bandSettings, 12)
+        bandSettings.addView(label("Altyazı hizası", 16, WHITE, bold = true))
+        bandSettings.append(label("Mavi bandı oyundaki İngilizce altyazının hizasına getir.", 14, MUTED), 4)
         bandPreview = BandPreview()
         bandSettings.addView(bandPreview, LinearLayout.LayoutParams(-1, dp(84)).apply { topMargin = dp(8) })
         bandControl = slider("Altyazı bölgesinin yüksekliği", CaptureSettings.MAX_TOP, config.bandTop) { value ->
@@ -266,8 +294,10 @@ class MainActivity : Activity() {
             sizeLabel.text = "Altyazı boyutu · $size"
         }
         settings.addView(sizeControl)
+        packButton = button("") { showPackMenu() }
+        settings.append(packButton, 8)
         testButton = button("Çeviriyi dene") { showTranslationTest() }
-        content.append(testButton, 14)
+        content.append(testButton, 12)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
         content.append(voiceButton, 6)
         content.append(button("Kaynak kod ve lisans") { showLicense() }, 8)
@@ -290,8 +320,6 @@ class MainActivity : Activity() {
                 "4. $textInstructions"
         }
         openSource.text = "${config.source.appName} uygulamasını aç"
-        styleButton(portal, !mobile)
-        styleButton(phone, mobile)
         portal.isSelected = !mobile
         phone.isSelected = mobile
         val panelTesting = state.portalPanel?.testing == true
@@ -299,7 +327,7 @@ class MainActivity : Activity() {
         listOf(portal, phone, bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
         displayChoice.isEnabled = controlsAvailable
-        displayChoice.text = "Altyazı ekranı · ${config.display.label}"
+        displayChoice.text = "Çeviri çıkışı · ${config.display.label}"
         readingChoice.isEnabled = controlsAvailable
         readingChoice.text = "Çevrilecek alan · ${config.readingArea.label}"
         packButton.isEnabled = controlsAvailable && demoTranslator == null
@@ -320,25 +348,34 @@ class MainActivity : Activity() {
             OfflineModelStore.Stage.VERIFYING -> "Dosya doğrulanıyor…"
             else -> "Türkçe modeli indir · ${OfflineModelStore.MODEL_SIZE}"
         }
-        startStop.isEnabled = (state.active || modelReady) && !pending && demoTranslator == null && !packLoading
-        startStop.text = if (state.active) "Canlı altyazıyı durdur" else "Canlı altyazıyı başlat"
+        startStop.visibility = if (state.active || modelReady) View.VISIBLE else View.GONE
+        startStop.isEnabled = !pending && demoTranslator == null && !packLoading
+        startStop.text = if (state.active) "Canlı çeviriyi durdur" else "Canlı çeviriyi başlat"
         testButton.isEnabled = modelReady && controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
-        val caption = if (state.active) state.caption else demoCaption
-        val source = recognizedText()
+        val caption = displayedCaption()
+        val recognized = recognizedText()
+        val source = caption?.source
+        val differentReading = recognized?.takeUnless { it == source }
         status.text = if (state.active || panelTesting) state.voiceIssue ?: state.translationIssue ?: state.status
         else demoMessage ?: state.status
         captionLabel.text = caption?.turkish.orEmpty()
-        sourceLabel.text = source?.let { "Okunan İngilizce\n$it" }.orEmpty()
+        sourceLabel.text = source?.let { "Çevirinin İngilizce metni\n$it" }.orEmpty()
+        recognizedLabel.text = differentReading?.let { "Okunan İngilizce\n$it" }.orEmpty()
         captionLabel.visibility = if (caption == null) View.GONE else View.VISIBLE
+        copyTurkish.visibility = captionLabel.visibility
         sourceLabel.visibility = if (source == null) View.GONE else View.VISIBLE
-        copySource.visibility = sourceLabel.visibility
+        recognizedLabel.visibility = if (differentReading == null) View.GONE else View.VISIBLE
+        copySource.visibility = if (recognized == null) View.GONE else View.VISIBLE
     }
 
-    private fun recognizedText(): String? = SessionState.current.let { state ->
-        if (state.active) state.recognizedSource else demoSource
-    }
+    private fun displayedCaption(): Caption? =
+        if (demoMessage != null) demoCaption else SessionState.current.let { it.caption ?: it.lastCaption }
+
+    private fun recognizedText(): String? =
+        if (demoMessage != null) demoSource
+        else SessionState.current.let { it.recognizedSource ?: displayedCaption()?.source }
 
     private fun updateModelState() {
         val current = runCatching { OfflineModelStore.status(this) }.getOrElse {
@@ -380,7 +417,7 @@ class MainActivity : Activity() {
     private fun selectDisplay() {
         val choices = SubtitleDisplay.entries
         AlertDialog.Builder(this)
-            .setTitle("Altyazı ekranı")
+            .setTitle("Çeviri çıkışı")
             .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.display)) { dialog, index ->
                 setDisplay(choices[index])
                 dialog.dismiss()
@@ -717,7 +754,7 @@ class MainActivity : Activity() {
         pending = false
         val state = SessionState.current
         SessionState.update(if (state.portalPanel?.testing == true) state.copy(active = false, status = message)
-            else SessionState.State(status = message))
+            else SessionState.State(status = message, lastCaption = state.lastCaption))
         render()
     }
 
@@ -794,9 +831,9 @@ class MainActivity : Activity() {
             demoMessage = "Örnek görseldeki İngilizce altyazı okunuyor…"
             render()
             val reader = SubtitleReader().also { demoReader = it }
-            reader.read(exampleBitmap()) { lines ->
+            reader.read(exampleBitmap()) { result ->
                 if (demoTranslator !== translator) return@read
-                val original = lines.orEmpty().joinToString("\n").trim()
+                val original = result?.lines.orEmpty().joinToString("\n").trim()
                 if (original.isEmpty()) {
                     completeDemo("Örnek görseldeki yazı okunamadı.")
                     return@read
@@ -879,19 +916,38 @@ class MainActivity : Activity() {
         if (bold) typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
 
-    private fun button(value: String, action: () -> Unit) = Button(this).apply {
+    private fun sectionTitle(value: String) = label(value, 18, WHITE, bold = true).apply {
+        isAccessibilityHeading = true
+    }
+
+    private fun button(value: String, action: (() -> Unit)? = null) = Button(this).apply {
         text = value
         textSize = 14f
         isAllCaps = false
-        setPadding(dp(12), dp(10), dp(12), dp(10))
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        stateListAnimator = null
         minimumHeight = dp(48)
-        setOnClickListener { action() }
+        if (action != null) setOnClickListener { action() }
         styleButton(this, false)
     }
 
     private fun styleButton(button: Button, primary: Boolean) {
-        button.background = shape(if (primary) ACCENT else 0xFF223249.toInt())
-        button.setTextColor(if (primary) BACKGROUND else WHITE)
+        val disabled = intArrayOf(-android.R.attr.state_enabled)
+        val selected = intArrayOf(android.R.attr.state_selected)
+        val shaped = StateListDrawable().apply {
+            addState(disabled, shape(0xFF1B2038.toInt(), OUTLINE, 14))
+            addState(selected, shape(0xFF332F63.toInt(), LAVENDER, 14))
+            addState(intArrayOf(), if (primary) {
+                gradient(GradientDrawable.Orientation.LEFT_RIGHT, ACCENT, LAVENDER, 14)
+            } else shape(0xFF242A4B.toInt(), OUTLINE, 14))
+        }
+        button.backgroundTintList = null
+        button.background = RippleDrawable(ColorStateList.valueOf(0x3389C5FF), shaped, null)
+        button.setPadding(dp(12), dp(10), dp(12), dp(10))
+        button.setTextColor(ColorStateList(
+            arrayOf(disabled, selected, intArrayOf()),
+            intArrayOf(0xFF909AB8.toInt(), WHITE, if (primary) BACKGROUND else WHITE),
+        ))
     }
 
     private fun slider(description: String, limit: Int, value: Int, changed: (Int) -> Unit) = SeekBar(this).apply {
@@ -911,14 +967,38 @@ class MainActivity : Activity() {
 
     private fun column() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
 
-    private fun card() = column().apply {
-        background = shape(PANEL)
+    private fun card(highlight: Boolean = false) = column().apply {
+        background = if (highlight) gradient(GradientDrawable.Orientation.TL_BR,
+            0xFF212B50.toInt(), PANEL, 21).apply { setStroke(dp(1), 0xFF486087.toInt()) }
+        else shape(PANEL, OUTLINE, 21)
         setPadding(dp(16), dp(15), dp(16), dp(15))
     }
 
-    private fun shape(color: Int) = GradientDrawable().apply {
+    private fun shape(color: Int, stroke: Int, radius: Int) = GradientDrawable().apply {
         setColor(color)
-        cornerRadius = dp(15).toFloat()
+        setStroke(dp(1), stroke)
+        cornerRadius = dp(radius).toFloat()
+    }
+
+    private fun gradient(orientation: GradientDrawable.Orientation, start: Int, end: Int, radius: Int) =
+        GradientDrawable(orientation, intArrayOf(start, end)).apply { cornerRadius = dp(radius).toFloat() }
+
+    private fun LinearLayout.addDetails(title: String): LinearLayout {
+        val container = card()
+        val body = column().apply { visibility = View.GONE }
+        val heading = button(title)
+        heading.gravity = Gravity.CENTER_VERTICAL or Gravity.START
+        heading.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_disclosure, 0)
+        heading.setOnClickListener {
+            val expanded = body.visibility != View.VISIBLE
+            body.visibility = if (expanded) View.VISIBLE else View.GONE
+            heading.isSelected = expanded
+            if (Build.VERSION.SDK_INT >= 30) heading.stateDescription = if (expanded) "Açık" else "Kapalı"
+        }
+        container.addView(heading, LinearLayout.LayoutParams(-1, -2))
+        container.addView(body, LinearLayout.LayoutParams(-1, -2))
+        append(container, 12)
+        return body
     }
 
     private fun LinearLayout.append(view: View, gap: Int) {
@@ -927,27 +1007,31 @@ class MainActivity : Activity() {
 
     private inner class BandPreview : View(this@MainActivity) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var video = Pixels(0, 0, 1, 1)
 
         init {
             contentDescription = "Oyun görüntüsündeki altyazı okuma bölgesi"
         }
 
-        override fun onDraw(canvas: Canvas) {
-            val boxHeight = height.toFloat() - dp(4)
+        override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
+            val boxHeight = minOf(height - dp(4), width * 9 / 16).coerceAtLeast(1)
             val boxWidth = boxHeight * 16 / 9
-            val left = (width - boxWidth) / 2
-            val top = dp(2).toFloat()
+            video = Pixels((width - boxWidth) / 2, (height - boxHeight) / 2, boxWidth, boxHeight)
+        }
+
+        override fun onDraw(canvas: Canvas) {
+            val left = video.x.toFloat()
+            val top = video.y.toFloat()
             val radius = dp(7).toFloat()
             paint.color = BACKGROUND
-            canvas.drawRoundRect(left, top, left + boxWidth, top + boxHeight, radius, radius, paint)
-            paint.color = 0xFF34695F.toInt()
-            val bandTop = top + boxHeight * config.bandTop / 100
-            val bandHeight = boxHeight * CaptureSettings.BAND_HEIGHT / 100
-            canvas.drawRoundRect(left + boxWidth * 0.06f, bandTop, left + boxWidth * 0.94f,
-                bandTop + bandHeight, radius / 2, radius / 2, paint)
+            canvas.drawRoundRect(left, top, left + video.width, top + video.height, radius, radius, paint)
+            paint.color = 0xFF345D81.toInt()
+            val band = config.scanArea(video)
+            canvas.drawRoundRect(band.x.toFloat(), band.y.toFloat(), (band.x + band.width).toFloat(),
+                (band.y + band.height).toFloat(), radius / 2, radius / 2, paint)
             paint.color = ACCENT
-            val centerY = bandTop + bandHeight / 2
-            canvas.drawRoundRect(left + boxWidth * 0.24f, centerY - dp(1), left + boxWidth * 0.76f,
+            val centerY = band.y + band.height / 2f
+            canvas.drawRoundRect(left + video.width * 0.24f, centerY - dp(1), left + video.width * 0.76f,
                 centerY + dp(1), dp(1).toFloat(), dp(1).toFloat(), paint)
         }
     }

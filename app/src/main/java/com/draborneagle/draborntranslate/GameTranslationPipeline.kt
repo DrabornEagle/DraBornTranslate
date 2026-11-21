@@ -8,7 +8,11 @@ import com.gametranslator.gametranslator_mobile.core.TermProtector
 import com.gametranslator.gametranslator_mobile.core.TextMatch
 import java.util.Locale
 
-internal data class TranslationInput(val text: String, val readingArea: ReadingArea = ReadingArea.SUBTITLES)
+internal data class TranslationInput(
+    val text: String,
+    val readingArea: ReadingArea = ReadingArea.SUBTITLES,
+    val allowPartial: Boolean = false,
+)
 internal data class TranslationReply(val text: String? = null, val issue: String? = null)
 
 /** Sends full speaker turns to the local model and keeps menu labels in their original order. */
@@ -21,14 +25,19 @@ internal class GameTranslationPipeline(
         val lines = input.text.lines().map(::cleanOcrLine).filter(String::isNotBlank)
         if (lines.isEmpty() || canceled()) return TranslationReply()
         val area = input.readingArea
-        val text = if (area == ReadingArea.SUBTITLES) translateText(lines.joinToString("\n"), area)
-        else lines.mapNotNull(::translateMenuLine).joinToString("\n")
-        return TranslationReply(text?.takeUnless { it.isBlank() || canceled() })
+        val reply = if (area == ReadingArea.SUBTITLES) {
+            translateText(lines.joinToString("\n"), area, allowPartial = input.allowPartial)
+        } else {
+            TranslationReply(lines.mapNotNull(::translateMenuLine).joinToString("\n").ifBlank { null })
+        }
+        return if (canceled()) TranslationReply() else reply
     }
 
     private fun translateMenuLine(line: String): String? {
         if (canceled()) return null
         findPack(line)?.let { return it }
+        GamePhrases.direct(line, ReadingArea.GAME_TEXT)?.let { return it }
+        GamePhrases.direct(line, ReadingArea.SUBTITLES)?.let { return it }
         val colon = line.indexOf(':')
         if (colon > 0) {
             val header = GamePhrases.direct(line.substring(0, colon), ReadingArea.GAME_TEXT)
@@ -37,20 +46,24 @@ internal class GameTranslationPipeline(
                 return when {
                     detail.isEmpty() -> "$header:"
                     detail.none(Char::isLetter) -> "$header: $detail"
-                    else -> translateText(detail, ReadingArea.GAME_TEXT)?.let { "$header: $it" }
+                    else -> translateText(detail, ReadingArea.GAME_TEXT).text?.let { "$header: $it" }
                 }
             }
         }
-        return translateText(line, ReadingArea.GAME_TEXT, lookupWholeText = false)
+        return translateText(line, ReadingArea.GAME_TEXT, lookupWholeText = false).text
     }
 
-    private fun translateText(text: String, area: ReadingArea, lookupWholeText: Boolean = true): String? {
-        if (lookupWholeText) findPack(text)?.let { return it }
+    private fun translateText(
+        text: String,
+        area: ReadingArea,
+        lookupWholeText: Boolean = true,
+        allowPartial: Boolean = false,
+    ): TranslationReply {
+        if (lookupWholeText) findPack(text)?.let { return TranslationReply(it) }
         val dialogue = area == ReadingArea.SUBTITLES
         val pieces = SubtitleSegmenter.split(text, preserveSpeakers = dialogue, keepSpeakerTurns = dialogue)
-        if (pieces.none { it.translate }) return null
         val speakerNames = pieces.mapNotNull(SubtitleSegmenter::labelName)
-        return renderPieces(pieces, area, speakerNames, splitOnFailure = dialogue)
+        return renderPieces(pieces, area, speakerNames, splitOnFailure = dialogue, allowPartial = allowPartial)
     }
 
     private fun renderPieces(
@@ -58,27 +71,39 @@ internal class GameTranslationPipeline(
         area: ReadingArea,
         speakerNames: List<String>,
         splitOnFailure: Boolean,
-    ): String? = buildString {
+        allowPartial: Boolean,
+    ): TranslationReply {
+        val result = StringBuilder()
+        var translatedAny = false
+        var incomplete = false
         for (piece in pieces) {
-            if (canceled()) return null
+            if (canceled()) return TranslationReply()
             if (!piece.translate) {
-                append(piece.text)
+                result.append(piece.text)
                 continue
             }
             val source = piece.text
             val translated = findPack(source) ?: GamePhrases.direct(source, area)
                 ?: if (splitOnFailure) translateKnownTurn(source, area) else null
-            val output = translated
-                ?: translatePiece(source, area, speakerNames)
-                ?: if (splitOnFailure) {
-                    val sentences = SubtitleSegmenter.split(source, preserveSpeakers = false)
-                    if (sentences.count { it.translate } < 2) null
-                    else renderPieces(sentences, area, speakerNames, splitOnFailure = false)
-                } else null
-            if (output == null) return null
-            append(output)
+            val direct = translated ?: translatePiece(source, area, speakerNames)
+            if (direct != null) {
+                translatedAny = true
+                result.append(direct)
+                continue
+            }
+            val sentences = if (splitOnFailure) SubtitleSegmenter.split(source, preserveSpeakers = false) else emptyList()
+            val fallback = if (sentences.count { it.translate } >= 2) {
+                renderPieces(sentences, area, speakerNames, splitOnFailure = false, allowPartial = allowPartial)
+            } else TranslationReply()
+            if (fallback.text == null && !allowPartial) return TranslationReply()
+            translatedAny = translatedAny || fallback.text != null
+            incomplete = incomplete || fallback.text == null || fallback.issue != null
+            result.append(fallback.text ?: "[…]")
         }
-    }.trim().takeIf(String::isNotEmpty)
+        if (!translatedAny) return TranslationReply()
+        return TranslationReply(result.toString().trim(),
+            if (incomplete) "Repliğin bir bölümü çevrilemedi." else null)
+    }
 
     private fun translateKnownTurn(source: String, area: ReadingArea): String? {
         val sentences = SubtitleSegmenter.split(source, preserveSpeakers = false)

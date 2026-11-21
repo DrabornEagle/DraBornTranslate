@@ -54,6 +54,12 @@ internal object GamePhrases {
         "Wait!" to "Bekle!",
         "Look out!" to "Dikkat et!",
         "Move!" to "Çabuk!",
+        "Follow me." to "Beni takip et.",
+        "Stay here." to "Burada kal.",
+        "Stop here." to "Burada dur.",
+        "Don't move." to "Kıpırdama.",
+        "Don't shoot!" to "Ateş etme!",
+        "Keep your hands where I can see them." to "Ellerini görebileceğim yerde tut.",
     ).mapKeys { (english, _) -> key(english) }
 
     private val menu = mapOf(
@@ -63,22 +69,34 @@ internal object GamePhrases {
         "back" to "Geri",
         "checkpoint" to "Kontrol noktası",
         "continue" to "Devam et",
+        "controller" to "Kumanda",
         "controls" to "Kontroller",
         "difficulty" to "Zorluk",
+        "display" to "Görüntü",
+        "exit" to "Çıkış",
         "exit to desktop" to "Masaüstüne dön",
         "exit to main menu" to "Ana menüye dön",
         "fast travel" to "Hızlı seyahat",
         "game saved" to "Oyun kaydedildi",
+        "graphics" to "Grafikler",
         "health bar" to "Can çubuğu",
         "hold r2 to accelerate." to "Hızlanmak için R2'yi basılı tut.",
         "hold r2 to accelerate" to "Hızlanmak için R2'yi basılı tut",
         "hold to skip" to "Atlamak için basılı tut",
         "inventory" to "Envanter",
         "load game" to "Oyun yükle",
+        "map" to "Harita",
+        "mission complete" to "Görev tamamlandı",
+        "mission failed" to "Görev başarısız",
+        "missions" to "Görevler",
         "new game" to "Yeni oyun",
         "new game+" to "Yeni Oyun+",
         "no" to "Hayır",
         "objective" to "Hedef",
+        "objectives" to "Hedefler",
+        "off" to "Kapalı",
+        "on" to "Açık",
+        "pause menu" to "Duraklatma menüsü",
         "reload checkpoint" to "Son kontrol noktasını yükle",
         "restart mission" to "Görevi yeniden başlat",
         "resume" to "Oyuna dön",
@@ -92,13 +110,19 @@ internal object GamePhrases {
         "subtitles" to "Altyazılar",
         "tracked missions" to "Takip edilen görevler",
         "wanted level" to "Aranma seviyesi",
+        "weapons" to "Silahlar",
         "yes" to "Evet",
     )
     private val checkpointJump = Regex("jump to checkpoint (\\d+)", RegexOption.IGNORE_CASE)
     private val controllerSprint = Regex("(?:tap|press) ([LR][1-3]) to sprint([.!]?)", RegexOption.IGNORE_CASE)
 
     fun direct(text: String, area: ReadingArea): String? {
-        if (area == ReadingArea.SUBTITLES) return dialogue[key(text)]
+        if (area == ReadingArea.SUBTITLES) {
+            val line = key(text)
+            return dialogue[line] ?: if (line.lastOrNull()?.isLetterOrDigit() == true) {
+                (dialogue["$line."] ?: dialogue["$line!"])?.trimEnd('.', '!')
+            } else null
+        }
         controllerSprint.matchEntire(text)?.let { match ->
             val button = match.groupValues[1].uppercase(Locale.ROOT)
             val ending = if (button.endsWith('2')) "ye" else "e"
@@ -134,6 +158,7 @@ internal object GamePhrases {
         "keep your eyes on the road" to "watch the road ahead",
         "keep an eye on" to "watch",
         "we've got to move(?=[,.!?…]|$)" to "we have to leave now",
+        "^meet me (outside|inside|in front of|at|by|near|in|on) " to "Let's meet $1 ",
         "i thought you said(?: that)?(?= (?:the|he|she|you|we|it|they|this|i) )" to "I thought you told me that",
         "(is|was|are|were) unlocked(?! by)" to "$1 not locked",
         "wait by the (car|elevator|door)" to "wait next to the $1",

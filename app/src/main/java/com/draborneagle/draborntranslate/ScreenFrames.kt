@@ -100,7 +100,7 @@ internal class ScreenFrames(
     }
 
     private fun attachReader(width: Int, height: Int, session: MediaProjection) {
-        val captureWidth = if (settings.readingArea == ReadingArea.SUBTITLES) 1920f else 1600f
+        val captureWidth = 1920f
         val scale = minOf(1f, captureWidth / maxOf(width, height))
         val scaledWidth = (width * scale).roundToInt().coerceAtLeast(2)
         val scaledHeight = (height * scale).roundToInt().coerceAtLeast(2)
@@ -159,7 +159,6 @@ internal class ScreenFrames(
             val now = SystemClock.elapsedRealtime()
             lastFrameAt = now
             if (now - lastSampleAt < settings.readingArea.sampleIntervalMs) return
-            lastSampleAt = now
 
             val plane = image.planes.firstOrNull() ?: return
             val rgba = plane.buffer
@@ -167,6 +166,7 @@ internal class ScreenFrames(
             if (plane.pixelStride != 4 || rowStride < image.width * 4) return
 
             if (isDark(rgba, rowStride)) {
+                lastSampleAt = now
                 if (darkSince == 0L) darkSince = now
                 if (now - darkSince >= 2700L) setSignal(FrameSource.DARK)
                 return
@@ -174,6 +174,7 @@ internal class ScreenFrames(
             darkSince = 0L
             setSignal(FrameSource.VISIBLE)
             if (!reserveFrame()) return
+            lastSampleAt = now
             val bitmap = try {
                 copyScanArea(rgba, rowStride)
             } catch (error: RuntimeException) {
@@ -201,8 +202,8 @@ internal class ScreenFrames(
             }
         }
         // Karanlık bir sahnede okuma alanında açık renkli yazı varsa OCR'a devam et.
-        for (y in scan.y until scan.y + scan.height step 5) {
-            for (x in scan.x until scan.x + scan.width step 8) {
+        for (y in scan.y until scan.y + scan.height step 4) {
+            for (x in scan.x until scan.x + scan.width step 6) {
                 val index = pixels.position() + y * stride + x * 4
                 if (index + 2 >= pixels.limit()) continue
                 if ((pixels.get(index).toInt() and 255) > 70 ||

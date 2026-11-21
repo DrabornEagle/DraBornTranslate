@@ -61,7 +61,7 @@ class SubtitleStabilizer(
     private var forgotten = ""
     private var retryAt = 0L
 
-    fun feed(rawText: String): StabilizerAction {
+    fun feed(rawText: String, confident: Boolean = false): StabilizerAction {
         val time = clock()
         val text = if (exactText) TextMatch.literal(rawText) else TextMatch.normalize(rawText)
         // 3 karakterden kısa okumalar (gürültü, tek simge) boş kare sayılır.
@@ -88,6 +88,7 @@ class SubtitleStabilizer(
         val garbled = isGarbled(rawText)
         val ready = when {
             garbled -> candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
+            confident -> true
             exactText -> candidateCount >= stableFrames
             else -> candidateCount >= stableFrames || (acceptCompletedSentence && endsSentence(rawText))
         }

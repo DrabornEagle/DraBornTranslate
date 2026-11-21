@@ -91,6 +91,16 @@ class GameTranslationPipelineTest {
     }
 
     @Test
+    fun liveDialogueKeepsVerifiedSentencesAndMarksAMissingOne() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+            if (request.text == "We have 20 minutes.") "On iki dakikamız var." else null
+        })
+        val reply = pipeline.translate(TranslationInput("Take cover! We have 20 minutes.", allowPartial = true))
+        assertEquals("Siper al! […]", reply.text)
+        assertEquals("Repliğin bir bölümü çevrilemedi.", reply.issue)
+    }
+
+    @Test
     fun rejectsAnAlteredNameOrAReversedNegativeCommand() {
         val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
             when (request.text) {
@@ -116,5 +126,15 @@ class GameTranslationPipelineTest {
     fun keepsContractionsAndNumbersWhenRepairingOcr() {
         assertEquals("I'll leave 3 cars here. Does R2-D2 know?", cleanOcrLine("l’ll leave 3 cars here. Does R2-D2 know ?"))
         assertEquals("3 More cars are coming.", cleanOcrLine(" 3  More cars are coming. "))
+    }
+
+    @Test
+    fun translatesAnInvitationToMeetAsAnInvitationRatherThanAnInstructionToGreet() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, translateModel = { request ->
+            assertEquals("Let's meet by the bridge.", request.text)
+            "Köprünün yanında buluşalım."
+        })
+        assertEquals("LUCIA: Köprünün yanında buluşalım.",
+            pipeline.translate(TranslationInput("LUCIA: Meet me by the bridge.")).text)
     }
 }

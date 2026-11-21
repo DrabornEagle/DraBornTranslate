@@ -11,13 +11,13 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import java.util.Locale
 
-/** Çeviriyi Android'in yüklü Türkçe ses verisiyle okur. Biriken eski satırları sıraya almaz. */
+/** Çeviriyi Android'in yüklü Türkçe ses verisiyle okur. */
 internal class TurkishVoice(context: Context, private val onIssue: (String) -> Unit) : AutoCloseable {
     private val main = Handler(Looper.getMainLooper())
     private val timeout = Runnable { fail() }
     private var ready = false
     private var closed = false
-    private var pending: String? = null
+    private val pending = ArrayDeque<String>()
     private var lastText: String? = null
     private var lastSpokenAt = 0L
     private var sequence = 0
@@ -56,35 +56,45 @@ internal class TurkishVoice(context: Context, private val onIssue: (String) -> U
             .build())
         speech.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) = Unit
-            override fun onDone(utteranceId: String?) = Unit
+            override fun onDone(utteranceId: String?) {
+                main.post {
+                    if (!closed && utteranceId == utterance) {
+                        utterance = null
+                        speakNext()
+                    }
+                }
+            }
             @Deprecated("Android uyumluluğu")
             override fun onError(utteranceId: String?) {
                 main.post { if (!closed && utteranceId == utterance) fail() }
             }
         })
         ready = true
-        pending?.let(::speak)
+        speakNext()
     }
 
     fun speak(text: String?) {
         if (closed) return
-        if (!ready) {
-            pending = text
-            return
-        }
-        pending = null
         val line = text?.replace('\n', ' ')?.trim()?.takeIf(String::isNotEmpty) ?: return
         val now = SystemClock.elapsedRealtime()
         if (line == lastText && now - lastSpokenAt < 3500L) return
-        val id = "caption-${++sequence}"
-        utterance = id
         lastText = line
         lastSpokenAt = now
-        if (engine?.speak(line, TextToSpeech.QUEUE_FLUSH, Bundle(), id) != TextToSpeech.SUCCESS) fail()
+        if (pending.size == 8) pending.removeFirst()
+        pending.addLast(line)
+        speakNext()
+    }
+
+    private fun speakNext() {
+        if (!ready || closed || utterance != null) return
+        val line = pending.removeFirstOrNull() ?: return
+        val id = "caption-${++sequence}"
+        utterance = id
+        if (engine?.speak(line, TextToSpeech.QUEUE_ADD, Bundle(), id) != TextToSpeech.SUCCESS) fail()
     }
 
     fun pause() {
-        pending = null
+        pending.clear()
         utterance = null
         lastText = null
         engine?.stop()

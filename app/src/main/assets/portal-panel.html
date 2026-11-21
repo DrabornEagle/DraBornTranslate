@@ -7,17 +7,18 @@
 <title>DraBornTranslate</title>
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; background: #0b111c; color: #f3f6fb; }
-  body { font-family: Arial, sans-serif; }
-  main { max-width: 34em; min-height: 100vh; margin: 0 auto; padding: 14px;
+  html, body { margin: 0; min-height: 100%; background: #0c0f22; color: #f5f7ff; }
+  body { font-family: Arial, sans-serif; background: linear-gradient(155deg, #21164a, #0c0f22 64%); }
+  main { max-width: 36em; min-height: 100vh; margin: 0 auto; padding: 16px;
     display: flex; flex-direction: column; }
   .subtitle { margin-top: auto; text-align: center; }
-  h1 { margin: 0 0 10px; color: #7cf0d2; font-size: 16px; }
+  h1 { margin: 0 0 10px; color: #79e5ff; font-size: 18px; }
   p { margin: 0; line-height: 1.38; }
-  #status { color: #aebbd1; font-size: 15px; }
+  #status { color: #b8c0d9; font-size: 15px; }
   #caption { white-space: pre-wrap; overflow-wrap: break-word; word-wrap: break-word;
     font-weight: bold; font-size: {{caption-size}}px; line-height: 1.25;
-    color: #fff; background: #06080d; padding: 10px 8px; border-radius: 7px;
+    color: #fff; background: #12162e; padding: 14px 10px; border-radius: 14px;
+    border: 1px solid #393e6d; border-top: 2px solid #79e5ff;
     text-shadow: 0 1px 3px #000; }
   [hidden] { display: none !important; }
 </style>
@@ -42,8 +43,8 @@
     if (caption.textContent !== text) caption.textContent = text;
     caption.hidden = !text;
     status.hidden = !!text;
-    status.textContent = connected ? "Panel açık. Oyun altyazısı bekleniyor." :
-      "Bağlantı kesildi. Telefonda canlı altyazı oturumunu kontrol et.";
+    status.textContent = connected ? "Panel açık. Oyun metni bekleniyor." :
+      "Bağlantı kesildi. Telefonda canlı çeviri oturumunu kontrol et.";
   }
 
   function poll() {

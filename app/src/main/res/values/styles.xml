@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="brand_icon_background">#16113F</color>
     <style name="Theme.DraBornTranslate" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:windowBackground">#0B111C</item>
-        <item name="android:colorAccent">#7CF0D2</item>
-        <item name="android:colorControlActivated">#7CF0D2</item>
-        <item name="android:statusBarColor">#0B111C</item>
-        <item name="android:navigationBarColor">#0B111C</item>
+        <item name="android:windowBackground">#0C0F22</item>
+        <item name="android:colorAccent">#79E5FF</item>
+        <item name="android:colorControlActivated">#79E5FF</item>
+        <item name="android:statusBarColor">#181336</item>
+        <item name="android:navigationBarColor">#0C0F22</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>

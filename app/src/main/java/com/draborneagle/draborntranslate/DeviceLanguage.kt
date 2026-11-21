@@ -15,7 +15,7 @@ internal interface CaptionTranslator : AutoCloseable {
 internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea.SUBTITLES) : AutoCloseable {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-    fun read(bitmap: Bitmap, done: (List<String>?) -> Unit) {
+    fun read(bitmap: Bitmap, done: (TextReading?) -> Unit) {
         val width = bitmap.width
         val height = bitmap.height
         recognizer.process(InputImage.fromBitmap(bitmap, 0)).addOnCompleteListener { task ->
@@ -26,14 +26,14 @@ internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea
             }
             val lines = task.result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
                 val box = line.boundingBox ?: return@mapNotNull null
-                if (line.text.count(Char::isLetter) < 2 || box.height() < 7) return@mapNotNull null
+                if (line.text.count(Char::isLetter) < 2 || box.height() < 6) return@mapNotNull null
                 RecognizedLine(line.text.trim(), box.left, box.top, box.right, box.bottom, line.confidence)
             }
             if (readingArea == ReadingArea.GAME_TEXT) {
-                done(lines.sortedWith(compareBy({ it.top / 10 }, { it.left }))
+                val readable = lines.filter { it.confidence == 0f || it.confidence >= 0.35f }
+                done(TextReading(joinSubtitleFragments(readable).sortedWith(compareBy({ it.top / 10 }, { it.left }))
                     .map { it.text }
-                    .distinct()
-                    .take(24))
+                    .distinct()))
                 return@addOnCompleteListener
             }
             done(selectSubtitleLines(lines, width, height))

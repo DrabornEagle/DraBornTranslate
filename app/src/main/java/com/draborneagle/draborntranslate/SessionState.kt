@@ -14,6 +14,7 @@ internal object SessionState {
         val active: Boolean = false,
         val status: String = "Canlı altyazı kapalı.",
         val caption: Caption? = null,
+        val lastCaption: Caption? = null,
         val recognizedSource: String? = null,
         val portalPanel: PortalPanel? = null,
         val portalIssue: String? = null,

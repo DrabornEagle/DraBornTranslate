@@ -1,138 +1,172 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
-import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 class CaptionSessionTest {
     private var now = 100L
+    private var cancelCount = 0
+    private var recognized: String? = null
     private var caption: Caption? = null
+    private val delivered = mutableListOf<String>()
     private val requests = ArrayDeque<Pair<TranslationInput, (TranslationReply) -> Unit>>()
-    private val session = CaptionSession(
+
+    private fun session(area: ReadingArea = ReadingArea.SUBTITLES) = CaptionSession(
         translate = { source, answer -> requests.addLast(source to answer) },
-        show = { caption = it },
+        show = {
+            caption = it
+            if (it != null) delivered.add(it.source)
+        },
         onFailure = {},
-        stabilizer = SubtitleStabilizer(clock = { now }),
+        onRead = { recognized = it },
+        cancelTranslation = { cancelCount++ },
+        readingArea = area,
+        clock = { now },
     )
 
+    private fun answer(source: String, turkish: String) {
+        val (input, reply) = requests.removeFirst()
+        assertEquals(source, input.text)
+        reply(TranslationReply(turkish))
+    }
+
     @Test
-    fun slowTranslationDoesNotReplaceNewerDialogue() {
-        session.read(listOf("Get to the bridge!"))
-        now += 340
-        session.read(listOf("We must leave now."))
-        now += 340
-        session.read(listOf("Close the gate."))
+    fun confirmedShortCuesSurviveASlowTranslationAndTheEndOfTheScene() {
+        val dialogue = session()
+        val samples = listOf(
+            "Get to the bridge!" to "Köprüye git!",
+            "We must leave now." to "Hemen gitmeliyiz.",
+            "Close the gate." to "Kapıyı kapat.",
+            "Stop!" to "Dur!",
+        )
+        for ((source, _) in samples) {
+            dialogue.read(listOf(source), confident = true)
+            now += 220
+        }
+        dialogue.read(emptyList())
+        now += 1500
+        dialogue.read(emptyList())
 
         assertEquals(1, requests.size)
-        requests.removeFirst().second(TranslationReply("Köprüye git!"))
+        assertEquals(0, cancelCount)
+        for ((source, turkish) in samples) {
+            answer(source, turkish)
+            dialogue.tick()
+            assertEquals(Caption(source, turkish), caption)
+            now += 1200
+        }
+        assertEquals(samples.map { it.first }, delivered)
+        dialogue.tick()
         assertNull(caption)
-        assertEquals("Close the gate.", requests.first().first.text)
-        requests.removeFirst().second(TranslationReply("Kapıyı kapat."))
-        assertEquals(Caption("Close the gate.", "Kapıyı kapat."), caption)
     }
 
     @Test
-    fun subtitleIsRemovedWhenSourceDisappears() {
-        session.read(listOf("Follow me."))
-        requests.removeFirst().second(TranslationReply("Beni takip et."))
+    fun anImmediateResultWaitsLongEnoughForPortalToReadThePreviousLine() {
+        val dialogue = session()
+        dialogue.read(listOf("Follow me."), confident = true)
+        answer("Follow me.", "Beni takip et.")
+        dialogue.read(listOf("Go!"), confident = true)
+        answer("Go!", "Git!")
+        now += 500
+        dialogue.tick()
+        assertEquals("Follow me.", caption?.source)
+        assertEquals("Go!", recognized)
+        now += 500
+        dialogue.tick()
+        assertEquals("Go!", caption?.source)
+    }
+
+    @Test
+    fun aDarkSceneLeavesAnAcceptedCueInFlight() {
+        val dialogue = session()
+        dialogue.read(listOf("Follow me."), confident = true)
+        dialogue.blankFrame()
+        assertEquals(0, cancelCount)
+        answer("Follow me.", "Beni takip et.")
         assertEquals("Beni takip et.", caption?.turkish)
-        now += 340
-        session.read(emptyList())
-        now += SubtitleStabilizer.CLEAR_AFTER_MS
-        session.read(emptyList())
+        now += 1000
+        dialogue.tick()
         assertNull(caption)
     }
 
     @Test
-    fun aReturningSubtitleUsesTheCachedTranslation() {
-        session.read(listOf("Follow me."))
-        requests.removeFirst().second(TranslationReply("Beni takip et."))
-        now += 340
-        session.read(emptyList())
-        now += SubtitleStabilizer.CLEAR_AFTER_MS
-        session.read(emptyList())
-        now += 340
-        session.read(listOf("Follow me."))
+    fun returningSubtitleReusesCacheAndAnUninterruptedReadDoesNotDuplicateIt() {
+        val dialogue = session()
+        repeat(5) {
+            dialogue.read(listOf("Follow me."), confident = true)
+            now += 220
+        }
+        assertEquals(1, requests.size)
+        answer("Follow me.", "Beni takip et.")
+        dialogue.read(emptyList())
+        now += 1500
+        dialogue.read(emptyList())
+        assertNull(caption)
+        dialogue.read(listOf("Follow me."), confident = true)
         assertEquals("Beni takip et.", caption?.turkish)
         assertEquals(0, requests.size)
+    }
+
+    @Test
+    fun resetCancelsOnlyTheOldSourceAndWaitsForItsCallbackBeforeSendingTheNext() {
+        val dialogue = session()
+        dialogue.read(listOf("Ready to go?"), confident = true)
+        dialogue.read(listOf("Follow me."), confident = true)
+        dialogue.reset()
+        assertEquals(1, cancelCount)
+        dialogue.read(listOf("Get out."), confident = true)
+        assertEquals(1, requests.size)
+        answer("Ready to go?", "Gitmeye hazır mısın?")
+        assertNull(caption)
+        answer("Get out.", "Dışarı çık.")
+        assertEquals("Dışarı çık.", caption?.turkish)
     }
 
     @Test
     fun stoppedSessionDiscardsAnInFlightTranslation() {
-        session.read(listOf("Ready to go?"))
-        session.close()
-        requests.removeFirst().second(TranslationReply("Gitmeye hazır mısın?"))
+        val dialogue = session()
+        dialogue.read(listOf("Ready to go?"), confident = true)
+        dialogue.close()
+        answer("Ready to go?", "Gitmeye hazır mısın?")
         assertNull(caption)
+        assertEquals(1, cancelCount)
     }
 
     @Test
-    fun menuTextKeepsStableLabelsEvenWhenHudNumbersChange() {
-        val session = CaptionSession(
-            translate = { source, answer -> requests.addLast(source to answer) },
-            show = { caption = it },
-            onFailure = {},
-            readingArea = ReadingArea.GAME_TEXT,
-            stabilizer = SubtitleStabilizer(stableFrames = 1, clock = { now }, exactText = true),
-        )
-        session.read(listOf("Settings", "Exit", "99 HP"))
+    fun translatesEveryStableMenuRowWithoutRetranslatingTheOnesAlreadyShown() {
+        val game = session(ReadingArea.GAME_TEXT)
+        val menu = (1..31).map { "Option $it" }
+        game.read(menu + "99 HP")
         assertEquals(0, requests.size)
-        session.read(listOf("Settings", "Exit", "98 HP"))
-        val first = requests.removeFirst()
-        assertEquals("Settings\nExit", first.first.text)
-        first.second(TranslationReply("Ayarlar\nÇıkış"))
-        assertEquals("Ayarlar\nÇıkış", caption?.turkish)
-
-        session.read(listOf("Settings", "Resume", "97 HP"))
-        val second = requests.removeFirst()
-        assertEquals("Settings", second.first.text)
-        session.read(listOf("Settings", "Resume", "96 HP"))
-        second.second(TranslationReply("Ayarlar"))
-        assertNull(caption)
-        val third = requests.removeFirst()
-        assertEquals("Settings\nResume", third.first.text)
-        third.second(TranslationReply("Ayarlar\nDevam et"))
-        assertEquals("Ayarlar\nDevam et", caption?.turkish)
-    }
-
-    @Test
-    fun clearsThePreviousTranslationWhenTheNewSourceIsConfirmed() {
-        var recognized: String? = null
-        val dialogue = CaptionSession(
-            translate = { input, answer -> requests.addLast(input to answer) },
-            show = { caption = it },
-            onFailure = {},
-            onRead = { recognized = it },
-            stabilizer = SubtitleStabilizer(clock = { now }, acceptCompletedSentence = false, minTextLength = 2),
-        )
-        dialogue.read(listOf("The cops are after us."))
+        game.read(menu + "98 HP")
+        for ((index, row) in menu.withIndex()) {
+            answer(row, "Seçenek ${index + 1}")
+            game.read(menu + "${97 - index} HP")
+        }
+        assertEquals(menu, caption?.source?.lines())
+        assertEquals(31, caption?.turkish?.lines()?.size)
         assertEquals(0, requests.size)
-        now += 340
-        dialogue.read(listOf("The cops are after us."))
-        requests.removeFirst().second(TranslationReply("Polis peşimizde."))
-        val previous = Caption("The cops are after us.", "Polis peşimizde.")
-        assertEquals(previous, caption)
-        now += 340
-        dialogue.read(listOf("Go!"))
-        now += 340
-        dialogue.read(listOf("Go!"))
-        assertNull(caption)
-        assertEquals("Go!", recognized)
-        val next = requests.removeFirst()
-        assertEquals(TranslationInput("Go!"), next.first)
-        next.second(TranslationReply("Bas gaza!"))
-        assertEquals(Caption("Go!", "Bas gaza!"), caption)
+        assertEquals(0, cancelCount)
     }
 
     @Test
-    fun recognizesDifferentNumbersAndQuestionsAcrossSuccessiveSubtitles() {
-        val dialogue = CaptionSession(
-            translate = { input, answer -> requests.addLast(input to answer) },
-            show = { caption = it },
-            onFailure = {},
-            stabilizer = SubtitleStabilizer(clock = { now }, exactText = true),
-        )
+    fun menuChangesKeepSharedRowsAndDoNotPublishThePreviousScreensPendingRow() {
+        val game = session(ReadingArea.GAME_TEXT)
+        repeat(2) { game.read(listOf("Settings", "Exit")) }
+        answer("Settings", "Ayarlar")
+        repeat(2) { game.read(listOf("Settings", "Resume")) }
+        answer("Exit", "Çıkış")
+        assertEquals("Ayarlar", caption?.turkish)
+        answer("Resume", "Oyuna dön")
+        assertEquals("Ayarlar\nOyuna dön", caption?.turkish)
+        assertEquals(0, requests.size)
+    }
+
+    @Test
+    fun uncertainReadsNeedConfirmationAndDifferentNumbersAndQuestionsRemainSeparate() {
+        val dialogue = session()
         for ((source, turkish) in listOf(
             "Do we need 3 more cars?" to "3 araba daha gerekiyor mu?",
             "Do we need 4 more cars?" to "4 araba daha gerekiyor mu?",
@@ -141,13 +175,11 @@ class CaptionSessionTest {
         )) {
             dialogue.read(listOf(source))
             assertEquals(0, requests.size)
-            now += 280
+            now += 220
             dialogue.read(listOf(source))
-            val (input, answer) = requests.removeFirst()
-            assertEquals(source, input.text)
-            answer(TranslationReply(turkish))
+            answer(source, turkish)
             assertEquals(Caption(source, turkish), caption)
-            now += 280
+            now += 1200
         }
     }
 

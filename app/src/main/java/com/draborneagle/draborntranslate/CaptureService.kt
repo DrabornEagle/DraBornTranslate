@@ -35,7 +35,7 @@ class CaptureService : Service() {
     private var source = FrameSource.WAITING
     private var readingArea = ReadingArea.SUBTITLES
     private var epoch = 0
-    @Volatile private var modelReady = false
+    private var modelReady = false
     private var ended = false
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -73,7 +73,7 @@ class CaptureService : Service() {
         main.removeCallbacks(panelTestTick)
         main.removeCallbacks(panelTestTimeout)
         val config = CaptureSettings(
-            intent.getIntExtra(EXTRA_TOP, 65),
+            intent.getIntExtra(EXTRA_TOP, CaptureSettings.DEFAULT_BAND_TOP),
             intent.getIntExtra(EXTRA_SIZE, 22),
             if (intent.getBooleanExtra(EXTRA_MOBILE, false)) Source.MOBILE else Source.PORTAL,
             SubtitleDisplay.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_DISPLAY) }
@@ -116,7 +116,7 @@ class CaptureService : Service() {
         captions = CaptionSession(
             translate = language::translate,
             show = ::showCaption,
-            onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
+            onFailure = ::updateTranslationIssue,
             onRead = { recognized ->
                 if (!ended) {
                     SessionState.update(SessionState.current.copy(recognizedSource = recognized, translationIssue = null))
@@ -128,7 +128,7 @@ class CaptureService : Service() {
         frames = ScreenFrames(
             context = this,
             settings = config,
-            reserveFrame = { modelReady && ocrPending.compareAndSet(false, true) },
+            reserveFrame = { ocrPending.compareAndSet(false, true) },
             discardFrame = { ocrPending.set(false) },
             onFrame = { bitmap -> main.post { recognize(bitmap) } },
             onSource = { value -> main.post { sourceChanged(value) } },
@@ -145,6 +145,7 @@ class CaptureService : Service() {
             modelReady = true
             sourceChanged(source)
             main.post(checkFrames)
+            main.post(captionTick)
         }
         return START_NOT_STICKY
     }
@@ -202,33 +203,42 @@ class CaptureService : Service() {
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
-        reader.read(bitmap) { lines ->
+        reader.read(bitmap) { result ->
             ocrPending.set(false)
             if (ended || frameEpoch != epoch) return@read
-            if (lines == null) {
+            if (result == null) {
                 updateStatus("Yazı tanıma yanıtı alınamadı.")
             } else {
-                updateStatus(when {
-                    lines.isEmpty() -> waitingForText()
-                    readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
-                    else -> "İngilizce altyazı okunuyor."
-                })
-                captions?.read(lines)
+                if (modelReady) {
+                    updateStatus(when {
+                        result.lines.isEmpty() -> waitingForText()
+                        readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
+                        else -> "İngilizce altyazı okunuyor."
+                    })
+                }
+                captions?.read(result.lines, result.confident)
             }
         }
     }
 
     private fun showCaption(caption: Caption?) {
         if (ended) return
-        if (SessionState.current.portalPanel?.previewing != true) publishCaption(caption)
-        voice?.speak(caption?.turkish)
+        val state = SessionState.current
+        if (state.portalPanel?.previewing != true) publishCaption(caption)
+        if (caption != null && caption != state.caption) {
+            val spoken = if (readingArea == ReadingArea.GAME_TEXT) {
+                val previous = state.caption?.turkish?.lines().orEmpty().toSet()
+                caption.turkish.lines().filterNot(previous::contains).joinToString("\n")
+            } else caption.turkish
+            voice?.speak(spoken)
+        }
         try {
             overlay?.show(caption)
         } catch (error: RuntimeException) {
             main.post { finish("Altyazı katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
             return
         }
-        SessionState.update(SessionState.current.copy(caption = caption))
+        SessionState.update(SessionState.current.copy(caption = caption, lastCaption = caption ?: state.lastCaption))
         if (caption != null) updateTranslationIssue(null)
     }
 
@@ -276,10 +286,14 @@ class CaptureService : Service() {
     private fun sourceChanged(value: FrameSource) {
         if (ended) return
         if (source != value) {
+            val previous = source
             source = value
             epoch++
-            if (value != FrameSource.VISIBLE) voice?.pause()
-            captions?.reset()
+            if (value == FrameSource.WAITING) voice?.pause()
+            when {
+                value == FrameSource.WAITING || previous == FrameSource.WAITING -> captions?.reset()
+                value == FrameSource.DARK -> captions?.blankFrame()
+            }
         }
         if (!modelReady) return
         updateStatus(when (value) {
@@ -314,7 +328,7 @@ class CaptureService : Service() {
     private fun finish(message: String) {
         if (ended) return
         ended = true
-        SessionState.update(SessionState.State(status = message))
+        SessionState.update(SessionState.State(status = message, lastCaption = SessionState.current.lastCaption))
         stopSelf()
     }
 
@@ -335,11 +349,12 @@ class CaptureService : Service() {
     override fun onDestroy() {
         if (!ended) {
             ended = true
-            SessionState.update(SessionState.State(status = stopMessage()))
+            SessionState.update(SessionState.State(status = stopMessage(), lastCaption = SessionState.current.lastCaption))
         }
         modelReady = false
         main.removeCallbacks(modelTimeout)
         main.removeCallbacks(checkFrames)
+        main.removeCallbacks(captionTick)
         main.removeCallbacks(panelTestTick)
         main.removeCallbacks(panelTestTimeout)
         main.removeCallbacks(endPanelPreview)
@@ -404,9 +419,17 @@ class CaptureService : Service() {
             if (ended) return
             val arrived = frames?.lastFrameAt ?: 0L
             if (arrived == 0L || SystemClock.elapsedRealtime() - arrived > 5000L) {
-                sourceChanged(FrameSource.WAITING)
+                updateStatus("${sourceName} üzerinde tam ekran oyun görüntüsünü aç.")
             }
             main.postDelayed(this, 1000L)
+        }
+    }
+
+    private val captionTick = object : Runnable {
+        override fun run() {
+            if (ended) return
+            captions?.tick()
+            main.postDelayed(this, 120L)
         }
     }
 

@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
+import android.os.SystemClock
 import com.gametranslator.gametranslator_mobile.core.StabilizerKind
 import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import com.gametranslator.gametranslator_mobile.core.TextMatch
 
 internal data class Caption(val source: String, val turkish: String)
 
-/** Tüm çağrılar ana iş parçacığından gelir. Çevirmene yalnızca en yeni bekleyen satır verilir. */
+/** The OCR reader and translator deliver their results on the main thread. */
 internal class CaptionSession(
     private val translate: (TranslationInput, (TranslationReply) -> Unit) -> Unit,
     private val show: (Caption?) -> Unit,
@@ -15,8 +16,9 @@ internal class CaptionSession(
     private val onRead: (String?) -> Unit = {},
     private val cancelTranslation: () -> Unit = {},
     private val readingArea: ReadingArea = ReadingArea.SUBTITLES,
+    private val clock: () -> Long = SystemClock::elapsedRealtime,
     private val stabilizer: SubtitleStabilizer = SubtitleStabilizer(
-        stableFrames = if (readingArea == ReadingArea.GAME_TEXT) 1 else 2,
+        clock = clock,
         exactText = true,
         acceptCompletedSentence = false,
         minTextLength = 2,
@@ -24,49 +26,112 @@ internal class CaptionSession(
         clearAfterMs = 1400,
     ),
 ) {
-    private data class Request(
-        val number: Int,
-        val source: String,
-        val input: TranslationInput,
-    )
-
-    private val cache = object : LinkedHashMap<TranslationInput, TranslationReply>(128, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TranslationInput, TranslationReply>?): Boolean = size > 128
+    private val cache = object : LinkedHashMap<TranslationInput, String>(128, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<TranslationInput, String>?) = size > 128
     }
-    private var number = 0
-    private var waiting: Request? = null
-    private var busy = false
+    private val dialogue = ArrayDeque<TranslationInput>()
+    private var inFlight: TranslationInput? = null
+    private var generation = 0
     private var closed = false
-    private var previousGameLines = emptySet<String>()
+    private var currentSubtitle: TranslationInput? = null
+    private var readySubtitle: Pair<Caption, String?>? = null
+    private var visibleUntil = 0L
+    private var shown: Caption? = null
+    private var previousRows = emptySet<TranslationInput>()
+    private var screen = emptyList<TranslationInput>()
+    private val screenResults = mutableMapOf<TranslationInput, String?>()
 
-    fun read(lines: List<String>) {
+    fun read(lines: List<String>, confident: Boolean = false) {
         if (closed) return
-        val clean = lines.map(::cleanOcrLine).filter(String::isNotBlank)
-        val accepted = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(clean) else clean
-        val text = accepted.joinToString("\n")
-        val action = stabilizer.feed(text)
+        val clean = lines.map(::cleanOcrLine).filter { it.isNotBlank() && !looksDamaged(it) }
+        val output = shown?.turkish?.lines().orEmpty().map(TextMatch::literal).toSet()
+        val source = clean.filterNot { TextMatch.literal(it) in output }
+
+        if (readingArea == ReadingArea.GAME_TEXT) readScreen(source)
+        else readSubtitle(source.joinToString("\n"), confident && source.size == lines.size)
+        tick()
+    }
+
+    fun tick() {
+        if (closed) return
+        presentSubtitle()
+        translateNext()
+    }
+
+    /** Retain every confirmed short cue long enough for the browser panel to read it. */
+    private fun presentSubtitle() {
+        if (readingArea != ReadingArea.SUBTITLES || clock() < visibleUntil) return
+        val ready = readySubtitle
+        if (ready != null) {
+            readySubtitle = null
+            val (caption, issue) = ready
+            visibleUntil = clock() + (caption.turkish.length * 27L).coerceIn(950L, 2200L)
+            publish(caption)
+            onFailure(issue)
+        } else if (inFlight == null && dialogue.isEmpty() && shown?.source != currentSubtitle?.text) {
+            publish(null)
+        }
+    }
+
+    private fun readSubtitle(text: String, confident: Boolean) {
+        val action = stabilizer.feed(text, confident)
         when (action.kind) {
             StabilizerKind.NONE -> Unit
-            StabilizerKind.CLEAR -> clearCaption()
-            StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
+            StabilizerKind.CLEAR -> clearReadSubtitle()
+            StabilizerKind.RESTORE, StabilizerKind.TRANSLATE -> {
                 val source = action.text ?: return
-                clearCaption(source)
-                val input = TranslationInput(source, readingArea)
-                val cached = cache[input]
-                if (cached != null) {
-                    deliver(source, cached)
-                } else {
-                    waiting = Request(number, source, input)
-                    translateNext()
-                }
+                val input = TranslationInput(source, allowPartial = true)
+                currentSubtitle = input
+                onRead(source)
+                if (shown?.source == source && dialogue.isEmpty() && inFlight == null && readySubtitle == null) return
+                if (input == inFlight || input.text == readySubtitle?.first?.source || input in dialogue) return
+                // A sustained backlog eventually becomes too old to follow the game.
+                if (dialogue.size == MAX_PENDING_SUBTITLES) dialogue.removeFirst()
+                dialogue.addLast(input)
             }
         }
     }
 
+    fun blankFrame() {
+        if (closed) return
+        if (readingArea == ReadingArea.GAME_TEXT) {
+            readScreen(emptyList())
+        } else {
+            stabilizer.reset()
+            clearReadSubtitle()
+        }
+        tick()
+    }
+
+    private fun clearReadSubtitle() {
+        currentSubtitle = null
+        onRead(null)
+    }
+
+    private fun readScreen(lines: List<String>) {
+        val rows = lines.distinctBy(TextMatch::literal).map { TranslationInput(it, ReadingArea.GAME_TEXT) }
+        val stable = rows.filter { it in previousRows || it in screenResults }
+        previousRows = rows.toSet()
+        if (stable == screen) return
+        screen = stable
+        screenResults.keys.retainAll(screen.toSet())
+        onRead(screen.joinToString("\n", transform = TranslationInput::text).ifBlank { null })
+        renderScreen()
+    }
+
     fun reset() {
-        previousGameLines = emptySet()
+        generation++
+        dialogue.clear()
+        currentSubtitle = null
+        readySubtitle = null
+        visibleUntil = 0L
         stabilizer.reset()
-        clearCaption()
+        previousRows = emptySet()
+        screen = emptyList()
+        screenResults.clear()
+        if (inFlight != null) cancelTranslation()
+        publish(null)
+        onRead(null)
     }
 
     fun close() {
@@ -75,51 +140,65 @@ internal class CaptionSession(
         cache.clear()
     }
 
-    private fun steadyGameText(lines: List<String>): List<String> {
-        val current = lines.associateBy(TextMatch::literal).filterKeys { it.length >= 2 }
-        val steady = current.filterKeys(previousGameLines::contains).values.take(6)
-        previousGameLines = current.keys
-        return steady
-    }
-
-    private fun clearCaption(source: String? = null) {
-        number++
-        waiting = null
-        if (busy) cancelTranslation()
-        show(null)
-        onRead(source)
+    private fun nextInput(): TranslationInput? = when (readingArea) {
+        ReadingArea.SUBTITLES -> dialogue.removeFirstOrNull()
+        ReadingArea.GAME_TEXT -> screen.firstOrNull { it !in screenResults }
     }
 
     private fun translateNext() {
-        if (busy || closed) return
-        val request = waiting ?: return
-        waiting = null
-        busy = true
-        translate(request.input) { reply ->
-            busy = false
-            if (!closed) {
-                val turkish = reply.text?.trim()?.takeIf(String::isNotEmpty)
-                if (turkish != null) cache[request.input] = reply
-                if (request.number == number) {
-                    if (turkish == null) {
-                        stabilizer.forgetSent()
-                        show(null)
-                        onFailure(reply.issue)
-                    } else {
-                        deliver(request.source, reply)
+        if (closed || inFlight != null || readySubtitle != null) return
+        while (true) {
+            val input = nextInput() ?: return
+            val cached = cache[input]
+            if (cached == null) {
+                val started = generation
+                inFlight = input
+                translate(input) { reply ->
+                    inFlight = null
+                    if (started == generation && !closed) {
+                        val turkish = reply.text?.trim()?.takeIf(String::isNotBlank)
+                        if (turkish != null && reply.issue == null) cache[input] = turkish
+                        accept(input, turkish, reply.issue)
                     }
+                    tick()
                 }
-                translateNext()
+                return
             }
+            accept(input, cached, null)
+            presentSubtitle()
+            if (readySubtitle != null) return
         }
     }
 
-    private fun deliver(source: String, reply: TranslationReply) {
-        val turkish = reply.text?.trim() ?: return
-        val changed = !TextMatch.literal(source).equals(TextMatch.literal(turkish), ignoreCase = true)
-        val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(turkish) else turkish
-        if (changed) show(Caption(source, displayed))
-        else show(null)
+    private fun accept(input: TranslationInput, turkish: String?, issue: String?) {
+        val changed = turkish?.takeUnless { TextMatch.literal(input.text).equals(TextMatch.literal(it), ignoreCase = true) }
+        if (readingArea == ReadingArea.GAME_TEXT) {
+            if (input !in screen) return
+            screenResults[input] = changed
+            renderScreen()
+            if (turkish == null) onFailure(issue ?: "Bu oyun satırı çevrilemedi.")
+        } else if (changed != null) {
+            readySubtitle = Caption(input.text, formatDialogue(changed)) to issue
+        } else if (turkish == null && (currentSubtitle == input || dialogue.isEmpty())) {
+            onFailure(issue ?: "Bu replik çevrilemedi.")
+        }
+    }
+
+    private fun renderScreen() {
+        val translated = screen.mapNotNull { input -> screenResults[input]?.let { input.text to it } }
+        publish(translated.takeIf { it.isNotEmpty() }?.let { rows ->
+            Caption(rows.joinToString("\n") { it.first }, rows.joinToString("\n") { it.second })
+        })
+    }
+
+    private fun publish(caption: Caption?) {
+        if (shown == caption) return
+        shown = caption
+        show(caption)
+    }
+
+    private companion object {
+        const val MAX_PENDING_SUBTITLES = 16
     }
 }
 
