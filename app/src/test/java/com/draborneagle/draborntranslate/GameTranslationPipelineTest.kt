@@ -175,6 +175,13 @@ class GameTranslationPipelineTest {
             Triple("Didn't you see him?", "I did.", "I did see him."),
             Triple("Can you wait for me at the dock?", "I can.", "I can wait at the dock."),
             Triple("The gate's supposed to be locked.", "It isn't.", "It isn't locked."),
+            Triple("Did you check the trunk?", "I haven't yet.", "I haven't checked the trunk yet."),
+            Triple("Did you call her?", "I would've, but my phone was dead.", "I would've called her, but my phone was dead."),
+            Triple("Can you get me a spare key?", "I could, but it'll take a while.", "I could get a spare key, but it'll take a while."),
+            Triple("Does Lucia know where we're going?", "She should by now.", "She should know the destination by now."),
+            Triple("Somebody was supposed to keep watch while I was gone.", "I was.", "I was supposed to keep watch."),
+            Triple("Did you call the tow truck?", "Jason did.", "Jason did call the tow truck."),
+            Triple("Did the driver show you a receipt?", "He would've, but he lost it.", "He would've shown a receipt, but he lost it."),
         )
         for ((prior, reply, expected) in cases) {
             assertEquals(expected, DialogueContext.expand(reply, prior))
@@ -183,6 +190,42 @@ class GameTranslationPipelineTest {
         assertEquals("Not anymore.", DialogueContext.expand("Not anymore.", "Are they awake?"))
         assertEquals("So am I.", DialogueContext.expand("So am I.", "The door is locked."))
         assertEquals("He said she was.", DialogueContext.expand("He said she was.", "Is Lucia coming?"))
+    }
+
+    @Test
+    fun contextSelectsTheIntendedMeaningOfFumes() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "I'm almost out of gas." -> "Benzinim bitmek üzere."
+                "I'm exhausted." -> "Bitmek üzereyim."
+                "Is there a gas station up ahead?" -> "İleride benzin istasyonu var mı?"
+                else -> error(text)
+            }
+        })
+        assertEquals(
+            "Benzinim bitmek üzere. İleride benzin istasyonu var mı?",
+            pipeline.translate(TranslationInput("I'm running on fumes. Is there a gas station up ahead?")).text,
+        )
+        assertEquals(
+            "Bitmek üzereyim.",
+            pipeline.translate(TranslationInput("I'm running on fumes.", previousSubtitle = "I've been up since four.")).text,
+        )
+    }
+
+    @Test
+    fun americanIdiomsPreserveNegationAndLiteralPhrasing() {
+        val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
+            when (text) {
+                "Don't press the gas pedal hard until we leave the lot." -> "Otoparktan çıkana kadar gaza basma."
+                "Put the cup on the side." -> "Bardağı kenara koy."
+                "Stand up front." -> "Önde dur."
+                else -> error(text)
+            }
+        })
+        assertEquals(
+            "Otoparktan çıkana kadar gaza basma. Bardağı kenara koy. Önde dur.",
+            pipeline.translate(TranslationInput("Don't floor it until we leave the lot. Put the cup on the side. Stand up front.")).text,
+        )
     }
 
     @Test

@@ -21,6 +21,7 @@ internal class CaptionSession(
         acceptCompletedSentence = false,
         minTextLength = 2,
     ),
+    private val contextClock: () -> Long = { System.nanoTime() / 1_000_000L },
 ) {
     private data class Request(
         val number: Int,
@@ -37,6 +38,7 @@ internal class CaptionSession(
     private var closed = false
     private var previousGameLines = emptySet<String>()
     private var previousSubtitle: TranslationInput? = null
+    private var previousSubtitleAt = 0L
 
     fun read(lines: List<String>) {
         if (closed) return
@@ -48,11 +50,10 @@ internal class CaptionSession(
         val text = clean.filter(String::isNotBlank).joinToString("\n")
         val action = stabilizer.feed(text)
         when (action.kind) {
-            StabilizerKind.NONE -> Unit
-            StabilizerKind.CLEAR -> {
-                previousSubtitle = null
-                clearCaption()
+            StabilizerKind.NONE -> {
+                if (text == previousSubtitle?.text) previousSubtitleAt = contextClock()
             }
+            StabilizerKind.CLEAR -> clearCaption()
             StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
                 val source = action.text ?: return
                 clearCaption(hide = readingArea == ReadingArea.GAME_TEXT)
@@ -90,13 +91,15 @@ internal class CaptionSession(
 
     private fun subtitleInput(source: String, kind: StabilizerKind): TranslationInput {
         if (readingArea == ReadingArea.GAME_TEXT) return TranslationInput(source, readingArea)
-        val previous = previousSubtitle
+        val now = contextClock()
+        val previous = previousSubtitle?.takeIf { now - previousSubtitleAt <= CONTEXT_WINDOW_MS }
         val restored = if (kind == StabilizerKind.RESTORE) cache.keys.lastOrNull { it.text == source } else null
         val input = restored ?: previous?.takeIf { it.text == source } ?: TranslationInput(
             text = source,
             previousSubtitle = previous?.text?.takeIf { DialogueContext.mightNeedPrevious(source) },
         )
         previousSubtitle = input
+        previousSubtitleAt = now
         return input
     }
 
@@ -137,6 +140,11 @@ internal class CaptionSession(
         val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(turkish) else turkish
         if (changed) show(Caption(source, displayed))
         else show(null)
+    }
+
+    private companion object {
+        // Keep nearby dialogue through a normal pause, then discard the old topic.
+        const val CONTEXT_WINDOW_MS = 6_000L
     }
 }
 

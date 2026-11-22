@@ -183,6 +183,41 @@ class CaptionSessionTest {
         assertEquals("Don't turn left at the light.", OcrNoise.clean("Don't turn Ieft at the light."))
         assertEquals("5 More cars are coming.", OcrNoise.clean("5 More cars are coming."))
         assertEquals("Open the gate now.", OcrNoise.clean("9? Open the gate now."))
+        assertEquals("We don't need to take Exit 23B off I-95.", OcrNoise.clean("We do n ' t need to take Exit 23B off I-95."))
+        assertEquals("He's not here. I didn't see him.", OcrNoise.clean("He ’ s not here. I didnt see him."))
+        assertEquals("DON'T DRIVE.", OcrNoise.clean("DO N T DRIVE."))
+    }
+
+    @Test
+    fun aShortPauseKeepsThePreviousQuestionAndALongPauseDropsIt() {
+        val dialogue = CaptionSession(
+            translate = { input, answer -> requests.addLast(input to answer) },
+            show = { caption = it },
+            onFailure = {},
+            stabilizer = SubtitleStabilizer(clock = { now }, minTextLength = 2),
+            contextClock = { now },
+        )
+        val question = "Did you check the trunk for the keys?"
+        val answer = "I haven't yet."
+        dialogue.read(listOf(question))
+        requests.removeFirst().second(TranslationReply("Bagaja baktın mı?"))
+        now += 300
+        dialogue.read(emptyList())
+        now += SubtitleStabilizer.CLEAR_AFTER_MS
+        dialogue.read(emptyList())
+        assertNull(caption)
+        dialogue.read(listOf(answer))
+        val shortPause = requests.removeFirst()
+        assertEquals(TranslationInput(answer, previousSubtitle = question), shortPause.first)
+        shortPause.second(TranslationReply("Henüz bakmadım."))
+        now += 300
+        dialogue.read(emptyList())
+        now += SubtitleStabilizer.CLEAR_AFTER_MS
+        dialogue.read(emptyList())
+        now += 7_000
+        dialogue.read(emptyList())
+        dialogue.read(listOf(answer))
+        assertEquals(TranslationInput(answer), requests.removeFirst().first)
     }
 
     @Test

@@ -6,8 +6,8 @@
 <p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı</strong></p>
 <p align="center">DrabornEagle ekosisteminin Android canlı oyun çevirisi uygulaması.</p>
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.10/DraBornTranslate-v0.4.10-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
-  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.10">Sürüm notları</a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.11/DraBornTranslate-v0.4.11-Android-arm64.apk"><strong>↓ İmzalı APK’yı indir</strong></a>
+  · <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.11">Sürüm notları</a>
   · <a href="docs/KURULUM.md">Kurulum rehberi</a>
 </p>
 
@@ -15,7 +15,7 @@
 
 | Güncel sürüm | Cihaz | Çeviri |
 | --- | --- | --- |
-| **v0.4.10** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
+| **v0.4.11** | Android 10 ve üzeri, ARM64 | Türkçe, çevrimdışı ve ücretsiz |
 
 1. İmzalı APK’yı indirip Android telefonuna kur. Önceki sürüm aynı imzayı taşıyorsa üzerine kurabilirsin.
 2. Çeviri modeli APK’ya dahildir ve telefonda çevrimdışı çalışır.
@@ -34,11 +34,11 @@ Sağ üstteki üç noktadan **Hakkında** penceresini aç ve **Yeni sürüm kont
 
 PS Portal için sürmekte olan oyun görüntüsünü **PlayStation App** üzerinden Android telefonda aç ve **Canlı çeviriyi başlat** seçeneğine dokun. Türkçe çeviri telefon ekranında, Türkçe ses olarak veya deneysel Portal yan panelinde gösterilebilir. PlayStation App, yayın ve panel adımları [kurulum rehberinde](docs/KURULUM.md) yer alıyor.
 
-## v0.4.10’da neler değişti?
+## v0.4.11’de neler değişti?
 
-- Üç nokta doğrudan Hakkında penceresini açıyor. En güncel sürüm yüklüyse ayrı bir bilgilendirme penceresi gösteriliyor.
-- Portal bağlantısı düğmeleri, paneli açma kılavuzu ve uzak PS5 kurulumu yenilendi.
-- Konuşma deyimleri, görev talimatları ve önceki soruya bağlı kısa yanıtlar için Türkçe çeviri iyileştirildi.
+- Amerikan İngilizcesindeki günlük konuşma, argo ve sürüş komutları anlamına göre Türkçeye çevriliyor.
+- Kısa yanıtların anlamı yakın repliklerle tamamlanıyor. Bağlam kısa bir altyazı boşluğunda korunuyor.
+- Ekran okumasında bölünen olumsuzluklar, yol adları ve çıkış kodları için düzeltmeler yapıldı.
 
 ## DrabornEagle kaynak kodu
 

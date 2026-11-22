@@ -63,15 +63,19 @@ internal class GameTranslationPipeline(
         if (pieces.none { it.translate }) return null
         return buildString {
             var previous = previousSentence
-            for (piece in pieces) {
+            for ((index, piece) in pieces.withIndex()) {
                 if (!piece.translate) {
                     append(piece.text)
                     continue
                 }
                 val source = piece.text
                 val direct = PackKey.key(source)?.let(commonLines::get)?.takeIf { preservesQuestion(source, it) }
-                val translation = findPack(source) ?: direct ?: shortAnswer(source, previous)
-                    ?: translateSentence(DialogueContext.expand(resolveDirection(source, previous), previous))
+                val translation = findPack(source) ?: direct ?: shortAnswer(source, previous) ?: run {
+                    val following = if (AmericanDialogue.needsContext(source)) {
+                        pieces.asSequence().drop(index + 1).firstOrNull { it.translate }?.text
+                    } else null
+                    translateSentence(DialogueContext.expand(resolveDirection(source, previous), previous), previous, following)
+                }
                 if (translation.isNullOrBlank()) return null
                 append(translation)
                 previous = source
@@ -79,9 +83,9 @@ internal class GameTranslationPipeline(
         }.trim().takeIf(String::isNotEmpty)
     }
 
-    private fun translateSentence(source: String): String? {
+    private fun translateSentence(source: String, previous: String?, following: String?): String? {
         val sentence = SubtitleSegmenter.normalizeCase(source, knownNames).replace('’', '\'')
-        val normalized = numberedDock.replace(normalizeTime(sentence)) { match ->
+        val normalized = numberedDock.replace(normalizeTime(AmericanDialogue.normalize(sentence, previous, following))) { match ->
             val article = if (match.range.first == 0) "The" else "the"
             "$article pier numbered ${match.groupValues[1]}"
         }
@@ -159,6 +163,7 @@ private val GAME_TERMS = Glossary.of(
         "health bar" to "can çubuğu",
         "title screen" to "başlangıç ekranı",
         "glove compartment" to "torpido gözü",
+        "glove box" to "torpido gözü",
         "call button" to "çağrı düğmesi",
         "hideout" to "sığınak",
         "the lookout" to "gözcü",
@@ -176,6 +181,8 @@ private val commonLines = mapOf(
     "Take your time." to "Acele etme.",
     "Not everyone made it out." to "Bazıları dışarı çıkamadı.",
     "Get in the car!" to "Arabaya bin!",
+    "Floor it!" to "Gaza bas!",
+    "Don't floor it." to "Gaza yüklenme.",
     "Stay out of sight." to "Görünme.",
     "Hold your fire!" to "Ateş etme!",
     "Keep your head down." to "Başını kaldırma.",
@@ -202,6 +209,11 @@ private val commonLines = mapOf(
     "There has to be a catch." to "Bu işte bir bit yeniği olmalı.",
     "Need a ride?" to "Seni bırakayım mı?",
     "Want a ride?" to "Seni bırakayım mı?",
+    "Spill it." to "Anlat hadi.",
+    "That tracks." to "Mantıklı.",
+    "Don't fall for that." to "Buna kanma.",
+    "Don't beat around the bush." to "Lafı dolandırma.",
+    "We're square." to "Ödeştik.",
     "I don't buy it." to "Buna inanmıyorum.",
     "I'm not buying it." to "Buna inanmıyorum.",
     "Keep still." to "Kıpırdama.",
@@ -423,7 +435,7 @@ private val idioms = listOf(
         },
     Regex("""\bgive (me|you|him|her|us|them) the benefit of the doubt\b""", RegexOption.IGNORE_CASE) to
         { match: MatchResult -> "trust ${match.groupValues[1]} for now" },
-    Regex("""\bin over (my|your|his|her|our|their) heads?\b""", RegexOption.IGNORE_CASE) to
+    Regex("""\bin (?:way )?over (my|your|his|her|our|their) heads?\b""", RegexOption.IGNORE_CASE) to
         { match: MatchResult -> "in a situation too difficult for " + objectPronouns.getValue(match.groupValues[1].lowercase(Locale.ROOT)) },
     Regex("""\blet (me|you|him|her|us|them) off the hook this time\b""", RegexOption.IGNORE_CASE) to
         { match: MatchResult -> "let ${match.groupValues[1]} go without punishment this time" },

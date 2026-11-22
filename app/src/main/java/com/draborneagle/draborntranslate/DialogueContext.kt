@@ -10,23 +10,26 @@ internal object DialogueContext {
     private const val AUXILIARY = "do|does|did|can|could|will|would|am|is|are|was|were|have|has|had"
     private const val NEGATIVE = "don't|doesn't|didn't|can't|couldn't|won't|wouldn't|isn't|aren't|wasn't|weren't|haven't|hasn't|hadn't"
     private const val STATES = "open|closed|locked|unlocked|ready|empty|safe|broken|blocked|gone|awake|all right|on|off"
+    private const val PERSON_ROLE = "the (?:driver|owner|guard|mechanic|clerk|bartender|manager|passenger)"
     private val answer = Regex(
         """((?:yes|no),? )?($PRONOUN) ($AUXILIARY|$NEGATIVE)(?:,? ((?:until|before) .+?))?([.!]?)""",
         RegexOption.IGNORE_CASE,
     )
-    private val question = Regex("""($AUXILIARY|$NEGATIVE) ($PRONOUN) (.+)\?""", RegexOption.IGNORE_CASE)
+    private val question = Regex("""($AUXILIARY|$NEGATIVE) ($PRONOUN|(?-i:$NAME)|$PERSON_ROLE) (.+)\?""", RegexOption.IGNORE_CASE)
     private val negativeAuxiliary = Regex(NEGATIVE, RegexOption.IGNORE_CASE)
     private val stateQuestion = Regex(
         """is (it|he|she|(?:the|that|this) (?:[a-z-]+ ){0,3}[a-z-]+) ($STATES)\?""",
         RegexOption.IGNORE_CASE,
     )
     private val neither = Regex("""neither (do|does|did|can|could|have|has|had) ($PRONOUN)([.!]?)""", RegexOption.IGNORE_CASE)
-    private val negativeStatement = Regex("""(?:$PRONOUN) ($NEGATIVE) (.+)""", RegexOption.IGNORE_CASE)
+    private val negativeStatement = Regex("""(?:$PRONOUN) (?:still )?($NEGATIVE) (.+)""", RegexOption.IGNORE_CASE)
     private val state = Regex(
         """\b(?:am|is|are|was|were) ($STATES|going to .+|the one who .+)$""",
         RegexOption.IGNORE_CASE,
     )
     private val expectedState = Regex("""\b(?:is|are|'s) (?:supposed|meant) to be ($STATES)$""", RegexOption.IGNORE_CASE)
+    private val expectedAction = Regex("""\b(?:am|is|are|was|were) ((?:supposed|meant) to .+)$""", RegexOption.IGNORE_CASE)
+    private val subordinateClause = Regex("""\b(?:while|because|after|before|until|when|if|although)\b""", RegexOption.IGNORE_CASE)
     private val statedObject = Regex(
         """\b(?:the|a|an|this|that) ((?:[a-z-]+ ){0,2}[a-z-]+) (?:is|was) ($STATES)$""",
         RegexOption.IGNORE_CASE,
@@ -38,6 +41,12 @@ internal object DialogueContext {
     private val standalone = Regex("""\bon your own$""", RegexOption.IGNORE_CASE)
     private val reportedDetail = Regex("""(tell (?:him|her|them)) (?:where|what|when|why|how) .+""", RegexOption.IGNORE_CASE)
     private val waitForSpeaker = Regex("""wait for me((?: (?:at|by|near|outside) .+)?)""", RegexOption.IGNORE_CASE)
+    private val requestObject = Regex("""(get|find|bring|make) (?:me|us) ((?:the|a|an|some) .+)""", RegexOption.IGNORE_CASE)
+    private val showedObject = Regex("""show (?:me|you|us) ((?:the|a|an|some) .+)""", RegexOption.IGNORE_CASE)
+    private val modalAnswer = Regex(
+        """($PRONOUN) (would've|would have|haven't|hasn't|could|should)( yet| by now)?(, but .+?)?([.!]?)""",
+        RegexOption.IGNORE_CASE,
+    )
     private val handledObject = Regex("""(open|close|lock|unlock) the (?:safe|door|gate|window)""", RegexOption.IGNORE_CASE)
     private val shortResponse = Regex("""(not yet|already did|not anymore|i will be|so am i)([.!]?)""", RegexOption.IGNORE_CASE)
     private val alignedBelief = Regex("""i (thought|figured|assumed|expected) (.+)""", RegexOption.IGNORE_CASE)
@@ -54,13 +63,15 @@ internal object DialogueContext {
         "take" to "taken", "see" to "seen", "leave" to "left", "go" to "gone", "put" to "put",
         "drive" to "driven", "get" to "gotten", "call" to "called", "lock" to "locked", "open" to "opened",
         "tell" to "told", "break" to "broken", "hear" to "heard", "read" to "read", "send" to "sent",
+        "check" to "checked", "find" to "found", "bring" to "brought", "pick" to "picked", "show" to "shown",
     )
 
     fun mightNeedPrevious(text: String): Boolean {
         val first = SubtitleSegmenter.split(text).firstOrNull { it.translate }?.text?.replace('’', '\'') ?: return false
         return answer.matches(first) || neither.matches(first) || shortResponse.matches(first) ||
             matchingBelief.matches(first) || mustHave.matches(first) || reportedAction.matches(first) ||
-            namedAnswer.matches(first) || stateReference.containsMatchIn(first) ||
+            namedAnswer.matches(first) || modalAnswer.matches(first) || stateReference.containsMatchIn(first) ||
+            AmericanDialogue.needsContext(first) ||
             refersToPreviousPassage(first)
     }
 
@@ -96,8 +107,8 @@ internal object DialogueContext {
         val auxiliaryFamily = family(auxiliary)
         val complement = when {
             precedingQuestion != null && family(precedingQuestion.groupValues[1]) == auxiliaryFamily -> precedingQuestion.groupValues[3]
-            precedingQuestion == null && (auxiliaryFamily == "be" || auxiliaryFamily == "past be") ->
-                (state.find(priorBody) ?: expectedState.find(priorBody))?.groupValues?.get(1)
+            precedingQuestion == null && !prior.endsWith('?') && auxiliaryFamily in listOf("be", "past be") ->
+                statementComplement(priorBody)
             else -> null
         }?.let(::retainAction) ?: return text
         val tail = if (condition.isEmpty()) "" else " $condition"
@@ -109,7 +120,27 @@ internal object DialogueContext {
         return "$prefix$subject $auxiliary $action$tail$ending"
     }
 
+    private fun statementComplement(statement: String): String? {
+        val primary = subordinateClause.find(statement)?.let { statement.substring(0, it.range.first).trimEnd(' ', ',') } ?: statement
+        return (state.find(primary) ?: expectedState.find(primary) ?: expectedAction.find(primary))?.groupValues?.get(1)
+    }
+
     private fun expandShortResponse(source: String, prior: String, question: MatchResult?): String? {
+        modalAnswer.matchEntire(source)?.destructured?.let { (subject, auxiliary, timing, tail, ending) ->
+            val (askedAuxiliary, _, action) = question?.destructured ?: return null
+            val complement = retainAction(action) ?: return null
+            val askedFamily = family(askedAuxiliary)
+            val modal = auxiliary.lowercase(Locale.ROOT)
+            val actionTaken = when {
+                modal in listOf("would've", "would have") && askedFamily == "did" -> asParticiple(complement)
+                modal in listOf("haven't", "hasn't") && askedFamily == "did" -> asParticiple(complement)
+                modal in listOf("haven't", "hasn't") && askedFamily == "have" -> complement
+                modal == "could" && askedFamily in listOf("can", "could") -> complement
+                modal == "should" && askedFamily == "do" && timing.equals(" by now", ignoreCase = true) -> complement
+                else -> null
+            } ?: return null
+            return "$subject $auxiliary $actionTaken$timing$tail$ending"
+        }
         reportedAction.matchEntire(source)?.destructured?.let { (speaker, subject, auxiliary, ending) ->
             val (askedSubject, action) = ongoingActionQuestion.matchEntire(prior)?.destructured ?: return null
             if (!speaker.equals(subject, ignoreCase = true)) return null
@@ -150,8 +181,10 @@ internal object DialogueContext {
             }
         }
         namedAnswer.matchEntire(source)?.destructured?.let { (name, ending) ->
-            val action = actionQuestion.matchEntire(prior)?.groupValues?.get(1) ?: return null
-            return retainAction(action)?.let { "$name $it$ending" }
+            val who = actionQuestion.matchEntire(prior)?.groupValues?.get(1)
+            if (who != null) return retainAction(who)?.let { "$name $it$ending" }
+            val action = question?.takeIf { family(it.groupValues[1]) == "did" }?.groupValues?.get(3)
+            return action?.let(::retainAction)?.let { "$name did $it$ending" }
         }
         matchingBelief.matchEntire(source)?.let { response ->
             val (verb, action) = alignedBelief.matchEntire(prior.trimEnd('.', '!'))?.destructured ?: return null
@@ -161,17 +194,31 @@ internal object DialogueContext {
             val (auxiliary, askedSubject, action) = question?.destructured ?: return null
             if (!auxiliary.equals("did", ignoreCase = true) || !subject.equals(askedSubject, ignoreCase = true)) return null
             val complement = retainAction(action) ?: return null
-            val verb = complement.substringBefore(' ')
-            val participle = pastParticiples[verb.lowercase(Locale.ROOT)] ?: return null
-            return "$subject must have $participle${complement.removePrefix(verb)}$ending"
+            val participle = asParticiple(complement) ?: return null
+            return "$subject must have $participle$ending"
         }
         return null
+    }
+
+    private fun asParticiple(action: String): String? {
+        val verb = action.substringBefore(' ')
+        val participle = pastParticiples[verb.lowercase(Locale.ROOT)] ?: return null
+        return participle + action.removePrefix(verb)
     }
 
     private fun retainAction(action: String): String? {
         // Drop a viewpoint-dependent modifier only when the shared event/person remains unambiguous.
         if (standalone.containsMatchIn(action)) return standalone.replace(action, "alone").takeUnless(speakerDependent::containsMatchIn)
         waitForSpeaker.matchEntire(action)?.let { return "wait${it.groupValues[1]}" }
+        requestObject.matchEntire(action)?.destructured?.let { (verb, value) ->
+            return "$verb $value".takeUnless(speakerDependent::containsMatchIn)
+        }
+        showedObject.matchEntire(action)?.let {
+            return ("show " + it.groupValues[1]).takeUnless(speakerDependent::containsMatchIn)
+        }
+        if (action.equals("know where we're going", ignoreCase = true) || action.equals("know where we are going", ignoreCase = true)) {
+            return "know the destination"
+        }
         observedEvent.matchEntire(action)?.let { return "${it.groupValues[1]} what happened" }
         observedPerson.matchEntire(action)?.destructured?.let { (verb, relative) ->
             val person = when (relative.lowercase(Locale.ROOT)) {

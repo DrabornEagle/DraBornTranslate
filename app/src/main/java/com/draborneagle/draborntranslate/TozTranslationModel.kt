@@ -156,7 +156,7 @@ internal class TozTranslationModel(model: File) : TextTranslator, AutoCloseable 
         private const val EOS = 3
         private const val MAX_INPUT_TOKENS = 254
         private const val VOCABULARY = 32_000
-        private val numberOrCode = Regex("""(?<![\p{L}\d])([a-z]{1,4}\d+|\d+(?:[.,:]\d+)*)(?:st|nd|rd|th)?(?![\p{L}\d])""", RegexOption.IGNORE_CASE)
+        private val numberOrCode = Regex("""(?<![\p{L}\d])((?i:[a-z]{1,4}-?\d+)|\d+[A-Z]|\d+(?:[.,:]\d+)*)(?i:st|nd|rd|th)?(?![\p{L}\d])""")
 
         private fun numberFacts(text: String): List<String> = numberOrCode.findAll(text).map { match ->
             match.groupValues[1].lowercase(Locale.ROOT).filter(Char::isLetterOrDigit).trimStart('0').ifEmpty { "0" }
