@@ -21,7 +21,22 @@
 
 ---
 
-## 🚀 v0.7.0 · Cloud Gaming Translate (PS Portal bulut oyunları)
+## 🚀 v0.7.1 · Cloud Translate Studio — Yatay/Dikey Kamera + Mikrofon
+
+PS Portal'ın bulut oyun görüntüsüne doğrudan erişim yok; ancak DraBornTranslate artık **kamerasız yalnızca ses**, **kamera + seçilebilir Lens**, veya **ses + kamera birlikte** seçenekleri sunar.
+
+- **Yeni CameraX önizlemesi:** Yatay/dikey sensör dönüşümü otomatik, `FIT_CENTER` ile görüntü gerilmeden/kırpılmadan gösterilir.
+- **Alan düzenleme:** Mavi konuşma ve yeşil oyun mesajı bölgelerini parmakla sürükle, dört köşeden yeniden boyutlandır, yüzde kaydırıcılarıyla tam 2D ayarla.
+- **Sadece ses:** Portal hoparlöründeki İngilizce konuşmayı telefon mikrofonundan oku; Türkçe altyazıyı telefonda göster. Kamera izni gerekmez.
+- **Ses + kamera:** Konuşma mikrofonla, sessiz telefon mesajı ve görev kartları kamera OCR ile aynı anda çevrilir.
+- **Önce cihaz içi tanıma:** Telefon desteklemezse sistem tanıma hizmetine ancak açık izin vererek geçilir; bu sesleri harici sağlayıcıya gönderebilir.
+- **Tekrar indirme gerekmez:** Yüklü GTA 6 Türkçe paketi ve kişisel düzeltmeler kullanılmaya devam eder.
+
+[V0.7.1 tüm kullanım adımları, açık kaynak araştırması ve sınırlar](docs/RELEASE-v0.7.1.md). Kamera dışında da çeviri almak için **🎙 Ses** modunu kullan.
+
+### Önceki v0.7.0 Cloud Camera
+
+
 
 PS Portal Cloud Streaming'de Sony'nin belgelenmiş canlı Share Screen desteği bulunmadığı için, oyunu buluttan oynarken telefon kamerasıyla Türkçe çeviren yeni mod geliştirildi.
 
@@ -62,7 +77,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.7.0` / `versionCode 5` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.7.1` / `versionCode 6` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
