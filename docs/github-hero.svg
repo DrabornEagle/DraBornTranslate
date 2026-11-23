@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="DraBornTranslate: Live game translation, Lens, offline translation and instant Turkish game packs">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#130E39"/><stop offset=".45" stop-color="#252076"/><stop offset="1" stop-color="#063A56"/></linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#EA80FC"/><stop offset=".48" stop-color="#79E5FF"/><stop offset="1" stop-color="#74F7D4"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="34"/></filter>
+</defs>
+<rect width="1200" height="360" rx="28" fill="url(#bg)"/>
+<circle cx="1040" cy="50" r="160" fill="#44DFFF" opacity=".16" filter="url(#glow)"/>
+<circle cx="260" cy="360" r="160" fill="#F055FF" opacity=".13" filter="url(#glow)"/>
+<g opacity=".14" stroke="#C3CDFF"><path d="M0 305H1200M0 235H1200M0 165H1200M0 95H1200"/><path d="M150 0V360M300 0V360M450 0V360M600 0V360M750 0V360M900 0V360M1050 0V360"/></g>
+<rect x="61" y="52" width="69" height="69" rx="21" stroke="#83EFFF" stroke-width="3" fill="#0E244B"/>
+<g stroke="#85F2FF" stroke-width="4" stroke-linecap="round"><path d="M80 84h34M97 67v34"/><path d="M80 102l-6 9M116 102l6 9"/></g>
+<text x="155" y="85" fill="#FFFFFF" font-family="Arial,sans-serif" font-size="46" font-weight="800">DraBorn<tspan fill="#80E5FF">Translate</tspan></text>
+<text x="156" y="121" fill="#CEDAF7" font-family="Arial,sans-serif" font-size="19" letter-spacing="2">GAME TRANSLATION • PLAYSTATION • ANDROID</text>
+<text x="68" y="201" fill="#FFFFFF" font-family="Arial,sans-serif" font-size="33" font-weight="700">Oyun ekranında gerçek zamanlı Türkçe.</text>
+<text x="68" y="246" fill="#C7D7F6" font-family="Arial,sans-serif" font-size="22">Lens OCR  ·  Cihazda çeviri  ·  Hazır oyun paketleri</text>
+<rect x="62" y="285" width="224" height="42" rx="21" fill="#36286C" stroke="#BC9EFF"/><text x="174" y="313" fill="#F6DBFF" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700">LENS MODE</text>
+<rect x="303" y="285" width="235" height="42" rx="21" fill="#133B59" stroke="#79E5FF"/><text x="420" y="313" fill="#C7F6FF" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700">OFFLINE AI</text>
+<rect x="555" y="285" width="250" height="42" rx="21" fill="#13473C" stroke="#74F7D4"/><text x="680" y="313" fill="#C5FFE8" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700">PACK-FIRST</text>
+<g transform="translate(905,135)">
+  <rect width="218" height="119" rx="17" fill="#10162D" stroke="#7ADAF4" stroke-width="2"/>
+  <text x="109" y="40" text-anchor="middle" fill="#93AEE3" font-family="Arial,sans-serif" font-size="14">MISSION OBJECTIVE</text>
+  <rect x="17" y="52" width="184" height="44" rx="10" fill="#20777A"/>
+  <text x="109" y="80" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-size="17" font-weight="700">Görevi tamamla</text>
+</g>
+<rect x="61" y="338" width="1078" height="4" rx="2" fill="url(#accent)"/>
+</svg>

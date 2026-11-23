@@ -376,6 +376,8 @@ class MainActivity : Activity() {
         packButton.text = when {
             packLoading -> "Oyun paketi yükleniyor…"
             ImportedGamePack.hasPack(this) -> "Oyun paketi · ${prefs.getString("packTitle", "Yüklü")}"
+            Gta6PackInstaller.isInstalled(this) -> "GTA 6 · " +
+                (Gta6PackInstaller.installedInfo(this)?.entries?.toString() ?: "Yüklü") + " satır"
             else -> "Oyun paketi ekle"
         }
         bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
@@ -457,6 +459,19 @@ class MainActivity : Activity() {
         val current = ImportedGamePack.hasPack(this)
         val appPacks = ImportedGamePack.installedAppPacks(this)
         val actions = linkedMapOf<String, () -> Unit>()
+        actions["🎮 GTA 6 Türkçe paketini indir / güncelle"] = {
+            installPack { app ->
+                val result = Gta6PackInstaller.install(app)
+                "GTA 6 · " + result.entries + " Türkçe satır"
+            }
+        }
+        if (Gta6PackInstaller.isInstalled(this)) {
+            actions["GTA 6 paketini kaldır"] = {
+                Gta6PackInstaller.remove(this)
+                prefs.edit().remove("packTitle").apply()
+                render()
+            }
+        }
         if (appPacks.isNotEmpty()) {
             actions["Yüklü GameTranslator’dan al"] = { pickInstalledPack(appPacks) }
         }
@@ -501,15 +516,16 @@ class MainActivity : Activity() {
         render()
         val app = applicationContext
         Thread({
-            val title = runCatching { load(app) }.getOrNull()
-            if (title != null) prefs.edit().putString("packTitle", title).apply()
+            val result = runCatching { load(app) }
+            result.getOrNull()?.let { prefs.edit().putString("packTitle", it).apply() }
             runOnUiThread {
                 if (isDestroyed) return@runOnUiThread
                 packLoading = false
-                Toast.makeText(this,
-                    if (title == null) "Geçerli bir GameTranslator oyun paketi seç." else "Oyun paketi yüklendi.",
-                    Toast.LENGTH_LONG,
-                ).show()
+                val message = result.fold(
+                    onSuccess = { title -> "Oyun paketi yüklendi: " + title },
+                    onFailure = { error -> "Paket yüklenemedi: " + (error.message ?: "Bağlantı veya dosya hatası") },
+                )
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 render()
             }
         }, "DraBornTranslate-pack-import").start()

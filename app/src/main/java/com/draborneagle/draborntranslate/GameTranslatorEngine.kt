@@ -14,8 +14,9 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
     private val app = context.applicationContext
     private val main = Handler(Looper.getMainLooper())
     private val executor = Executors.newSingleThreadExecutor()
+    private val modelInitialization = Executors.newSingleThreadExecutor()
     private var model: TozTranslationModel? = null
-    private var localTranslator: MlKitLocalTranslator? = null
+    @Volatile private var localTranslator: MlKitLocalTranslator? = null
     private val packs = ImportedGamePack.library(app)
     private val pipeline = GameTranslationPipeline(
         packLookup = { text -> PackTranslation.match(packs, text) },
@@ -27,18 +28,25 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
         if (closed) return
         executor.execute {
             if (closed) return@execute
-            // Prefer Google's free local translation when its EN/TR model is available.
-            // Keep the bundled Töz model as an offline-first fallback.
-            val mlKitReady = runCatching {
-                if (localTranslator == null) localTranslator = MlKitLocalTranslator()
-                localTranslator!!.prepare()
-            }.onFailure { Log.w(TAG, "ML Kit modeli hazır değil; yedek modele geçiliyor", it) }
+            // Load game packs before any neural model: a known game line must not
+            // wait for ML Kit's optional model download or ONNX initialization.
+            val hasPacks = runCatching {
+                packs.warmUp()
+                packs.infos.isNotEmpty()
+            }.onFailure { Log.w(TAG, "Oyun paketi açılamadı; çeviri motoruna geçiliyor", it) }
                 .getOrDefault(false)
-            val ready = mlKitReady || runCatching {
-                if (model == null) model = TozTranslationModel(unpackModel(app))
-                true
-            }.onFailure { Log.w(TAG, "Yedek Töz modeli açılamadı", it) }.getOrDefault(false)
-            main.post { if (!closed) done(ready) }
+            if (hasPacks) {
+                main.post { if (!closed) done(true) }
+                // Download ML Kit's language model separately so pack hits remain fast.
+                modelInitialization.execute { prepareMlKit() }
+            } else {
+                val mlKitReady = prepareMlKit()
+                val ready = mlKitReady || runCatching {
+                    if (model == null) model = TozTranslationModel(unpackModel(app))
+                    true
+                }.onFailure { Log.w(TAG, "Yedek Töz modeli açılamadı", it) }.getOrDefault(false)
+                main.post { if (!closed) done(ready) }
+            }
         }
     }
 
@@ -53,6 +61,15 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
             else TranslationReply(issue = "Bu satır çevrilemedi. Sonraki replikte tekrar denenecek.")
             main.post { if (!closed) done(result) }
         }
+    }
+
+    private fun prepareMlKit(): Boolean {
+        val candidate = MlKitLocalTranslator()
+        val ready = runCatching { candidate.prepare() }
+            .onFailure { Log.w(TAG, "ML Kit modeli hazır değil; Töz yedeği kullanılabilir", it) }
+            .getOrDefault(false)
+        if (ready && !closed) localTranslator = candidate else candidate.close()
+        return ready
     }
 
     private fun translateLocally(text: String): String? {
@@ -74,6 +91,7 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
             runCatching { localTranslator?.close() }
         }
         executor.shutdown()
+        modelInitialization.shutdown()
     }
 
     companion object {

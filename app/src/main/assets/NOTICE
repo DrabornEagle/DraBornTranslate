@@ -19,3 +19,10 @@ Google ML Kit model use is governed by Google's ML Kit terms and guidelines:
 https://developers.google.com/ml-kit/terms
 https://developers.google.com/ml-kit/language/translation
 Original CouchSubs / GameTranslator copyright and AGPL notices above remain intact.
+
+DraBornTranslate v0.4.13: optional GameTranslator v1.8.50 game-pack compatibility.
+The public game-pack feed is operated independently by Sefflex/GameTranslator:
+https://gitlab.com/sefflex/GameTranslator
+https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.50
+The original GameTranslator and CouchSubs AGPL notices above remain intact.
+The game-content translation pack is NOT copied or redistributed in this APK or repository.

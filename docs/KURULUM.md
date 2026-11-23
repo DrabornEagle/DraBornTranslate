@@ -1,6 +1,6 @@
 # DraBornTranslate kurulum rehberi
 
-> **Sürüm notu:** v0.4.12 Lens modu kaynak koduna eklenmiştir; bu rehberdeki v0.4.11 bağlantısı yayımlanmış kararlı APK içindir. v0.4.12 imzalı APK yayınlanmadan Lens modunu denemek için kaynak koddan Android derlemesi gerekir.
+> **Sürüm notu:** v0.4.13 kaynak kodunda Lens modu ve GTA 6 paket indirme entegrasyonu vardır. v0.4.11 bağlantısı son yayımlanmış imzalı APK içindir. v0.4.13 üretim imzalı sürümü henüz yayımlanmadı.
 
 DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.11 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.11) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
 
@@ -59,6 +59,21 @@ Portal’ın **Bulut Akışı** modunda PS5 Paylaşımlı Ekran yayını sağlan
 5. GTA tarzı oyunlarda görev hedefleri, telefon mesajları, menüleri ve ekrandaki diyalogları dene. Konuşulan ama altyazısı olmayan sesleri OCR çevirmez.
 
 **Sınırlar:** Bu yöntem PlayStation Portal'ın kendi ekranının görüntüsünü doğrudan değiştirmez. Android'deki PS App/Remote Play görüntüsünü çevirir; Portal paneline yalnızca metin aktarılabilir. Yazı küçük, hareketli veya bulanıksa OCR yanlış okuyabilir. Türkçenin daha uzun olması bazı yerlerde kutuların kaymasına veya üst üste gelmesine neden olabilir. Google Lens ile aynı ürün veya aynı kalite garantisi değildir; fiziksel cihaz ve farklı oyun sahnelerinde test gerektirir.
+
+## GTA 6 Türkçe oyun paketi (v0.4.13)
+
+**Görünüm ve oyun paketi → Oyun paketi → 🎮 GTA 6 Türkçe paketini indir / güncelle** seç. GameTranslator v1.8.50 açık kaynak uygulamasının kullandığı genel paket sunucusundan Türkçe dosya istenir. Paket içeriği APK içine gömülü değildir.
+
+- Uygulama paket listesindeki GTA 6 Türkçe satırlarını bulur, HTTPS üzerinden indirir, sunucunun yayımladığı SHA-256 ile karşılaştırır ve dosyayı ayrıştırıp bulunan satır sayısını gösterir.
+- Paket yüklüyken bilinen İngilizce altyazılar, Google ML Kit veya Töz modeli hesaplama yapmadan paketten gelir; başka replikler yerel çeviri motoruna düşer.
+- Bağlantı kesilirse veya doğrulama başarısız olursa önceden indirilmiş dosya silinmez. Paketi kaldırma seçeneği aynı menüde bulunur.
+- GameTranslator v1.8.50 sürüm notlarında yaklaşık **475.000 satır** bildiriyor; bu sayı üçüncü taraf beyanıdır. Gerçek kurulu dosyanın satır sayısını yalnızca başarılı indirme ve ayrıştırmadan sonra görebiliriz.
+- Paketin kullanım/yeniden dağıtım haklarını GameTranslator ve ilgili içerik sahipleri belirler. DraBornTranslate üçüncü taraf çeviri paketini GitHub deposuna veya APK'ya kopyalamaz.
+- Sunucu erişilemezse, dosya yoksa veya kullanım koşulları değişirse otomatik paket indirimi çalışmayabilir. **.json / .json.gz dosyası seç** ile elinde bulunan yasal, uyumlu paketini de yükleyebilirsin.
+
+### Uyarı
+
+Lens yerleştirmesi **telefondaki** oyun görüntüsüne uygulanır; PS Portal ekranına doğrudan müdahale edilemez. Seslendirme yalnız duyulup altyazı gösterilmiyorsa OCR ile yakalanamaz.
 
 ## PS App menüsü ve telefonda oyun
 

@@ -27,6 +27,22 @@ class GameTranslationPipelineTest {
     }
 
     @Test
+    fun gta6LabelledTextUsesPackWithoutWaitingForTranslationModel() {
+        // The labelled text is treated as a complete subtitle, not as OCR noise.
+        val source = "Kolt & Associates:"
+        val expected = "Kolt ve Ortakları:"
+        val pack = JSONObject().put("id", "gta6").put("format", 2)
+            .put("entries", JSONObject().put(checkNotNull(PackKey.key(source)), expected))
+        val library = GamePackLibrary({ listOf("gta6.json" to { pack.toString().toByteArray() }) }, null)
+        val pipeline = GameTranslationPipeline(
+            packLookup = { PackTranslation.match(library, it) },
+            model = { error("Pack hit must bypass the translation model") },
+        )
+        assertEquals(expected, pipeline.translate(TranslationInput(source)).text)
+        assertEquals(expected, pipeline.translate(TranslationInput(source, ReadingArea.GAME_TEXT)).text)
+    }
+
+    @Test
     fun splitSentencesAvoidMissingDialogueAndKeepSeparateSpeakers() {
         val calls = mutableListOf<String>()
         val pipeline = GameTranslationPipeline(packLookup = { null }, model = { text ->
