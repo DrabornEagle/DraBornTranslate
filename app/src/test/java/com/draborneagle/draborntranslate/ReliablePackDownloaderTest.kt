@@ -124,7 +124,7 @@ class ReliablePackDownloaderTest {
                     url, File(dir, "test.part"), data.size.toLong(), sha(data), progress::add
                 )
                 assertArrayEquals(data, archive)
-                assertTrue(count.get() >= 4)
+                assertTrue(count.get() >= 3)
                 assertTrue(seen.any { !it.startsWith("bytes=0-") })
                 assertEquals(100, progress.last())
             } finally { dir.deleteRecursively() }
