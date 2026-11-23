@@ -96,7 +96,9 @@ class CloudCameraActivity : Activity() {
             translate = translator::translate,
             show = { translated, _ ->
                 if (!destroyed && translated.isNotEmpty()) {
-                    message.text = translated.take(3).joinToString("\n") { it.turkish }
+                    val text = translated.take(3).joinToString("\n") { it.turkish }
+                    message.text = text
+                    if (::guides.isInitialized) guides.setTranslation(text)
                 }
             },
             onFailure = { problem -> problem?.let(::showStatus) },
@@ -480,6 +482,17 @@ class CloudCameraActivity : Activity() {
 
     private inner class CloudRegionView : View(this@CloudCameraActivity) {
         private val brush = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = dp(2).toFloat() }
+        private val glyph = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = dp(14).toFloat(); color = Color.WHITE }
+        private val shade = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xE8192033.toInt() }
+        private var translated = ""
+
+        fun setTranslation(value: String) {
+            if (translated != value) {
+                translated = value
+                invalidate()
+            }
+        }
+
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
             val frame = Pixels(0, 0, width, height)
@@ -497,6 +510,32 @@ class CloudCameraActivity : Activity() {
                 (messages.x + messages.width).toFloat(),
                 (messages.y + messages.height).toFloat(), 12f, 12f, brush,
             )
+            if (translated.isNotBlank() && messages.width > dp(100)) {
+                val left = messages.x + dp(7).toFloat()
+                val top = messages.y + dp(7).toFloat()
+                val maxWidth = (messages.width - dp(20)).toFloat()
+                val rows = mutableListOf<String>()
+                var row = ""
+                for (word in translated.replace('\n', ' ').split(Regex("\\s+"))) {
+                    val candidate = if (row.isEmpty()) word else "$" + "{row} $" + "word"
+                    if (row.isNotEmpty() && glyph.measureText(candidate) > maxWidth) {
+                        rows.add(row)
+                        row = word
+                    } else row = candidate
+                    if (rows.size >= 3) break
+                }
+                if (row.isNotEmpty() && rows.size < 4) rows.add(row)
+                val visible = rows.take(4)
+                val lineStep = dp(19).toFloat()
+                val heightNeeded = visible.size * lineStep + dp(12)
+                canvas.drawRoundRect(
+                    left, top, left + maxWidth, top + heightNeeded,
+                    dp(8).toFloat(), dp(8).toFloat(), shade
+                )
+                visible.forEachIndexed { index, line ->
+                    canvas.drawText(line, left + dp(5), top + dp(17) + index * lineStep, glyph)
+                }
+            }
         }
     }
 }
