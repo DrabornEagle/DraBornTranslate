@@ -61,7 +61,9 @@ internal object Gta6PackInstaller {
             ?: throw IOException("Paket sunucusunda Türkçe GTA 6 paketi bulunamadı.")
         if (target.size > MAX_PACK_BYTES) throw IOException("Paket izin verilen boyuttan büyük.")
         val old = installedInfo(context)
-        if (old != null && old.sha256 == target.sha256) return old
+        if (old != null && old.sha256 == target.sha256 &&
+            runCatching { sha256(installedFile(context).readBytes()) == target.sha256 }.getOrDefault(false)
+        ) return old
 
         val id = URLEncoder.encode(target.id, "UTF-8")
         val bytes = download(BASE_URL + "/v1/packs/" + id, MAX_PACK_BYTES)
