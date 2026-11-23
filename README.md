@@ -21,7 +21,7 @@
 
 ---
 
-## 🚀 v0.6.1 · İki mod ve dayanıklı GTA 6 paket indirme
+## 🚀 v0.6.2 · GTA 6 Türkçe altyazı kalitesi ve kişisel düzeltmeler
 
 DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve altyazı araçlarının tamamı DrabornEagle görsel kimliğiyle sunulur.
 
@@ -49,7 +49,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.6.1` / `versionCode 2` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.6.2` / `versionCode 3` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
@@ -74,6 +74,13 @@ CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemes
 
 İş akışı derleme testlerini çalıştırır, APK imzasını ve Android sürüm kodunu doğrular ve ancak başarılı olursa GitHub Release oluşturur. Keystore veya parolaları kaynak depoya yüklemeyin.
 
+### GTA 6 kalite iyileştirmesi (v0.6.2)
+
+- Paketteki eşleşmiş altyazılarda temkinli doğruluk denetimi: bozuk karakterleri, bazı İngilizce kalmış satırları ve soru işareti uyuşmazlıklarını tespit eder. Yalnız kesin biçim hatalarını düzeltir; tahminî anlam değişikliği yapmaz.
+- **Son çeviri → Türkçe repliği düzelt**: İngilizce satırın anlamını doğru çevirdiğin Türkçesini telefonda kaydeder. Aynı replik çıktığında bu özel düzeltme pakettekinden önce **anında** gösterilir. Kaydı kaldırabilirsin.
+- Özel düzeltmeler cihazda kalır, otomatik olarak hiçbir sunucuya gönderilmez.
+- Orijinal 475.893 satır paketin içeriği yeniden yazılmamıştır; **tüm satırların profesyonel olarak elden geçirildiği iddia edilmez**. Kaliteli düzeltme için gerçek İngilizce/Türkçe hatalı örnekler gerekir.
+
 ### GTA 6 indirme düzeltmesi (v0.6.1)
 
 Mobil ağlarda görülen `Connection reset` için paket indirme motoru yeniden deneme ve kaldığı yerden devam etme desteğiyle yenilendi. Paket sunucusu HTTP Range destekliyorsa 1 MiB parçalardan indirilir; desteklemiyorsa dosya yeniden alınır. Eksik/bozuk dosya asla etkinleştirilmez. Ana ekranda ilerleme yüzdesi, [resmî paket bağlantısı](https://gametranslator-packs.gametranslator-pool.workers.dev/v1/packs/gta-6) ve `.json.gz` içe alma seçenekleri vardır. Operatörün alan adına erişimi kesmesi durumunda Wi-Fi veya farklı ağ denenmelidir.
@@ -92,11 +99,11 @@ Android'de **modelden önce paket** araması yapılır; tam eşleşme bulunursa 
 
 ## 🔁 Açık kaynak geliştirme senkronu
 
-`.github/workflows/gametranslator-upstream.yml` GitLab'daki referans açık kaynak sürümlerini kontrol eder; lisanslı kaynakları `upstream/GameTranslator` klasörüne alır. **Bu işlem yeni bir DraBornTranslate APK'sı oluşturmaz.** Platformlar arası kaynak değişiklikleri ayrı entegrasyon, Android derleme ve gerçek cihaz testinden geçmek zorundadır. Üçüncü taraf ikili dosyalar veya oyun diyalog paketleri doğrudan repoya kopyalanmaz.
+`.github/workflows/gametranslator-upstream.yml` GitLab'daki referans açık kaynak sürümlerini kontrol eder; lisanslı kaynakları üçüncü taraf lisanslı kaynak klasörüne alır. **Bu işlem yeni bir DraBornTranslate APK'sı oluşturmaz.** Platformlar arası kaynak değişiklikleri ayrı entegrasyon, Android derleme ve gerçek cihaz testinden geçmek zorundadır. Üçüncü taraf ikili dosyalar veya oyun diyalog paketleri doğrudan repoya kopyalanmaz.
 
 ## ⚖️ Lisans ve üçüncü taraf bildirimleri
 
-DraBornTranslate, GNU AGPL-3.0 kapsamındaki açık kaynak bileşenlerini de kullanır. [Lisans](app/src/main/assets/LICENSE), [telif / kaynak bildirimleri](app/src/main/assets/NOTICE) ve [orijinal kaynak bilgisi](https://gitlab.com/sefflex/GameTranslator) yasal yükümlülüklerin gereği olarak korunur. Orijinal CouchSubs katkılarının sahipleri de NOTICE dosyasında belirtilmiştir. DraBornTranslate bağımsız bir DrabornEagle projesidir; üçüncü taraf projenin resmî ürünü değildir.
+DraBornTranslate, GNU AGPL-3.0 kapsamındaki açık kaynak bileşenlerini de kullanır. [Lisans](app/src/main/assets/LICENSE), [telif / kaynak bildirimleri](app/src/main/assets/NOTICE) ve üçüncü taraf kaynak bildirimleri yasal yükümlülüklerin gereği olarak korunur. Orijinal CouchSubs katkılarının sahipleri de NOTICE dosyasında belirtilmiştir. DraBornTranslate bağımsız bir DrabornEagle projesidir; üçüncü taraf projenin resmî ürünü değildir.
 
 ---
 
