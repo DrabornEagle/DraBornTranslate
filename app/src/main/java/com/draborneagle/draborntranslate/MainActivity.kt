@@ -77,6 +77,8 @@ class MainActivity : Activity() {
     private var voicePreview: TurkishVoice? = null
     private var packLoading = false
     private var packDownloadPercent = 0
+    private var gtaStatusLabel: TextView? = null
+    private var gtaDownloadButton: Button? = null
     private var tunnelAddress = ""
     private var tunnelSession: String? = null
     private val popups = mutableSetOf<Dialog>()
@@ -303,13 +305,14 @@ class MainActivity : Activity() {
         }
         gta.addView(label("⚡ GTA 6 • Hazır Türkçe paket", 19, WHITE, true))
         val installed = Gta6PackInstaller.installedInfo(this)
-        gta.append(label(when {
+        gtaStatusLabel = label(when {
             packLoading -> "GTA 6 paketi indiriliyor · %$packDownloadPercent"
             installed != null -> "Yüklü ve doğrulanmış: " + installed.entries + " Türkçe satır"
             else -> "Sunucudaki GTA 6 Türkçe paketi • yaklaşık 475 bin satır. İlk indirme internet gerektirir."
-        }, 14, MUTED), 8)
+        }, 14, MUTED)
+        gta.append(gtaStatusLabel!!, 8)
         gta.append(label("Eşleşen İngilizce satır doğrudan paketten gelir. Bulunmayan satırlarda yerel çeviri devreye girer.", 13, MINT), 8)
-        gta.append(button(if (packLoading) "Paket yükleniyor…" else if (installed == null) "GTA 6 paketini indir" else "GTA 6 paketini kontrol et / güncelle") {
+        gtaDownloadButton = button(if (packLoading) "Paket yükleniyor…" else if (installed == null) "GTA 6 paketini indir" else "GTA 6 paketini kontrol et / güncelle") {
             AlertDialog.Builder(this)
                 .setTitle("GTA 6 Türkçe oyun paketi")
                 .setMessage("Paket yaklaşık 25 MB indirir ve telefonda yer kaplar. Dosya SHA-256 ve satır sayısıyla doğrulanır. Devam edilsin mi?")
@@ -320,7 +323,8 @@ class MainActivity : Activity() {
                         "GTA 6 · " + result.entries + " Türkçe satır"
                     }
                 }.show()
-        }.apply { isEnabled = !packLoading; styleButton(this, MINT to ACCENT) }, 14)
+        }.apply { isEnabled = !packLoading; styleButton(this, MINT to ACCENT) }
+        gta.append(gtaDownloadButton!!, 14)
         gta.append(button("Dosyadan GTA 6 paketi yükle (.json.gz)") {
             pickGamePack()
         }, 9)
@@ -775,7 +779,10 @@ class MainActivity : Activity() {
 
     private fun refreshCurrentMode() {
         when (entryMode) {
-            EntryMode.HOME -> buildLandingUi()
+            EntryMode.HOME -> if (packLoading) {
+                gtaStatusLabel?.text = "GTA 6 paketi indiriliyor · %$packDownloadPercent"
+                gtaDownloadButton?.apply { text = "İndiriliyor · %$packDownloadPercent"; isEnabled = false }
+            } else buildLandingUi()
             EntryMode.PORTAL -> render()
             EntryMode.PS5_TV -> Unit
         }
