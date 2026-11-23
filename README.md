@@ -22,6 +22,8 @@
 
 > **Sürüm durumu:** Kaynak kodu **v0.4.13**. Son yayımlanan, eski APK'larla imza uyumluluğu doğrulanmış dağıtım **v0.4.11**. v0.4.13 imzalı Release APK henüz yayımlanmadı. GitHub Actions Debug APK'sı mevcut uygulamanın üzerine kurulabilen Production Release APK değildir.
 
+> **🚧 v5.0 geliştirme çalışması:** GameTranslator v1.8.51 kaynak motorunun kısa konuşma karşılıkları ve Türkçe son düzenleme kuralları mevcut çeviri hattına bağlandı. Resmî GitLab sürümlerini izleyen otomatik kaynak senkronu ve uygulama içi kontrol ekranı eklendi. Flutter/Chiaki/TV modüllerinin tamamının tek APK'da entegrasyonu **henüz tamamlanmadı**; bu nedenle v5.0 imzalı kararlı APK yayımlandığı iddia edilmez. [v5.0 entegrasyon ayrıntıları](docs/INTEGRATION-v5.0.md).
+
 ## ✨ Özellikler
 
 | Özellik | Açıklama |
