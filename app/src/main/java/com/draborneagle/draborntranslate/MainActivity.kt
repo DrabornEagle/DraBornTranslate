@@ -590,7 +590,13 @@ class MainActivity : Activity() {
             lensSettings.append(name, 11)
             val control = slider(title, 100, value) { position ->
                 change(position)
-                prefs.edit().putInt(savedKey, position).apply()
+                val clamped = when (savedKey) {
+                    "lensLeft" -> config.lensLeft
+                    "lensTop" -> config.lensTop
+                    "lensWidth" -> config.lensWidth
+                    else -> config.lensHeight
+                }
+                prefs.edit().putInt(savedKey, clamped).apply()
                 lensAreaPreview.invalidate()
                 updateLensStatus()
             }
@@ -648,7 +654,7 @@ class MainActivity : Activity() {
     private fun updateLensStatus() {
         if (!::lensStatus.isInitialized) return
         val region = config.lensArea(Pixels(0, 0, 100, 100))
-        lensStatus.text = "Lens alanı: Sol %\${region.x} · Üst %\${region.y} · En %\${region.width} · Boy %\${region.height}"
+        lensStatus.text = "Lens alanı: Sol %${region.x} · Üst %${region.y} · En %${region.width} · Boy %${region.height}"
     }
 
     private fun render() {
