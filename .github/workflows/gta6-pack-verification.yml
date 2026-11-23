@@ -33,7 +33,11 @@ jobs:
       - name: Download and inspect GTA 6 Turkish pack without redistributing it
         run: |
           set -euo pipefail
-          python scripts/verify_gta6_pack.py --live | tee "$RUNNER_TEMP/gta6-verification.json.txt"
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+            python scripts/verify_gta6_pack.py --live | tee "$RUNNER_TEMP/gta6-verification.json.txt"
+          else
+            python scripts/verify_gta6_pack.py --live --temp-archive "$RUNNER_TEMP/gta6-pack.json.gz" | tee "$RUNNER_TEMP/gta6-verification.json.txt"
+          fi
           {
             echo "### GTA 6 Türkçe paket denetimi"
             echo "Canlı dosya: manifest, SHA-256, satır sayısı ve Kolt & Associates: anahtarı kontrol edildi."
@@ -42,3 +46,24 @@ jobs:
             cat "$RUNNER_TEMP/gta6-verification.json.txt"
             echo "\`\`\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-java@v4
+        if: github.event_name != 'schedule'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        if: github.event_name != 'schedule'
+      - uses: android-actions/setup-android@v4
+        if: github.event_name != 'schedule'
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - name: Run Android JVM pipeline against the real Turkish pack
+        if: github.event_name != 'schedule'
+        env:
+          DBT_GTA6_ARCHIVE: ${{ runner.temp }}/gta6-pack.json.gz
+        run: |
+          ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest --tests com.draborneagle.draborntranslate.Gta6LivePackIntegrationTest
+      - name: Remove local GTA 6 test data
+        if: always()
+        run: rm -f "$RUNNER_TEMP/gta6-pack.json.gz"
