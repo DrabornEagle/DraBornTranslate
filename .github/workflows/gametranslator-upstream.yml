@@ -1,0 +1,51 @@
+name: Upstream GameTranslator source sync
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/sync_gametranslator.py'
+      - '.github/workflows/gametranslator-upstream.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: gametranslator-source-sync
+  cancel-in-progress: false
+
+jobs:
+  source-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch tagged source, not foreign APKs
+        run: python scripts/sync_gametranslator.py
+      - name: Confirm legally required notices
+        run: |
+          test -s upstream/GameTranslator/LICENSE
+          test -s upstream/GameTranslator/NOTICE
+          python -m json.tool upstream/GameTranslator/source-version.json > /dev/null
+          python -m py_compile scripts/sync_gametranslator.py
+          git diff --check
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          branch: automation/gametranslator-upstream
+          delete-branch: true
+          add-paths: |
+            upstream/GameTranslator/**
+          commit-message: "chore(upstream): sync licensed GameTranslator sources"
+          title: "GameTranslator kaynak güncellemesi · inceleme ve entegrasyon"
+          body: |
+            Resmi GitLab sürümünün kaynak dosyaları ve orijinal yasal bildirimleri alınmıştır.
+            Oyun metni paketleri ve üçüncü taraf imzalı APKlar yeniden dağıtılmamıştır.
+            Bu PR yalnızca kaynak senkronudur; uygulama motoru kendiliğinden güncellenmez.
+            Android derleme ve işlev testleri tamamlanmadan üretim sürümü yayımlanmaz.

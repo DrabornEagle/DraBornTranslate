@@ -5,7 +5,9 @@ import com.gametranslator.gametranslator_mobile.core.Glossary
 import com.gametranslator.gametranslator_mobile.core.GlossaryTranslator
 import com.gametranslator.gametranslator_mobile.core.PackKey
 import com.gametranslator.gametranslator_mobile.core.PackMatch
+import com.gametranslator.gametranslator_mobile.core.ShortPhrases
 import com.gametranslator.gametranslator_mobile.core.SubtitleSegmenter
+import com.gametranslator.gametranslator_mobile.core.TurkishPostEdit
 import com.gametranslator.gametranslator_mobile.core.TextMatch
 import com.gametranslator.gametranslator_mobile.core.TextTranslator
 import java.util.Locale
@@ -70,7 +72,7 @@ internal class GameTranslationPipeline(
                 }
                 val source = piece.text
                 val direct = PackKey.key(source)?.let(commonLines::get)?.takeIf { preservesQuestion(source, it) }
-                val translation = findPack(source) ?: direct ?: shortAnswer(source, previous) ?: run {
+                val translation = findPack(source) ?: direct ?: shortAnswer(source, previous) ?: ShortPhrases.translate(source)?.takeIf { preservesQuestion(source, it) } ?: run {
                     val following = if (AmericanDialogue.needsContext(source)) {
                         pieces.asSequence().drop(index + 1).firstOrNull { it.translate }?.text
                     } else null
@@ -98,10 +100,10 @@ internal class GameTranslationPipeline(
         val sentences = SubtitleSegmenter.split(translated).filter { it.translate }.map { it.text }
         val filtered = sentences.distinctBy { PackKey.key(it) }
         val natural = if (filtered.size < sentences.size) filtered.joinToString(" ") else translated
-        return when (val end = source.trimEnd('"', '”').lastOrNull()) {
+        return TurkishPostEdit.apply(source, when (val end = source.trimEnd('"', '”').lastOrNull()) {
             '?', '!' -> natural.trimEnd('.', '?', '!') + end
             else -> natural
-        }
+        })
     }
 }
 
