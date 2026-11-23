@@ -76,6 +76,7 @@ class MainActivity : Activity() {
     private var demoReader: SubtitleReader? = null
     private var voicePreview: TurkishVoice? = null
     private var packLoading = false
+    private var packDownloadPercent = 0
     private var tunnelAddress = ""
     private var tunnelSession: String? = null
     private val popups = mutableSetOf<Dialog>()
@@ -303,7 +304,7 @@ class MainActivity : Activity() {
         gta.addView(label("⚡ GTA 6 • Hazır Türkçe paket", 19, WHITE, true))
         val installed = Gta6PackInstaller.installedInfo(this)
         gta.append(label(when {
-            packLoading -> "İndiriliyor ve doğrulanıyor…"
+            packLoading -> "GTA 6 paketi indiriliyor · %$packDownloadPercent"
             installed != null -> "Yüklü ve doğrulanmış: " + installed.entries + " Türkçe satır"
             else -> "Sunucudaki GTA 6 Türkçe paketi • yaklaşık 475 bin satır. İlk indirme internet gerektirir."
         }, 14, MUTED), 8)
@@ -315,11 +316,17 @@ class MainActivity : Activity() {
                 .setNegativeButton("Vazgeç", null)
                 .setPositiveButton("İndir / Güncelle") { _, _ ->
                     installPack { app ->
-                        val result = Gta6PackInstaller.install(app)
+                        val result = Gta6PackInstaller.install(app, ::updateGta6DownloadProgress)
                         "GTA 6 · " + result.entries + " Türkçe satır"
                     }
                 }.show()
         }.apply { isEnabled = !packLoading; styleButton(this, MINT to ACCENT) }, 14)
+        gta.append(button("Dosyadan GTA 6 paketi yükle (.json.gz)") {
+            pickGamePack()
+        }, 9)
+        gta.append(button("İndirme hatası mı? Paketi tarayıcıda aç") {
+            openLink("https://gametranslator-packs.gametranslator-pool.workers.dev/v1/packs/gta-6")
+        }, 9)
         content.append(gta, 19)
 
         val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
@@ -597,7 +604,7 @@ class MainActivity : Activity() {
         readingChoice.text = "Çevrilecek alan · ${config.readingArea.label}"
         packButton.isEnabled = controlsAvailable && demoTranslator == null
         packButton.text = when {
-            packLoading -> "Oyun paketi yükleniyor…"
+            packLoading -> "GTA 6 paketi indiriliyor · %$packDownloadPercent"
             ImportedGamePack.hasPack(this) -> "Oyun paketi · ${prefs.getString("packTitle", "Yüklü")}"
             Gta6PackInstaller.isInstalled(this) -> "GTA 6 · " +
                 (Gta6PackInstaller.installedInfo(this)?.entries?.toString() ?: "Yüklü") + " satır"
@@ -684,7 +691,7 @@ class MainActivity : Activity() {
         val actions = linkedMapOf<String, () -> Unit>()
         actions["🎮 GTA 6 Türkçe paketini indir / güncelle"] = {
             installPack { app ->
-                val result = Gta6PackInstaller.install(app)
+                val result = Gta6PackInstaller.install(app, ::updateGta6DownloadProgress)
                 "GTA 6 · " + result.entries + " Türkçe satır"
             }
         }
@@ -737,6 +744,7 @@ class MainActivity : Activity() {
     private fun installPack(load: (Context) -> String) {
         if (packLoading) return
         packLoading = true
+        packDownloadPercent = 0
         refreshCurrentMode()
         val app = applicationContext
         Thread({
@@ -745,6 +753,7 @@ class MainActivity : Activity() {
             runOnUiThread {
                 if (isDestroyed) return@runOnUiThread
                 packLoading = false
+                packDownloadPercent = 0
                 val message = result.fold(
                     onSuccess = { title -> "Oyun paketi yüklendi: " + title },
                     onFailure = { error -> "Paket yüklenemedi: " + (error.message ?: "Bağlantı veya dosya hatası") },
@@ -753,6 +762,15 @@ class MainActivity : Activity() {
                 refreshCurrentMode()
             }
         }, "DraBornTranslate-pack-import").start()
+    }
+
+    private fun updateGta6DownloadProgress(percent: Int) {
+        main.post {
+            if (packLoading && !isFinishing && !isDestroyed && packDownloadPercent != percent) {
+                packDownloadPercent = percent
+                refreshCurrentMode()
+            }
+        }
     }
 
     private fun refreshCurrentMode() {
