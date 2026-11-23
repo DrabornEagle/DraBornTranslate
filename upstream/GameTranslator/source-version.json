@@ -1,0 +1,9 @@
+{
+  "tag": "v1.8.51",
+  "commit": "90074239529de5b4738340d00bbb06f706adef59",
+  "source_files": 1694,
+  "upstream": "https://gitlab.com/sefflex/GameTranslator.git",
+  "release": "https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.51",
+  "integration_state": "imported-for-review-not-compiled",
+  "excluded": "prebuilt APKs, generated files and game dialogue packs"
+}

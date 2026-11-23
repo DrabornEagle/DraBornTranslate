@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<!-- Varsayılan kurallar aynen kalır (şifresiz HTTP kapalı). Tek istisna telefonun kendisi: Samsung'un giriş sayfası
+     girişi uygulama içi tarayıcıda http://localhost:4794/signin/callback adresine gönderir (tvinstall/SamsungLogin.kt). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>

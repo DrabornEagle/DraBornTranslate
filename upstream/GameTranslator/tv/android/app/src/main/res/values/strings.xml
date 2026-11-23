@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<!-- Android tarafının kısa metinleri (katman modu, giriş seçici); sayfa metinleri tv/webos/i18n.js'tedir.
+     CouchSubs'tan uyarlanmıştır (AGPL-3.0, github.com/yorulmazsinan/couchsubs, tv-android/). -->
+<resources>
+    <string name="overlay_running">Showing subtitles over the TV\'s HDMI picture</string>
+    <string name="overlay_stopped">Overlay turned off: subtitles now show inside GameTranslator. Press OK for the panel.</string>
+    <string name="overlay_selected">Overlay mode: subtitles appear over the TV\'s own HDMI picture.</string>
+    <string name="overlay_fallback">No picture inside GameTranslator. Switching to overlay mode: subtitles appear over the TV\'s own HDMI picture.</string>
+    <string name="overlay_choose_input">Switch the TV to the console\'s input (HDMI %1$d) with the remote. Subtitles will appear on top.</string>
+    <string name="overlay_permission_needed">Overlay mode needs the \"Display over other apps\" permission.</string>
+    <string name="overlay_fallback_needs_permission">On some TVs the console picture stays black inside the app; overlay mode fixes this, but it needs the \"Display over other apps\" permission.</string>
+    <string name="overlay_permission_how">GameTranslator on your computer or phone grants it when it installs the TV app. Or press \"Allow\" below, or on the TV open Settings › Apps › Special app access › Display over other apps and turn on GameTranslator.</string>
+    <string name="overlay_permission_open">Allow</string>
+    <string name="overlay_permission_no_settings">This TV has no screen for this permission. Install the TV app again from GameTranslator on your computer or phone: it grants the permission itself.</string>
+    <string name="console_not_found">GameTranslator could not tell which HDMI input your console is on.</string>
+    <string name="no_picture">No picture from HDMI %1$d.</string>
+    <string name="no_picture_empty">No device on HDMI %1$d.</string>
+    <string name="no_picture_choose">Choose the HDMI input your console is connected to (arrow keys and OK, or number keys 1–4):</string>
+    <string name="no_picture_still_black">Still black on the right input? This TV may not hand its HDMI picture to apps (some Vestel and MediaTek TVs), or HDCP blocks it. Try turning off Settings › System › HDMI › Enable HDCP on the PS5.</string>
+    <string name="hdmi_not_offered">This TV does not let apps show its HDMI inputs, so the console picture cannot appear inside GameTranslator.</string>
+    <string name="picker_connected">connected</string>
+    <string name="picker_close">Close</string>
+    <string name="overlay_offer">Or switch to overlay: the TV shows the console on its own HDMI input and the subtitles appear on top.</string>
+    <string name="overlay_switch">Switch to overlay</string>
+    <string name="overlay_started_manual_input">Overlay is on and GameTranslator keeps running in the background. This TV does not let apps change its input: switch the TV to the console\'s HDMI input with the remote, and subtitles appear on top. If they do not show on the HDMI input, this device draws HDMI outside Android (some projectors) and no app can draw over it: read the subtitles on your phone. Open GameTranslator again to turn the overlay off.</string>
+    <string name="overlay_failed">Overlay could not start: this TV did not let GameTranslator show subtitles over other apps. GameTranslator stays open; you can read the subtitles on your phone.</string>
+</resources>

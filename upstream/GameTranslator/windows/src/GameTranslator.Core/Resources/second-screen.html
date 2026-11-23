@@ -1,0 +1,428 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<!-- GameTranslator ikinci ekran: TV uygulaması kurulamayan (desteklenmeyen) TV'ler için. Aynı Wi-Fi'deki herhangi bir
+     telefon, tablet ya da bilgisayarın tarayıcısında açılır; çeviriyi siyah zemin üstünde büyük yazıyla gösterir.
+     Bilgisayardaki ve telefondaki uygulama bu dosyayı kendi içinden /ekran adresinden verir (aynı dosya); internete
+     hiçbir şey gitmez. Adres parametresi: ?size=1.3 (yazı ölçeği). -->
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>GameTranslator · İkinci ekran</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; overflow: hidden;
+    font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif; -webkit-user-select: none; user-select: none;
+    -webkit-tap-highlight-color: transparent; }
+  #stage { position: absolute; inset: 0;
+    padding: max(4vh, env(safe-area-inset-top)) max(5vw, env(safe-area-inset-right)) max(4vh, env(safe-area-inset-bottom)) max(5vw, env(safe-area-inset-left));
+    box-sizing: border-box; text-align: center; }
+  /* Altyazı bloğu: dikey yeri kullanıcı seçer (Konum düğmesi ya da parmakla sürükleme); 0 en üst, 1 en alt. */
+  #block { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; align-items: center;
+    padding: 0 max(5vw, env(safe-area-inset-right)) 0 max(5vw, env(safe-area-inset-left)); box-sizing: border-box;
+    touch-action: none; }
+  #block.dragging { outline: 1px dashed #48484a; outline-offset: 6px; border-radius: 8px; }
+  #previous { color: #8e8e93; font-weight: 500; line-height: 1.25; margin-bottom: 0.5em; min-height: 1em;
+    opacity: 0; transition: opacity 0.2s; white-space: pre-line; overflow-wrap: anywhere; }
+  #previous.on { opacity: 1; }
+  #line { font-weight: 650; line-height: 1.22; white-space: pre-line; overflow-wrap: anywhere; line-break: strict; opacity: 0; transition: opacity 0.12s; }
+  #line.on { opacity: 1; }
+  #line.idle { color: #636366; font-weight: 500; opacity: 1; }
+  .speaker { color: #ffd60a; }
+  /* Kumanda tuşları (TV uygulamasıyla aynı çizim, tv/webos/style.css): PlayStation yüz tuşları kendi renginde dairede,
+     Xbox Ⓐ Ⓑ Ⓧ Ⓨ koyu dairede renkli harf, L1 / RT gibi tuşlar yuvarlak köşeli kutuda; yazı boyuna göre ölçeklenir. */
+  .btn { display: inline-block; box-sizing: border-box; vertical-align: -0.15em; margin: 0 0.12em; font-family: Arial, sans-serif;
+    font-weight: 700; line-height: 1; text-align: center; text-shadow: none; }
+  .btn-face { position: relative; width: 1.15em; height: 1.15em; padding-top: 0.12em; border: 0.08em solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%; background: rgba(0, 0, 0, 0.55); font-size: 0.95em; }
+  .btn-circle::after, .btn-square::after { content: ''; position: absolute; left: 50%; top: 50%; width: 0.5em; height: 0.5em;
+    margin: -0.25em 0 0 -0.25em; box-sizing: border-box; border: 0.1em solid currentColor; }
+  .btn-circle::after { border-radius: 50%; }
+  .btn-square::after { border-radius: 0.06em; }
+  .btn-cross { color: #7fb8f0; }
+  .btn-circle { color: #ff6f78; }
+  .btn-triangle { color: #3fdcb4; }
+  .btn-square { color: #f08ce4; }
+  .btn-plain { color: #fff; }
+  .btn-xbox { background: #1b1b1b; }
+  .btn-xbox-a { color: #8dc63f; }
+  .btn-xbox-b { color: #ff4b4b; }
+  .btn-xbox-x { color: #3d9bff; }
+  .btn-xbox-y { color: #ffb900; }
+  .btn-view, .btn-menu { color: #e6e6e6; }
+  .btn-view::before, .btn-view::after { content: ''; position: absolute; width: 0.36em; height: 0.28em; box-sizing: border-box;
+    border: 0.07em solid currentColor; border-radius: 0.04em; }
+  .btn-view::before { left: 0.22em; top: 0.26em; }
+  .btn-view::after { left: 0.38em; top: 0.42em; background: #1b1b1b; }
+  .btn-menu::after { content: ''; position: absolute; left: 50%; top: 50%; width: 0.46em; height: 0.07em; margin: -0.035em 0 0 -0.23em;
+    background: currentColor; box-shadow: 0 -0.15em 0 currentColor, 0 0.15em 0 currentColor; }
+  .btn-shoulder, .btn-wide { min-width: 1.6em; padding: 0.12em 0.25em 0.1em; border: 0.08em solid rgba(255, 255, 255, 0.9);
+    border-radius: 0.35em; background: rgba(0, 0, 0, 0.55); color: #fff; font-size: 0.72em; }
+  #bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px;
+    padding: 10px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    background: linear-gradient(transparent, rgba(0,0,0,0.85) 45%); transition: opacity 0.25s; }
+  #bar.hidden { opacity: 0; pointer-events: none; }
+  button { font: 600 15px/1 inherit; font-family: inherit; color: #fff; background: #2c2c2e; border: 0; border-radius: 12px;
+    padding: 12px 16px; min-width: 46px; }
+  button:active { background: #48484a; }
+  #status { position: absolute; top: max(10px, env(safe-area-inset-top)); left: 0; right: 0; display: flex; justify-content: center;
+    align-items: center; gap: 8px; font-size: 13px; color: #8e8e93; transition: opacity 0.25s; }
+  #status.hidden { opacity: 0; }
+  #dot { width: 8px; height: 8px; border-radius: 50%; background: #ff9f0a; }
+  #dot.ok { background: #30d158; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="block">
+  <div id="previous"></div>
+  <div id="line" class="idle">Çeviri bekleniyor…</div>
+  </div>
+</div>
+<div id="status"><span id="dot"></span><span id="statusText">Bağlanıyor…</span></div>
+<div id="bar">
+  <button id="smaller" aria-label="Yazıyı küçült">A−</button>
+  <button id="bigger" aria-label="Yazıyı büyüt">A+</button>
+  <button id="history" aria-label="Önceki satırı göster ya da gizle">Önceki satır: açık</button>
+  <button id="place" aria-label="Altyazının yeri">Konum: ortada</button>
+  <button id="full" aria-label="Tam ekran">Tam ekran</button>
+</div>
+<script>
+(function () {
+  'use strict';
+  var line = document.getElementById('line'), previous = document.getElementById('previous');
+  var bar = document.getElementById('bar'), status = document.getElementById('status');
+  var dot = document.getElementById('dot'), statusText = document.getElementById('statusText');
+  var params = new URLSearchParams(location.search);
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+                set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  var scale = Number(params.get('size') || store.get('gt.screen.size')) || 1;
+  var showPrevious = store.get('gt.screen.previous') !== '0';
+  var speakerColor = '';
+  var hideTimer = null, uiTimer = null, lastText = '', hasLine = false;
+
+  // Sayfanın kendi yazıları tarayıcının diline göre (?lang=tr / ?lang=en ile zorlanabilir). Çeviri metnine dokunmaz.
+  var turkish = /^tr/i.test(params.get('lang') || navigator.language || '');
+  var T = turkish ? {
+    waiting: 'Çeviri bekleniyor…', connecting: 'Bağlanıyor…', connected: 'Bağlı',
+    lost: 'Bağlantı yok; uygulama açık ve aynı Wi-Fi\'de mi? Yeniden deneniyor…',
+    previousOn: 'Önceki satır: açık', previousOff: 'Önceki satır: kapalı', full: 'Tam ekran',
+    smaller: 'Yazıyı küçült', bigger: 'Yazıyı büyüt', title: 'GameTranslator · İkinci ekran',
+    top: 'Konum: üstte', middle: 'Konum: ortada', bottom: 'Konum: altta', custom: 'Konum: elle',
+    placeHint: 'Altyazıyı parmağınla yukarı aşağı sürükleyebilirsin'
+  } : {
+    waiting: 'Waiting for subtitles…', connecting: 'Connecting…', connected: 'Connected',
+    lost: 'No connection. Is the app open and on the same Wi-Fi? Retrying…',
+    previousOn: 'Previous line: on', previousOff: 'Previous line: off', full: 'Full screen',
+    smaller: 'Smaller text', bigger: 'Larger text', title: 'GameTranslator · Second screen',
+    top: 'Position: top', middle: 'Position: middle', bottom: 'Position: bottom', custom: 'Position: custom',
+    placeHint: 'You can drag the subtitle up or down with your finger'
+  };
+  document.documentElement.lang = turkish ? 'tr' : 'en';
+  document.title = T.title;
+  line.textContent = T.waiting;
+  statusText.textContent = T.connecting;
+  document.getElementById('smaller').setAttribute('aria-label', T.smaller);
+  document.getElementById('bigger').setAttribute('aria-label', T.bigger);
+  document.getElementById('full').textContent = T.full;
+
+  // Metin sağdan sola mı okunur (Arapça, Farsça, İbranice): harflerin çoğunluğuna bakılır; satır "MARKOS:" gibi Latin bir
+  // adla başlasa da Arapça söz sağdan sola dizilir. Uygulamadaki Languages.IsRtlText ile aynı kural.
+  function isRtl(text) {
+    var rtl = (text.match(/[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/g) || []).length;
+    if (!rtl) return false;
+    var letters = (text.match(/[A-Za-z\u00C0-\u024F\u0370-\u052F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/g) || []).length;
+    return rtl >= letters;
+  }
+
+  // Yazı boyu ekranın kısa kenarına göre: telefonda yatay da dikey de okunur kalır.
+  var baseSize = 30;
+  function applySize() {
+    scale = Math.max(0.5, Math.min(3, scale));
+    baseSize = Math.max(18, Math.min(window.innerWidth, window.innerHeight * 1.6) * 0.075 * scale);
+    previous.style.fontSize = Math.max(13, baseSize * 0.55) + 'px';
+    fit();
+  }
+
+  // Satır ekrana sığmıyorsa yazı O SATIR için sığana kadar küçülür (okunur kalacak bir alt sınıra kadar); sonraki
+  // kısa satır yeniden seçilen boyda çıkar. Önce önceki satır gizlenir: yer asıl satıra kalır.
+  var MIN_SIZE = 12;
+  function fit() {
+    var stage = document.getElementById('stage');
+    var style = getComputedStyle(stage);
+    var room = stage.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    previous.style.display = '';
+    var size = baseSize;
+    line.style.fontSize = size + 'px';
+    if (room <= 0) return;
+    function needed() { return line.offsetHeight + (previous.className === 'on' && previous.style.display !== 'none' ? previous.offsetHeight + parseFloat(getComputedStyle(previous).marginBottom) : 0); }
+    if (needed() > room) previous.style.display = 'none';
+    for (var i = 0; i < 40 && needed() > room && size > MIN_SIZE; i++) {
+      size = Math.max(MIN_SIZE, size * 0.92);
+      line.style.fontSize = size + 'px';
+    }
+  }
+
+  // Her konuşmacının kendi rengi: ilk görülme sırasıyla verilir, aynı ad hep aynı renkte kalır (TV uygulamasıyla aynı).
+  var speakerColors = [], speakerMap = {}, speakerRecent = [];
+  function setSpeakerColors(list) {
+    list = list || [];
+    if (list.join(',') === speakerColors.join(',')) return;
+    speakerColors = list; speakerMap = {}; speakerRecent = [];
+  }
+  function colorForSpeaker(name) {
+    if (!speakerColors.length) return speakerColor;
+    var key = String(name).toUpperCase();
+    var at = speakerRecent.indexOf(key);
+    if (at >= 0) speakerRecent.splice(at, 1);
+    else {
+      var used = {}, free = null, k, i;
+      for (k in speakerMap) used[speakerMap[k]] = true;
+      for (i = 0; i < speakerColors.length; i++) if (!used[speakerColors[i]]) { free = speakerColors[i]; break; }
+      if (free === null) { var oldest = speakerRecent.shift(); free = speakerMap[oldest]; delete speakerMap[oldest]; }
+      speakerMap[key] = free;
+    }
+    speakerRecent.push(key);
+    return speakerMap[key];
+  }
+
+  // --- Kumanda tuşları (tv/webos/app.js ile aynı) ---
+  // Metindeki ✕ / R2 / Ⓐ / LB gibi tuşlar PlayStation ya da Xbox simgesi olarak çizilir. Sözcük sınırı büyük-küçük
+  // harfe duyarlıdır: "BLT", "LBS", "lb", "Alt" tuş sayılmaz.
+  var BUTTON = /(✕|×|✖|○|◯|△|□|✜|▦|⧉|☰|[↑↓←→]|[Ⓐ-Ⓩ]|\b(?:L[123]|R[123]|[LR][BTS]|OPTIONS|TOUCHPAD)\b)/g;
+  var FACE = { '✕': 'cross', '×': 'cross', '✖': 'cross', '○': 'circle', '◯': 'circle', '△': 'triangle', '□': 'square' };
+  var XBOX = { 'Ⓐ': 'a', 'Ⓑ': 'b', 'Ⓧ': 'x', 'Ⓨ': 'y' };
+
+  function buttonIcon(token) {
+    var icon = document.createElement('span');
+    var face = FACE[token];
+    if (face) {
+      icon.className = 'btn btn-face btn-' + face;
+      // ○ ve □ yazı tipinde dairenin içinde çok küçük kalıyor: CSS ile çizilir (.btn-circle::after).
+      icon.textContent = { cross: '✕', circle: '', triangle: '△', square: '' }[face];
+    } else if (XBOX[token]) {
+      icon.className = 'btn btn-face btn-xbox btn-xbox-' + XBOX[token];
+      icon.textContent = XBOX[token].toUpperCase();
+    } else if (token === '⧉' || token === '☰') {
+      // View ve Menu işaretleri her yazı tipinde yok: CSS ile çizilir (.btn-view, .btn-menu).
+      icon.className = 'btn btn-face btn-xbox ' + (token === '⧉' ? 'btn-view' : 'btn-menu');
+      icon.textContent = '';
+    } else if (/^[LR](?:[123]|[BTS])$/.test(token)) {
+      icon.className = 'btn btn-shoulder';
+      icon.textContent = token;
+    } else if (token === 'OPTIONS' || token === 'TOUCHPAD') {
+      icon.className = 'btn btn-wide';
+      icon.textContent = token === 'OPTIONS' ? 'OPTIONS' : '▦';
+    } else {
+      // Yön tuşu, dokunmatik yüzey, harita işareti
+      icon.className = 'btn btn-face btn-plain';
+      icon.textContent = token;
+    }
+    return icon;
+  }
+
+  // Metni tuş simgeleriyle birlikte ekler (yalnız textContent ve öğe kullanılır; metin HTML olarak yorumlanmaz).
+  function appendWithButtons(el, text) {
+    var last = 0, match;
+    BUTTON.lastIndex = 0;
+    while ((match = BUTTON.exec(text)) !== null) {
+      if (match.index > last) el.appendChild(document.createTextNode(text.slice(last, match.index)));
+      el.appendChild(buttonIcon(match[0]));
+      last = BUTTON.lastIndex;
+    }
+    if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+  }
+
+  // "MARKOS: Merhaba" → konuşmacı adı renkli (uygulamada "Konuşmacı adı renkli" açıksa).
+  function render(target, text) {
+    target.textContent = '';
+    target.dir = isRtl(text) ? 'rtl' : 'ltr';
+    // [\s\S]: "s" bayrağı (dotAll) eski tabletlerin tarayıcısında sözdizimi hatası, bütün betik çalışmıyordu
+    var match = speakerColor ? /^([^\s:][^:\n]{0,28}):\s+([\s\S]+)$/.exec(text) : null;
+    if (match) {
+      var name = document.createElement('span');
+      name.className = 'speaker';
+      name.style.color = colorForSpeaker(match[1]);
+      name.textContent = match[1] + ': ';
+      target.appendChild(name);
+      appendWithButtons(target, match[2]);
+    } else appendWithButtons(target, text);
+  }
+
+  function show(text, duration, replace) {
+    clearTimeout(hideTimer);
+    if (!text) return hide();
+    // Aynı cümlenin uzamış okuması öncekinin yerine geçer; yeni cümlede eskisi üstte soluk kalır.
+    if (hasLine && lastText && !replace && text !== lastText && showPrevious) {
+      render(previous, lastText);
+      previous.className = 'on';
+    }
+    lastText = text;
+    hasLine = true;
+    render(line, text);
+    line.className = 'on';
+    fit();
+    hideTimer = setTimeout(hide, Math.max(2500, duration || 8000));
+  }
+
+  function hide() {
+    clearTimeout(hideTimer);
+    line.className = '';
+    previous.className = '';
+    hasLine = false;
+  }
+
+  function setStatus(ok, text) {
+    dot.className = ok ? 'ok' : '';
+    statusText.textContent = text;
+  }
+
+  // Düğmeler ve durum birkaç saniye sonra kaybolur; ekrana dokununca geri gelir.
+  function wake() {
+    bar.className = '';
+    status.className = '';
+    clearTimeout(uiTimer);
+    uiTimer = setTimeout(function () { bar.className = 'hidden'; status.className = 'hidden'; }, 4500);
+  }
+
+  // Ekran kararmasın (destekleyen tarayıcılarda); sekme öne gelince yeniden istenir.
+  var wakeLock = null;
+  function keepAwake() {
+    if (!('wakeLock' in navigator) || wakeLock) return;
+    navigator.wakeLock.request('screen').then(function (lock) {
+      wakeLock = lock;
+      lock.addEventListener('release', function () { wakeLock = null; });
+    }).catch(function () {});
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') keepAwake(); });
+
+  document.getElementById('smaller').onclick = function (e) { e.stopPropagation(); scale /= 1.15; store.set('gt.screen.size', scale.toFixed(3)); applySize(); wake(); };
+  document.getElementById('bigger').onclick = function (e) { e.stopPropagation(); scale *= 1.15; store.set('gt.screen.size', scale.toFixed(3)); applySize(); wake(); };
+  var historyButton = document.getElementById('history');
+  function labelHistory() { historyButton.textContent = showPrevious ? T.previousOn : T.previousOff; }
+  historyButton.onclick = function (e) {
+    e.stopPropagation();
+    showPrevious = !showPrevious;
+    store.set('gt.screen.previous', showPrevious ? '1' : '0');
+    if (!showPrevious) previous.className = '';
+    labelHistory();
+    wake();
+  };
+  var fullButton = document.getElementById('full');
+  var root = document.documentElement;
+  var canFull = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (!canFull) fullButton.style.display = 'none';
+  fullButton.onclick = function (e) {
+    e.stopPropagation();
+    if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    wake();
+  };
+  document.body.addEventListener('click', function () { wake(); keepAwake(); });
+  window.addEventListener('resize', applySize);
+
+  // --- Altyazının dikey yeri: düğme üst / orta / alt arasında geçer, parmakla sürükleyerek tam yer seçilir ---
+  var stage = document.getElementById('stage'), block = document.getElementById('block');
+  var placeButton = document.getElementById('place');
+  var savedPlace = store.get('gt.screen.place');
+  var place = savedPlace === null ? 0.5 : Number(savedPlace);
+  if (!(place >= 0 && place <= 1)) place = 0.5;
+  var presets = [0, 0.5, 1];
+  function applyPlace() {
+    // Blok, sahnenin iç alanında yerine göre durur: 0'da üst kenara, 1'de alt kenara yaslanır (taşmaz).
+    var inner = stage.clientHeight - parseFloat(getComputedStyle(stage).paddingTop) - parseFloat(getComputedStyle(stage).paddingBottom);
+    var room = Math.max(0, inner - block.offsetHeight);
+    block.style.top = (parseFloat(getComputedStyle(stage).paddingTop) + room * place) + 'px';
+    var label = place <= 0.02 ? T.top : place >= 0.98 ? T.bottom : Math.abs(place - 0.5) <= 0.02 ? T.middle : T.custom;
+    placeButton.textContent = label;
+  }
+  function savePlace() { store.set('gt.screen.place', place.toFixed(3)); }
+  placeButton.onclick = function (e) {
+    e.stopPropagation();
+    var next = presets.filter(function (p) { return p > place + 0.02; })[0];
+    place = next === undefined ? presets[0] : next;
+    savePlace();
+    applyPlace();
+    wake();
+    // Sürüklenebildiğini bir kez söyle; birkaç saniye sonra bağlantı durumu geri gelir.
+    var before = statusText.textContent;
+    statusText.textContent = T.placeHint;
+    setTimeout(function () { if (statusText.textContent === T.placeHint) statusText.textContent = before; }, 3000);
+  };
+  var dragFrom = null;
+  block.addEventListener('pointerdown', function (e) {
+    dragFrom = { y: e.clientY, place: place };
+    block.classList.add('dragging');
+    try { block.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  block.addEventListener('pointermove', function (e) {
+    if (!dragFrom) return;
+    var inner = stage.clientHeight - parseFloat(getComputedStyle(stage).paddingTop) - parseFloat(getComputedStyle(stage).paddingBottom);
+    var room = Math.max(1, inner - block.offsetHeight);
+    place = Math.max(0, Math.min(1, dragFrom.place + (e.clientY - dragFrom.y) / room));
+    applyPlace();
+  });
+  function endDrag() {
+    if (!dragFrom) return;
+    dragFrom = null;
+    block.classList.remove('dragging');
+    savePlace();
+  }
+  block.addEventListener('pointerup', endDrag);
+  block.addEventListener('pointercancel', endDrag);
+  // Satır değişince bloğun yüksekliği değişir; yerinde kalsın.
+  new MutationObserver(applyPlace).observe(block, { childList: true, subtree: true, characterData: true, attributes: true });
+  window.addEventListener('resize', applyPlace);
+
+  labelHistory();
+  applySize();
+  applyPlace();
+  wake();
+  keepAwake();
+
+  // "viewer=obs": uygulama bunu TV saymaz ("TV bağlı" sayısına katılmaz) ama altyazıyı her zaman gönderir.
+  var events = new EventSource('/events?viewer=obs&screen=1');
+  events.onopen = function () {
+    setStatus(true, T.connected);
+    if (!hasLine) { line.dir = 'ltr'; line.textContent = T.waiting; line.className = 'idle'; }
+  };
+  events.onerror = function () {
+    setStatus(false, T.lost);
+    wake();
+  };
+  events.addEventListener('style', function (e) {
+    try {
+      var s = JSON.parse(e.data);
+      speakerColor = typeof s.speakerColor === 'string' ? s.speakerColor : '';
+      setSpeakerColors(speakerColor && s.speakerColors instanceof Array ? s.speakerColors : []);
+      if (typeof s.fontFamily === 'string') applyFont(s.fontFamily, s.fontUrl);
+    } catch (err) {}
+  });
+
+  // Altyazı fontu: uygulama kurulu fontun dosyasını fontUrl'den verir; dosya yoksa standart yazı kalır.
+  var fontKey = '';
+  function applyFont(family, url) {
+    var key = family + '|' + (url || '');
+    if (key === fontKey) return;
+    fontKey = key;
+    var tag = document.getElementById('subtitle-font-face');
+    if (!tag) { tag = document.createElement('style'); tag.id = 'subtitle-font-face'; document.head.appendChild(tag); }
+    var name = url ? 'GTFont' + url.replace(/[^a-z0-9]/gi, '') : family.replace(/['"\\]/g, '');
+    tag.textContent = url ? "@font-face { font-family: '" + name + "'; src: url('" + url + "'); font-weight: 100 900; }" : '';
+    var value = name ? "'" + name + "', -apple-system, \"Segoe UI\", Roboto, system-ui, sans-serif" : '';
+    line.style.fontFamily = value;
+    previous.style.fontFamily = value;
+    // Yeni fontun genişliği farklı: yazı yeniden sığdırılır (font inince bir kez daha)
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }
+  events.addEventListener('subtitle', function (e) {
+    try { var d = JSON.parse(e.data); show(d.text, d.duration, d.replace === true); } catch (err) {}
+  });
+  events.addEventListener('clear', hide);
+})();
+</script>
+</body>
+</html>
