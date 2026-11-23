@@ -14,9 +14,11 @@ mirrored under upstream/GameTranslator for integration work. Generated binaries,
 game dialogue/copyrighted patch files and packaged APKs are deliberately omitted.
 The importer also records the exact release tag and Git commit.
 
-A daily GitHub Action polls GitLab Releases, imports the newest stable tagged
-source and opens a review PR. It never silently installs a foreign APK, auto-merges
-third-party changes or publishes a new DraBornTranslate production build.
+A daily GitHub Action polls GitLab Releases and mirrors the newest stable
+upstream source snapshot to the isolated `upstream/GameTranslator` directory in
+`main` (without automatically compiling or executing it). Original copyright
+notices remain intact. Third-party changes are not auto-applied to the Android
+host or published as a new DraBornTranslate production APK.
 Original DraBornTranslate app and its Kotlin engine are kept intact.
 
 The supplied v1.8.51 ZIP does not contain a GTA 6 translation pack. The GitLab

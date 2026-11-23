@@ -984,7 +984,7 @@ class MainActivity : Activity() {
                     } else {
                         append(label("En yeni kaynak: " + version.tag, 18, WHITE, bold = true), 12)
                         append(label(version.title, 14, MUTED), 6)
-                        append(label("Yeni kaynaklar GitHub'a inceleme önerisi olarak alınır. " +
+                        append(label("Yeni kaynaklar GitHub'da ayrı kaynak klasörüne alınır. " +
                             "Testler ve entegrasyon bitmeden APK'ya uygulanmaz.", 14, MUTED), 10)
                         append(button("GitLab sürüm notlarını aç") { openLink(version.url) }, 12)
                     }
