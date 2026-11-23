@@ -14,10 +14,10 @@
 
 ## GTA 6 translation pack
 
-The original GameTranslator v1.8.50 release notes claim approximately 475,000 GTA VI Turkish entries, including labels such as Kolt & Associates:. The uploaded v1.8.51 source ZIP and uploaded v1.8.50 APK do NOT embed that translation pack. The original Android code uses a remote manifest at:
+The official GameTranslator v1.8.50 release notes claim approximately 475,000 GTA VI Turkish entries, including labels such as Kolt & Associates:. On 2026-11-23, a live fetch of the official /v1/packs manifest confirmed the **gta-6** Turkish pack is advertised with **475,893 entries**, **version 3**, **25,271,152 bytes**, and SHA-256 **f64f4505e9d41246c86ba1ac87f0932bc102d01d820acb4abdaff61f0b21a268**. This verifies the server's catalog claim, not every translated script line. The uploaded v1.8.51 source ZIP and uploaded v1.8.50 APK do NOT embed that translation pack. The original Android code uses a remote manifest at:
 https://gametranslator-packs.gametranslator-pool.workers.dev/v1/packs
 
-The upstream Android engine downloads packs on demand, validates SHA-256 checksums and queries local indexed translations before running the fallback translation model. This preserves pack-first behavior for entries actually downloaded and matched. The server's live pack completeness and actual 475k entry count were not independently verified. The third-party game's script is not republished in this repository or in the locally built APK.
+The upstream Android engine downloads packs on demand, validates SHA-256 checksums and queries local indexed translations before running the fallback translation model. This preserves pack-first behavior for entries actually downloaded and matched. The server manifest's 475,893 entry count was confirmed, but the pack binary, individual entries and coverage have not been independently inspected or verified. The third-party game's script is not republished in this repository or in the locally built APK.
 
 ## Reproduce from full Android source
 
