@@ -5,13 +5,10 @@ import android.content.Context
 import android.util.AtomicFile
 import com.gametranslator.gametranslator_mobile.core.GamePack
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-import java.security.MessageDigest
 import java.util.Locale
 
 /**
@@ -43,8 +40,11 @@ internal object Gta6PackInstaller {
     }
 
     /** Must run on a worker thread. An existing verified pack survives failed downloads. */
-    @Synchronized fun install(context: Context): Installed {
-        val manifest = JSONObject(String(download(BASE_URL + "/v1/packs", MAX_MANIFEST), Charsets.UTF_8))
+    @Synchronized fun install(context: Context, onProgress: (Int) -> Unit = {}): Installed {
+        val manifest = JSONObject(String(
+            ReliablePackDownloader.manifest(URL(BASE_URL + "/v1/packs"), MAX_MANIFEST),
+            Charsets.UTF_8
+        ))
         val packs = manifest.optJSONArray("packs") ?: throw IOException("Sunucu oyun paketi listesi döndürmedi.")
         val matches = (0 until packs.length()).mapNotNull { index ->
             val entry = packs.optJSONObject(index) ?: return@mapNotNull null
@@ -65,12 +65,18 @@ internal object Gta6PackInstaller {
         val old = installedInfo(context)
         if (old != null && old.sha256 == target.sha256 &&
             runCatching { sha256(installedFile(context).readBytes()) == target.sha256 }.getOrDefault(false)
-        ) return old
+        ) {
+            onProgress(100)
+            return old
+        }
 
         val id = URLEncoder.encode(target.id, "UTF-8")
-        val bytes = download(BASE_URL + "/v1/packs/" + id, MAX_PACK_BYTES)
-        val actual = sha256(bytes)
-        if (actual != target.sha256) throw IOException("Paket SHA-256 kontrolü başarısız. Eski paket korundu.")
+        val partial = File(context.filesDir, NAME + ".part")
+        val bytes = ReliablePackDownloader.archive(
+            URL(BASE_URL + "/v1/packs/" + id),
+            partial, target.size, target.sha256, onProgress
+        )
+        val actual = target.sha256
         if (bytes.size >= 4 && bytes[0] == 0x1f.toByte() && bytes[1] == 0x8b.toByte()) {
             val size = (bytes[bytes.size-4].toLong() and 255) or
                 ((bytes[bytes.size-3].toLong() and 255) shl 8) or
@@ -106,12 +112,16 @@ internal object Gta6PackInstaller {
             metadata.failWrite(metaStream)
             throw failure
         }
+        File(context.filesDir, NAME + ".part").delete()
+        File(context.filesDir, NAME + ".part.state").delete()
         return info
     }
 
     @Synchronized fun remove(context: Context) {
         AtomicFile(installedFile(context)).delete()
         AtomicFile(File(context.filesDir, METADATA)).delete()
+        File(context.filesDir, NAME + ".part").delete()
+        File(context.filesDir, NAME + ".part.state").delete()
     }
 
     private fun isGta6(value: String): Boolean {
@@ -121,29 +131,8 @@ internal object Gta6PackInstaller {
     }
 
     private fun sha256(bytes: ByteArray): String =
-        MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }
-
-    private fun download(address: String, max: Int): ByteArray {
-        val connection = URL(address).openConnection() as HttpURLConnection
-        try {
-            connection.connectTimeout = 12_000
-            connection.readTimeout = 60_000
-            connection.instanceFollowRedirects = false
-            if (connection.responseCode != 200) throw IOException("Paket sunucusu HTTP " + connection.responseCode)
-            if (connection.contentLengthLong > max) throw IOException("Paket boyutu sınırı aşıldı.")
-            return connection.inputStream.use { input ->
-                val output = ByteArrayOutputStream(minOf(max, 1 shl 17))
-                val block = ByteArray(64 * 1024)
-                while (true) {
-                    val count = input.read(block)
-                    if (count < 0) break
-                    if (output.size() + count > max) throw IOException("Paket boyutu sınırı aşıldı.")
-                    output.write(block, 0, count)
-                }
-                output.toByteArray()
-            }
-        } finally {
-            connection.disconnect()
+        java.security.MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") {
+            "%02x".format(it.toInt() and 255)
         }
-    }
+
 }
