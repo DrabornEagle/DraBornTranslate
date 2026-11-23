@@ -1,0 +1,58 @@
+name: Full Android Flutter / Chiaki source build v5.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/prepare_gametranslator_full_v5_1.py'
+      - '.github/workflows/full-android-v5.1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  full-android-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0 cmake;3.22.1'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install upstream native build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build pkg-config nasm
+          python -m pip install --upgrade protobuf grpcio-tools
+      - name: Clone exact GameTranslator version and Chiaki-native sources
+        run: |
+          git clone --depth 1 --branch v1.8.51 --single-branch https://gitlab.com/sefflex/GameTranslator.git "$RUNNER_TEMP/GameTranslator-v1.8.51"
+          git clone --depth 1 --branch v1.10.0 --recurse-submodules https://github.com/streetpea/chiaki-ng.git "$RUNNER_TEMP/GameTranslator-v1.8.51/third-party/chiaki-ng"
+          python scripts/prepare_gametranslator_full_v5_1.py "$RUNNER_TEMP/GameTranslator-v1.8.51"
+      - name: Flutter dependencies
+        working-directory: ${{ runner.temp }}/GameTranslator-v1.8.51/mobile
+        run: flutter pub get
+      - name: Build complete source preview
+        working-directory: ${{ runner.temp }}/GameTranslator-v1.8.51/mobile
+        env:
+          GT_PYTHON: ${{ env.pythonLocation }}/bin/python
+        run: |
+          flutter build apk --release --target-platform android-arm64 --build-name 5.1.0 --build-number 51001 -v
+      - name: Publish build artifact for testing only
+        uses: actions/upload-artifact@v4
+        with:
+          name: DraBornTranslate-v5.1-full-source-build-UNVERIFIED
+          path: ${{ runner.temp }}/GameTranslator-v1.8.51/mobile/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
