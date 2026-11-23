@@ -1,0 +1,101 @@
+name: Release · Verified Signed APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: draborntranslate-v0.4.13-release
+  cancel-in-progress: false
+
+jobs:
+  signed-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+
+      - name: Require original signing credentials (never create a different keystore)
+        env:
+          KS_B64: ${{ secrets.DRABORNTRANSLATE_KEYSTORE_BASE64 }}
+          KS_STORE_PASS: ${{ secrets.DRABORNTRANSLATE_KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.DRABORNTRANSLATE_KEY_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.DRABORNTRANSLATE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for value in KS_B64 KS_STORE_PASS KS_ALIAS KS_KEY_PASS; do
+            if [[ -z "${!value:-}" ]]; then
+              echo "::error::Missing signing secret $value. Original v0.4.11 certificate required."
+              exit 1
+            fi
+          done
+          printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/signing.jks"
+          keytool -list -keystore "$RUNNER_TEMP/signing.jks" \
+            -storepass "$KS_STORE_PASS" -alias "$KS_ALIAS" > /dev/null
+
+      - name: Build and test release
+        run: |
+          ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
+
+      - name: Align and sign with original production key
+        env:
+          KS_STORE_PASS: ${{ secrets.DRABORNTRANSLATE_KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.DRABORNTRANSLATE_KEY_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.DRABORNTRANSLATE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+          INPUT="app/build/outputs/apk/release/app-release-unsigned.apk"
+          OUTPUT="DraBornTranslate-v0.4.13-Android-arm64.apk"
+          test -f "$INPUT"
+          "$TOOLS/zipalign" -f -p 4 "$INPUT" aligned.apk
+          "$TOOLS/apksigner" sign --ks "$RUNNER_TEMP/signing.jks" \
+            --ks-key-alias "$KS_ALIAS" --ks-pass env:KS_STORE_PASS \
+            --key-pass env:KS_KEY_PASS --out "$OUTPUT" aligned.apk
+          "$TOOLS/apksigner" verify --verbose --print-certs "$OUTPUT"
+          curl --retry 3 --fail --location \
+            "https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.11/DraBornTranslate-v0.4.11-Android-arm64.apk" \
+            --output old.apk
+          OLD_CERT=$("$TOOLS/apksigner" verify --print-certs old.apk | awk -F ': ' '/Signer #1 certificate SHA-256 digest/ { print $2; exit }')
+          NEW_CERT=$("$TOOLS/apksigner" verify --print-certs "$OUTPUT" | awk -F ': ' '/Signer #1 certificate SHA-256 digest/ { print $2; exit }')
+          if [[ -z "$OLD_CERT" || -z "$NEW_CERT" || "$OLD_CERT" != "$NEW_CERT" ]]; then
+            echo "::error::APK signing certificate differs from v0.4.11. Do not publish."
+            exit 1
+          fi
+          echo "Verified matching signing certificate SHA-256: $NEW_CERT"
+          sha256sum "$OUTPUT" > "$OUTPUT.sha256"
+          rm old.apk aligned.apk
+
+      - name: Save verified signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DraBornTranslate-v0.4.13-Signed-Release
+          path: |
+            DraBornTranslate-v0.4.13-Android-arm64.apk
+            DraBornTranslate-v0.4.13-Android-arm64.apk.sha256
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v0.4.13 >/dev/null 2>&1; then
+            echo "::error::v0.4.13 already exists. Refusing overwrite."
+            exit 1
+          fi
+          gh release create v0.4.13 \
+            DraBornTranslate-v0.4.13-Android-arm64.apk \
+            DraBornTranslate-v0.4.13-Android-arm64.apk.sha256 \
+            --target "$GITHUB_SHA" \
+            --title "DraBornTranslate v0.4.13 · GTA 6 Türkçe paket ve Lens" \
+            --notes-file docs/RELEASE-v0.4.13.md
