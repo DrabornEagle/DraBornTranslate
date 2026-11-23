@@ -68,11 +68,26 @@ def prepareTozModel = tasks.register('prepareTozModel') {
                     java.nio.file.Files.copy(local.toPath(), temporary.toPath(),
                         java.nio.file.StandardCopyOption.REPLACE_EXISTING)
                 } else {
-                    def connection = URI.create("https://huggingface.co/TozAI/Toz-Cevir-1/resolve/${modelRevision}/${remotePath}").toURL().openConnection()
-                    connection.connectTimeout = 20000
-                    connection.readTimeout = 45000
-                    connection.inputStream.withCloseable { input ->
-                        temporary.withOutputStream { output -> input.transferTo(output) }
+                    // Hugging Face CDN redirects can sporadically return 502.
+                    // Retry transient network errors and keep mandatory SHA-256 validation.
+                    def sourceUrl = URI.create("https://huggingface.co/TozAI/Toz-Cevir-1/resolve/${modelRevision}/${remotePath}").toURL()
+                    for (int attempt = 1; attempt <= 4; attempt++) {
+                        try {
+                            def connection = sourceUrl.openConnection()
+                            connection.connectTimeout = 20000
+                            connection.readTimeout = 45000
+                            connection.inputStream.withCloseable { input ->
+                                temporary.withOutputStream { output -> input.transferTo(output) }
+                            }
+                            if (temporary.withInputStream { sha256(it) } != checksum) {
+                                throw new IOException("Model hash mismatch after download: ${name}")
+                            }
+                            break
+                        } catch (IOException failure) {
+                            if (attempt == 4) throw failure
+                            logger.warn("Model download attempt ${attempt} failed for ${name}: ${failure.message}")
+                            sleep(1000L * attempt)
+                        }
                     }
                 }
                 if (temporary.withInputStream { sha256(it) } != checksum) {
