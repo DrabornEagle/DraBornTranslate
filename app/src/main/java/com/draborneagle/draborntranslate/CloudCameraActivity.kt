@@ -63,6 +63,7 @@ class CloudCameraActivity : Activity() {
     private val recognizer: TextRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private val translator: GameTranslatorEngine by lazy { GameTranslatorEngine(this) }
     private val busy = AtomicBoolean(false)
+    private val opening = AtomicBoolean(false)
     private val prefs by lazy { getSharedPreferences("cloud-camera-v07", MODE_PRIVATE) }
     private var config = CaptureSettings(readingArea = ReadingArea.DUAL)
     private var camera: CameraDevice? = null
@@ -70,9 +71,9 @@ class CloudCameraActivity : Activity() {
     private var reader: ImageReader? = null
     private var cameraId: String? = null
     private var sensorOrientation = 90
-    private var foreground = false
-    private var destroyed = false
-    private var ready = false
+    @Volatile private var foreground = false
+    @Volatile private var destroyed = false
+    @Volatile private var ready = false
     private var lastReadAt = 0L
     private lateinit var preview: TextureView
     private lateinit var guides: CloudRegionView
@@ -266,12 +267,14 @@ class CloudCameraActivity : Activity() {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), 701)
             return
         }
+        if (!opening.compareAndSet(false, true)) return
         try {
             val id = manager.cameraIdList.firstOrNull { candidate ->
                 manager.getCameraCharacteristics(candidate)
                     .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK
             } ?: manager.cameraIdList.firstOrNull()
             if (id == null) {
+                opening.set(false)
                 showStatus("Bu telefonda kullanılabilir kamera bulunamadı.")
                 return
             }
@@ -281,6 +284,7 @@ class CloudCameraActivity : Activity() {
             @Suppress("MissingPermission")
             manager.openCamera(id, object : CameraDevice.StateCallback() {
                 override fun onOpened(device: CameraDevice) {
+                    opening.set(false)
                     if (!foreground || destroyed) {
                         device.close()
                         return
@@ -289,17 +293,20 @@ class CloudCameraActivity : Activity() {
                     configureCamera(device)
                 }
                 override fun onDisconnected(device: CameraDevice) {
+                    opening.set(false)
                     device.close()
                     camera = null
                     showStatus("Kamera bağlantısı kesildi. Tekrar aç.")
                 }
                 override fun onError(device: CameraDevice, error: Int) {
+                    opening.set(false)
                     device.close()
                     camera = null
                     showStatus("Kamera açılamadı ($error). Kamera iznini kontrol et.")
                 }
             }, cameraHandler)
         } catch (error: Exception) {
+            opening.set(false)
             showStatus("Kamera açılamadı: ${error.message ?: "Cihaz kamerasını kontrol et."}")
         }
     }
@@ -416,6 +423,7 @@ class CloudCameraActivity : Activity() {
     }
 
     private fun stopCamera() {
+        opening.set(false)
         cameraHandler.post {
             runCatching { capture?.close() }
             capture = null
