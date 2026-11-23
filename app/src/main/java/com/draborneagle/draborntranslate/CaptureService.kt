@@ -322,7 +322,7 @@ class CaptureService : Service() {
             region.frameWidth, region.frameHeight,
         )
         try {
-            regionReader.readLocated(lensBitmap) { lines ->
+            regionReader.readMessageBlocks(lensBitmap) { lines ->
                 try {
                     if (!ended && frameEpoch == epoch) {
                         if (lines == null) {
