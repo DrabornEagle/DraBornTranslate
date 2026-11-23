@@ -21,7 +21,7 @@
 
 ---
 
-## 🚀 v0.6.2 · GTA 6 Türkçe altyazı kalitesi ve kişisel düzeltmeler
+## 🚀 v0.6.3 · Eş zamanlı altyazı ve seçili Lens mesaj bölgesi
 
 DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve altyazı araçlarının tamamı DrabornEagle görsel kimliğiyle sunulur.
 
@@ -49,7 +49,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.6.2` / `versionCode 3` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.6.3` / `versionCode 4` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
@@ -73,6 +73,17 @@ CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemes
 - `DRABORNTRANSLATE_KEY_PASSWORD`
 
 İş akışı derleme testlerini çalıştırır, APK imzasını ve Android sürüm kodunu doğrular ve ancak başarılı olursa GitHub Release oluşturur. Keystore veya parolaları kaynak depoya yüklemeyin.
+
+### GTA 6 mesajları + konuşmalar eş zamanlı (v0.6.3)
+
+Portal ekranında **Çevrilecek alan → Altyazı + Lens · Aynı anda** seç. Uygulama **tek Android ekran paylaşım izni** ve aynı görüntü akışından iki ayrı alan okur:
+
+- **Mavi altyazı bandı:** diyalogları kendi Türkçe altyazı katmanında gösterir; Portal yan paneli açıksa konuşma altyazısı panelde de görünür.
+- **Yeşil Lens alanı:** GTA 6 telefon mesajlarını oyun görüntüsündeki yerlerinde Türkçeye çevirir. Sol, üst, genişlik ve yükseklik kaydırıcılarıyla mesaj alanını ayarla.
+- Çok satırlı telefon mesajları metin bloğu olarak çevrilir. Belirsiz argoyu tahmin etmek yerine yaygın, açık anlamlı mesaj kısaltmaları için sınırlı editör düzeltmeleri uygulanır.
+- Tek capture ile iki OCR işlemi kullanılır; bunlar aynı cihaz üstü çeviri kuyruğunu paylaşır. Model/paket hızı ve gerçek PS5 görüntüsü cihazda test edilmelidir.
+
+⚠️ **Lens sonucu fiziksel PS Portal ekranına doğrudan çizilmez.** Lens ekran katmanı telefon üzerinde çalışır; PS5 oyununun mesaj ekranı telefon ekranına aktarılan yayında görünmelidir. [v0.6.3 sürüm notları](docs/RELEASE-v0.6.3.md).
 
 ### GTA 6 kalite iyileştirmesi (v0.6.2)
 
