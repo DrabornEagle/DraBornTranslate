@@ -64,6 +64,8 @@ private const val PORTAL_START = "Portal Bağlantısını Başlat"
 private const val PORTAL_STOP = "Portal Bağlantısını Durdur"
 
 class MainActivity : Activity() {
+    private enum class EntryMode { HOME, PS5_TV, PORTAL }
+    private var entryMode = EntryMode.HOME
     private val prefs by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
     private lateinit var config: CaptureSettings
     private var pending = false
@@ -109,7 +111,7 @@ class MainActivity : Activity() {
     private lateinit var testButton: Button
     private lateinit var voiceButton: Button
 
-    private val observe: (SessionState.State) -> Unit = { render() }
+    private val observe: (SessionState.State) -> Unit = { if (entryMode == EntryMode.PORTAL) render() }
     private val observeUpdate: (UpdateState) -> Unit = { state ->
         renderAboutUpdate?.invoke(state)
         if (updateResultPending && state != UpdateState.Checking) {
@@ -136,8 +138,10 @@ class MainActivity : Activity() {
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
         updateResultPending = savedInstanceState?.getBoolean("updateResultPending") ?: false
-        buildUi()
-        render()
+        entryMode = savedInstanceState?.getString("entryMode")?.let { saved ->
+            EntryMode.entries.firstOrNull { it.name == saved }
+        } ?: EntryMode.HOME
+        navigate(entryMode)
         if (savedInstanceState?.getBoolean("aboutOpen") == true) showAbout()
     }
 
@@ -171,6 +175,7 @@ class MainActivity : Activity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("entryMode", entryMode.name)
         outState.putBoolean("pending", pending)
         outState.putString("tunnelAddress", tunnelAddress)
         outState.putString("tunnelSession", tunnelSession)
@@ -184,6 +189,197 @@ class MainActivity : Activity() {
         finishDemo()
         voicePreview?.close()
         super.onDestroy()
+    }
+
+
+    @Deprecated("Back navigation uses the Activity callback for Android 10 compatibility")
+    override fun onBackPressed() {
+        if (entryMode == EntryMode.HOME) super.onBackPressed()
+        else navigate(EntryMode.HOME)
+    }
+
+    private fun navigate(mode: EntryMode) {
+        entryMode = mode
+        when (mode) {
+            EntryMode.HOME -> buildLandingUi()
+            EntryMode.PS5_TV -> buildPs5TvUi()
+            EntryMode.PORTAL -> {
+                buildUi()
+                render()
+            }
+        }
+    }
+
+    /** A common portrait-safe shell shared by the two entry points. */
+    private fun newPage(): LinearLayout {
+        val viewport = FrameLayout(this).apply {
+            background = gradient(GradientDrawable.Orientation.TOP_BOTTOM,
+                0xFF24164D.toInt(), BACKGROUND, 0)
+        }
+        viewport.setOnApplyWindowInsetsListener { view, insets ->
+            if (Build.VERSION.SDK_INT >= 30) {
+                val safe = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
+                view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+            }
+            insets
+        }
+        setContentView(viewport)
+        val scroll = ScrollView(this).apply { isFillViewport = true }
+        viewport.addView(scroll)
+        return column().apply {
+            setPadding(dp(17), dp(24), dp(17), dp(28))
+            layoutParams = FrameLayout.LayoutParams(
+                minOf(resources.displayMetrics.widthPixels, dp(610)), -2, Gravity.TOP or Gravity.CENTER_HORIZONTAL)
+            scroll.addView(this)
+        }
+    }
+
+    private fun brandHeader(content: LinearLayout, subtitle: String) {
+        val hero = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF43246D.toInt(), 0xFF18375B.toInt(), 23)
+                .apply { setStroke(dp(1), 0xFF7464B8.toInt()) }
+            setPadding(dp(15), dp(16), dp(15), dp(16))
+        }
+        hero.addView(ImageView(this).apply {
+            setImageResource(R.drawable.brand_mark)
+            contentDescription = "DraBornTranslate logosu"
+        }, LinearLayout.LayoutParams(dp(58), dp(58)).apply { marginEnd = dp(12) })
+        hero.addView(column().apply {
+            addView(label("DraBornTranslate", 22, WHITE, true))
+            append(label(subtitle, 13, MUTED), 4)
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        val more = button("ⓘ") { showAbout() }.apply {
+            contentDescription = "Hakkında ve sürüm"
+            textSize = 22f
+            minWidth = dp(48)
+        }
+        hero.addView(more, LinearLayout.LayoutParams(dp(48), dp(48)))
+        content.append(hero, 0)
+    }
+
+    private fun buildLandingUi() {
+        val content = newPage()
+        brandHeader(content, "Türkçe oyun deneyiminin merkezi")
+        content.append(label("Oynamak istediğin cihazı seç", 24, WHITE, true).apply {
+            isAccessibilityHeading = true
+        }, 30)
+        content.append(label("PS5 ve TV bağlantısı veya mevcut PS Portal çeviri araçlarına tek dokunuşla geç.", 15, MUTED), 9)
+
+        val psCard = card(true).apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF17446D.toInt(), 0xFF263164.toInt(), 24)
+                .apply { setStroke(dp(2), 0xFF3CBEFF.toInt()) }
+            isClickable = true
+            setOnClickListener { navigate(EntryMode.PS5_TV) }
+        }
+        psCard.addView(label("🎮  PS5 ve TV'ye Bağlan", 21, WHITE, true))
+        psCard.append(label("Dil ayarları • PSN kurulum ekranı • TV bağlantı adımları", 14, MUTED), 11)
+        psCard.append(button("PS5 / TV kurulumunu aç") { navigate(EntryMode.PS5_TV) }.apply {
+            styleButton(this, ACCENT to LAVENDER)
+        }, 16)
+        content.append(psCard, 22)
+
+        val portalCard = card(true).apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF462A6D.toInt(), 0xFF1B4562.toInt(), 24)
+                .apply { setStroke(dp(2), 0xFFB6A8FF.toInt()) }
+            isClickable = true
+            setOnClickListener { navigate(EntryMode.PORTAL) }
+        }
+        portalCard.addView(label("🕹  PS Portal'a Bağlan", 21, WHITE, true))
+        portalCard.append(label("Eski DraBornTranslate • Canlı altyazı • Lens • GTA 6 oyun paketi", 14, MUTED), 11)
+        portalCard.append(button("Portal çevirisini aç") { navigate(EntryMode.PORTAL) }.apply {
+            styleButton(this, LAVENDER to ACCENT)
+        }, 16)
+        content.append(portalCard, 14)
+
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        val versionCard = card()
+        versionCard.addView(label("DraBornTranslate  v" + version, 17, WHITE, true))
+        versionCard.append(label("Resmî güncellemeler: github.com/DrabornEagle/DraBornTranslate", 12, MUTED), 8)
+        versionCard.append(button("🔄  GitHub'da yeni sürüm kontrolü") {
+            showAbout()
+            updateResultPending = true
+            AppUpdater.check(this)
+        }.apply { styleButton(this, MINT to ACCENT) }, 14)
+        content.append(versionCard, 22)
+    }
+
+    private fun choosePsLanguage(
+        heading: String, key: String, choices: Array<String>, fallback: String
+    ) {
+        showPopup(heading, R.drawable.ic_portal_check) { dialog ->
+            append(label("Tercihin yalnızca bu cihazda saklanır.", 13, MUTED), 12)
+            choices.forEach { choice ->
+                append(button(choice) {
+                    prefs.edit().putString(key, choice).apply()
+                    dialog.dismiss()
+                    buildPs5TvUi()
+                }, 7)
+            }
+        }
+    }
+
+    private fun buildPs5TvUi() {
+        val content = newPage()
+        brandHeader(content, "PS5 / TV · Bağlantı kurulumu")
+        content.append(button("←  Ana sayfa") { navigate(EntryMode.HOME) }, 14)
+        content.append(label("Kurulum", 32, WHITE, true), 24)
+        content.append(label("Önce PlayStation hesabını bağla.", 16, MUTED), 5)
+
+        val language = card()
+        language.addView(label("Dil tercihleri", 18, WHITE, true))
+        val appLanguage = prefs.getString("setupAppLanguage", "Otomatik · Türkçe") ?: "Otomatik · Türkçe"
+        val translated = prefs.getString("setupTranslated", "Türkçe") ?: "Türkçe"
+        val game = prefs.getString("setupGame", "English · İngilizce") ?: "English · İngilizce"
+        language.append(button("Aa   Uygulama dili     " + appLanguage) {
+            choosePsLanguage("Uygulama dili", "setupAppLanguage",
+                arrayOf("Otomatik · Türkçe", "Türkçe", "English"), appLanguage)
+        }, 11)
+        language.append(button("🌐   Çeviri dili     " + translated) {
+            choosePsLanguage("Çeviri dili", "setupTranslated",
+                arrayOf("Türkçe", "English", "Deutsch", "Español"), translated)
+        }, 8)
+        language.append(button("🎮   Oyunun dili     " + game) {
+            choosePsLanguage("Oyunun dili", "setupGame",
+                arrayOf("English · İngilizce", "Türkçe", "Deutsch", "Español"), game)
+        }, 8)
+        content.append(language, 22)
+
+        content.append(label("Konsolun", 18, WHITE, true), 23)
+        val ps5 = card(true).apply {
+            background = shape(0xFF092B50.toInt(), 0xFF3FAFFF.toInt(), 18)
+        }
+        ps5.addView(label("PlayStation 5   ✓", 20, WHITE, true))
+        ps5.append(label("Remote Play / ikinci PSN hesabı için kurulum adımları.", 14, MUTED), 6)
+        content.append(ps5, 10)
+        content.append(label("Adım 1 / 2   •   PSN hesabı", 15, ACCENT, true), 24)
+
+        val account = card(true)
+        account.addView(label("👤   PSN ile giriş yap", 20, WHITE, true))
+        account.append(label("PS5'te ikinci kullanıcının (yan hesabın) PSN hesabıyla giriş yap. Böylece kendi hesabınla oynarken kumandan TV'den kopmaz.", 15, MUTED), 13)
+        account.append(label("🔒 Sony parolan hiçbir zaman DraBornTranslate'e girilmez.", 13, ACCENT), 14)
+        account.append(button("Sony PSN hesap sayfasını aç") {
+            showPopup("PlayStation hesabı", R.drawable.ic_portal_check, ACCENT) { dialog ->
+                append(label("Bu bağlantı Sony'nin resmî hesap sayfasını açar. Hesabını görüntülemek, uygulamanın PS5 ile eşleştiği anlamına gelmez.", 15, WHITE), 14)
+                append(label("Doğrudan PSN eşleştirme ve Chiaki bağlantı motoru bu Android sürümünde henüz entegre edilmemiştir.", 14, MUTED), 10)
+                append(button("Sony hesabını aç") {
+                    dialog.dismiss()
+                    openLink("https://www.playstation.com/acct/management/")
+                }, 14)
+            }
+        }.apply { styleButton(this, ACCENT to LAVENDER) }, 17)
+        content.append(account, 18)
+
+        content.append(label("Adım 2 / 2   •   TV ve oyun görüntüsü", 15, LAVENDER, true), 23)
+        val tv = card()
+        tv.addView(label("📺   TV'ye bağlantı", 19, WHITE, true))
+        tv.append(label("PS5 ve TV aynı oturumdayken bağlantı adımlarını tamamla. Bu ekrandaki TV eşleştirmesi henüz etkin değil; mevcut Portal canlı çevirisi ayrı modda çalışır.", 14, MUTED), 11)
+        tv.append(button("PS Portal çevirisine geç") { navigate(EntryMode.PORTAL) }, 14)
+        content.append(tv, 11)
     }
 
     private fun buildUi() {
@@ -235,6 +431,7 @@ class MainActivity : Activity() {
             setOnClickListener { showAbout() }
         }, LinearLayout.LayoutParams(dp(48), dp(48)))
         content.append(hero, 0)
+        content.append(button("←  Ana sayfa") { navigate(EntryMode.HOME) }, 13)
 
         content.append(label("Oyun kaynağı", 15, LAVENDER, bold = true), 18)
         val inputs = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -966,8 +1163,7 @@ class MainActivity : Activity() {
             }
             updateUi(AppUpdater.state)
             renderAboutUpdate = updateUi
-            append(button("GameTranslator kaynak sürümlerini kontrol et") { checkUpstreamSourceVersion() }, 12)
-            append(label("Kaynak sürümü ayrı takip edilir. Başka bir APK, DraBornTranslate üzerine kurulmaz.", 13, MUTED), 6)
+            append(label("Güncellemeler yalnızca resmî DraBornTranslate GitHub sürümlerinden alınır.", 13, MUTED), 10)
         }
     }
 
