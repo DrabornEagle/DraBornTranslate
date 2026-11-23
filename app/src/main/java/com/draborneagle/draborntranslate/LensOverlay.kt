@@ -4,6 +4,7 @@ package com.draborneagle.draborntranslate
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.os.Build
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
@@ -46,9 +47,10 @@ internal class LensOverlay(
             canvas = view
         }
         root.removeAllViews()
-        val viewport = windows.maximumWindowMetrics.bounds
-        val screenWidth = viewport.width()
-        val screenHeight = viewport.height()
+        val screenWidth = if (Build.VERSION.SDK_INT >= 30) windows.maximumWindowMetrics.bounds.width()
+            else context.resources.displayMetrics.widthPixels
+        val screenHeight = if (Build.VERSION.SDK_INT >= 30) windows.maximumWindowMetrics.bounds.height()
+            else context.resources.displayMetrics.heightPixels
         val scaleX = screenWidth.toFloat() / region.frameWidth
         val scaleY = screenHeight.toFloat() / region.frameHeight
 
