@@ -32,7 +32,6 @@
         <activity
             android:name=".CloudStudioActivity"
             android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="unspecified" />
         <activity
             android:name=".CloudCameraActivity"
