@@ -1,128 +1,91 @@
 <p align="center">
-  <img src="docs/github-hero.svg" width="100%" alt="DraBornTranslate — Oyun Ekranında Türkçe">
+  <img src="docs/github-hero.svg" width="100%" alt="DraBornTranslate — oyunlarda canlı Türkçe çeviri">
 </p>
 
 <h1 align="center">🎮 DraBornTranslate</h1>
-<p align="center"><strong>PlayStation oyunları için canlı Türkçe altyazı, Lens modu ve hazır oyun paketleri.</strong></p>
+<p align="center"><strong>PlayStation deneyimin için tasarlanmış Türkçe oyun çeviri merkezi.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/DrabornEagle/DraBornTranslate?color=8B5CF6&label=Latest%20release"></a>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml"><img alt="Android build" src="https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml/badge.svg"></a>
-  <img alt="Android 10+" src="https://img.shields.io/badge/Android-10%2B-20BB84?logo=android&logoColor=white">
-  <img alt="Free" src="https://img.shields.io/badge/Fiyat-%C3%BCcretsiz-13B8A6">
-  <a href="app/src/main/assets/LICENSE"><img alt="AGPL-3.0" src="https://img.shields.io/badge/Lisans-AGPL--3.0-E86AE8"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases"><img alt="Releases" src="https://img.shields.io/github/v/release/DrabornEagle/DraBornTranslate?color=8B5CF6&label=S%C3%BCr%C3%BCm"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml"><img alt="Android CI" src="https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml/badge.svg"></a>
+  <img alt="Android 10+" src="https://img.shields.io/badge/Android-10%2B-22D3EE?logo=android&logoColor=white">
+  <a href="app/src/main/assets/LICENSE"><img alt="AGPL-3.0" src="https://img.shields.io/badge/Lisans-AGPL--3.0-F59E0B"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/latest"><strong>📥 Son imzalı APK</strong></a> ·
-  <a href="docs/KURULUM.md"><strong>📘 Kurulum</strong></a> ·
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/actions"><strong>⚙️ Derlemeler</strong></a> ·
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/issues"><strong>🐛 Destek</strong></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases"><strong>📥 APK sürümleri</strong></a> ·
+  <a href="docs/KURULUM.md"><strong>📖 Kurulum</strong></a> ·
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/actions"><strong>⚙️ Android derlemeleri</strong></a> ·
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/issues"><strong>🛟 Destek</strong></a>
 </p>
-
-> **Sürüm durumu:** Kaynak kodu **v0.4.13**. Son yayımlanan, eski APK'larla imza uyumluluğu doğrulanmış dağıtım **v0.4.11**. v0.4.13 imzalı Release APK henüz yayımlanmadı. GitHub Actions Debug APK'sı mevcut uygulamanın üzerine kurulabilen Production Release APK değildir.
-
-> **🚧 v5.0 geliştirme çalışması:** GameTranslator v1.8.51 kaynak motorunun kısa konuşma karşılıkları ve Türkçe son düzenleme kuralları mevcut çeviri hattına bağlandı. Resmî GitLab sürümlerini izleyen otomatik kaynak senkronu ve uygulama içi kontrol ekranı eklendi. Flutter/Chiaki/TV modüllerinin tamamının tek APK'da entegrasyonu **henüz tamamlanmadı**; bu nedenle v5.0 imzalı kararlı APK yayımlandığı iddia edilmez. [v5.0 entegrasyon ayrıntıları](docs/INTEGRATION-v5.0.md).
-
-
-## 🎮 v5.1 · GameTranslator Android uyarlaması
-
-**Yeni geliştirme sürümü: v5.1.0.** GameTranslator v1.8.50 Android ikili sürümünden hazırlanan DraBornTranslate uyarlamasında Android uygulama kimliği ve adı yeniden düzenlendi; **yeni RSA-3072 keystore** ile ayrı bir APK imzalandı. Bu uygulama, kaynak kodu temel alınarak tamamı sıfırdan yeniden derlenmiş birleşik Kotlin/Flutter uygulama **değildir**. Gerçek Android telefon / PS5 testi yapılmadı. Özel keystore ve APK bu GitHub deposuna yüklenmedi.
-
-| Öğe | Kaynak / durum |
-|---|---|
-| Android uygulama adı | **DraBornTranslate**, sürüm **5.1.0** |
-| GameTranslator tabanlı Android özellikleri | PS5/Chiaki, oyun paketleri, OCR, TV bağlantısı kodu (orijinal v1.8.50 derlemesinde) |
-| GTA 6 Türkçe paketi | **Sunucu manifestinde 475.893 kayıt (v3), 25,27 MB ve SHA-256 doğrulama özeti var.** APK'ya gömülü değil; internetten indirilir. Paket dosyası ve satırların tamamı bağımsız olarak incelenmedi |
-| Kaynak sürümü | GameTranslator **v1.8.51**, resmi lisanslı kaynak aynası |
-| İmza | **Yeni sertifika**; eski DraBornTranslate kurulumu üzerine yüklenemez |
-| Tam kod derlemesi / cihaz doğrulaması | **Devam ediyor; tamamlanmış sayılmaz** |
-
-[**v5.1 teknik açıklama ve kurulum**](docs/RELEASE-v5.1.md) · [**v5.1 kaynak yeniden markalama betiği**](scripts/prepare_gametranslator_full_v5_1.py) · [**GameTranslator kaynakları**](upstream/GameTranslator) · [**GTA 6 paketi hakkında**](docs/RELEASE-v5.1.md#gta-6-translation-pack)
 
 ---
 
-## 🚀 v5.0 · GameTranslator Entegrasyon Programı
+## 🚀 v0.6.0 · İki mod, tek ana ekran
 
-**v5.0 geliştirmesi başladı; bu başlık imzalı v5.0 APK'sı yayımlandığı anlamına gelmez.** DraBornTranslate kendi uygulama kimliği, tasarımı, Lens/Portal özellikleri ve yerel çeviri motoruyla korunuyor.
+DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve altyazı araçlarının tamamı DrabornEagle görsel kimliğiyle sunulur.
 
-| Geliştirme | Durum |
+| Mod | Neler var? |
 |---|---|
-| GameTranslator v1.8.51 kaynak ağacı (1.694 dosya) | ✅ `upstream/GameTranslator` altında |
-| Kısa oyun cümleleri ve Türkçe metin düzeltme motoru | ✅ Mevcut Kotlin çeviri hattına bağlı |
-| GameTranslator kaynak sürümü kontrolü | ✅ Hakkında penceresinde |
-| GitLab yeni sürüm kaynaklarını günlük eşitleme | ✅ GitHub Actions; yalnızca lisanslı kaynak kodu |
-| Flutter ekranları + Chiaki/PS5 ve TV modüllerini aynı APK'da çalıştırma | 🚧 Geliştirme gerekiyor |
-| Orijinal sertifikayla imzalı v5.0 Android Release | ⏳ Henüz yayımlanmadı |
+| **🎮 PS5 ve TV'ye Bağlan** | PlayStation 5 kurulum ekranı, uygulama/çeviri/oyun dili tercihleri, PSN hesap yönlendirmesi ve TV adımları |
+| **🕹 PS Portal'a Bağlan** | Önceki DraBornTranslate'in ekran yakalama, canlı çeviri, Lens, oyun paketi ve Portal yardımcı araçları |
+| **🔄 Sürüm kontrolü** | Ana sayfada sürüm numarası, GitHub Releases üzerinden imza ve SHA-256 doğrulamalı güncelleme kontrolü |
 
-**Kaynak takibi:** Resmî GitLab sürümü çıktığında kaynak kod otomatik eşitlenir. Yeni özelliklerin çalışan Android uygulamasına aktarılması, test edilmesi ve imzalı sürüm hazırlanması ayrı aşamalardır. [v5.0 değişiklik notları](docs/CHANGELOG-v5.0.md) · [Entegrasyon mimarisi](docs/INTEGRATION-v5.0.md)
+> **Geliştirme durumu:** v0.6.0'ın PS5/TV tarafı bir **kurulum arayüzü önizlemesidir**. Sony PSN/Chiaki oturum eşleştirmesi veya TV'ye gerçek zamanlı görüntü aktarımı mevcut Kotlin APK'ya henüz entegre edilmemiştir. PSN düğmesi resmî Sony hesabı sayfasını açar; tek başına konsol bağlantısı oluşturmaz.
 
-## ✨ Özellikler
+## ✨ Portal çeviri özellikleri
 
-| Özellik | Açıklama |
-|:---|:---|
-| 🟣 **Lens modu** | Oyundaki menü, görev ve İngilizce yazıyı OCR ile bulup Türkçe karşılığını telefon ekranına yerleştirir |
-| 🩵 **Canlı diyalog çevirisi** | Ekranda görünen İngilizce altyazıyı Türkçeye çevirir |
-| 💚 **Paket öncelikli altyazı** | Hazır pakette eşleşme varsa yapay zekâ modelini beklemeden çeviriyi getirir |
-| ⚡ **GTA 6 paket indirme** | GameTranslator'ın v1.8.50 paket sunucusundaki Türkçe paketi isteğe bağlı indirir, SHA-256 ile doğrular |
-| 🧩 **Cihazda çalışan model** | Google ML Kit EN→TR ile Töz/ONNX yedeği; ücretli çeviri API anahtarı gerekmez |
-| 🌐 **PS Portal yan panel** | Deneysel metin paneli bağlantısı; Portal'da görüntüleme ve sabitleme garanti değildir |
+- **Canlı altyazı:** Telefonda görüntülenen PlayStation App veya PS Remote Play oyun görüntüsünden OCR ile İngilizce metin okuma.
+- **Lens görünümü:** Telefon ekranındaki yakalanan görüntü üzerine Türkçe metin yerleştirme.
+- **Çevrimdışı çeviri:** Model ilk defa indirilip hazırlandıktan sonra cihazda çeviri.
+- **İsteğe bağlı oyun paketleri:** Desteklenen paketleri kullanıcı başlatır; indirme ve özet doğrulaması uygulanır.
+- **Esnek görünüm:** Altyazı bandı, yazı boyutu, okuma bölgesi ve Portal yardımcı araçları.
 
-## 🎮 Paket öncelikli GTA 6 altyazısı
+**Sınırlar:** DraBornTranslate PlayStation Portal'ın fiziksel ekranına doğrudan sistem katmanı kuramaz. Telefonun görüntü erişim izinleri ve ilgili PlayStation uygulamasındaki yayın gereksinimleri geçerlidir. Oyun çevirilerinin doğruluğu ve oyun paketlerinin tamamlığı garanti edilmez.
 
-~~~text
-İngilizce oyun görüntüsü
-         │
-         ▼
-    OCR + metin takibi
-         │
-         ▼
-  Türkçe oyun paketini ara
-       /            \
-    Eşleşti       Eşleşmedi
-       |              |
-       ▼              ▼
- Paketten getir   Yerel AI çevir
-       \              /
-        ▼            ▼
-       Türkçe altyazı / Lens
-~~~
+## 📲 Kurulum ve güncelleme
 
-GameTranslator'ın **v1.8.50** sürüm notları, GTA 6 Türkçe paketinde **yaklaşık 475.000 satır** bulunduğunu iddia ediyor. Bu sayı **bağımsız olarak doğrulanmış değildir**. DraBornTranslate paketi APK içine veya GitHub'a gömmez. Uygulama, sunucuda mevcutsa kullanıcının isteğiyle indirir, dosyanın SHA-256 özetini kontrol eder ve ayrıştırılan satır sayısını gösterir. Çeviri kapsamı ile doğruluğu garanti edilmez.
+1. [GitHub Releases](https://github.com/DrabornEagle/DraBornTranslate/releases) sayfasından **DraBornTranslate imzalı APK'sını** indir.
+2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
+3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-## 🚀 Nasıl kullanılır?
+**Sürüm kimliği:** `versionName 0.6.0` / `versionCode 1` / `applicationId com.draborneagle.draborntranslate`.
 
-1. [Son yayımlanan Android APK](https://github.com/DrabornEagle/DraBornTranslate/releases/latest) sürümünü indir. v0.4.13 kaynak kodu için [Actions önizleme derlemesine](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml) bak.
-2. **Oyun kaynağı:** PS Portal / PlayStation App veya Telefonda oyna / PS Remote Play seç.
-3. **Çevrilecek alan:** Altyazı bölgesi, Tüm oyun metinleri veya **Lens · Yazının üzerine çevir** seç.
-4. **Görünüm ve oyun paketi → Oyun paketi → 🎮 GTA 6 Türkçe paketini indir / güncelle** yolunu kullan.
-5. Ekran paylaşımı iznini ver, oyun görüntüsünü telefonda açık tut ve canlı çeviriyi başlat.
+**Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
-> **Önemli:** Lens katmanı **Android telefonundaki** oyun görüntüsüne eklenir. PlayStation Portal'ın fiziksel ekranını doğrudan değiştirmez. Portal yan panel yöntemi deneysel olmaya devam ediyor. OCR, yalnızca görüntüde **yazılı** olan konuşmaları çevirebilir.
+### Android kaynak derleme
 
-## 🛡️ Güvenlik ve üretim imzası
+JDK 17 + Android SDK 35:
 
-- **Test:** GitHub Actions her değişiklikte birim test, lint ve Debug APK derlemesi çalıştırır.
-- **Güncelleme uyumluluğu:** v0.4.11 ile aynı sertifikayı üreten keystore olmadan yeni bir APK'yı mevcut kurulumun üzerine güvenli güncelleme olarak sunmuyoruz.
-- **Paket güvenliği:** İndirme boyut sınırı, sunucu SHA-256 kontrolü ve başarısız güncellemede eski paket dosyasını koruyan kurulum.
-- **Gizlilik:** Paket içeriği DraBornTranslate tarafından ayrı bir sunucuya yüklenmez; model çevirisi cihazda yapılır. Paket indirilirken üçüncü taraf GameTranslator sunucusuyla ağ bağlantısı kurulur.
-
-### Kaynak koddan Android derleme
-
-JDK 17 + Android SDK 35, ARM64:
-
-~~~bash
+```bash
 ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
-~~~
+```
 
-Üretilen önizleme dosyası: <code>app/build/outputs/apk/debug/app-debug.apk</code>.
+CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemesi GitHub Actions artifact'ı olarak sağlanır. **Debug APK üretim sürümü değildir** ve mevcut Release APK'nın üzerine güvenli güncelleme olarak yüklenmez.
 
-## ⚖️ Lisans ve kaynak
+### İmzalı sürüm yayınlama
 
-DraBornTranslate AGPL-3.0 kapsamındaki [CouchSubs](https://github.com/yorulmazsinan/couchsubs) ve [Sefflex/GameTranslator](https://gitlab.com/sefflex/GameTranslator) bileşenlerinden uyarlanmış kaynakları da içerir. İlgili telif ve lisans bildirimleri [LICENSE](app/src/main/assets/LICENSE) ve [NOTICE](app/src/main/assets/NOTICE) içindedir. GameTranslator sunucusu bağımsız üçüncü taraf hizmetidir; DraBornTranslate onun resmî uygulaması değildir.
+`.github/workflows/android-release-v0.6.yml`, `v0.6.0` etiketiyle tetiklenir. Dağıtım için depoda şu **GitHub Actions secrets** tanımlı olmalıdır:
 
-Oyun senaryosu ve çeviri paketlerinin yeniden dağıtım hakkı, kodun açık kaynak lisansıyla otomatik olarak verilmiş değildir. Bu nedenle üçüncü taraf GTA 6 paketi depoya veya APK'ya kopyalanmaz.
+- `DRABORN_KEYSTORE_B64`
+- `DRABORN_KEYSTORE_PASSWORD`
+- `DRABORN_KEY_ALIAS`
+- `DRABORN_KEY_PASSWORD`
+
+İş akışı derleme testlerini çalıştırır, APK imzasını ve Android sürüm kodunu doğrular ve ancak başarılı olursa GitHub Release oluşturur. Keystore veya parolaları kaynak depoya yüklemeyin.
+
+## 🔁 Açık kaynak geliştirme senkronu
+
+`.github/workflows/gametranslator-upstream.yml` GitLab'daki referans açık kaynak sürümlerini kontrol eder; lisanslı kaynakları `upstream/GameTranslator` klasörüne alır. **Bu işlem yeni bir DraBornTranslate APK'sı oluşturmaz.** Platformlar arası kaynak değişiklikleri ayrı entegrasyon, Android derleme ve gerçek cihaz testinden geçmek zorundadır. Üçüncü taraf ikili dosyalar veya oyun diyalog paketleri doğrudan repoya kopyalanmaz.
+
+## ⚖️ Lisans ve üçüncü taraf bildirimleri
+
+DraBornTranslate, GNU AGPL-3.0 kapsamındaki açık kaynak bileşenlerini de kullanır. [Lisans](app/src/main/assets/LICENSE), [telif / kaynak bildirimleri](app/src/main/assets/NOTICE) ve [orijinal kaynak bilgisi](https://gitlab.com/sefflex/GameTranslator) yasal yükümlülüklerin gereği olarak korunur. Orijinal CouchSubs katkılarının sahipleri de NOTICE dosyasında belirtilmiştir. DraBornTranslate bağımsız bir DrabornEagle projesidir; üçüncü taraf projenin resmî ürünü değildir.
 
 ---
-<p align="center"><strong>DrabornEagle ecosystem 💜 · Made for gamers</strong></p>
-<p align="center"><a href="https://www.draborneagle.com">Website</a> · <a href="https://github.com/DrabornEagle">GitHub</a> · <a href="https://github.com/DrabornEagle/DraBornTranslate/issues">Feedback</a></p>
+
+<p align="center"><strong>DrabornEagle · Made for gamers 💜</strong><br>
+<a href="https://www.draborneagle.com">Resmî web sitesi</a> ·
+<a href="https://github.com/DrabornEagle">GitHub</a> ·
+<a href="https://github.com/DrabornEagle/DraBornTranslate/issues">Görüş ve hata bildirimi</a>
+</p>
