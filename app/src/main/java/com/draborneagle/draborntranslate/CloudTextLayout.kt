@@ -18,8 +18,8 @@ internal object CloudTextLayout {
     fun containsCenter(region: Pixels, line: CloudTextBlock): Boolean {
         val centerX = line.left + (line.right - line.left) / 2
         val centerY = line.top + (line.bottom - line.top) / 2
-        return centerX in region.x until region.x + region.width &&
-            centerY in region.y until region.y + region.height
+        return centerX >= region.x && centerX < region.x + region.width &&
+            centerY >= region.y && centerY < region.y + region.height
     }
 
     fun subtitles(
