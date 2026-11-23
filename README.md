@@ -21,7 +21,20 @@
 
 ---
 
-## 🚀 v0.6.3 · Eş zamanlı altyazı ve seçili Lens mesaj bölgesi
+## 🚀 v0.7.0 · Cloud Gaming Translate (PS Portal bulut oyunları)
+
+PS Portal Cloud Streaming'de Sony'nin belgelenmiş canlı Share Screen desteği bulunmadığı için, oyunu buluttan oynarken telefon kamerasıyla Türkçe çeviren yeni mod geliştirildi.
+
+- **Fiziksel Portal ekranı → telefonun arka kamerası → ML Kit OCR → GTA 6 Türkçe paket / yerel model → telefon ekranında Türkçe altyazı.**
+- Mavi konuşma altyazısı bölgesi ve yeşil oyun telefonu mesaj bölgesi aynı anda çevrilir.
+- Görüntüler kaydedilmez, bizim sunucumuza aktarılmaz ve PSN hesap bilgileri istenmez.
+- Çeviriler doğrudan Portal'ın donanım ekranında değil, telefon ekranında gösterilir. Gerçek oynanışta kamera odak/performance testi gereklidir.
+
+[Cloud Gaming Translate v0.7.0 kullanım ve sınırlamalar](docs/RELEASE-v0.7.0.md).
+
+### Önceki v0.6.3 modu
+
+
 
 DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve altyazı araçlarının tamamı DrabornEagle görsel kimliğiyle sunulur.
 
@@ -49,7 +62,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.6.3` / `versionCode 4` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.7.0` / `versionCode 5` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
