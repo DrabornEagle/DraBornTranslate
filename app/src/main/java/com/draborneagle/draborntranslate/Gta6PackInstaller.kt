@@ -59,7 +59,9 @@ internal object Gta6PackInstaller {
         }
         val target = matches.maxByOrNull { it.entries }
             ?: throw IOException("Paket sunucusunda Türkçe GTA 6 paketi bulunamadı.")
-        if (target.size > MAX_PACK_BYTES) throw IOException("Paket izin verilen boyuttan büyük.")
+        if (target.size !in 1..MAX_PACK_BYTES.toLong() || target.entries < 1) {
+            throw IOException("Paket boyutu veya kayıt sayısı geçersiz.")
+        }
         val old = installedInfo(context)
         if (old != null && old.sha256 == target.sha256 &&
             runCatching { sha256(installedFile(context).readBytes()) == target.sha256 }.getOrDefault(false)
@@ -78,6 +80,11 @@ internal object Gta6PackInstaller {
         }
         val parsed = GamePack.decode(bytes, target.title)
         if (parsed.size < 1) throw IOException("Pakette çevrilebilir satır bulunamadı.")
+        // Never advertise the 475k-line pack merely because the server says so.
+        // Verify the real number of decoded, usable Turkish lines before activation.
+        if (parsed.size != target.entries) {
+            throw IOException("GTA 6 paketi doğrulanamadı: sunucu ${target.entries}, gerçek ${parsed.size} satır. Eski paket korundu.")
+        }
         val info = Installed(parsed.title, parsed.size, actual)
 
         val destination = AtomicFile(installedFile(context))
