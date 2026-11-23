@@ -61,11 +61,11 @@ JDK 17 + Android SDK 35:
 ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
 ```
 
-CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemesi GitHub Actions artifact'ı olarak sağlanır. **Debug APK üretim sürümü değildir** ve mevcut Release APK'nın üzerine güvenli güncelleme olarak yüklenmez.
+CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemesi GitHub Actions artifact'ı olarak sağlanır. Ayrı GTA 6 entegrasyon iş akışı gerçek 25,27 MB dosyayı doğrular ve Android JVM'deki paket öncelikli çeviri hattıyla test eder; oyun verilerini depoya yayımlamaz. **Debug APK üretim sürümü değildir** ve mevcut Release APK'nın üzerine güvenli güncelleme olarak yüklenmez.
 
 ### İmzalı sürüm yayınlama
 
-`.github/workflows/android-release-v0.6.yml`, `v0.6.0` etiketiyle tetiklenir. Dağıtım için depoda şu **GitHub Actions secrets** tanımlı olmalıdır:
+`.github/workflows/android-release-v0.6.yml`, ana dala alınan v0.6 değişikliklerinde veya elle tetiklenir; test ve sertifika kontrolleri başarılıysa `v0.6.0` önizleme sürümünü oluşturur. Dağıtım için depoda şu **GitHub Actions secrets** tanımlı olmalıdır:
 
 - `DRABORNTRANSLATE_KEYSTORE_BASE64`
 - `DRABORNTRANSLATE_KEYSTORE_PASSWORD`
