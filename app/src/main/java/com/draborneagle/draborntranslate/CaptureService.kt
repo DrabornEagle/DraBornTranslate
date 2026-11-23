@@ -365,7 +365,15 @@ class CaptureService : Service() {
         }
         // In dual mode the subtitle owns the caption/panel stream. Lens paints
         // independently at its detected coordinates and must not overwrite it.
-        if (readingArea == ReadingArea.DUAL) return
+        if (readingArea == ReadingArea.DUAL) {
+            val last = cues.firstOrNull()?.let { Caption(it.source, it.turkish) }
+            val previous = SessionState.current
+            SessionState.update(previous.copy(
+                lensCaption = last,
+                lastLensCaption = last ?: previous.lastLensCaption,
+            ))
+            return
+        }
         val caption = cues.firstOrNull()?.let { Caption(it.source, it.turkish) }
         val state = SessionState.current
         if (state.portalPanel?.previewing != true) {
@@ -460,7 +468,11 @@ class CaptureService : Service() {
     private fun finish(message: String) {
         if (ended) return
         ended = true
-        SessionState.update(SessionState.State(status = message, lastCaption = SessionState.current.lastCaption))
+        SessionState.update(SessionState.State(
+            status = message,
+            lastCaption = SessionState.current.lastCaption,
+            lastLensCaption = SessionState.current.lastLensCaption,
+        ))
         stopSelf()
     }
 
