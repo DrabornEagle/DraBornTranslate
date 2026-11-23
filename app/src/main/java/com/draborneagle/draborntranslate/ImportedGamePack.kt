@@ -21,8 +21,14 @@ internal object ImportedGamePack {
 
     fun library(context: Context) = GamePackLibrary(
         bundled = {
-            if (hasPack(context)) listOf(FILE_NAME to { file(context).readFully() })
-            else emptyList()
+            buildList {
+                // Remote GTA 6 packs are optional and installed by the user, never shipped in the APK.
+                // Bundled decoders read one file at a time; later user overrides take priority.
+                if (Gta6PackInstaller.isInstalled(context)) {
+                    add("gta6-community.json.gz" to { Gta6PackInstaller.installedFile(context).readBytes() })
+                }
+                if (hasPack(context)) add(FILE_NAME to { file(context).readFully() })
+            }
         },
         userDirectory = null,
     )
