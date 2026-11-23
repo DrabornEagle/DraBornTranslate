@@ -2,8 +2,16 @@ name: DraBornTranslate v0.6 · signed Android release
 
 on:
   push:
-    tags:
-      - 'v0.6.0'
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'scripts/verify_gta6_pack.py'
+      - '.github/workflows/android-release-v0.6.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: draborntranslate-signed-v0.6-release
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -37,6 +45,10 @@ jobs:
           umask 077
           printf '%s' "$DRABORN_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/draborn-signing.jks"
           echo "DRABORN_KEYSTORE_FILE=$RUNNER_TEMP/draborn-signing.jks" >> "$GITHUB_ENV"
+      - name: Verify the actual GTA 6 Turkish pack before releasing
+        run: |
+          python3 scripts/verify_gta6_pack.py
+          python3 scripts/verify_gta6_pack.py --live
       - name: Test and build signed APK
         env:
           DRABORN_KEYSTORE_PASSWORD: ${{ secrets.DRABORNTRANSLATE_KEYSTORE_PASSWORD }}
@@ -66,16 +78,19 @@ jobs:
           name: DraBornTranslate-v0.6.0-signed-arm64
           path: dist/
           if-no-files-found: error
-      - name: Publish only the verified DraBornTranslate APK
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/DraBornTranslate-v0.6.0-Android-arm64.apk
-            dist/SHA256SUMS.txt
-          generate_release_notes: true
-          body: |
-            DraBornTranslate v0.6.0 (Android versionCode 1).
-            Includes the dual-mode launcher and Portal translation screen.
-            PS5/TV setup is a UI preview; full PSN/Chiaki/TV pairing integration is not yet implemented.
-            Android requires uninstall/reinstall if the installed versionCode is higher or the certificate differs.
-            Source attribution and AGPL notices are retained under app/src/main/assets.
+      - name: Publish verified v0.6.0 preview to GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v0.6.0 >/dev/null 2>&1; then
+            echo "Release v0.6.0 already exists; refusing to overwrite."
+            exit 1
+          fi
+          gh release create v0.6.0 \
+            dist/DraBornTranslate-v0.6.0-Android-arm64.apk \
+            dist/SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "DraBornTranslate v0.6.0 · GTA 6 Hazır Türkçe Paket (Önizleme)" \
+            --prerelease \
+            --notes-file docs/RELEASE-v0.6.0.md
