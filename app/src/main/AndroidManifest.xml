@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -9,6 +10,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
     <queries>
+        <intent><action android:name="android.speech.RecognitionService" /></intent>
         <package android:name="com.scee.psxandroid" />
         <package android:name="com.playstation.remoteplay" />
         <package android:name="com.termux" />
@@ -23,6 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:label="DraBornTranslate"
         android:theme="@style/Theme.DraBornTranslate">
+        <activity android:name=".CloudGamingActivity" android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
