@@ -69,6 +69,8 @@ internal class CloudRegionOverlay(context: Context) : View(context) {
     var aspect = 16f / 9f
         set(value) { field = value.coerceIn(0.4f, 2.5f); invalidate() }
     var onChanged: ((CloudRegion, CloudRegion) -> Unit)? = null
+    var messageTranslation = ""
+        set(value) { field = value.take(260); invalidate() }
 
     private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         strokeWidth = dp(2.5f)
@@ -118,6 +120,31 @@ internal class CloudRegionOverlay(context: Context) : View(context) {
             stroke.color = color
             stroke.strokeWidth = dp(if (editing && selected == i) 3.5f else 2f)
             canvas.drawRoundRect(rect, dp(10f), dp(10f), stroke)
+            if (i == 1 && !editing && messageTranslation.isNotBlank()) {
+                val pad = dp(6f)
+                val maxW = (rect.width() - pad * 4).coerceAtLeast(dp(55f))
+                val lines = mutableListOf<String>()
+                var line = ""
+                for (word in messageTranslation.replace('\n', ' ').split(Regex("\\s+"))) {
+                    val candidate = if (line.isEmpty()) word else "$line $word"
+                    if (line.isNotEmpty() && words.measureText(candidate) > maxW) {
+                        lines.add(line)
+                        line = word
+                    } else line = candidate
+                    if (lines.size >= 3) break
+                }
+                if (line.isNotBlank() && lines.size < 4) lines.add(line)
+                val h = (lines.size * dp(18f) + pad * 2).coerceAtMost(rect.height())
+                fill.color = 0xE61A2442.toInt()
+                canvas.drawRoundRect(rect.left + pad, rect.top + pad,
+                    rect.right - pad, rect.top + pad + h, dp(7f), dp(7f), fill)
+                words.color = 0xFFB8FFDE.toInt()
+                lines.take(4).forEachIndexed { index, wordLine ->
+                    canvas.drawText(wordLine, rect.left + pad * 2,
+                        rect.top + pad * 2 + dp(12f) + dp(18f) * index, words)
+                }
+                words.color = Color.WHITE
+            }
             if (editing) {
                 val name = if (i == 0) "ALTYAZI" else "TELEFON / LENS"
                 fill.color = 0xE51B2140.toInt()
