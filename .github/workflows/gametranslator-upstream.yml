@@ -48,11 +48,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A upstream/GameTranslator
           if git diff --cached --quiet; then
-            echo "GameTranslator sources already match official GitLab release"
+            echo "Reference source snapshot is already current"
           else
-            git commit -m "chore(upstream): mirror official GameTranslator tagged source"
+            git commit -m "chore(upstream): sync licensed source snapshot"
             git push origin HEAD:main
           fi
-          echo "### GameTranslator source sync" >> "$GITHUB_STEP_SUMMARY"
+          echo "### DraBornTranslate source compatibility sync" >> "$GITHUB_STEP_SUMMARY"
           echo "Only licensed source snapshots, licence notices and the upstream commit are mirrored." >> "$GITHUB_STEP_SUMMARY"
           echo "Third-party binaries and copyrighted game packs are excluded. Android app integration and signed release must be reviewed and tested separately." >> "$GITHUB_STEP_SUMMARY"

@@ -18,8 +18,13 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
     private var model: TozTranslationModel? = null
     @Volatile private var localTranslator: MlKitLocalTranslator? = null
     private val packs = ImportedGamePack.library(app)
+    private val corrections = LocalTranslationCorrections(app)
     private val pipeline = GameTranslationPipeline(
-        packLookup = { text -> PackTranslation.match(packs, text) },
+        // Human-approved lines override the external pack. For all other hits,
+        // reject only malformed/obviously mismatched text and keep pack-first speed.
+        packLookup = { text ->
+            corrections.find(text) ?: PackQualityGate.select(text, PackTranslation.match(packs, text))
+        },
         model = { text -> translateLocally(text) },
     )
     @Volatile private var closed = false
