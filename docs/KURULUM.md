@@ -1,8 +1,10 @@
 # DraBornTranslate kurulum rehberi
 
+> **Sürüm notu:** v0.4.12 Lens modu kaynak koduna eklenmiştir; bu rehberdeki v0.4.11 bağlantısı yayımlanmış kararlı APK içindir. v0.4.12 imzalı APK yayınlanmadan Lens modunu denemek için kaynak koddan Android derlemesi gerekir.
+
 DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.11 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.11) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
 
-Çeviri cihazda çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
+Çeviri cihaz üzerinde yapılır. v0.4.12 Google ML Kit İngilizce–Türkçe dil modeli ilk kurulumda internetten indirilebilir (yaklaşık 30 MB); model indirildikten sonra çeviri için ücretli API veya bağlantı gerekmez. İndirme başarısızsa APK içinde bulunan Töz modeli devreye girer. Google ML Kit kullanımı sırasında anonimleştirilmiş kullanım/teşhis metrikleri Google'a gidebilir; oyun metni ve çeviriler ML Kit tarafından sunucuya gönderilmez. PlayStation yayını ve uzaktaki PS5 için açılan panel ayrıca internet bağlantısını kullanır.
 
 Sağ üstteki üç noktadan **Hakkında** penceresini aç ve **Yeni sürüm kontrolü** düğmesine dokun. Uygulama daha yeni APK’yı indirip doğruladığında kurulumu başlatır. Android uygulama kurma izni veya onay gösterirse ekrandaki adımları tamamla.
 
@@ -47,6 +49,16 @@ Portal yan paneli deneysel. Oyunun yanında görünmesi, PS5’in panel bağlant
 | Portal’da sabitleme çıkmıyor | **Çeviri çıkışı → Telefon** Türkçeyi PS App videosu üzerinde gösterir. İlk kullanımda üstte gösterme iznini aç. **Sesli Türkçe** seçeneği telefonundan okur ve Termux istemez. |
 
 Portal’ın **Bulut Akışı** modunda PS5 Paylaşımlı Ekran yayını sağlanmadığı için bu kurulum **Uzaktan Oynama** ile kullanılır. Oturumu bitirince DraBornTranslate’te **Canlı çeviriyi durdur** seç ve Termux’ta tüneli `Ctrl+C` ile kapat. Özel panel bağlantısını yalnızca kullandığın hesaplar arasında paylaş.
+
+## v0.4.12 Lens modu — ekran yazılarını yerinde çevir
+
+1. **Çevrilecek alan → Lens · Yazının üzerine çevir** seç.
+2. **Çeviri çıkışı → Telefon** veya **Telefon ve Portal paneli (deneysel)** seç; Lens'in görsel katmanı yalnızca Android telefon üzerinde gösterilir.
+3. PlayStation App ya da PS Remote Play'te oyunun İngilizce yazılarının gerçekten görülebildiğini doğrula. Ekran paylaşımı iznini verip oyunu önde tut.
+4. OCR ile bulunan İngilizce yazılar, mevcut yerlerine yakın koyu arka planlı Türkçe kutularla değiştirilir. Aynı metin tekrar göründüğünde önbellekteki çeviri hızlıca gösterilir.
+5. GTA tarzı oyunlarda görev hedefleri, telefon mesajları, menüleri ve ekrandaki diyalogları dene. Konuşulan ama altyazısı olmayan sesleri OCR çevirmez.
+
+**Sınırlar:** Bu yöntem PlayStation Portal'ın kendi ekranının görüntüsünü doğrudan değiştirmez. Android'deki PS App/Remote Play görüntüsünü çevirir; Portal paneline yalnızca metin aktarılabilir. Yazı küçük, hareketli veya bulanıksa OCR yanlış okuyabilir. Türkçenin daha uzun olması bazı yerlerde kutuların kaymasına veya üst üste gelmesine neden olabilir. Google Lens ile aynı ürün veya aynı kalite garantisi değildir; fiziksel cihaz ve farklı oyun sahnelerinde test gerektirir.
 
 ## PS App menüsü ve telefonda oyun
 
