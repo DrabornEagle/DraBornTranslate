@@ -63,39 +63,6 @@ JDK 17 + Android SDK 35:
 
 CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemesi GitHub Actions artifact'ı olarak sağlanır. Ayrı GTA 6 entegrasyon iş akışı gerçek 25,27 MB dosyayı doğrular ve Android JVM'deki paket öncelikli çeviri hattıyla test eder; oyun verilerini depoya yayımlamaz. **Debug APK üretim sürümü değildir** ve mevcut Release APK'nın üzerine güvenli güncelleme olarak yüklenmez.
 
-### İmzalı sürüm yayınlama
-
-`.github/workflows/android-release-v0.6.yml`, ana dala alınan v0.6 değişikliklerinde veya elle tetiklenir; test ve sertifika kontrolleri başarılıysa `v0.6.0` önizleme sürümünü oluşturur. Dağıtım için depoda şu **GitHub Actions secrets** tanımlı olmalıdır:
-
-- `DRABORNTRANSLATE_KEYSTORE_BASE64`
-- `DRABORNTRANSLATE_KEYSTORE_PASSWORD`
-- `DRABORNTRANSLATE_KEY_ALIAS`
-- `DRABORNTRANSLATE_KEY_PASSWORD`
-
-İş akışı derleme testlerini çalıştırır, APK imzasını ve Android sürüm kodunu doğrular ve ancak başarılı olursa GitHub Release oluşturur. Keystore veya parolaları kaynak depoya yüklemeyin.
-
-### GTA 6 mesajları + konuşmalar eş zamanlı (v0.6.3)
-
-Portal ekranında **Çevrilecek alan → Altyazı + Lens · Aynı anda** seç. Uygulama **tek Android ekran paylaşım izni** ve aynı görüntü akışından iki ayrı alan okur:
-
-- **Mavi altyazı bandı:** diyalogları kendi Türkçe altyazı katmanında gösterir; Portal yan paneli açıksa konuşma altyazısı panelde de görünür.
-- **Yeşil Lens alanı:** GTA 6 telefon mesajlarını oyun görüntüsündeki yerlerinde Türkçeye çevirir. Sol, üst, genişlik ve yükseklik kaydırıcılarıyla mesaj alanını ayarla.
-- Çok satırlı telefon mesajları metin bloğu olarak çevrilir. Belirsiz argoyu tahmin etmek yerine yaygın, açık anlamlı mesaj kısaltmaları için sınırlı editör düzeltmeleri uygulanır.
-- Tek capture ile iki OCR işlemi kullanılır; bunlar aynı cihaz üstü çeviri kuyruğunu paylaşır. Model/paket hızı ve gerçek PS5 görüntüsü cihazda test edilmelidir.
-
-⚠️ **Lens sonucu fiziksel PS Portal ekranına doğrudan çizilmez.** Lens ekran katmanı telefon üzerinde çalışır; PS5 oyununun mesaj ekranı telefon ekranına aktarılan yayında görünmelidir. [v0.6.3 sürüm notları](docs/RELEASE-v0.6.3.md).
-
-### GTA 6 kalite iyileştirmesi (v0.6.2)
-
-- Paketteki eşleşmiş altyazılarda temkinli doğruluk denetimi: bozuk karakterleri, bazı İngilizce kalmış satırları ve soru işareti uyuşmazlıklarını tespit eder. Yalnız kesin biçim hatalarını düzeltir; tahminî anlam değişikliği yapmaz.
-- **Son çeviri → Türkçe repliği düzelt**: İngilizce satırın anlamını doğru çevirdiğin Türkçesini telefonda kaydeder. Aynı replik çıktığında bu özel düzeltme pakettekinden önce **anında** gösterilir. Kaydı kaldırabilirsin.
-- Özel düzeltmeler cihazda kalır, otomatik olarak hiçbir sunucuya gönderilmez.
-- Orijinal 475.893 satır paketin içeriği yeniden yazılmamıştır; **tüm satırların profesyonel olarak elden geçirildiği iddia edilmez**. Kaliteli düzeltme için gerçek İngilizce/Türkçe hatalı örnekler gerekir.
-
-### GTA 6 indirme düzeltmesi (v0.6.1)
-
-Mobil ağlarda görülen `Connection reset` için paket indirme motoru yeniden deneme ve kaldığı yerden devam etme desteğiyle yenilendi. Paket sunucusu HTTP Range destekliyorsa 1 MiB parçalardan indirilir; desteklemiyorsa dosya yeniden alınır. Eksik/bozuk dosya asla etkinleştirilmez. Ana ekranda ilerleme yüzdesi, [resmî paket bağlantısı](https://gametranslator-packs.gametranslator-pool.workers.dev/v1/packs/gta-6) ve `.json.gz` içe alma seçenekleri vardır. Operatörün alan adına erişimi kesmesi durumunda Wi-Fi veya farklı ağ denenmelidir.
-
 ## ⚡ GTA 6 — 475.893 satır paket doğrulaması
 
 GTA 6 Türkçe paketinin sunucuda ilan edilen **475.893 satırı**, gerçek `.json.gz` dosyası indirilerek kontrol edildi. GitHub Actions [canlı test](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/gta6-pack-verification.yml) şu koşulları doğrular:
@@ -112,11 +79,6 @@ Android'de **modelden önce paket** araması yapılır; tam eşleşme bulunursa 
 
 `.github/workflows/gametranslator-upstream.yml` GitLab'daki referans açık kaynak sürümlerini kontrol eder; lisanslı kaynakları üçüncü taraf lisanslı kaynak klasörüne alır. **Bu işlem yeni bir DraBornTranslate APK'sı oluşturmaz.** Platformlar arası kaynak değişiklikleri ayrı entegrasyon, Android derleme ve gerçek cihaz testinden geçmek zorundadır. Üçüncü taraf ikili dosyalar veya oyun diyalog paketleri doğrudan repoya kopyalanmaz.
 
-## ⚖️ Lisans ve üçüncü taraf bildirimleri
-
-DraBornTranslate, GNU AGPL-3.0 kapsamındaki açık kaynak bileşenlerini de kullanır. [Lisans](app/src/main/assets/LICENSE), [telif / kaynak bildirimleri](app/src/main/assets/NOTICE) ve üçüncü taraf kaynak bildirimleri yasal yükümlülüklerin gereği olarak korunur. Orijinal CouchSubs katkılarının sahipleri de NOTICE dosyasında belirtilmiştir. DraBornTranslate bağımsız bir DrabornEagle projesidir; üçüncü taraf projenin resmî ürünü değildir.
-
----
 
 <p align="center"><strong>DrabornEagle · Made for gamers 💜</strong><br>
 <a href="https://www.draborneagle.com">Resmî web sitesi</a> ·
