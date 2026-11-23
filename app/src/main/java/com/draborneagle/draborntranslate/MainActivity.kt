@@ -109,10 +109,19 @@ class MainActivity : Activity() {
     private lateinit var copySource: Button
     private lateinit var copyTurkish: Button
     private lateinit var editTranslation: Button
+    private lateinit var lensLastMessage: TextView
+    private lateinit var lensEditMessage: Button
     private lateinit var bandPreview: BandPreview
     private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
     private lateinit var sizeControl: SeekBar
+    private lateinit var lensSettings: LinearLayout
+    private lateinit var lensAreaPreview: LensAreaPreview
+    private lateinit var lensStatus: TextView
+    private lateinit var lensLeftControl: SeekBar
+    private lateinit var lensTopControl: SeekBar
+    private lateinit var lensWidthControl: SeekBar
+    private lateinit var lensHeightControl: SeekBar
     private lateinit var testButton: Button
     private lateinit var voiceButton: Button
 
@@ -138,6 +147,10 @@ class MainActivity : Activity() {
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
                 ?: ReadingArea.SUBTITLES,
+            prefs.getInt("lensLeft", 52),
+            prefs.getInt("lensTop", 6),
+            prefs.getInt("lensWidth", 46),
+            prefs.getInt("lensHeight", 48),
         )
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
@@ -519,6 +532,12 @@ class MainActivity : Activity() {
             recognizedText()?.let { copyText("Okunan İngilizce", it) }
         }
         live.append(copySource, 6)
+        lensLastMessage = label("", 16, MINT).apply { setLineSpacing(dp(3).toFloat(), 1f) }
+        live.append(lensLastMessage, 18)
+        lensEditMessage = button("✏️  Lens telefon mesajını düzelt") {
+            showCorrectionEditor(SessionState.current.lensCaption ?: SessionState.current.lastLensCaption)
+        }
+        live.append(lensEditMessage, 7)
 
         panelCard = card()
         content.append(panelCard, 14)
@@ -561,6 +580,61 @@ class MainActivity : Activity() {
             bandPreview.contentDescription = "Oyun görüntüsünün yüzde ${value} hizasındaki okuma bandı"
         }
         bandSettings.addView(bandControl)
+        lensSettings = column()
+        settings.append(lensSettings, 15)
+        lensSettings.addView(label("📱 GTA 6 telefon mesajları · Lens alanı", 17, WHITE, bold = true))
+        lensSettings.append(label(
+            "Yeşil alanı oyundaki mesaj ekranına göre ayarla. Mavi alan konuşma altyazılarını ayrı izler. Aynı ekran yakalama izni iki alana da uygulanır.",
+            14, MUTED,
+        ), 7)
+        lensAreaPreview = LensAreaPreview()
+        lensSettings.addView(lensAreaPreview, LinearLayout.LayoutParams(-1, dp(138)).apply {
+            topMargin = dp(9)
+        })
+        lensStatus = label("", 14, MINT)
+        lensSettings.append(lensStatus, 9)
+        fun addLensSlider(title: String, savedKey: String, value: Int, change: (Int) -> Unit): SeekBar {
+            val name = label(title, 14, WHITE)
+            lensSettings.append(name, 11)
+            val control = slider(title, 100, value) { position ->
+                change(position)
+                val clamped = when (savedKey) {
+                    "lensLeft" -> config.lensLeft
+                    "lensTop" -> config.lensTop
+                    "lensWidth" -> config.lensWidth
+                    else -> config.lensHeight
+                }
+                prefs.edit().putInt(savedKey, clamped).apply()
+                lensAreaPreview.invalidate()
+                updateLensStatus()
+            }
+            lensSettings.addView(control)
+            return control
+        }
+        lensLeftControl = addLensSlider("Lens · soldan başlangıç (%)", "lensLeft", config.lensLeft) {
+            config = config.copy(lensLeft = it.coerceIn(0, 85))
+        }
+        lensTopControl = addLensSlider("Lens · üstten başlangıç (%)", "lensTop", config.lensTop) {
+            config = config.copy(lensTop = it.coerceIn(0, 85))
+        }
+        lensWidthControl = addLensSlider("Lens · genişlik (%)", "lensWidth", config.lensWidth) {
+            config = config.copy(lensWidth = it.coerceIn(15, 100))
+        }
+        lensHeightControl = addLensSlider("Lens · yükseklik (%)", "lensHeight", config.lensHeight) {
+            config = config.copy(lensHeight = it.coerceIn(15, 100))
+        }
+        lensSettings.append(button("GTA 6 · Telefon sağ üst (varsayılan)") {
+            config = config.copy(lensLeft = 52, lensTop = 6, lensWidth = 46, lensHeight = 48)
+            prefs.edit().putInt("lensLeft", 52).putInt("lensTop", 6)
+                .putInt("lensWidth", 46).putInt("lensHeight", 48).apply()
+            lensLeftControl.progress = 52
+            lensTopControl.progress = 6
+            lensWidthControl.progress = 46
+            lensHeightControl.progress = 48
+            lensAreaPreview.invalidate()
+            updateLensStatus()
+        }, 13)
+        updateLensStatus()
         val sizeLabel = label("Altyazı boyutu · ${config.textSize}", 15, WHITE)
         settings.append(sizeLabel, 8)
         sizeControl = slider("Altyazı yazı boyutu", CaptureSettings.MAX_SIZE - CaptureSettings.MIN_SIZE,
@@ -585,11 +659,18 @@ class MainActivity : Activity() {
         content.append(voiceButton, 6)
     }
 
+    private fun updateLensStatus() {
+        if (!::lensStatus.isInitialized) return
+        val region = config.lensArea(Pixels(0, 0, 100, 100))
+        lensStatus.text = "Lens alanı: Sol %${region.x} · Üst %${region.y} · En %${region.width} · Boy %${region.height}"
+    }
+
     private fun render() {
         val state = SessionState.current
         val mobile = config.source == Source.MOBILE
         val textInstructions = when (config.readingArea) {
             ReadingArea.LENS -> "Lens modu yazıların üzerine Türkçe katman yerleştirir. Oyun görüntüsü telefon ekranında açık olmalı."
+            ReadingArea.DUAL -> "Altyazılar normal bandında, GTA 6 telefon mesajları seçtiğin yeşil Lens alanında eş zamanlı çevrilir. Mesaj ekranı görünür olmalı."
             ReadingArea.GAME_TEXT -> "Çevirmek istediğin menüyü veya görevi açıp metni birkaç saniye ekranda tut."
             ReadingArea.SUBTITLES -> "Oyunun İngilizce altyazısını aç."
         }
@@ -608,7 +689,8 @@ class MainActivity : Activity() {
         phone.isSelected = mobile
         val panelTesting = state.portalPanel?.testing == true
         val controlsAvailable = !state.active && !pending && !panelTesting && !packLoading
-        listOf(portal, phone, bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
+        listOf(portal, phone, bandControl, sizeControl, lensLeftControl, lensTopControl,
+            lensWidthControl, lensHeightControl).forEach { it.isEnabled = controlsAvailable }
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
         displayChoice.isEnabled = controlsAvailable
         displayChoice.text = "Çeviri çıkışı · ${config.display.label}"
@@ -622,7 +704,9 @@ class MainActivity : Activity() {
                 (Gta6PackInstaller.installedInfo(this)?.entries?.toString() ?: "Yüklü") + " satır"
             else -> "Oyun paketi ekle"
         }
-        bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
+        bandSettings.visibility = if (config.readingArea == ReadingArea.SUBTITLES ||
+            config.readingArea == ReadingArea.DUAL) View.VISIBLE else View.GONE
+        lensSettings.visibility = if (config.readingArea == ReadingArea.DUAL) View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
         startStop.isEnabled = !pending && demoTranslator == null && !packLoading
@@ -645,6 +729,11 @@ class MainActivity : Activity() {
         sourceLabel.visibility = if (source == null) View.GONE else View.VISIBLE
         recognizedLabel.visibility = if (differentReading == null) View.GONE else View.VISIBLE
         copySource.visibility = if (recognized == null) View.GONE else View.VISIBLE
+        val latestLens = state.lensCaption ?: state.lastLensCaption
+        val showLensResult = config.readingArea == ReadingArea.DUAL && latestLens != null
+        lensLastMessage.text = latestLens?.let { "📱 Son Lens mesajı\n${it.source}\n→ ${localCorrections.find(it.source)?.text ?: it.turkish}" }.orEmpty()
+        lensLastMessage.visibility = if (showLensResult) View.VISIBLE else View.GONE
+        lensEditMessage.visibility = lensLastMessage.visibility
     }
 
     private fun displayedCaption(): Caption? {
@@ -688,6 +777,11 @@ class MainActivity : Activity() {
             .setTitle("Çevrilecek alan")
             .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.readingArea)) { dialog, index ->
                 config = config.copy(readingArea = choices[index])
+                val dualOrLens = config.readingArea == ReadingArea.DUAL || config.readingArea == ReadingArea.LENS
+                if (dualOrLens && config.source == Source.PORTAL && !config.display.phone) {
+                    config = config.copy(display = SubtitleDisplay.BOTH)
+                    prefs.edit().putString("display", config.display.name).apply()
+                }
                 prefs.edit().putString("readingArea", config.readingArea.name).apply()
                 dialog.dismiss()
                 render()
@@ -1092,8 +1186,8 @@ class MainActivity : Activity() {
      * An exact English → Turkish editor keeps user corrections separate from the
      * downloaded third-party package. Future matches are instant and offline.
      */
-    private fun showCorrectionEditor() {
-        val caption = displayedCaption()
+    private fun showCorrectionEditor(overrideCaption: Caption? = null) {
+        val caption = overrideCaption ?: displayedCaption()
         showPopup("Oyun repliğini düzelt", R.drawable.ic_portal_check, MINT) { dialog ->
             append(label("İngilizce ve doğru Türkçe karşılığını yaz. Kaydın yalnızca bu telefonda tutulur; oyun paketi değişse bile korunur.", 14, MUTED), 12)
             val english = EditText(this@MainActivity).apply {
@@ -1535,6 +1629,42 @@ class MainActivity : Activity() {
 
     private fun LinearLayout.append(view: View, gap: Int) {
         addView(view, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(gap) })
+    }
+
+    /** 16:9 landscape diagram: subtitle zone (blue) and selected message zone (mint). */
+    private inner class LensAreaPreview : View(this@MainActivity) {
+        private val pen = Paint(Paint.ANTI_ALIAS_FLAG)
+        override fun onDraw(canvas: Canvas) {
+            super.onDraw(canvas)
+            val padding = dp(8).toFloat()
+            val availableW = width - padding * 2
+            val availableH = height - padding * 2
+            val gameW = minOf(availableW, availableH * 16f / 9f)
+            val gameH = gameW * 9f / 16f
+            val x = (width - gameW) / 2f
+            val y = (height - gameH) / 2f
+            pen.color = 0xFF10162C.toInt()
+            canvas.drawRoundRect(x, y, x + gameW, y + gameH, dp(12).toFloat(), dp(12).toFloat(), pen)
+            val captions = config.subtitleArea(Pixels(0, 0, 1000, 1000))
+            pen.color = 0x663DC7FF
+            canvas.drawRect(
+                x + gameW * captions.x / 1000f, y + gameH * captions.y / 1000f,
+                x + gameW * (captions.x + captions.width) / 1000f,
+                y + gameH * (captions.y + captions.height) / 1000f, pen
+            )
+            val lens = config.lensArea(Pixels(0, 0, 1000, 1000))
+            val left = x + gameW * lens.x / 1000f
+            val top = y + gameH * lens.y / 1000f
+            val right = x + gameW * (lens.x + lens.width) / 1000f
+            val bottom = y + gameH * (lens.y + lens.height) / 1000f
+            pen.color = 0x4455E3B5
+            canvas.drawRoundRect(left, top, right, bottom, dp(5).toFloat(), dp(5).toFloat(), pen)
+            pen.color = 0xFF55E3B5.toInt()
+            pen.style = Paint.Style.STROKE
+            pen.strokeWidth = dp(2).toFloat()
+            canvas.drawRoundRect(left, top, right, bottom, dp(5).toFloat(), dp(5).toFloat(), pen)
+            pen.style = Paint.Style.FILL
+        }
     }
 
     private inner class BandPreview : View(this@MainActivity) {

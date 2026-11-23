@@ -77,5 +77,38 @@ internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea
         }
     }
 
+
+    /**
+     * GTA 6 phone-message mode: multiple wrapped lines in the same OCR text
+     * block are one sentence/paragraph, not independent translation requests.
+     * Multiple text blocks remain separate, preserving chat-bubble boundaries.
+     */
+    fun readMessageBlocks(bitmap: Bitmap, done: (List<DetectedLine>?) -> Unit) {
+        recognizer.process(InputImage.fromBitmap(bitmap, 0)).addOnCompleteListener { task ->
+            bitmap.recycle()
+            if (!task.isSuccessful) {
+                done(null)
+                return@addOnCompleteListener
+            }
+            val paragraphs = task.result.textBlocks.mapNotNull { block ->
+                val validLines = block.lines.mapNotNull { line ->
+                    val box = line.boundingBox ?: return@mapNotNull null
+                    val source = line.text.trim()
+                    if (source.count(Char::isLetter) < 2 || box.height() < 7) null
+                    else DetectedLine(source, Rect(box))
+                }.sortedWith(compareBy({ it.bounds.top }, { it.bounds.left }))
+                if (validLines.isEmpty()) return@mapNotNull null
+                val source = validLines.joinToString(" ") { it.source }
+                    .replace(Regex("\\s+"), " ").trim().take(320)
+                val bounds = Rect(validLines.first().bounds).apply {
+                    validLines.drop(1).forEach { union(it.bounds) }
+                }
+                if (source.count(Char::isLetter) < 2 || bounds.width() < 13) null
+                else DetectedLine(source, bounds)
+            }.sortedWith(compareBy({ it.bounds.top }, { it.bounds.left }))
+            done(paragraphs.take(16))
+        }
+    }
+
     override fun close() = recognizer.close()
 }

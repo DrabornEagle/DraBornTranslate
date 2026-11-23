@@ -19,6 +19,7 @@ internal enum class ReadingArea(val label: String, val sampleIntervalMs: Long) {
     SUBTITLES("Altyazı bölgesi", 340L),
     GAME_TEXT("Tüm oyun metinleri", 650L),
     LENS("Lens · Yazının üzerine çevir", 520L),
+    DUAL("Altyazı + Lens · Aynı anda", 450L),
 }
 
 internal data class CaptureSettings(
@@ -27,12 +28,26 @@ internal data class CaptureSettings(
     val source: Source = Source.PORTAL,
     val display: SubtitleDisplay = SubtitleDisplay.PHONE,
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
+    val lensLeft: Int = 52,
+    val lensTop: Int = 6,
+    val lensWidth: Int = 46,
+    val lensHeight: Int = 48,
 ) {
     val captionsAtTop: Boolean get() = bandTop >= 35
     val showOnPhone: Boolean get() = source == Source.MOBILE || display.phone
     val showOnPortal: Boolean get() = source == Source.PORTAL && display.portal
     val speakOnPhone: Boolean get() = source == Source.PORTAL && display == SubtitleDisplay.VOICE
-    fun scanArea(video: Pixels): Pixels = if (readingArea != ReadingArea.SUBTITLES) video else subtitleBand(video, bandTop)
+    fun scanArea(video: Pixels): Pixels = when (readingArea) {
+        ReadingArea.SUBTITLES -> subtitleBand(video, bandTop)
+        else -> video
+    }
+
+    /** The Lens rectangle is relative to the actual 16:9 video, not status/navigation bars. */
+    fun lensArea(video: Pixels): Pixels = percentRect(
+        video, lensLeft, lensTop, lensWidth, lensHeight
+    )
+
+    fun subtitleArea(video: Pixels): Pixels = subtitleBand(video, bandTop)
 
     companion object {
         const val DEFAULT_BAND_TOP = 65
@@ -57,4 +72,17 @@ internal fun subtitleBand(area: Pixels, top: Int): Pixels {
     val bandY = (area.height * topPercent / 100f).roundToInt()
     val bandBottom = (area.height * (topPercent + CaptureSettings.BAND_HEIGHT) / 100f).roundToInt()
     return Pixels(area.x + inset, area.y + bandY, area.width - inset * 2, (bandBottom - bandY).coerceAtLeast(1))
+}
+
+/** A user-selected rectangle within the game video, clamped against borders. */
+internal fun percentRect(area: Pixels, left: Int, top: Int, width: Int, height: Int): Pixels {
+    val l = left.coerceIn(0, 95)
+    val t = top.coerceIn(0, 95)
+    val w = width.coerceIn(5, 100 - l)
+    val h = height.coerceIn(5, 100 - t)
+    val x = area.x + area.width * l / 100
+    val y = area.y + area.height * t / 100
+    val right = (area.x + area.width * (l + w) / 100).coerceAtMost(area.x + area.width)
+    val bottom = (area.y + area.height * (t + h) / 100).coerceAtMost(area.y + area.height)
+    return Pixels(x, y, (right - x).coerceAtLeast(1), (bottom - y).coerceAtLeast(1))
 }
