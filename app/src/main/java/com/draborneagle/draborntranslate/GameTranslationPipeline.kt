@@ -42,6 +42,10 @@ internal class GameTranslationPipeline(
             ?.takeIf { preservesQuestion(text, it) }
 
     private fun translateMenuLine(line: String): String? {
+        // Editor-reviewed, unambiguous US text-message shorthands win over
+        // noisy OCR pack matches. All other package hits remain instantaneous.
+        PackKey.key(line)?.let(phoneMessageOverrides::get)
+            ?.takeIf { preservesQuestion(line, it) }?.let { return it }
         findPack(line)?.let { return it }
         controllerHint(line)?.let { return it }
         checkpointJump.matchEntire(line)?.groupValues?.get(1)?.let { return "$it. kontrol noktasına geç" }
@@ -173,6 +177,28 @@ private val GAME_TERMS = Glossary.of(
     ),
     keep = names,
 )
+
+/**
+ * Short, context-independent game-phone messages. Never guess slang such as
+ * "pull up" or "I'm down" without context: those need the actual dialogue.
+ */
+private val phoneMessageOverrides = mapOf(
+    "Hit me up." to "Bana yaz.",
+    "Hmu." to "Bana yaz.",
+    "OMW." to "Yoldayım.",
+    "Lmk." to "Haber ver.",
+    "BRB." to "Hemen döneceğim.",
+    "Where u at?" to "Neredesin?",
+    "U up?" to "Uyanık mısın?",
+    "Text me." to "Bana mesaj at.",
+    "Call me." to "Beni ara.",
+    "I'm outside." to "Dışarıdayım.",
+    "We need to talk." to "Konuşmamız gerek.",
+    "Don't tell anyone." to "Kimseye söyleme.",
+    "Keep this between us." to "Bu aramızda kalsın.",
+    "Don't text me again." to "Bana bir daha mesaj atma.",
+    "Can't talk rn." to "Şu an konuşamam.",
+).mapKeys { (source, _) -> checkNotNull(PackKey.key(source)) }
 
 private val commonLines = mapOf(
     "Lose the cops!" to "Polisleri atlat!",
