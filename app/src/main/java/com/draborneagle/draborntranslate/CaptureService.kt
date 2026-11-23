@@ -20,12 +20,15 @@ import android.os.SystemClock
 import android.provider.Settings
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 class CaptureService : Service() {
     private val main = Handler(Looper.getMainLooper())
     private val ocrPending = AtomicBoolean(false)
     private var frames: ScreenFrames? = null
     private var ocr: SubtitleReader? = null
+    private var lensOcr: SubtitleReader? = null
+    private var captureSettings = CaptureSettings()
     private var translator: CaptionTranslator? = null
     private var captions: CaptionSession? = null
     private var lensSession: LensSession? = null
@@ -82,8 +85,12 @@ class CaptureService : Service() {
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
                 ?: ReadingArea.SUBTITLES,
+            intent.getIntExtra(EXTRA_LENS_LEFT, 52),
+            intent.getIntExtra(EXTRA_LENS_TOP, 6),
+            intent.getIntExtra(EXTRA_LENS_WIDTH, 46),
+            intent.getIntExtra(EXTRA_LENS_HEIGHT, 48),
         )
-        if (config.readingArea == ReadingArea.LENS && !config.showOnPhone) {
+        if ((config.readingArea == ReadingArea.LENS || config.readingArea == ReadingArea.DUAL) && !config.showOnPhone) {
             finish("Lens çevirisi telefon ekranında çalışır. Çeviri çıkışını Telefon olarak seç.")
             return START_NOT_STICKY
         }
@@ -103,6 +110,7 @@ class CaptureService : Service() {
         panel?.publish(null)
         sourceName = config.source.appName
         readingArea = config.readingArea
+        captureSettings = config
         SessionState.update(SessionState.State(
             active = true,
             status = "Telefondaki Türkçe çeviri modeli hazırlanıyor…",
@@ -111,10 +119,13 @@ class CaptureService : Service() {
             },
             portalIssue = panelIssue,
         ))
-        ocr = SubtitleReader(readingArea)
+        ocr = SubtitleReader(if (readingArea == ReadingArea.DUAL) ReadingArea.SUBTITLES else readingArea)
+        if (readingArea == ReadingArea.DUAL) lensOcr = SubtitleReader(ReadingArea.LENS)
         if (config.showOnPhone) {
-            if (readingArea == ReadingArea.LENS) lensOverlay = LensOverlay(this, config)
-            else overlay = CaptionOverlay(this, config)
+            if (readingArea != ReadingArea.LENS) overlay = CaptionOverlay(this, config)
+            if (readingArea == ReadingArea.LENS || readingArea == ReadingArea.DUAL) {
+                lensOverlay = LensOverlay(this, config)
+            }
         }
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
             if (!ended) {
@@ -122,18 +133,19 @@ class CaptureService : Service() {
                 getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(issue))
             }
         }
-        if (readingArea == ReadingArea.LENS) {
+        if (readingArea == ReadingArea.LENS || readingArea == ReadingArea.DUAL) {
             lensSession = LensSession(
                 translate = language::translate,
                 show = ::showLens,
                 onFailure = { issue -> updateTranslationIssue(issue ?: "Bu oyun metni çevrilemedi.") },
             )
-        } else {
+        }
+        if (readingArea != ReadingArea.LENS) {
             captions = CaptionSession(
                 translate = language::translate,
                 show = ::showCaption,
                 onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
-                readingArea = readingArea,
+                readingArea = if (readingArea == ReadingArea.DUAL) ReadingArea.SUBTITLES else readingArea,
             )
         }
         frames = ScreenFrames(
@@ -217,6 +229,10 @@ class CaptureService : Service() {
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
+        if (readingArea == ReadingArea.DUAL) {
+            recognizeDual(bitmap, region, frameEpoch)
+            return
+        }
         if (readingArea == ReadingArea.LENS) {
             reader.readLocated(bitmap) { lines ->
                 ocrPending.set(false)
@@ -246,6 +262,84 @@ class CaptureService : Service() {
         }
     }
 
+    /**
+     * Both OCR jobs consume independent sub-bitmaps from ONE projection frame.
+     * We release the in-flight guard only after both OCR callbacks complete;
+     * no second Android MediaProjection permission or VirtualDisplay is needed.
+     */
+    private fun recognizeDual(bitmap: Bitmap, region: FrameRegion, frameEpoch: Int) {
+        val subtitleReader = ocr
+        val regionReader = lensOcr
+        if (subtitleReader == null || regionReader == null) {
+            bitmap.recycle()
+            ocrPending.set(false)
+            return
+        }
+        val frameArea = Pixels(0, 0, bitmap.width, bitmap.height)
+        val subtitleArea = captureSettings.subtitleArea(frameArea)
+        val lensArea = captureSettings.lensArea(frameArea)
+        val subtitleBitmap: Bitmap
+        val lensBitmap: Bitmap
+        try {
+            subtitleBitmap = Bitmap.createBitmap(
+                bitmap, subtitleArea.x, subtitleArea.y, subtitleArea.width, subtitleArea.height
+            )
+            lensBitmap = Bitmap.createBitmap(
+                bitmap, lensArea.x, lensArea.y, lensArea.width, lensArea.height
+            )
+        } catch (error: RuntimeException) {
+            bitmap.recycle()
+            ocrPending.set(false)
+            updateStatus("İki okuma bölgesi hazırlanamadı. Seçili alanı kontrol et.")
+            return
+        }
+        bitmap.recycle()
+        val remaining = AtomicInteger(2)
+        fun completeOne() {
+            if (remaining.decrementAndGet() == 0) ocrPending.set(false)
+        }
+
+        try {
+            subtitleReader.read(subtitleBitmap) { lines ->
+                try {
+                    if (!ended && frameEpoch == epoch) {
+                        if (lines == null) {
+                            updateTranslationIssue("Altyazı OCR okunamadı; Lens alanı takip ediliyor.")
+                        } else {
+                            captions?.read(lines)
+                        }
+                    }
+                } finally { completeOne() }
+            }
+        } catch (error: RuntimeException) {
+            if (!subtitleBitmap.isRecycled) subtitleBitmap.recycle()
+            completeOne()
+            updateTranslationIssue("Altyazı algılama geçici hata verdi.")
+        }
+
+        val selectedRegion = FrameRegion(
+            region.x + lensArea.x, region.y + lensArea.y,
+            region.frameWidth, region.frameHeight,
+        )
+        try {
+            regionReader.readLocated(lensBitmap) { lines ->
+                try {
+                    if (!ended && frameEpoch == epoch) {
+                        if (lines == null) {
+                            updateTranslationIssue("Lens mesaj alanı okunamadı; altyazı devam ediyor.")
+                        } else {
+                            lensSession?.read(lines, selectedRegion)
+                        }
+                    }
+                } finally { completeOne() }
+            }
+        } catch (error: RuntimeException) {
+            if (!lensBitmap.isRecycled) lensBitmap.recycle()
+            completeOne()
+            updateTranslationIssue("Lens mesaj alanı geçici hata verdi.")
+        }
+    }
+
     private fun showCaption(caption: Caption?) {
         if (ended) return
         val state = SessionState.current
@@ -269,6 +363,9 @@ class CaptureService : Service() {
             main.post { finish("Lens katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
             return
         }
+        // In dual mode the subtitle owns the caption/panel stream. Lens paints
+        // independently at its detected coordinates and must not overwrite it.
+        if (readingArea == ReadingArea.DUAL) return
         val caption = cues.firstOrNull()?.let { Caption(it.source, it.turkish) }
         val state = SessionState.current
         if (state.portalPanel?.previewing != true) {
@@ -336,9 +433,11 @@ class CaptureService : Service() {
         })
     }
 
-    private fun waitingForText() = if (readingArea != ReadingArea.SUBTITLES) {
-        "Görüntü alınıyor. Okunabilir oyun metni bekleniyor."
-    } else "Görüntü alınıyor. Altyazı bekleniyor."
+    private fun waitingForText() = when (readingArea) {
+        ReadingArea.DUAL -> "Altyazı ve seçili Lens mesaj bölgesi aynı anda izleniyor."
+        ReadingArea.SUBTITLES -> "Görüntü alınıyor. Altyazı bekleniyor."
+        else -> "Görüntü alınıyor. Okunabilir oyun metni bekleniyor."
+    }
 
     private fun updateStatus(message: String) {
         val state = SessionState.current
@@ -398,6 +497,7 @@ class CaptureService : Service() {
         voice?.close()
         closePanel()
         ocr?.close()
+        lensOcr?.close()
         translator?.close()
         stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
@@ -499,6 +599,10 @@ class CaptureService : Service() {
         private const val EXTRA_MOBILE = "mobile"
         private const val EXTRA_DISPLAY = "display"
         private const val EXTRA_READING_AREA = "readingArea"
+        private const val EXTRA_LENS_LEFT = "lensLeft"
+        private const val EXTRA_LENS_TOP = "lensTop"
+        private const val EXTRA_LENS_WIDTH = "lensWidth"
+        private const val EXTRA_LENS_HEIGHT = "lensHeight"
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
@@ -509,6 +613,10 @@ class CaptureService : Service() {
                 putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
                 putExtra(EXTRA_DISPLAY, config.display.name)
                 putExtra(EXTRA_READING_AREA, config.readingArea.name)
+                putExtra(EXTRA_LENS_LEFT, config.lensLeft)
+                putExtra(EXTRA_LENS_TOP, config.lensTop)
+                putExtra(EXTRA_LENS_WIDTH, config.lensWidth)
+                putExtra(EXTRA_LENS_HEIGHT, config.lensHeight)
             })
         }
 
