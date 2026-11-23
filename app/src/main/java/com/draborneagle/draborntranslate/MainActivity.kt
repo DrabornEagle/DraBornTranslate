@@ -67,6 +67,7 @@ class MainActivity : Activity() {
     private enum class EntryMode { HOME, PS5_TV, PORTAL }
     private var entryMode = EntryMode.HOME
     private val prefs by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
+    private val localCorrections by lazy { LocalTranslationCorrections(this) }
     private lateinit var config: CaptureSettings
     private var pending = false
     private var demoMessage: String? = null
@@ -107,6 +108,7 @@ class MainActivity : Activity() {
     private lateinit var recognizedLabel: TextView
     private lateinit var copySource: Button
     private lateinit var copyTurkish: Button
+    private lateinit var editTranslation: Button
     private lateinit var bandPreview: BandPreview
     private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
@@ -510,6 +512,9 @@ class MainActivity : Activity() {
             displayedCaption()?.let { copyText("Türkçe çeviri", it.turkish) }
         }
         live.append(copyTurkish, 8)
+        editTranslation = button("✏️  Türkçe repliği düzelt") { showCorrectionEditor() }
+        styleButton(editTranslation, MINT to ACCENT)
+        live.append(editTranslation, 7)
         copySource = button("İngilizceyi kopyala") {
             recognizedText()?.let { copyText("Okunan İngilizce", it) }
         }
@@ -636,13 +641,19 @@ class MainActivity : Activity() {
         recognizedLabel.text = differentReading?.let { "Okunan İngilizce\n$it" }.orEmpty()
         captionLabel.visibility = if (caption == null) View.GONE else View.VISIBLE
         copyTurkish.visibility = captionLabel.visibility
+        editTranslation.visibility = if (source.isNullOrBlank()) View.GONE else View.VISIBLE
         sourceLabel.visibility = if (source == null) View.GONE else View.VISIBLE
         recognizedLabel.visibility = if (differentReading == null) View.GONE else View.VISIBLE
         copySource.visibility = if (recognized == null) View.GONE else View.VISIBLE
     }
 
-    private fun displayedCaption(): Caption? =
-        if (demoMessage != null) demoCaption else SessionState.current.let { if (it.active) it.caption else it.lastCaption }
+    private fun displayedCaption(): Caption? {
+        val current = if (demoMessage != null) demoCaption
+            else SessionState.current.let { if (it.active) it.caption else it.lastCaption }
+        return current?.let { caption ->
+            localCorrections.find(caption.source)?.let { edited -> Caption(caption.source, edited.text) } ?: caption
+        }
+    }
 
     private fun recognizedText(): String? =
         if (demoMessage != null) demoSource else displayedCaption()?.source
@@ -710,7 +721,7 @@ class MainActivity : Activity() {
             }
         }
         if (appPacks.isNotEmpty()) {
-            actions["Yüklü GameTranslator’dan al"] = { pickInstalledPack(appPacks) }
+            actions["Diğer uygulamadaki oyun paketini aktar"] = { pickInstalledPack(appPacks) }
         }
         actions[".json veya .json.gz dosyası seç"] = ::pickGamePack
         if (current) actions["Paketi kaldır"] = {
@@ -728,7 +739,7 @@ class MainActivity : Activity() {
 
     private fun pickInstalledPack(names: List<String>) {
         AlertDialog.Builder(this)
-            .setTitle("GameTranslator paketleri")
+            .setTitle("Yüklü oyun paketleri")
             .setItems(names.map { it.substringBefore(".json").replace('-', ' ') }.toTypedArray()) { _, index ->
                 installPack { app -> ImportedGamePack.installFromApp(app, names[index]) }
             }
@@ -1066,11 +1077,70 @@ class MainActivity : Activity() {
     private fun showTranslationTest() {
         AlertDialog.Builder(this)
             .setTitle("Çeviriyi dene")
-            .setItems(arrayOf("Örnek görseldeki altyazıyı oku", "İngilizce metni gir")) { _, index ->
-                if (index == 0) runDemo() else showTextTest()
+            .setItems(arrayOf("Örnek görseldeki altyazıyı oku", "İngilizce metni gir", "Hatalı repliği düzelt")) { _, index ->
+                when (index) {
+                    0 -> runDemo()
+                    1 -> showTextTest()
+                    else -> showCorrectionEditor()
+                }
             }
             .setNegativeButton("Kapat", null)
             .show()
+    }
+
+    /**
+     * An exact English → Turkish editor keeps user corrections separate from the
+     * downloaded third-party package. Future matches are instant and offline.
+     */
+    private fun showCorrectionEditor() {
+        val caption = displayedCaption()
+        showPopup("Oyun repliğini düzelt", R.drawable.ic_portal_check, MINT) { dialog ->
+            append(label("İngilizce ve doğru Türkçe karşılığını yaz. Kaydın yalnızca bu telefonda tutulur; oyun paketi değişse bile korunur.", 14, MUTED), 12)
+            val english = EditText(this@MainActivity).apply {
+                hint = "Oyunda görünen İngilizce replik"
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                setSingleLine(false)
+                setText(caption?.source.orEmpty())
+                minLines = 2
+                maxLines = 5
+            }
+            append(english, 11)
+            val turkish = EditText(this@MainActivity).apply {
+                hint = "Anlamı doğru, doğal Türkçe çeviri"
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                setSingleLine(false)
+                setText(caption?.turkish.orEmpty())
+                minLines = 2
+                maxLines = 6
+            }
+            append(turkish, 8)
+            append(button("✓  Düzeltmeyi kaydet") {
+                val source = english.text.toString().trim()
+                val corrected = turkish.text.toString().trim()
+                when {
+                    source.isEmpty() -> english.error = "İngilizce repliği gir."
+                    corrected.isEmpty() -> turkish.error = "Türkçe karşılığını gir."
+                    !localCorrections.save(source, corrected) ->
+                        Toast.makeText(this@MainActivity, "Düzeltme kaydedilemedi. Metin çok uzun olabilir.", Toast.LENGTH_LONG).show()
+                    else -> {
+                        dialog.dismiss()
+                        Toast.makeText(this@MainActivity, "Türkçe düzeltme kaydedildi. Bundan sonra paket yerine kullanılacak.", Toast.LENGTH_LONG).show()
+                        render()
+                    }
+                }
+            }.apply { styleButton(this, MINT to ACCENT) }, 13)
+            append(button("Bu repliğin özel düzeltmesini kaldır") {
+                val source = english.text.toString().trim()
+                if (source.isBlank()) {
+                    english.error = "İngilizce repliği gir."
+                } else {
+                    localCorrections.delete(source)
+                    dialog.dismiss()
+                    Toast.makeText(this@MainActivity, "Özel düzeltme kaldırıldı.", Toast.LENGTH_SHORT).show()
+                    render()
+                }
+            }, 9)
+        }
     }
 
     private fun showTextTest() {
