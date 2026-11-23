@@ -490,7 +490,7 @@ class CloudStudioActivity : ComponentActivity() {
         }
     }
 
-    @androidx.annotation.OptIn(markerClass = androidx.camera.core.ExperimentalGetImage::class)
+    @androidx.annotation.OptIn(markerClass = [androidx.camera.core.ExperimentalGetImage::class])
     private fun analyzeFrame(proxy: ImageProxy) {
         val now = SystemClock.elapsedRealtime()
         if (!active || closing || !translationReady || mode == Mode.AUDIO ||
