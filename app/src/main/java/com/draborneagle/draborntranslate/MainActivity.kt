@@ -322,9 +322,12 @@ class MainActivity : Activity() {
         cloud.addView(label("☁  Cloud Gaming Translate · v0.7.1", 21, WHITE, true))
         cloud.append(label("PS Portal bulut oyunları • Düzeltilmiş yatay/dikey kamera veya sadece ses çevirisi • GTA 6 paketiyle anında Türkçe", 14, MUTED), 10)
         cloud.append(label("🎙 Sesle çeviri (kamera gerekmez) • 📷 Kamera + Lens • İkisi birlikte. Veriler DraBornTranslate sunucularına yüklenmez.", 13, MINT), 9)
-        cloud.append(button("Cloud Translate Stüdyosu'nu aç") {
-            startActivity(Intent(this, CloudStudioActivity::class.java))
+        cloud.append(button("🎙 Kamerasız • Sesle Türkçe çevir") {
+            startActivity(Intent(this, CloudStudioActivity::class.java).putExtra("startMode", "AUDIO"))
         }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        cloud.append(button("📷 Kamera + Lens stüdyosunu aç") {
+            startActivity(Intent(this, CloudStudioActivity::class.java).putExtra("startMode", "CAMERA"))
+        }, 9)
         cloud.append(label("Not: Türkçe altyazılar telefonda gösterilir. PS Portal'ın fiziksel ekranına doğrudan yazı yerleştirilmez.", 12, MUTED), 10)
         content.append(cloud, 15)
 
