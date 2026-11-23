@@ -305,14 +305,17 @@ class MainActivity : Activity() {
         }
         gta.addView(label("⚡ GTA 6 • Hazır Türkçe paket", 19, WHITE, true))
         val installed = Gta6PackInstaller.installedInfo(this)
+        val importedGta6 = ImportedGamePack.hasPack(this) &&
+            prefs.getString("packTitle", "").orEmpty().contains("Grand Theft Auto VI", ignoreCase = true)
         gtaStatusLabel = label(when {
             packLoading -> "GTA 6 paketi indiriliyor · %$packDownloadPercent"
             installed != null -> "Yüklü ve doğrulanmış: " + installed.entries + " Türkçe satır"
+            importedGta6 -> "GTA 6 Türkçe paketi dosyadan yüklendi • çevrimdışı kullanılabilir"
             else -> "Sunucudaki GTA 6 Türkçe paketi • yaklaşık 475 bin satır. İlk indirme internet gerektirir."
         }, 14, MUTED)
         gta.append(gtaStatusLabel!!, 8)
         gta.append(label("Eşleşen İngilizce satır doğrudan paketten gelir. Bulunmayan satırlarda yerel çeviri devreye girer.", 13, MINT), 8)
-        gtaDownloadButton = button(if (packLoading) "Paket yükleniyor…" else if (installed == null) "GTA 6 paketini indir" else "GTA 6 paketini kontrol et / güncelle") {
+        gtaDownloadButton = button(if (packLoading) "Paket yükleniyor…" else if (installed == null && !importedGta6) "GTA 6 paketini indir" else "GTA 6 paketini kontrol et / güncelle") {
             AlertDialog.Builder(this)
                 .setTitle("GTA 6 Türkçe oyun paketi")
                 .setMessage("Paket yaklaşık 25 MB indirir ve telefonda yer kaplar. Dosya SHA-256 ve satır sayısıyla doğrulanır. Devam edilsin mi?")
