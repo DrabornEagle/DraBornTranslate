@@ -112,7 +112,11 @@ class CloudStudioActivity : ComponentActivity() {
         } else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        mode = runCatching { Mode.valueOf(prefs.getString("mode", "CAMERA") ?: "CAMERA") }
+        val requestedMode = if (savedInstanceState == null) intent.getStringExtra("startMode")
+            else null
+        mode = runCatching {
+            Mode.valueOf(requestedMode ?: prefs.getString("mode", "CAMERA") ?: "CAMERA")
+        }
             .getOrDefault(Mode.CAMERA)
         subtitleRect = readRect("sub", CloudRegion.SUBTITLES)
         phoneRect = readRect("msg", CloudRegion.MESSAGES)
