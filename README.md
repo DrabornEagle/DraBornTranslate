@@ -67,12 +67,24 @@ CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemes
 
 `.github/workflows/android-release-v0.6.yml`, `v0.6.0` etiketiyle tetiklenir. Dağıtım için depoda şu **GitHub Actions secrets** tanımlı olmalıdır:
 
-- `DRABORN_KEYSTORE_B64`
-- `DRABORN_KEYSTORE_PASSWORD`
-- `DRABORN_KEY_ALIAS`
-- `DRABORN_KEY_PASSWORD`
+- `DRABORNTRANSLATE_KEYSTORE_BASE64`
+- `DRABORNTRANSLATE_KEYSTORE_PASSWORD`
+- `DRABORNTRANSLATE_KEY_ALIAS`
+- `DRABORNTRANSLATE_KEY_PASSWORD`
 
 İş akışı derleme testlerini çalıştırır, APK imzasını ve Android sürüm kodunu doğrular ve ancak başarılı olursa GitHub Release oluşturur. Keystore veya parolaları kaynak depoya yüklemeyin.
+
+## ⚡ GTA 6 — 475.893 satır paket doğrulaması
+
+GTA 6 Türkçe paketinin sunucuda ilan edilen **475.893 satırı**, gerçek `.json.gz` dosyası indirilerek kontrol edildi. GitHub Actions [canlı test](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/gta6-pack-verification.yml) şu koşulları doğrular:
+
+- `gta-6` / `tr` / `format: 2` (Arapça paketle karışmaz).
+- Manifestteki boyut, indirilen dosyanın SHA-256 özeti ve açılmış dosyadaki **475.893 kullanılabilir satır** eşleşmelidir.
+- **"Kolt & Associates:"** için hesaplanan 64-bit GamePack anahtarı dosyada bulunmalı ve boş olmamalıdır.
+- Doğrulanmayan yeni dosya kurulmaz; mevcut doğrulanmış sürüm korunur.
+- Dosya APK'ya veya GitHub'a kopyalanmaz. İndirmeyi kullanıcı açıkça başlatır; cihazda bir kez açılan paket tekrar ağ üzerinden sorgulanmadan kullanılabilir.
+
+Android'de **modelden önce paket** araması yapılır; tam eşleşme bulunursa makine çevirisi devreye girmez. Paket dışındaki satırlar yerel motora gider. Bu durum OCR okumasının, ilk paket yüklemesinin veya cihazın işleme süresinin sıfır olduğunu **garanti etmez**. GTA 6'daki bütün repliklerin oyunda doğrulanmış olduğu iddia edilmez.
 
 ## 🔁 Açık kaynak geliştirme senkronu
 
