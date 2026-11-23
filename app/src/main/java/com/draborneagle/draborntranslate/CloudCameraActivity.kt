@@ -300,7 +300,7 @@ class CloudCameraActivity : Activity() {
                 }
             }, cameraHandler)
         } catch (error: Exception) {
-            showStatus("Kamera açılamadı: \${error.message ?: "Cihaz kamerasını kontrol et."}")
+            showStatus("Kamera açılamadı: ${error.message ?: "Cihaz kamerasını kontrol et."}")
         }
     }
 
@@ -349,7 +349,7 @@ class CloudCameraActivity : Activity() {
                     }
                 }, cameraHandler)
         } catch (error: Exception) {
-            showStatus("Kamera görüntüsü hazırlanamadı: \${error.message.orEmpty()}")
+            showStatus("Kamera görüntüsü hazırlanamadı: ${error.message.orEmpty()}")
         }
     }
 
@@ -445,16 +445,14 @@ class CloudCameraActivity : Activity() {
         foreground = false
         stopCamera()
         cameraThread.quitSafely()
-        if (captionsInitialized()) captions.close()
-        if (lensInitialized()) lens.close()
+        captions.close()
+        lens.close()
         recognizer.close()
         translator.close()
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         super.onDestroy()
     }
 
-    private fun captionsInitialized(): Boolean = this::class.java != null
-    private fun lensInitialized(): Boolean = this::class.java != null
 
     private fun action(text: String, click: () -> Unit): Button = Button(this).apply {
         this.text = text
