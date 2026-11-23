@@ -294,7 +294,8 @@ class CloudStudioActivity : ComponentActivity() {
             notice("Ses modunda kamera bölgesi ayarı gerekmez.")
             return
         }
-        overlay.editing = true
+        val regionView = overlay
+        regionView.editing = true
         val parent = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(7), dp(18), dp(9))
@@ -306,7 +307,7 @@ class CloudStudioActivity : ComponentActivity() {
         parent.addView(sliderBox)
         val names = listOf("Sol", "Üst", "Genişlik", "Yükseklik")
         fun valuesOf(region: CloudRegion) = listOf(region.left, region.top, region.width, region.height)
-        fun selectedRegion() = if (overlay.selected == 0) overlay.subtitleRegion else overlay.messageRegion
+        fun selectedRegion() = if (regionView.selected == 0) regionView.subtitleRegion else regionView.messageRegion
 
         fun setAxis(axis: Int, value: Int) {
             val old = selectedRegion()
@@ -316,8 +317,8 @@ class CloudStudioActivity : ComponentActivity() {
                 2 -> old.copy(width = value.coerceAtLeast(5))
                 else -> old.copy(height = value.coerceAtLeast(5))
             }.normalized()
-            if (overlay.selected == 0) overlay.subtitleRegion = updated
-            else overlay.messageRegion = updated
+            if (regionView.selected == 0) regionView.subtitleRegion = updated
+            else regionView.messageRegion = updated
             storeRegions()
         }
 
@@ -356,17 +357,17 @@ class CloudStudioActivity : ComponentActivity() {
             }
         }
         choices.addView(button("🔵 Konuşma altyazısı") {
-            overlay.selected = 0
+            regionView.selected = 0
             makeRows()
         })
         choices.addView(button("🟢 Telefon / Lens") {
-            overlay.selected = 1
+            regionView.selected = 1
             makeRows()
         })
         makeRows()
         parent.addView(button("↺ Her iki alanı sıfırla") {
-            overlay.subtitleRegion = CloudRegion.SUBTITLES
-            overlay.messageRegion = CloudRegion.MESSAGES
+            regionView.subtitleRegion = CloudRegion.SUBTITLES
+            regionView.messageRegion = CloudRegion.MESSAGES
             storeRegions()
             makeRows()
         })
@@ -390,15 +391,15 @@ class CloudStudioActivity : ComponentActivity() {
             notice("Kamera hazır değil.")
             return
         }
-        val max = zoom.maxZoomRatio.coerceAtMost(6f)
+        val zoomMax = zoom.maxZoomRatio.coerceAtMost(6f)
         val bar = SeekBar(this).apply {
-            max = 100
-            progress = (((zoom.zoomRatio - 1f) / (max - 1f).coerceAtLeast(0.1f)) * 100f).toInt()
+            this.max = 100
+            progress = (((zoom.zoomRatio - 1f) / (zoomMax - 1f).coerceAtLeast(0.1f)) * 100f).toInt()
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onStartTrackingTouch(bar: SeekBar) = Unit
                 override fun onStopTrackingTouch(bar: SeekBar) = Unit
                 override fun onProgressChanged(bar: SeekBar, percent: Int, user: Boolean) {
-                    if (user) device.cameraControl.setZoomRatio(1f + (max - 1f) * percent / 100f)
+                    if (user) device.cameraControl.setZoomRatio(1f + (zoomMax - 1f) * percent / 100f)
                 }
             })
         }
@@ -436,7 +437,7 @@ class CloudStudioActivity : ComponentActivity() {
         if (missing.isNotEmpty()) notice("Eksik izin: " + missing.joinToString { it.substringAfterLast('.') })
     }
 
-    override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, grants: IntArray) {
+    override fun onRequestPermissionsResult(code: Int, permissions: Array<String>, grants: IntArray) {
         super.onRequestPermissionsResult(code, permissions, grants)
         if (code == 1071) ensurePermissions(false)
     }
