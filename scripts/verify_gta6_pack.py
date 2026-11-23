@@ -12,6 +12,8 @@ import gzip
 import hashlib
 import io
 import json
+import os
+from pathlib import Path
 import re
 import sys
 import unicodedata
@@ -117,6 +119,7 @@ def verify_archive(pack: dict, archive: bytes) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true", help="Download and verify public GTA 6 pack")
+    parser.add_argument("--temp-archive", type=Path, help="Optional local-only temporary archive for Android JVM tests")
     args = parser.parse_args()
     assert pack_key(KOLT_LABEL) == "5a1c20dc114b3b6c"
     if not args.live:
@@ -139,6 +142,12 @@ def main() -> int:
     manifest = parse_manifest(fetch(MANIFEST_URL, MAX_MANIFEST))
     archive = fetch(BASE + "/v1/packs/" + GTA_ID, MAX_DOWNLOAD)
     verified = verify_archive(manifest, archive)
+    if args.temp_archive is not None:
+        # Only local CI scratch space, never committed or uploaded as an artifact.
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+        handle = os.open(args.temp_archive, flags, 0o600)
+        with os.fdopen(handle, "wb") as output:
+            output.write(archive)
     print(json.dumps(verified, ensure_ascii=False, indent=2))
     print("Verified remote archive; no copyrighted text has been redistributed.")
     return 0
