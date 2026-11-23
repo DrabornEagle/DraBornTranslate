@@ -33,7 +33,7 @@
 |---|---|
 | Android uygulama adı | **DraBornTranslate**, sürüm **5.1.0** |
 | GameTranslator tabanlı Android özellikleri | PS5/Chiaki, oyun paketleri, OCR, TV bağlantısı kodu (orijinal v1.8.50 derlemesinde) |
-| GTA 6 Türkçe paketi | **İnternetten isteğe bağlı indirme; APK'da 475 bin satır gömülü değil.** Sunucudaki gerçek kapsam doğrulanamadı |
+| GTA 6 Türkçe paketi | **Sunucu manifestinde 475.893 kayıt (v3), 25,27 MB ve SHA-256 doğrulama özeti var.** APK'ya gömülü değil; internetten indirilir. Paket dosyası ve satırların tamamı bağımsız olarak incelenmedi |
 | Kaynak sürümü | GameTranslator **v1.8.51**, resmi lisanslı kaynak aynası |
 | İmza | **Yeni sertifika**; eski DraBornTranslate kurulumu üzerine yüklenemez |
 | Tam kod derlemesi / cihaz doğrulaması | **Devam ediyor; tamamlanmış sayılmaz** |
