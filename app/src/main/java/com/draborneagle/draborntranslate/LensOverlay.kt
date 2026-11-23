@@ -71,7 +71,7 @@ internal class LensOverlay(
                 typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
                 gravity = Gravity.CENTER
                 includeFontPadding = false
-                maxLines = 3
+                maxLines = if (settings.readingArea == ReadingArea.DUAL) 6 else 3
                 ellipsize = TextUtils.TruncateAt.END
                 setAutoSizeTextTypeUniformWithConfiguration(
                     11, settings.textSize, 1, TypedValue.COMPLEX_UNIT_SP,
