@@ -284,7 +284,7 @@ class MainActivity : Activity() {
         content.append(label("Oynamak istediğin cihazı seç", 24, WHITE, true).apply {
             isAccessibilityHeading = true
         }, 30)
-        content.append(label("PS5 ve TV bağlantısı veya mevcut PS Portal çeviri araçlarına tek dokunuşla geç.", 15, MUTED), 9)
+        content.append(label("PS5, PS Portal veya bulut oyun ses çevirisi modunu seç.", 15, MUTED), 9)
 
         val psCard = card(true).apply {
             background = gradient(GradientDrawable.Orientation.TL_BR,
@@ -313,6 +313,17 @@ class MainActivity : Activity() {
             styleButton(this, LAVENDER to ACCENT)
         }, 16)
         content.append(portalCard, 14)
+
+        val cloudCard = card(true).apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF10443E.toInt(), 0xFF202950.toInt(), 24)
+        }
+        cloudCard.addView(label("☁  Cloud Gaming Translate", 21, WHITE, true))
+        cloudCard.append(label("PS5 gerekmez • Kamera yok • Mikrofonla Türkçe altyazı (telefonda)", 14, MUTED), 11)
+        cloudCard.append(button("Bulut oyun çevirisini aç") {
+            startActivity(android.content.Intent(this, CloudGamingActivity::class.java))
+        }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        content.append(cloudCard, 14)
 
         val gta = card(true).apply {
             background = gradient(GradientDrawable.Orientation.TL_BR, 0xFF193D42.toInt(), 0xFF202950.toInt(), 20)
