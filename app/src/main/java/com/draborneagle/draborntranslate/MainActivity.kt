@@ -109,6 +109,8 @@ class MainActivity : Activity() {
     private lateinit var copySource: Button
     private lateinit var copyTurkish: Button
     private lateinit var editTranslation: Button
+    private lateinit var lensLastMessage: TextView
+    private lateinit var lensEditMessage: Button
     private lateinit var bandPreview: BandPreview
     private lateinit var bandSettings: LinearLayout
     private lateinit var bandControl: SeekBar
@@ -530,6 +532,12 @@ class MainActivity : Activity() {
             recognizedText()?.let { copyText("Okunan İngilizce", it) }
         }
         live.append(copySource, 6)
+        lensLastMessage = label("", 16, MINT).apply { setLineSpacing(dp(3).toFloat(), 1f) }
+        live.append(lensLastMessage, 18)
+        lensEditMessage = button("✏️  Lens telefon mesajını düzelt") {
+            showCorrectionEditor(SessionState.current.lensCaption ?: SessionState.current.lastLensCaption)
+        }
+        live.append(lensEditMessage, 7)
 
         panelCard = card()
         content.append(panelCard, 14)
@@ -721,6 +729,11 @@ class MainActivity : Activity() {
         sourceLabel.visibility = if (source == null) View.GONE else View.VISIBLE
         recognizedLabel.visibility = if (differentReading == null) View.GONE else View.VISIBLE
         copySource.visibility = if (recognized == null) View.GONE else View.VISIBLE
+        val latestLens = state.lensCaption ?: state.lastLensCaption
+        val showLensResult = config.readingArea == ReadingArea.DUAL && latestLens != null
+        lensLastMessage.text = latestLens?.let { "📱 Son Lens mesajı\n${it.source}\n→ ${localCorrections.find(it.source)?.text ?: it.turkish}" }.orEmpty()
+        lensLastMessage.visibility = if (showLensResult) View.VISIBLE else View.GONE
+        lensEditMessage.visibility = lensLastMessage.visibility
     }
 
     private fun displayedCaption(): Caption? {
@@ -1173,8 +1186,8 @@ class MainActivity : Activity() {
      * An exact English → Turkish editor keeps user corrections separate from the
      * downloaded third-party package. Future matches are instant and offline.
      */
-    private fun showCorrectionEditor() {
-        val caption = displayedCaption()
+    private fun showCorrectionEditor(overrideCaption: Caption? = null) {
+        val caption = overrideCaption ?: displayedCaption()
         showPopup("Oyun repliğini düzelt", R.drawable.ic_portal_check, MINT) { dialog ->
             append(label("İngilizce ve doğru Türkçe karşılığını yaz. Kaydın yalnızca bu telefonda tutulur; oyun paketi değişse bile korunur.", 14, MUTED), 12)
             val english = EditText(this@MainActivity).apply {
