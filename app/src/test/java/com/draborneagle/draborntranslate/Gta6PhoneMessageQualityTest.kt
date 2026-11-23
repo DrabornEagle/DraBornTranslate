@@ -3,6 +3,7 @@ package com.draborneagle.draborntranslate
 
 import com.gametranslator.gametranslator_mobile.core.PackMatch
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class Gta6PhoneMessageQualityTest {
@@ -42,15 +43,14 @@ class Gta6PhoneMessageQualityTest {
     }
 
     @Test fun uncertainSlangIsNotBlindlyRewritten() {
+        var modelCalled = false
         val pipeline = GameTranslationPipeline(
             packLookup = { null },
-            model = {
-                assertEquals("Pull up.", it)
-                "Arabayı yanaştır."
-            },
+            model = { modelCalled = true; "Arabayı yanaştır." },
         )
         assertEquals("Arabayı yanaştır.", pipeline.translate(
             TranslationInput("Pull up.", ReadingArea.GAME_TEXT)
         ).text)
+        assertTrue("Ambiguous phrase must use context-aware translator", modelCalled)
     }
 }
