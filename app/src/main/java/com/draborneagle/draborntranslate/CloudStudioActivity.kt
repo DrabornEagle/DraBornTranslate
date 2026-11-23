@@ -77,6 +77,7 @@ class CloudStudioActivity : ComponentActivity() {
     private lateinit var turkish: TextView
     private lateinit var messages: TextView
     private lateinit var modeLabel: TextView
+    private lateinit var footer: LinearLayout
 
     private val captions by lazy {
         CaptionSession(
@@ -230,6 +231,7 @@ class CloudStudioActivity : ComponentActivity() {
         messages = txt("📱 Lens: oyun içi mesajlar ayrı çevrilir.", 14f, 0xFF86E8BC.toInt())
         messages.maxLines = 3
         panel.addView(messages)
+        footer = panel
         root.addView(panel, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply {
             setMargins(dp(9), 0, dp(9), dp(6))
         })
@@ -257,6 +259,7 @@ class CloudStudioActivity : ComponentActivity() {
         viewfinder.visibility = if (cameraMode) View.VISIBLE else View.GONE
         overlay.visibility = if (cameraMode) View.VISIBLE else View.GONE
         if (!cameraMode) overlay.editing = false
+        if (::footer.isInitialized) footer.visibility = View.VISIBLE
         modeLabel.text = when (mode) {
             Mode.CAMERA -> "☁ Kamera · OCR + Lens"
             Mode.AUDIO -> "🎙 Sesli Türkçe altyazı"
@@ -276,6 +279,7 @@ class CloudStudioActivity : ComponentActivity() {
             return
         }
         overlay.editing = !overlay.editing
+        footer.visibility = if (overlay.editing) View.GONE else View.VISIBLE
         notice(if (overlay.editing) "Mavi/yeşil kutuyu sürükle. Köşe noktalarından yeniden boyutlandır."
                else "Okuma alanları kaydedildi.")
         if (!overlay.editing) storeRegions()
@@ -296,6 +300,7 @@ class CloudStudioActivity : ComponentActivity() {
         }
         val regionView = overlay
         regionView.editing = true
+        footer.visibility = View.GONE
         val parent = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(7), dp(18), dp(9))
@@ -377,7 +382,15 @@ class CloudStudioActivity : ComponentActivity() {
             .setView(scroller)
             .setPositiveButton("Kaydet") { _, _ -> storeRegions() }
             .setNegativeButton("Kapat", null)
-            .show()
+            .create()
+            .apply {
+                setOnDismissListener {
+                    regionView.editing = false
+                    footer.visibility = View.VISIBLE
+                    storeRegions()
+                }
+                show()
+            }
     }
 
     private fun showZoom() {
