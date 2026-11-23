@@ -517,7 +517,7 @@ class CloudCameraActivity : Activity() {
                 val rows = mutableListOf<String>()
                 var row = ""
                 for (word in translated.replace('\n', ' ').split(Regex("\\s+"))) {
-                    val candidate = if (row.isEmpty()) word else "$" + "{row} $" + "word"
+                    val candidate = if (row.isEmpty()) word else "$row $word"
                     if (row.isNotEmpty() && glyph.measureText(candidate) > maxWidth) {
                         rows.add(row)
                         row = word
