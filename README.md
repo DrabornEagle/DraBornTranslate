@@ -21,7 +21,7 @@
 
 ---
 
-## 🚀 v0.6.0 · İki mod, tek ana ekran
+## 🚀 v0.6.1 · İki mod ve dayanıklı GTA 6 paket indirme
 
 DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve altyazı araçlarının tamamı DrabornEagle görsel kimliğiyle sunulur.
 
@@ -49,7 +49,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.6.0` / `versionCode 1` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.6.1` / `versionCode 2` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
@@ -73,6 +73,10 @@ CI başarılı olduğunda `app/build/outputs/apk/debug/app-debug.apk` önizlemes
 - `DRABORNTRANSLATE_KEY_PASSWORD`
 
 İş akışı derleme testlerini çalıştırır, APK imzasını ve Android sürüm kodunu doğrular ve ancak başarılı olursa GitHub Release oluşturur. Keystore veya parolaları kaynak depoya yüklemeyin.
+
+### GTA 6 indirme düzeltmesi (v0.6.1)
+
+Mobil ağlarda görülen `Connection reset` için paket indirme motoru yeniden deneme ve kaldığı yerden devam etme desteğiyle yenilendi. Paket sunucusu HTTP Range destekliyorsa 1 MiB parçalardan indirilir; desteklemiyorsa dosya yeniden alınır. Eksik/bozuk dosya asla etkinleştirilmez. Ana ekranda ilerleme yüzdesi, [resmî paket bağlantısı](https://gametranslator-packs.gametranslator-pool.workers.dev/v1/packs/gta-6) ve `.json.gz` içe alma seçenekleri vardır. Operatörün alan adına erişimi kesmesi durumunda Wi-Fi veya farklı ağ denenmelidir.
 
 ## ⚡ GTA 6 — 475.893 satır paket doğrulaması
 

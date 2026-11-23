@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.AtomicFile
 import com.gametranslator.gametranslator_mobile.core.GamePack
 import com.gametranslator.gametranslator_mobile.core.GamePackLibrary
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -13,7 +14,8 @@ import java.io.InputStream
 import java.util.zip.GZIPInputStream
 
 internal object ImportedGamePack {
-    private const val MAX_BYTES = 40 * 1024 * 1024
+    private const val MAX_BYTES = 96 * 1024 * 1024
+    private const val MAX_INFLATED_BYTES = 245 * 1024 * 1024
     private const val FILE_NAME = "oyun-paketi.json"
     private const val GAME_TRANSLATOR_APP = "com.gametranslator.gametranslator_mobile"
 
@@ -52,13 +54,22 @@ internal object ImportedGamePack {
     }
 
     private fun install(context: Context, raw: InputStream, title: String): String {
-        val data = raw.buffered().use { input ->
-            input.mark(2)
-            val first = input.read()
-            val second = input.read()
-            input.reset()
-            if (first == 0x1f && second == 0x8b) GZIPInputStream(input).use(::readLimited)
-            else readLimited(input)
+        // Preserve gzip while importing. GTA 6's verified archive is 25 MB,
+        // but its expanded JSON can exceed the old 40 MB import limit.
+        // GamePack.decode handles gzip directly; first check the inflation cap
+        // without retaining a second uncompressed copy in memory.
+        val data = raw.buffered().use(::readLimited)
+        if (data.size >= 2 && data[0] == 0x1f.toByte() && data[1] == 0x8b.toByte()) {
+            GZIPInputStream(ByteArrayInputStream(data)).use { inflated ->
+                val buffer = ByteArray(64 * 1024)
+                var total = 0L
+                while (true) {
+                    val count = inflated.read(buffer)
+                    if (count < 0) break
+                    total += count
+                    if (total > MAX_INFLATED_BYTES) throw IOException("Paketin açılmış boyutu çok büyük.")
+                }
+            }
         }
         val pack = GamePack.decode(data, title)
         val file = file(context)
