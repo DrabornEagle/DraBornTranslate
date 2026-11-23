@@ -25,6 +25,23 @@
 > **🚧 v5.0 geliştirme çalışması:** GameTranslator v1.8.51 kaynak motorunun kısa konuşma karşılıkları ve Türkçe son düzenleme kuralları mevcut çeviri hattına bağlandı. Resmî GitLab sürümlerini izleyen otomatik kaynak senkronu ve uygulama içi kontrol ekranı eklendi. Flutter/Chiaki/TV modüllerinin tamamının tek APK'da entegrasyonu **henüz tamamlanmadı**; bu nedenle v5.0 imzalı kararlı APK yayımlandığı iddia edilmez. [v5.0 entegrasyon ayrıntıları](docs/INTEGRATION-v5.0.md).
 
 
+## 🎮 v5.1 · GameTranslator Android uyarlaması
+
+**Yeni geliştirme sürümü: v5.1.0.** GameTranslator v1.8.50 Android ikili sürümünden hazırlanan DraBornTranslate uyarlamasında Android uygulama kimliği ve adı yeniden düzenlendi; **yeni RSA-3072 keystore** ile ayrı bir APK imzalandı. Bu uygulama, kaynak kodu temel alınarak tamamı sıfırdan yeniden derlenmiş birleşik Kotlin/Flutter uygulama **değildir**. Gerçek Android telefon / PS5 testi yapılmadı. Özel keystore ve APK bu GitHub deposuna yüklenmedi.
+
+| Öğe | Kaynak / durum |
+|---|---|
+| Android uygulama adı | **DraBornTranslate**, sürüm **5.1.0** |
+| GameTranslator tabanlı Android özellikleri | PS5/Chiaki, oyun paketleri, OCR, TV bağlantısı kodu (orijinal v1.8.50 derlemesinde) |
+| GTA 6 Türkçe paketi | **İnternetten isteğe bağlı indirme; APK'da 475 bin satır gömülü değil.** Sunucudaki gerçek kapsam doğrulanamadı |
+| Kaynak sürümü | GameTranslator **v1.8.51**, resmi lisanslı kaynak aynası |
+| İmza | **Yeni sertifika**; eski DraBornTranslate kurulumu üzerine yüklenemez |
+| Tam kod derlemesi / cihaz doğrulaması | **Devam ediyor; tamamlanmış sayılmaz** |
+
+[**v5.1 teknik açıklama ve kurulum**](docs/RELEASE-v5.1.md) · [**v5.1 kaynak yeniden markalama betiği**](scripts/prepare_gametranslator_full_v5_1.py) · [**GameTranslator kaynakları**](upstream/GameTranslator) · [**GTA 6 paketi hakkında**](docs/RELEASE-v5.1.md#gta-6-translation-pack)
+
+---
+
 ## 🚀 v5.0 · GameTranslator Entegrasyon Programı
 
 **v5.0 geliştirmesi başladı; bu başlık imzalı v5.0 APK'sı yayımlandığı anlamına gelmez.** DraBornTranslate kendi uygulama kimliği, tasarımı, Lens/Portal özellikleri ve yerel çeviri motoruyla korunuyor.
