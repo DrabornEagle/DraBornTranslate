@@ -171,8 +171,6 @@ internal object ReliablePackDownloader {
                     received += count
                     onWrite()
                 }
-                // A 206 response must end at the announced range size.
-                if (input.read() >= 0) throw NonRetryable("Sunucu beklenenden fazla paket verisi gönderdi.")
             }
         }
     }
