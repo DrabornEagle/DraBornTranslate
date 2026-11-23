@@ -1,0 +1,580 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<!-- GameTranslator OBS katmanı: OBS'de "Tarayıcı kaynağı" olarak eklenir, Türkçe altyazıyı şeffaf zemin üstünde gösterir.
+     Görünüm TV uygulamasıyla (tv/webos) aynıdır: aynı ölçüler, aynı yerleşimler (sabit, örtme, üstünde, altında), örtmede
+     çeviri oyunun altyazısının alanına sığdırılır, konuşmacı adı renklenir, "temizle" gelince yazı okunacak kadar kalır.
+     Sürekli okunan ek alanların (görev yazısı, ipucu kutusu, telefon mesajı) çevirisi de oyundaki yazının üstünü örter;
+     metindeki kumanda tuşları (✕ ○ △ □, R2) PlayStation simgesi olarak çizilir. Ölçüler 1080p'ye göredir; kaynak 720p ise orantılı küçülür. Mac ve Windows uygulaması bu dosyayı /obs adresinden verir.
+     Adres parametreleri (ayarları ezer): ?size=48 (yazı boyu, 1080p'de piksel), ?bottom=8 (alttan uzaklık, %), ?bg=60 (zemin koyuluğu, 0-100). -->
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameTranslator OBS</title>
+<style>
+  :root { --u: calc(100vh / 1080); }
+  html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; color: #fff;
+    font-family: "Segoe UI", -apple-system, system-ui, Arial, sans-serif; }
+  #subtitle { position: absolute; left: 4%; right: 4%; bottom: 7%; text-align: center; z-index: 10; }
+  #subtitle.hidden { visibility: hidden; }
+  /* "Üstünü örtsün" yerleşiminde oyundaki İngilizce altyazıyı kapatan zemin */
+  #subtitle-cover { position: absolute; z-index: 9; border-radius: calc(10 * var(--u)); background: rgb(10, 10, 12); }
+  #subtitle-cover.hidden { display: none; }
+  #subtitle-text {
+    display: inline-block;
+    padding: calc(10 * var(--u)) calc(26 * var(--u));
+    border-radius: calc(10 * var(--u));
+    background: rgba(0, 0, 0, 0.72);
+    font-size: calc(46 * var(--u));
+    line-height: 1.3;
+    font-weight: 600;
+    text-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) #000;
+    overflow-wrap: anywhere;
+  }
+  /* Sürekli okunan ek alanlar ve kumanda tuşları: TV uygulamasıyla (tv/webos/style.css) aynı. */
+#regions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 7;
+  pointer-events: none;
+}
+#regions.hidden { display: none; }
+#regions .region {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 2px 9px;
+  border-radius: 6px;
+  /* İngilizce yazı seçilmesin diye örtücü; oyunun kendi kutuları gibi koyu gri, altyazı zemininden bir ton açık. */
+  background: rgb(28, 28, 32);
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: left;
+  white-space: pre-line;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+/* Kumanda tuşları: yüz tuşları kendi renginde dairede, omuz tuşları yuvarlak köşeli kutuda; yazı boyuna göre ölçeklenir. */
+.btn {
+  display: inline-block;
+  box-sizing: border-box;
+  vertical-align: -0.15em;
+  margin: 0 0.12em;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-shadow: none;
+}
+.btn-face {
+  width: 1.15em;
+  height: 1.15em;
+  padding-top: 0.12em;
+  border: 0.08em solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 0.95em;
+}
+.btn-face { position: relative; }
+.btn-circle::after, .btn-square::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.5em;
+  height: 0.5em;
+  margin: -0.25em 0 0 -0.25em;
+  box-sizing: border-box;
+  border: 0.1em solid currentColor;
+}
+.btn-circle::after { border-radius: 50%; }
+.btn-square::after { border-radius: 0.06em; }
+.btn-cross { color: #7fb8f0; }
+.btn-circle { color: #ff6f78; }
+.btn-triangle { color: #3fdcb4; }
+.btn-square { color: #f08ce4; }
+.btn-plain { color: #fff; }
+/* Xbox: koyu dairede tuşun kendi renginde harf; View (⧉) ve Menu (☰) işaretleri CSS ile çizilir. */
+.btn-xbox { background: #1b1b1b; }
+.btn-xbox-a { color: #8dc63f; }
+.btn-xbox-b { color: #ff4b4b; }
+.btn-xbox-x { color: #3d9bff; }
+.btn-xbox-y { color: #ffb900; }
+.btn-view, .btn-menu { color: #e6e6e6; }
+.btn-view::before, .btn-view::after {
+  content: '';
+  position: absolute;
+  width: 0.36em;
+  height: 0.28em;
+  box-sizing: border-box;
+  border: 0.07em solid currentColor;
+  border-radius: 0.04em;
+}
+.btn-view::before { left: 0.22em; top: 0.26em; }
+.btn-view::after { left: 0.38em; top: 0.42em; background: #1b1b1b; }
+.btn-menu::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.46em;
+  height: 0.07em;
+  margin: -0.035em 0 0 -0.23em;
+  background: currentColor;
+  box-shadow: 0 -0.15em 0 currentColor, 0 0.15em 0 currentColor;
+}
+.btn-shoulder, .btn-wide {
+  min-width: 1.6em;
+  padding: 0.12em 0.25em 0.1em;
+  border: 0.08em solid rgba(255, 255, 255, 0.9);
+  border-radius: 0.35em;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72em;
+}
+</style>
+</head>
+<body>
+<div id="subtitle-cover" class="hidden"></div>
+<div id="subtitle" class="hidden"><span id="subtitle-text"></span></div>
+<div id="regions" class="hidden"></div>
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  var params = new URLSearchParams(location.search);
+  var fixed = { size: params.get('size'), bottom: params.get('bottom'), bg: params.get('bg') };
+  var TEXT_COLORS = { white: '#FFFFFF', yellow: '#FFE135' };
+  var PLACEMENTS = { fixed: 1, cover: 1, above: 1, below: 1 };
+  var HOLD_MAX_MS = 6000;
+  var bottomPercent = 7, placement = 'fixed', speakerColor = '', baseFontSize = 46;
+  var currentBox = null, currentSource = null, currentLine = 0;
+  var fitted = false, coverBackground = '', holdUntil = 0, hideTimer = null;
+
+  // 1080p'deki piksel değerini kaynağın gerçek boyuna çevirir (TV uygulaması 1080p'de çizer).
+  function px(value) { return value * (window.innerHeight || 1080) / 1080; }
+
+  function validBox(box) {
+    if (!box || typeof box !== 'object') return null;
+    var left = Number(box.left), top = Number(box.top), right = Number(box.right), bottom = Number(box.bottom);
+    if (isNaN(left) || isNaN(top) || isNaN(right) || isNaN(bottom)) return null;
+    left = Math.max(0, Math.min(0.98, left));
+    right = Math.max(left + 0.01, Math.min(1.0, right));
+    top = Math.max(0, Math.min(0.98, top));
+    bottom = Math.max(top + 0.01, Math.min(1.0, bottom));
+    return { left: left, top: top, right: right, bottom: bottom };
+  }
+
+  // Metin sağdan sola mı okunur (Arapça, Farsça, İbranice): harflerin çoğunluğuna bakılır. Uygulamadaki Languages.IsRtlText ile aynı kural.
+  function isRtl(text) {
+    var rtl = (text.match(/[֐-ࣿיִ-﷿ﹰ-﻿]/g) || []).length;
+    if (!rtl) return false;
+    var letters = (text.match(/[A-Za-zÀ-ɏͰ-ԯ぀-ヿ一-鿿가-힯]/g) || []).length;
+    return rtl >= letters;
+  }
+
+  // Konuşmacı adları ("MARKOS: …") ayarlarda açıksa ayrı renkte yazılır (TV uygulamasıyla aynı kural).
+  var SPEAKER = /(^|[.!?…”"]\s+|\n)([A-ZÇĞİÖŞÜÂÎÛ][^\s:.!?]*(?: [A-ZÇĞİÖŞÜÂÎÛ][^\s:.!?]*){0,2}):(?=\s)/g;
+  // Her konuşmacının kendi rengi: ilk görülme sırasıyla verilir, aynı ad hep aynı renkte kalır (TV uygulamasıyla aynı).
+  var speakerColors = [], speakerMap = {}, speakerRecent = [];
+  function setSpeakerColors(list) {
+    list = list || [];
+    if (list.join(',') === speakerColors.join(',')) return;
+    speakerColors = list; speakerMap = {}; speakerRecent = [];
+  }
+  function colorForSpeaker(name) {
+    if (!speakerColors.length) return speakerColor;
+    var key = String(name).toUpperCase();
+    var at = speakerRecent.indexOf(key);
+    if (at >= 0) speakerRecent.splice(at, 1);
+    else {
+      var used = {}, free = null, k, i;
+      for (k in speakerMap) used[speakerMap[k]] = true;
+      for (i = 0; i < speakerColors.length; i++) if (!used[speakerColors[i]]) { free = speakerColors[i]; break; }
+      if (free === null) { var oldest = speakerRecent.shift(); free = speakerMap[oldest]; delete speakerMap[oldest]; }
+      speakerMap[key] = free;
+    }
+    speakerRecent.push(key);
+    return speakerMap[key];
+  }
+
+  // --- Kumanda tuşları ---
+  // Bilgisayar tuş simgesini görüntüden tanıyıp metne koyar ("Tırmanmak için ✕ basılı tut", "R2"); TV bunları
+  // PlayStation tuşu gibi çizer: yüz tuşları kendi renginde dairede, omuz tuşları yuvarlak köşeli kutuda.
+  // Xbox: Ⓐ Ⓑ Ⓧ Ⓨ koyu dairede kendi renginde harf; LB / RT / LS gibi tuşlar L1 gibi kutuda; ⧉ (View) ve ☰ (Menu)
+  // koyu dairede çizilir. Sözcük sınırı büyük-küçük harfe duyarlıdır: "BLT", "LBS", "lb", "Alt" tuş sayılmaz.
+  var BUTTON = /(✕|×|✖|○|◯|△|□|✜|▦|⧉|☰|[↑↓←→]|[Ⓐ-Ⓩ]|\b(?:L[123]|R[123]|[LR][BTS]|OPTIONS|TOUCHPAD)\b)/g;
+  var FACE = { '✕': 'cross', '×': 'cross', '✖': 'cross', '○': 'circle', '◯': 'circle', '△': 'triangle', '□': 'square' };
+  var XBOX = { 'Ⓐ': 'a', 'Ⓑ': 'b', 'Ⓧ': 'x', 'Ⓨ': 'y' };
+
+  function buttonIcon(token) {
+    var icon = document.createElement('span');
+    var face = FACE[token];
+    if (face) {
+      icon.className = 'btn btn-face btn-' + face;
+      // ○ ve □ yazı tipinde dairenin içinde çok küçük kalıyor: CSS ile çizilir (style.css .btn-circle::after).
+      icon.textContent = { cross: '✕', circle: '', triangle: '△', square: '' }[face];
+    } else if (XBOX[token]) {
+      icon.className = 'btn btn-face btn-xbox btn-xbox-' + XBOX[token];
+      icon.textContent = XBOX[token].toUpperCase();
+    } else if (token === '⧉' || token === '☰') {
+      // View ve Menu işaretleri her yazı tipinde yok: CSS ile çizilir (.btn-view, .btn-menu).
+      icon.className = 'btn btn-face btn-xbox ' + (token === '⧉' ? 'btn-view' : 'btn-menu');
+      icon.textContent = '';
+    } else if (/^[LR](?:[123]|[BTS])$/.test(token)) {
+      icon.className = 'btn btn-shoulder';
+      icon.textContent = token;
+    } else if (token === 'OPTIONS' || token === 'TOUCHPAD') {
+      icon.className = 'btn btn-wide';
+      icon.textContent = token === 'OPTIONS' ? 'OPTIONS' : '▦';
+    } else {
+      // Yön tuşu, dokunmatik yüzey, harita işareti
+      icon.className = 'btn btn-face btn-plain';
+      icon.textContent = token;
+    }
+    return icon;
+  }
+
+  // Metni tuş simgeleriyle birlikte ekler (yalnız textContent ve öğe kullanılır; metin HTML olarak yorumlanmaz).
+  function appendWithButtons(el, text) {
+    var last = 0, match;
+    BUTTON.lastIndex = 0;
+    while ((match = BUTTON.exec(text)) !== null) {
+      if (match.index > last) el.appendChild(document.createTextNode(text.slice(last, match.index)));
+      el.appendChild(buttonIcon(match[0]));
+      last = BUTTON.lastIndex;
+    }
+    if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+  }
+
+  function setTextWithButtons(el, text) {
+    el.textContent = '';
+    appendWithButtons(el, text);
+  }
+
+  // Ek alanda oyunun renkli yazdığı sözcük aynı renkte gösterilir: bilgisayar onu "⁅#rrggbb|metin⁆" diye işaretler.
+  var COLORED = /⁅(#[0-9a-fA-F]{6})\|([^⁆]*)⁆/g;
+  function setColoredText(el, text) {
+    el.textContent = '';
+    var last = 0, match;
+    COLORED.lastIndex = 0;
+    while ((match = COLORED.exec(text)) !== null) {
+      if (match.index > last) appendWithButtons(el, text.slice(last, match.index));
+      var part = document.createElement('span');
+      part.style.color = match[1];
+      appendWithButtons(part, match[2]);
+      el.appendChild(part);
+      last = COLORED.lastIndex;
+    }
+    if (last < text.length) appendWithButtons(el, text.slice(last));
+  }
+
+  function setSubtitleText(el, text, paragraphs) {
+    el.dir = isRtl(text) ? 'rtl' : 'ltr';
+    if (!speakerColor || paragraphs) { setTextWithButtons(el, text); return; }
+    el.textContent = '';
+    var last = 0, match;
+    SPEAKER.lastIndex = 0;
+    while ((match = SPEAKER.exec(text)) !== null) {
+      var nameStart = match.index + match[1].length;
+      if (nameStart > last) appendWithButtons(el, text.slice(last, nameStart));
+      var name = document.createElement('span');
+      name.style.color = colorForSpeaker(match[2]);
+      name.textContent = match[2] + ':';
+      el.appendChild(name);
+      last = SPEAKER.lastIndex;
+    }
+    if (last < text.length) appendWithButtons(el, text.slice(last));
+  }
+
+  function showSubtitle(text, duration, box, paragraphs, source, line) {
+    if (!text) return hideSubtitle();
+    currentSource = paragraphs ? null : validBox(source);
+    currentLine = typeof line === 'number' && line > 0 ? line : 0;
+    holdUntil = Date.now() + Math.min(HOLD_MAX_MS, 2000 + text.length * 60);
+    currentBox = validBox(box);
+    var el = $('subtitle-text');
+    setSubtitleText(el, text, paragraphs);
+    el.style.whiteSpace = paragraphs ? 'pre-line' : '';
+    el.style.textAlign = paragraphs ? (isRtl(text) ? 'right' : 'left') : '';
+    $('subtitle').className = '';
+    layout();
+    clearTimeout(hideTimer);
+    var ms = duration > 0 ? Math.max(1000, duration) : Math.min(8000, 2000 + text.length * 60);
+    hideTimer = setTimeout(hideSubtitle, ms);
+  }
+
+  function hideSubtitle() {
+    clearTimeout(hideTimer);
+    $('subtitle').className = 'hidden';
+    $('subtitle-cover').className = 'hidden';
+  }
+
+  // "Temizle": yazı okunacak kadar görünmediyse kalan süre dolunca kaldırılır (TV'deki gibi).
+  function onClear() {
+    var left = holdUntil - Date.now();
+    if (left <= 0 || $('subtitle').className === 'hidden') return hideSubtitle();
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideSubtitle, left);
+  }
+
+  // Altyazıyı seçilen yerleşime göre konumlar. İngilizce altyazının yeri bilinmiyorsa sabit yükseklik kullanılır.
+  function layout() {
+    var el = $('subtitle');
+    var cover = $('subtitle-cover');
+    var box = placement === 'fixed' || fixed.bottom ? null : currentBox;
+    el.style.left = '4%';
+    el.style.right = '4%';
+    el.style.top = 'auto';
+    el.style.bottom = Math.max(2, Math.min(88, bottomPercent)) + '%';
+    el.style.transform = 'none';
+    cover.className = 'hidden';
+    unfit();
+    if (!box || el.className === 'hidden') return;
+
+    var mode = placement;
+    if (mode === 'below' && box.bottom > 0.88) mode = 'above';
+    if (mode === 'above' && box.top < 0.12) mode = 'below';
+
+    if (mode === 'cover' && currentSource) {
+      fitToSource(el, cover, currentSource);
+    } else if (mode === 'cover') {
+      var cLeft = Math.max(0.01, box.left - 0.02), cTop = Math.max(0.01, box.top - 0.015);
+      var cRight = Math.min(0.99, box.right + 0.02), cBottom = Math.min(0.99, box.bottom + 0.015);
+      cover.style.left = (cLeft * 100).toFixed(2) + '%';
+      cover.style.top = (cTop * 100).toFixed(2) + '%';
+      cover.style.width = ((cRight - cLeft) * 100).toFixed(2) + '%';
+      cover.style.height = ((cBottom - cTop) * 100).toFixed(2) + '%';
+      cover.className = '';
+      var centerBottom = (1.0 - (box.top + box.bottom) / 2.0) * 100.0;
+      el.style.bottom = Math.max(2, Math.min(92, centerBottom)).toFixed(2) + '%';
+      el.style.transform = 'translateY(50%)';
+    } else if (mode === 'above') {
+      el.style.bottom = Math.max(5, Math.min(94, (1.0 - box.top) * 100.0 + 1.5)).toFixed(2) + '%';
+    } else if (mode === 'below') {
+      el.style.bottom = 'auto';
+      el.style.top = Math.max(5, Math.min(94, box.bottom * 100.0 + 1.5)).toFixed(2) + '%';
+    }
+  }
+
+  // Çeviriyi oyunun altyazısının kapladığı alana sığdırır (TV uygulamasındaki fitToSource ile aynı): aynı genişlikte
+  // sarılır, yazı boyu alana sığan en büyük boydur; en küçük boyda da sığmıyorsa zemin yazıya göre büyür.
+  function fitToSource(el, cover, box) {
+    var padX = 0.008, padY = 0.006;
+    var left = Math.max(0, box.left - padX), right = Math.min(1, box.right + padX);
+    var top = Math.max(0, box.top - padY), bottom = Math.min(1, box.bottom + padY);
+    var minWidth = 0.16;
+    if (right - left < minWidth) {
+      var center = (left + right) / 2;
+      left = Math.max(0, center - minWidth / 2);
+      right = Math.min(1, center + minWidth / 2);
+    }
+    var place = function (l, t, r, b) {
+      cover.style.left = (l * 100).toFixed(3) + '%';
+      cover.style.top = (t * 100).toFixed(3) + '%';
+      cover.style.width = ((r - l) * 100).toFixed(3) + '%';
+      cover.style.height = ((b - t) * 100).toFixed(3) + '%';
+    };
+    place(left, top, right, bottom);
+    if (!fitted) coverBackground = cover.style.background;
+    cover.style.background = 'rgb(10, 10, 12)';
+    cover.className = '';
+    var area = cover.getBoundingClientRect();
+    var perX = area.width / (right - left), perY = area.height / (bottom - top);
+
+    var text = $('subtitle-text');
+    el.style.left = (left * 100).toFixed(3) + '%';
+    el.style.right = ((1 - right) * 100).toFixed(3) + '%';
+    el.style.bottom = 'auto';
+    el.style.top = (((top + bottom) / 2) * 100).toFixed(3) + '%';
+    el.style.transform = 'translateY(-50%)';
+    text.style.padding = '0 ' + px(6) + 'px';
+    text.style.lineHeight = '1.2';
+
+    var base = px(baseFontSize);
+    var low = Math.max(px(16), Math.round(base * 0.55));
+    var high = currentLine > 0 ? Math.round(currentLine * perY * 1.05) : Math.round(base * 1.15);
+    high = Math.max(low, Math.min(Math.round(base * 1.6), high));
+    var fits = function (size) {
+      text.style.fontSize = size + 'px';
+      var rect = text.getBoundingClientRect();
+      return rect.width <= area.width + 1 && rect.height <= area.height + 1;
+    };
+    var best = low;
+    if (fits(high)) best = high;
+    else if (fits(low)) {
+      var a = low, b = high;
+      while (b - a > 1) {
+        var mid = Math.floor((a + b) / 2);
+        if (fits(mid)) a = mid; else b = mid;
+      }
+      best = a;
+    }
+    text.style.fontSize = best + 'px';
+
+    var rect = text.getBoundingClientRect();
+    var growTop = Math.max(0, area.top - rect.top + 2) / perY, growBottom = Math.max(0, rect.bottom - area.bottom + 2) / perY;
+    var growLeft = Math.max(0, area.left - rect.left + 2) / perX, growRight = Math.max(0, rect.right - area.right + 2) / perX;
+    if (growTop || growBottom || growLeft || growRight)
+      place(Math.max(0, left - growLeft), Math.max(0, top - growTop), Math.min(1, right + growRight), Math.min(1, bottom + growBottom));
+    fitted = true;
+  }
+
+  function unfit() {
+    if (!fitted) return;
+    fitted = false;
+    var text = $('subtitle-text');
+    $('subtitle-cover').style.background = coverBackground;
+    text.style.padding = '';
+    text.style.lineHeight = '';
+    text.style.fontSize = 'calc(' + baseFontSize + ' * var(--u))';
+  }
+
+  function applyStyle(style) {
+    style = style || {};
+    if (typeof style.regionBackground === 'number') regionBackground = Math.max(0, Math.min(100, style.regionBackground));
+    if (typeof style.regionScale === 'number') regionScale = Math.max(70, Math.min(150, style.regionScale));
+    if (typeof style.regionColor === 'string') regionColor = /^#[0-9A-Fa-f]{6}$/.test(style.regionColor) ? style.regionColor : '';
+    var text = $('subtitle-text');
+    var size = Number(fixed.size || style.fontSize);
+    if (size > 0) { baseFontSize = size; text.style.fontSize = 'calc(' + size + ' * var(--u))'; }
+    if (/^#[0-9A-Fa-f]{6}$/.test(style.color || '')) text.style.color = style.color;
+    else if (TEXT_COLORS[style.textColor]) text.style.color = TEXT_COLORS[style.textColor];
+    if (PLACEMENTS[style.placement]) placement = style.placement;
+    if (typeof style.speakerColor === 'string') speakerColor = style.speakerColor;
+    setSpeakerColors(speakerColor && style.speakerColors instanceof Array ? style.speakerColors : []);
+    var bg = fixed.bg !== null ? Number(fixed.bg) : style.background;
+    if (typeof bg === 'number' && !isNaN(bg)) text.style.background = 'rgba(0, 0, 0, ' + Math.max(0, Math.min(100, bg)) / 100 + ')';
+    if (typeof style.bold === 'boolean') text.style.fontWeight = style.bold ? '700' : '600';
+    var bottom = fixed.bottom !== null ? Number(fixed.bottom) : Number(style.bottomPercent);
+    if (bottom >= 0 && !isNaN(bottom)) bottomPercent = Math.max(0, Math.min(92, bottom));
+    if (typeof style.fontFamily === 'string') applyFont(text, style.fontFamily, style.fontUrl);
+    layout();
+  }
+
+  // Altyazı fontu: uygulama kurulu fontun dosyasını fontUrl'den verir; dosya yoksa ad denenir, o da yoksa standart yazı.
+  var fontKey = '';
+  function applyFont(text, family, url) {
+    var key = family + '|' + (url || '');
+    if (key === fontKey) return;
+    fontKey = key;
+    var tag = document.getElementById('subtitle-font-face');
+    if (!tag) { tag = document.createElement('style'); tag.id = 'subtitle-font-face'; document.head.appendChild(tag); }
+    var name = url ? 'GTFont' + url.replace(/[^a-z0-9]/gi, '') : family.replace(/['"\\]/g, '');
+    tag.textContent = url ? "@font-face { font-family: '" + name + "'; src: url('" + url + "'); font-weight: 100 900; }" : '';
+    text.style.fontFamily = name ? "'" + name + "', \"Segoe UI\", -apple-system, system-ui, Arial, sans-serif" : '';
+  }
+
+  // --- Ek alanlar ---
+  // Bilgisayar altyazının yanında ekranın başka yazılarını da (görev yazısı, ipucu kutusu, telefon mesajı) sürekli okur ve
+  // her alanın çevirisini "region" olayıyla gönderir: {id, text, box, line}. Çeviri İngilizce yazının tam üstünü örter;
+  // altyazının yazı tipi, rengi ve kalınlığıyla yazılır, Türkçe uzun gelirse sığana kadar küçülür. Zemini altyazınınkinden
+  // bir ton açık gridir. Boş "text" o alanın kutusunu, "region-clear" hepsini kaldırır. Ana altyazıya dokunulmaz.
+
+  var regionBoxes = {};
+  // Ek alan görünümü (bilgisayardaki Okuma Alanı ayarları): zemin koyuluğu (0–100), yazı boyu (%), yazı rengi ("" altyazınınki).
+  var regionBackground = 100, regionScale = 100, regionColor = '';
+  var REGION_PAD = 0.004;
+  var REGION_MIN_FONT = 14;
+  var REGION_MAX_FONT = 56;
+
+  function showRegion(data) {
+    var id = data && typeof data.id === 'string' ? data.id : '';
+    if (!id) return;
+    var box = validBox(data.box);
+    if (!data.text || !box) return hideRegion(id);
+    var el = regionBoxes[id];
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'region';
+      $('regions').appendChild(el);
+      regionBoxes[id] = el;
+    }
+    $('regions').className = '';
+    var width = window.innerWidth || 1920;
+    var height = window.innerHeight || 1080;
+    // Altyazının görünüşü: yazı tipi, renk, kalınlık (Ayarlar'daki Altyazı Görünümü).
+    var subtitle = $('subtitle-text');
+    el.style.fontFamily = subtitle.style.fontFamily || '';
+    el.style.color = regionColor || subtitle.style.color || '#fff';
+    el.style.background = 'rgba(28, 28, 32, ' + (regionBackground / 100).toFixed(2) + ')';
+    // Saydam zeminde yazı oyunun üstünde de okunsun diye gölge güçlenir.
+    el.style.textShadow = regionBackground < 70 ? '0 1px 3px #000, 0 0 6px rgba(0, 0, 0, 0.9)' : '';
+    el.style.fontWeight = subtitle.style.fontWeight || '600';
+    setColoredText(el, data.text);
+    el.dir = isRtl(data.text) ? 'rtl' : 'ltr';
+    // Ortalı yazı (alttaki görev satırı) ortalı, köşedeki yazı sola yaslı kalır.
+    var center = (box.left + box.right) / 2;
+    el.style.textAlign = Math.abs(center - 0.5) < 0.12 ? 'center' : (el.dir === 'rtl' ? 'right' : 'left');
+    var left = Math.max(0, box.left - REGION_PAD);
+    var top = Math.max(0, box.top - REGION_PAD);
+    var boxWidth = (Math.min(1, box.right + REGION_PAD) - left) * width;
+    var boxHeight = (Math.min(1, box.bottom + REGION_PAD) - top) * height;
+    var line = typeof data.line === 'number' && data.line > 0 ? data.line * height : boxHeight;
+    var size = Math.max(REGION_MIN_FONT, Math.min(REGION_MAX_FONT * 1.5, Math.round(line * 0.95 * regionScale / 100)));
+    el.style.top = (top * 100) + '%';
+    el.style.minHeight = Math.round(boxHeight) + 'px';
+    // Oyundaki yazı tek satırsa çeviri de tek satır kalır (görev yazısı, tuş çubuğu): alt satıra geçmez; kutu en çok
+    // %35 genişler (ortalı yazı iki yana, sağdaki yazı sola doğru), o da yetmezse yazı küçülür.
+    var single = data.text.indexOf('\n') < 0 && (box.bottom - box.top) * height < line * 1.6;
+    var boxLeft = left * width;
+    if (single) {
+      var grown = Math.min(width - 4, boxWidth * 1.35);
+      var start = Math.abs(center - 0.5) < 0.12 ? boxLeft - (grown - boxWidth) / 2
+        : center > 0.5 ? boxLeft - (grown - boxWidth) : boxLeft;
+      start = Math.max(2, Math.min(width - grown - 2, start));
+      el.style.whiteSpace = 'nowrap';
+      el.style.left = (start / width * 100) + '%';
+      el.style.width = Math.round(grown) + 'px';
+      el.style.fontSize = size + 'px';
+      while (el.scrollWidth > el.clientWidth + 1 && size > REGION_MIN_FONT) {
+        size -= 1;
+        el.style.fontSize = size + 'px';
+      }
+      return;
+    }
+    el.style.whiteSpace = '';
+    el.style.left = (left * 100) + '%';
+    el.style.width = Math.max(60, Math.round(boxWidth)) + 'px';
+    el.style.fontSize = size + 'px';
+    // Çok satırlı yazı: Türkçe çoğu zaman İngilizceden uzundur; kutu biraz uzayabilir, daha fazlası için yazı küçülür.
+    var limit = Math.max(boxHeight * 1.35, line * 2.4);
+    while (el.scrollHeight > limit && size > REGION_MIN_FONT) {
+      size -= 2;
+      el.style.fontSize = size + 'px';
+    }
+  }
+
+  function hideRegion(id) {
+    var el = regionBoxes[id];
+    if (!el) return;
+    delete regionBoxes[id];
+    $('regions').removeChild(el);
+  }
+
+  function hideRegions() {
+    for (var id in regionBoxes) {
+      if (Object.prototype.hasOwnProperty.call(regionBoxes, id)) $('regions').removeChild(regionBoxes[id]);
+    }
+    regionBoxes = {};
+    $('regions').className = 'hidden';
+  }
+
+  window.addEventListener('resize', layout);
+  applyStyle({});
+  // "obs" parametresi uygulamaya bunun TV olmadığını söyler; "TV bağlı" sayısına katılmaz.
+  var events = new EventSource('/events?viewer=obs');
+  events.addEventListener('style', function (e) { try { applyStyle(JSON.parse(e.data)); } catch (err) {} });
+  events.addEventListener('subtitle', function (e) {
+    try { var d = JSON.parse(e.data); showSubtitle(d.text, d.duration, d.box, d.paragraphs, d.source, d.line); } catch (err) {}
+  });
+  events.addEventListener('clear', onClear);
+  events.addEventListener('region', function (e) { try { showRegion(JSON.parse(e.data)); } catch (err) {} });
+  events.addEventListener('region-clear', hideRegions);
+})();
+</script>
+</body>
+</html>

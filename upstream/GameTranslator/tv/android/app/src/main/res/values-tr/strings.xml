@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<resources>
+    <string name="overlay_running">Altyazı TV\'nin HDMI görüntüsünün üstünde gösteriliyor</string>
+    <string name="overlay_stopped">Katman kapatıldı: altyazı artık GameTranslator\'ın içinde gösteriliyor. Panel için Tamam\'a basın.</string>
+    <string name="overlay_selected">Katman modu: altyazı TV\'nin kendi HDMI görüntüsünün üstünde çıkar.</string>
+    <string name="overlay_fallback">GameTranslator\'ın içinde görüntü gelmedi. Katman moduna geçiliyor: altyazı TV\'nin kendi HDMI görüntüsünün üstünde çıkar.</string>
+    <string name="overlay_choose_input">TV\'yi kumandadan konsolun girişine (HDMI %1$d) alın. Altyazı görüntünün üstünde çıkar.</string>
+    <string name="overlay_permission_needed">Katman modu için \"Diğer uygulamaların üzerinde göster\" izni gerekiyor.</string>
+    <string name="overlay_fallback_needs_permission">Bazı TV\'lerde konsol görüntüsü uygulamanın içinde siyah kalır; katman modu bunu çözer ama \"Diğer uygulamaların üzerinde göster\" izni gerekiyor.</string>
+    <string name="overlay_permission_how">Bilgisayardaki ya da telefondaki GameTranslator bu izni TV uygulamasını kurarken kendisi verir. Ya da aşağıdaki \"İzin ver\"e basın ya da TV\'de Ayarlar › Uygulamalar › Özel uygulama erişimi › Diğer uygulamaların üzerinde göster\'den GameTranslator\'ı açın.</string>
+    <string name="overlay_permission_open">İzin ver</string>
+    <string name="overlay_permission_no_settings">Bu TV\'de bu izin için ayar ekranı yok. TV uygulamasını bilgisayardaki ya da telefondaki GameTranslator\'dan yeniden kurun: izni kendisi verir.</string>
+    <string name="console_not_found">GameTranslator konsolun hangi HDMI girişinde olduğunu bulamadı.</string>
+    <string name="no_picture">HDMI %1$d girişinden görüntü gelmiyor.</string>
+    <string name="no_picture_empty">HDMI %1$d girişinde cihaz görünmüyor.</string>
+    <string name="no_picture_choose">Konsolun bağlı olduğu HDMI girişini seçin (ok tuşları ve Tamam, ya da 1–4 sayı tuşları):</string>
+    <string name="no_picture_still_black">Doğru girişte de siyah mı? Bu TV HDMI görüntüsünü uygulamalara vermiyor olabilir (bazı Vestel ve MediaTek TV\'ler) ya da HDCP engelliyordur. PS5\'te Ayarlar › Sistem › HDMI › HDCP\'yi Etkinleştir\'i kapatmayı deneyin.</string>
+    <string name="hdmi_not_offered">Bu TV HDMI girişlerini uygulamalara açmıyor; konsol görüntüsü GameTranslator\'ın içinde gösterilemiyor.</string>
+    <string name="picker_connected">bağlı</string>
+    <string name="picker_close">Kapat</string>
+    <string name="overlay_offer">Ya da Katman\'a geçin: TV, konsolu kendi HDMI girişinde gösterir, altyazı görüntünün üstünde çıkar.</string>
+    <string name="overlay_switch">Katman\'a geç</string>
+    <string name="overlay_started_manual_input">Katman açık, GameTranslator arka planda çalışıyor. Bu TV girişi uygulamalara değiştirtmiyor: TV\'yi kumandadan konsolun HDMI girişine alın, altyazı görüntünün üstünde çıkar. HDMI girişinde altyazı görünmüyorsa bu cihaz HDMI görüntüsünü Android\'in dışında gösteriyordur (bazı projeksiyonlar): uygulamalar onun üstüne yazamaz, altyazıyı telefonda izleyin. Katmanı kapatmak için GameTranslator\'ı yeniden açın.</string>
+    <string name="overlay_failed">Katman açılamadı: bu TV, GameTranslator\'ın altyazıyı başka uygulamaların üstünde göstermesine izin vermedi. GameTranslator açık kalıyor; altyazıyı telefonda izleyebilirsiniz.</string>
+</resources>
