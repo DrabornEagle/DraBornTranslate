@@ -1,0 +1,74 @@
+name: DraBornTranslate v0.6 · signed Android release
+
+on:
+  push:
+    tags:
+      - 'v0.6.0'
+
+permissions:
+  contents: write
+
+jobs:
+  signed-android-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - name: Check signing secrets
+        env:
+          DRABORN_KEYSTORE_B64: ${{ secrets.DRABORN_KEYSTORE_B64 }}
+          DRABORN_KEYSTORE_PASSWORD: ${{ secrets.DRABORN_KEYSTORE_PASSWORD }}
+          DRABORN_KEY_ALIAS: ${{ secrets.DRABORN_KEY_ALIAS }}
+          DRABORN_KEY_PASSWORD: ${{ secrets.DRABORN_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$DRABORN_KEYSTORE_B64"
+          test -n "$DRABORN_KEYSTORE_PASSWORD"
+          test -n "$DRABORN_KEY_ALIAS"
+          test -n "$DRABORN_KEY_PASSWORD"
+          umask 077
+          printf '%s' "$DRABORN_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/draborn-signing.jks"
+          echo "DRABORN_KEYSTORE_FILE=$RUNNER_TEMP/draborn-signing.jks" >> "$GITHUB_ENV"
+      - name: Test and build signed APK
+        env:
+          DRABORN_KEYSTORE_PASSWORD: ${{ secrets.DRABORN_KEYSTORE_PASSWORD }}
+          DRABORN_KEY_ALIAS: ${{ secrets.DRABORN_KEY_ALIAS }}
+          DRABORN_KEY_PASSWORD: ${{ secrets.DRABORN_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk dist/DraBornTranslate-v0.6.0-Android-arm64.apk
+      - name: Verify APK signature and build version
+        run: |
+          set -euo pipefail
+          APK="dist/DraBornTranslate-v0.6.0-Android-arm64.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "versionCode='1' versionName='0.6.0'"
+          sha256sum "$APK" > dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DraBornTranslate-v0.6.0-signed-arm64
+          path: dist/
+          if-no-files-found: error
+      - name: Publish only the verified DraBornTranslate APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/DraBornTranslate-v0.6.0-Android-arm64.apk
+            dist/SHA256SUMS.txt
+          generate_release_notes: true
+          body: |
+            DraBornTranslate v0.6.0 (Android versionCode 1).
+            Includes the dual-mode launcher and Portal translation screen.
+            PS5/TV setup is a UI preview; full PSN/Chiaki/TV pairing integration is not yet implemented.
+            Android requires uninstall/reinstall if the installed versionCode is higher or the certificate differs.
+            Source attribution and AGPL notices are retained under app/src/main/assets.
