@@ -24,6 +24,22 @@
 
 > **🚧 v5.0 geliştirme çalışması:** GameTranslator v1.8.51 kaynak motorunun kısa konuşma karşılıkları ve Türkçe son düzenleme kuralları mevcut çeviri hattına bağlandı. Resmî GitLab sürümlerini izleyen otomatik kaynak senkronu ve uygulama içi kontrol ekranı eklendi. Flutter/Chiaki/TV modüllerinin tamamının tek APK'da entegrasyonu **henüz tamamlanmadı**; bu nedenle v5.0 imzalı kararlı APK yayımlandığı iddia edilmez. [v5.0 entegrasyon ayrıntıları](docs/INTEGRATION-v5.0.md).
 
+
+## 🚀 v5.0 · GameTranslator Entegrasyon Programı
+
+**v5.0 geliştirmesi başladı; bu başlık imzalı v5.0 APK'sı yayımlandığı anlamına gelmez.** DraBornTranslate kendi uygulama kimliği, tasarımı, Lens/Portal özellikleri ve yerel çeviri motoruyla korunuyor.
+
+| Geliştirme | Durum |
+|---|---|
+| GameTranslator v1.8.51 kaynak ağacı (1.694 dosya) | ✅ `upstream/GameTranslator` altında |
+| Kısa oyun cümleleri ve Türkçe metin düzeltme motoru | ✅ Mevcut Kotlin çeviri hattına bağlı |
+| GameTranslator kaynak sürümü kontrolü | ✅ Hakkında penceresinde |
+| GitLab yeni sürüm kaynaklarını günlük eşitleme | ✅ GitHub Actions; yalnızca lisanslı kaynak kodu |
+| Flutter ekranları + Chiaki/PS5 ve TV modüllerini aynı APK'da çalıştırma | 🚧 Geliştirme gerekiyor |
+| Orijinal sertifikayla imzalı v5.0 Android Release | ⏳ Henüz yayımlanmadı |
+
+**Kaynak takibi:** Resmî GitLab sürümü çıktığında kaynak kod otomatik eşitlenir. Yeni özelliklerin çalışan Android uygulamasına aktarılması, test edilmesi ve imzalı sürüm hazırlanması ayrı aşamalardır. [v5.0 değişiklik notları](docs/CHANGELOG-v5.0.md) · [Entegrasyon mimarisi](docs/INTEGRATION-v5.0.md)
+
 ## ✨ Özellikler
 
 | Özellik | Açıklama |
