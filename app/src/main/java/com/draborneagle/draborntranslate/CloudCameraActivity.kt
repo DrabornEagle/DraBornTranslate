@@ -71,7 +71,7 @@ class CloudCameraActivity : Activity() {
     private var reader: ImageReader? = null
     private var cameraId: String? = null
     private var sensorOrientation = 90
-    @Volatile private var foreground = false
+    @Volatile private var cameraActive = false
     @Volatile private var destroyed = false
     @Volatile private var ready = false
     private var lastReadAt = 0L
@@ -128,7 +128,7 @@ class CloudCameraActivity : Activity() {
         preview = TextureView(this).apply {
             surfaceTextureListener = object : TextureView.SurfaceTextureListener {
                 override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) {
-                    if (foreground) startCamera()
+                    if (cameraActive) startCamera()
                 }
                 override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) = Unit
                 override fun onSurfaceTextureUpdated(texture: SurfaceTexture) = Unit
@@ -251,18 +251,18 @@ class CloudCameraActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        foreground = true
+        cameraActive = true
         if (::preview.isInitialized && preview.isAvailable) startCamera()
     }
 
     override fun onPause() {
-        foreground = false
+        cameraActive = false
         stopCamera()
         super.onPause()
     }
 
     private fun startCamera() {
-        if (!foreground || camera != null || destroyed || !preview.isAvailable) return
+        if (!cameraActive || camera != null || destroyed || !preview.isAvailable) return
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), 701)
             return
@@ -285,7 +285,7 @@ class CloudCameraActivity : Activity() {
             manager.openCamera(id, object : CameraDevice.StateCallback() {
                 override fun onOpened(device: CameraDevice) {
                     opening.set(false)
-                    if (!foreground || destroyed) {
+                    if (!cameraActive || destroyed) {
                         device.close()
                         return
                     }
@@ -334,7 +334,7 @@ class CloudCameraActivity : Activity() {
             device.createCaptureSession(listOf(display, images.surface),
                 object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
-                        if (!foreground || destroyed) {
+                        if (!cameraActive || destroyed) {
                             session.close()
                             return
                         }
@@ -363,7 +363,7 @@ class CloudCameraActivity : Activity() {
     private fun onImage(source: ImageReader) {
         val image = try { source.acquireLatestImage() } catch (_: IllegalStateException) { null } ?: return
         val now = SystemClock.elapsedRealtime()
-        if (!ready || !foreground || destroyed || now - lastReadAt < 620L ||
+        if (!ready || !cameraActive || destroyed || now - lastReadAt < 620L ||
             !busy.compareAndSet(false, true)) {
             image.close()
             return
@@ -380,7 +380,7 @@ class CloudCameraActivity : Activity() {
             val input = InputImage.fromMediaImage(image, rotation)
             recognizer.process(input)
                 .addOnSuccessListener { result ->
-                    if (foreground && !destroyed) onRecognized(
+                    if (cameraActive && !destroyed) onRecognized(
                         result, if (rotation % 180 == 0) image.width else image.height,
                         if (rotation % 180 == 0) image.height else image.width,
                     )
@@ -450,7 +450,7 @@ class CloudCameraActivity : Activity() {
 
     override fun onDestroy() {
         destroyed = true
-        foreground = false
+        cameraActive = false
         stopCamera()
         cameraThread.quitSafely()
         captions.close()
