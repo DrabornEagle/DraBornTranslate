@@ -28,7 +28,9 @@ class CaptureService : Service() {
     private var ocr: SubtitleReader? = null
     private var translator: CaptionTranslator? = null
     private var captions: CaptionSession? = null
+    private var lensSession: LensSession? = null
     private var overlay: CaptionOverlay? = null
+    private var lensOverlay: LensOverlay? = null
     private var voice: TurkishVoice? = null
     private var panel: PortalPanelServer? = null
     private var sourceName = "PlayStation App"
@@ -81,6 +83,10 @@ class CaptureService : Service() {
             ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
                 ?: ReadingArea.SUBTITLES,
         )
+        if (config.readingArea == ReadingArea.LENS && !config.showOnPhone) {
+            finish("Lens çevirisi telefon ekranında çalışır. Çeviri çıkışını Telefon olarak seç.")
+            return START_NOT_STICKY
+        }
         if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
             finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
             return START_NOT_STICKY
@@ -106,25 +112,36 @@ class CaptureService : Service() {
             portalIssue = panelIssue,
         ))
         ocr = SubtitleReader(readingArea)
-        if (config.showOnPhone) overlay = CaptionOverlay(this, config)
+        if (config.showOnPhone) {
+            if (readingArea == ReadingArea.LENS) lensOverlay = LensOverlay(this, config)
+            else overlay = CaptionOverlay(this, config)
+        }
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
             if (!ended) {
                 SessionState.update(SessionState.current.copy(voiceIssue = issue))
                 getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(issue))
             }
         }
-        captions = CaptionSession(
-            translate = language::translate,
-            show = ::showCaption,
-            onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
-            readingArea = readingArea,
-        )
+        if (readingArea == ReadingArea.LENS) {
+            lensSession = LensSession(
+                translate = language::translate,
+                show = ::showLens,
+                onFailure = { issue -> updateTranslationIssue(issue ?: "Bu oyun metni çevrilemedi.") },
+            )
+        } else {
+            captions = CaptionSession(
+                translate = language::translate,
+                show = ::showCaption,
+                onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
+                readingArea = readingArea,
+            )
+        }
         frames = ScreenFrames(
             context = this,
             settings = config,
             reserveFrame = { modelReady && ocrPending.compareAndSet(false, true) },
             discardFrame = { ocrPending.set(false) },
-            onFrame = { bitmap -> main.post { recognize(bitmap) } },
+            onFrame = { bitmap, region -> main.post { recognize(bitmap, region) } },
             onSource = { value -> main.post { sourceChanged(value) } },
             onEnded = { message -> main.post { finish(message) } },
         ).also { it.start(Activity.RESULT_OK, grant) }
@@ -185,9 +202,13 @@ class CaptureService : Service() {
         val current = SessionState.current.caption
         overlay?.close()
         if (overlay != null && current != null) showCaption(current)
+        if (lensOverlay != null) {
+            lensOverlay?.close()
+            lensSession?.refresh()
+        }
     }
 
-    private fun recognize(bitmap: Bitmap) {
+    private fun recognize(bitmap: Bitmap, region: FrameRegion) {
         val reader = ocr
         if (ended || reader == null) {
             bitmap.recycle()
@@ -196,6 +217,19 @@ class CaptureService : Service() {
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
+        if (readingArea == ReadingArea.LENS) {
+            reader.readLocated(bitmap) { lines ->
+                ocrPending.set(false)
+                if (ended || frameEpoch != epoch) return@readLocated
+                if (lines == null) {
+                    updateStatus("Lens görüntüsünde yazı tanınamadı.")
+                } else {
+                    updateStatus(if (lines.isEmpty()) waitingForText() else "Lens · Oyun yazıları konumlarında çevriliyor.")
+                    lensSession?.read(lines, region)
+                }
+            }
+            return
+        }
         reader.read(bitmap) { lines ->
             ocrPending.set(false)
             if (ended || frameEpoch != epoch) return@read
@@ -224,6 +258,23 @@ class CaptureService : Service() {
             return
         }
         SessionState.update(SessionState.current.copy(caption = caption, lastCaption = caption ?: state.lastCaption))
+        if (caption != null) updateTranslationIssue(null)
+    }
+
+    private fun showLens(cues: List<LensCue>, region: FrameRegion) {
+        if (ended) return
+        try {
+            lensOverlay?.show(cues, region)
+        } catch (error: RuntimeException) {
+            main.post { finish("Lens katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
+            return
+        }
+        val caption = cues.firstOrNull()?.let { Caption(it.source, it.turkish) }
+        val state = SessionState.current
+        if (state.portalPanel?.previewing != true) {
+            panel?.publish(cues.take(6).joinToString("\n") { it.turkish }.ifEmpty { null })
+        }
+        SessionState.update(state.copy(caption = caption, lastCaption = caption ?: state.lastCaption))
         if (caption != null) updateTranslationIssue(null)
     }
 
@@ -275,6 +326,7 @@ class CaptureService : Service() {
             epoch++
             if (value != FrameSource.VISIBLE) voice?.pause()
             captions?.reset()
+            lensSession?.reset()
         }
         if (!modelReady) return
         updateStatus(when (value) {
@@ -284,7 +336,7 @@ class CaptureService : Service() {
         })
     }
 
-    private fun waitingForText() = if (readingArea == ReadingArea.GAME_TEXT) {
+    private fun waitingForText() = if (readingArea != ReadingArea.SUBTITLES) {
         "Görüntü alınıyor. Okunabilir oyun metni bekleniyor."
     } else "Görüntü alınıyor. Altyazı bekleniyor."
 
@@ -340,7 +392,9 @@ class CaptureService : Service() {
         main.removeCallbacks(endPanelPreview)
         frames?.close()
         captions?.close()
+        lensSession?.close()
         overlay?.close()
+        lensOverlay?.close()
         voice?.close()
         closePanel()
         ocr?.close()

@@ -12,3 +12,10 @@ This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License version 3 (see LICENSE).
 This notice and the license notices must be kept intact in copies and modified
 versions (AGPL-3.0, section 4 and 5).
+
+DraBornTranslate v0.4.12: English-to-Turkish on-device translation optionally uses
+Google ML Kit Translation (Google LLC). Models may be downloaded at first use.
+Google ML Kit model use is governed by Google's ML Kit terms and guidelines:
+https://developers.google.com/ml-kit/terms
+https://developers.google.com/ml-kit/language/translation
+Original CouchSubs / GameTranslator copyright and AGPL notices above remain intact.

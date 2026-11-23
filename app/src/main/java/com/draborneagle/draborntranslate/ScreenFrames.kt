@@ -22,13 +22,21 @@ import kotlin.math.roundToInt
 
 internal enum class FrameSource { WAITING, VISIBLE, DARK }
 
+/** Coordinate mapping from a cropped OCR bitmap into the full captured frame. */
+internal data class FrameRegion(
+    val x: Int,
+    val y: Int,
+    val frameWidth: Int,
+    val frameHeight: Int,
+)
+
 /** Android'in izin verdiği yansıtmayı okur; görüntü hiçbir dosyaya yazılmaz. */
 internal class ScreenFrames(
     private val context: Context,
     private val settings: CaptureSettings,
     private val reserveFrame: () -> Boolean,
     private val discardFrame: () -> Unit,
-    private val onFrame: (Bitmap) -> Unit,
+    private val onFrame: (Bitmap, FrameRegion) -> Unit,
     private val onSource: (FrameSource) -> Unit,
     private val onEnded: (String) -> Unit,
 ) : AutoCloseable {
@@ -180,7 +188,8 @@ internal class ScreenFrames(
                 onEnded("Oyun karesi okunamadı. Kaynağı açıp yeniden dene.")
                 return
             }
-            if (bitmap == null) discardFrame() else onFrame(bitmap)
+            if (bitmap == null) discardFrame()
+            else onFrame(bitmap, FrameRegion(scan.x, scan.y, image.width, image.height))
         }
     }
 

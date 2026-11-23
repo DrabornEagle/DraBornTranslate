@@ -2,10 +2,13 @@
 package com.draborneagle.draborntranslate
 
 import android.graphics.Bitmap
+import android.graphics.Rect
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlin.math.abs
+
+internal data class DetectedLine(val source: String, val bounds: Rect)
 
 internal interface CaptionTranslator : AutoCloseable {
     fun prepare(done: (Boolean) -> Unit) = done(true)
@@ -51,6 +54,26 @@ internal class SubtitleReader(private val readingArea: ReadingArea = ReadingArea
                     box.height() in (center.height() * 0.5f).toInt()..(center.height() * 2f).toInt()
             }.sortedWith(compareBy({ it.second.top }, { it.second.left }))
             done(group.take(3).map { it.first })
+        }
+    }
+
+    /** Preserve OCR bounding boxes for Lens mode instead of flattening them to subtitles. */
+    fun readLocated(bitmap: Bitmap, done: (List<DetectedLine>?) -> Unit) {
+        recognizer.process(InputImage.fromBitmap(bitmap, 0)).addOnCompleteListener { task ->
+            bitmap.recycle()
+            if (!task.isSuccessful) {
+                done(null)
+                return@addOnCompleteListener
+            }
+            val result = task.result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
+                val box = line.boundingBox ?: return@mapNotNull null
+                val source = line.text.trim().replace(Regex("\\s+"), " ")
+                if (source.count(Char::isLetter) < 2 || box.height() < 7 || box.width() < 13) {
+                    return@mapNotNull null
+                }
+                DetectedLine(source.take(150), Rect(box))
+            }.sortedWith(compareBy({ it.bounds.top }, { it.bounds.left }))
+            done(result.take(24))
         }
     }
 
