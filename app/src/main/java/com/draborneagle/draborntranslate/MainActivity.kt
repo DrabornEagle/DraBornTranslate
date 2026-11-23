@@ -966,7 +966,31 @@ class MainActivity : Activity() {
             }
             updateUi(AppUpdater.state)
             renderAboutUpdate = updateUi
+            append(button("GameTranslator kaynak sürümlerini kontrol et") { checkUpstreamSourceVersion() }, 12)
+            append(label("Kaynak sürümü ayrı takip edilir. Başka bir APK, DraBornTranslate üzerine kurulmaz.", 13, MUTED), 6)
         }
+    }
+
+    private fun checkUpstreamSourceVersion() {
+        Thread {
+            val result = runCatching { GameTranslatorSource.latest() }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                showPopup("GameTranslator kaynak sürümü", R.drawable.ic_portal_check, LAVENDER) {
+                    append(label("Referans: " + GameTranslatorSource.REFERENCE, 14, MUTED), 12)
+                    val version = result.getOrNull()
+                    if (version == null) {
+                        append(label("GitLab sürümüne ulaşılamadı. İnternet bağlantını kontrol et.", 15, WHITE), 10)
+                    } else {
+                        append(label("En yeni kaynak: " + version.tag, 18, WHITE, bold = true), 12)
+                        append(label(version.title, 14, MUTED), 6)
+                        append(label("Yeni kaynaklar GitHub'a inceleme önerisi olarak alınır. " +
+                            "Testler ve entegrasyon bitmeden APK'ya uygulanmaz.", 14, MUTED), 10)
+                        append(button("GitLab sürüm notlarını aç") { openLink(version.url) }, 12)
+                    }
+                }
+            }
+        }.start()
     }
 
     private fun showCurrentVersion() {
