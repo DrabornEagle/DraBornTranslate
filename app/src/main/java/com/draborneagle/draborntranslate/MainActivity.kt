@@ -346,9 +346,11 @@ class MainActivity : Activity() {
     private fun render() {
         val state = SessionState.current
         val mobile = config.source == Source.MOBILE
-        val textInstructions = if (config.readingArea == ReadingArea.GAME_TEXT) {
-            "Çevirmek istediğin menüyü veya görevi açıp metni birkaç saniye ekranda tut."
-        } else "Oyunun İngilizce altyazısını aç."
+        val textInstructions = when (config.readingArea) {
+            ReadingArea.LENS -> "Lens modu yazıların üzerine Türkçe katman yerleştirir. Oyun görüntüsü telefon ekranında açık olmalı."
+            ReadingArea.GAME_TEXT -> "Çevirmek istediğin menüyü veya görevi açıp metni birkaç saniye ekranda tut."
+            ReadingArea.SUBTITLES -> "Oyunun İngilizce altyazısını aç."
+        }
         instructions.text = if (mobile) {
             "1. PS Remote Play ile telefondan konsola bağlan.\n" +
                 "2. Yatay tam ekrana geç. $textInstructions\n" +
@@ -695,6 +697,10 @@ class MainActivity : Activity() {
         }
         demoMessage = null
         demoCaption = null
+        if (config.readingArea == ReadingArea.LENS && !config.showOnPhone) {
+            Toast.makeText(this, "Lens modu için çeviri çıkışını Telefon veya Telefon ve Portal seç.", Toast.LENGTH_LONG).show()
+            return
+        }
         pending = true
         render()
         if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
@@ -898,7 +904,7 @@ class MainActivity : Activity() {
         showPopup("DraBornTranslate", R.drawable.brand_mark, overline = "DrabornEagle") { dialog ->
             aboutDialog = dialog
             append(
-                label("İngilizce oyun metinlerini oynarken canlı olarak Türkçeye çevirir. Çeviri çevrimdışı ve ücretsizdir.", 14, MUTED)
+                label("İngilizce oyun yazılarını ücretsiz olarak cihazda çevirir. Lens modunda Türkçe yazıyı görüntünün üzerinde gösterir. Google ML Kit modeli ilk kullanımda internetten indirilebilir; ardından çeviri cihazda çalışır.", 14, MUTED)
                     .apply { setLineSpacing(dp(3).toFloat(), 1f) },
                 16,
             )
