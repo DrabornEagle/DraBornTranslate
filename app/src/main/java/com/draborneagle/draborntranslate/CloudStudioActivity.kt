@@ -288,62 +288,95 @@ class CloudStudioActivity : ComponentActivity() {
             else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
 
+    /** Detailed controls and touch handles always edit the same selected region. */
     private fun showPreciseEditor() {
         if (mode == Mode.AUDIO) {
-            notice("Ses modunda kamera alanı ayarına ihtiyaç yok.")
+            notice("Ses modunda kamera bölgesi ayarı gerekmez.")
             return
         }
+        overlay.editing = true
         val parent = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(22), dp(10), dp(22), dp(10))
+            setPadding(dp(18), dp(7), dp(18), dp(9))
         }
-        parent.addView(txt("Bir bölge seç. Kutuları ekranda sürükleyebilir veya %1 hassasiyetle ayarlayabilirsin.", 14f))
-        val types = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        types.addView(button("🔵 Konuşma") { overlay.selected = 0; showPreciseEditorRefresh() })
-        types.addView(button("🟢 Mesaj") { overlay.selected = 1; showPreciseEditorRefresh() })
-        parent.addView(types)
-        val values = listOf("Soldan", "Üstten", "Genişlik", "Yükseklik")
-        values.forEachIndexed { axis, title ->
-            val selected = if (overlay.selected == 0) overlay.subtitleRegion else overlay.messageRegion
-            val initial = listOf(selected.left, selected.top, selected.width, selected.height)[axis]
-            val label = txt("$title • %$initial", 14f)
-            parent.addView(label)
-            parent.addView(SeekBar(this).apply {
-                max = 100
-                progress = initial
-                setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        parent.addView(txt("Önizlemede mavi/yeşil kutuyu sürükle veya dört köşeden yeniden boyutlandır. Aşağıdaki %1 hassasiyetli değerler aynı bölgeyi günceller.", 14f))
+        val choices = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        parent.addView(choices)
+        val sliderBox = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        parent.addView(sliderBox)
+        val names = listOf("Sol", "Üst", "Genişlik", "Yükseklik")
+        fun valuesOf(region: CloudRegion) = listOf(region.left, region.top, region.width, region.height)
+        fun selectedRegion() = if (overlay.selected == 0) overlay.subtitleRegion else overlay.messageRegion
+
+        fun setAxis(axis: Int, value: Int) {
+            val old = selectedRegion()
+            val updated = when (axis) {
+                0 -> old.copy(left = value)
+                1 -> old.copy(top = value)
+                2 -> old.copy(width = value.coerceAtLeast(5))
+                else -> old.copy(height = value.coerceAtLeast(5))
+            }.normalized()
+            if (overlay.selected == 0) overlay.subtitleRegion = updated
+            else overlay.messageRegion = updated
+            storeRegions()
+        }
+
+        fun makeRows() {
+            sliderBox.removeAllViews()
+            for (axis in 0..3) {
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                val title = txt("", 14f)
+                val initial = valuesOf(selectedRegion())[axis]
+                title.text = names[axis] + " • %" + initial
+                sliderBox.addView(title)
+                val slider = SeekBar(this).apply {
+                    max = 100
+                    progress = initial
+                }
+                fun adjust(value: Int) {
+                    setAxis(axis, value.coerceIn(0, 100))
+                    val actual = valuesOf(selectedRegion())[axis]
+                    slider.progress = actual
+                    title.text = names[axis] + " • %" + actual
+                }
+                row.addView(button("−1") { adjust(slider.progress - 1) })
+                row.addView(slider, LinearLayout.LayoutParams(0, -2, 1f))
+                row.addView(button("+1") { adjust(slider.progress + 1) })
+                slider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onStartTrackingTouch(bar: SeekBar) = Unit
                     override fun onStopTrackingTouch(bar: SeekBar) = Unit
-                    override fun onProgressChanged(bar: SeekBar, value: Int, user: Boolean) {
-                        if (!user) return
-                        val current = if (overlay.selected == 0) overlay.subtitleRegion else overlay.messageRegion
-                        val next = when (axis) {
-                            0 -> current.copy(left = value)
-                            1 -> current.copy(top = value)
-                            2 -> current.copy(width = value.coerceAtLeast(5))
-                            else -> current.copy(height = value.coerceAtLeast(5))
-                        }.normalized()
-                        if (overlay.selected == 0) overlay.subtitleRegion = next else overlay.messageRegion = next
-                        label.text = "$title • %$value"
-                        storeRegions()
+                    override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
+                        if (fromUser) adjust(value)
                     }
                 })
-            })
+                sliderBox.addView(row)
+            }
         }
-        parent.addView(button("🔄 Varsayılan yerleşim") {
+        choices.addView(button("🔵 Konuşma altyazısı") {
+            overlay.selected = 0
+            makeRows()
+        })
+        choices.addView(button("🟢 Telefon / Lens") {
+            overlay.selected = 1
+            makeRows()
+        })
+        makeRows()
+        parent.addView(button("↺ Her iki alanı sıfırla") {
             overlay.subtitleRegion = CloudRegion.SUBTITLES
             overlay.messageRegion = CloudRegion.MESSAGES
             storeRegions()
-            notice("Okuma alanları varsayılana döndü.")
+            makeRows()
         })
         val scroller = ScrollView(this).apply { addView(parent) }
-        AlertDialog.Builder(this).setTitle("Cloud OCR • Hassas alan ayarı")
-            .setView(scroller).setPositiveButton("Kaydet") { _, _ -> storeRegions() }
+        AlertDialog.Builder(this)
+            .setTitle("Cloud Translate • Profesyonel alan editörü")
+            .setView(scroller)
+            .setPositiveButton("Kaydet") { _, _ -> storeRegions() }
+            .setNegativeButton("Kapat", null)
             .show()
-    }
-
-    private fun showPreciseEditorRefresh() {
-        notice("Seçili bölge değişti. Ayar penceresini yeniden açarak yüzdelerini düzenle.")
     }
 
     private fun showZoom() {
