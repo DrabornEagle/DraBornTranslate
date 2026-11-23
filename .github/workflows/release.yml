@@ -1,6 +1,10 @@
 name: Release · Verified Signed APK
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/RELEASE-v0.4.13.md'
   workflow_dispatch:
 
 permissions:
