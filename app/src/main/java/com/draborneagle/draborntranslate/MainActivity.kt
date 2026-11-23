@@ -309,10 +309,10 @@ class MainActivity : Activity() {
     }
 
     private fun choosePsLanguage(
-        heading: String, key: String, choices: Array<String>, fallback: String
+        heading: String, key: String, choices: Array<String>
     ) {
         showPopup(heading, R.drawable.ic_portal_check) { dialog ->
-            append(label("Tercihin yalnızca bu cihazda saklanır.", 13, MUTED), 12)
+            append(label("Şimdilik uygulamanın çeviri motoru İngilizce → Türkçe dil çiftini destekler.", 13, MUTED), 12)
             choices.forEach { choice ->
                 append(button(choice) {
                     prefs.edit().putString(key, choice).apply()
@@ -337,15 +337,15 @@ class MainActivity : Activity() {
         val game = prefs.getString("setupGame", "English · İngilizce") ?: "English · İngilizce"
         language.append(button("Aa   Uygulama dili     " + appLanguage) {
             choosePsLanguage("Uygulama dili", "setupAppLanguage",
-                arrayOf("Otomatik · Türkçe", "Türkçe", "English"), appLanguage)
+                arrayOf("Otomatik · Türkçe", "Türkçe"))
         }, 11)
         language.append(button("🌐   Çeviri dili     " + translated) {
             choosePsLanguage("Çeviri dili", "setupTranslated",
-                arrayOf("Türkçe", "English", "Deutsch", "Español"), translated)
+                arrayOf("Türkçe"))
         }, 8)
         language.append(button("🎮   Oyunun dili     " + game) {
             choosePsLanguage("Oyunun dili", "setupGame",
-                arrayOf("English · İngilizce", "Türkçe", "Deutsch", "Español"), game)
+                arrayOf("English · İngilizce"))
         }, 8)
         content.append(language, 22)
 
