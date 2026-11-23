@@ -296,6 +296,32 @@ class MainActivity : Activity() {
         }, 16)
         content.append(portalCard, 14)
 
+        val gta = card(true).apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR, 0xFF193D42.toInt(), 0xFF202950.toInt(), 20)
+                .apply { setStroke(dp(1), 0xFF59D7B4.toInt()) }
+        }
+        gta.addView(label("⚡ GTA 6 • Hazır Türkçe paket", 19, WHITE, true))
+        val installed = Gta6PackInstaller.installedInfo(this)
+        gta.append(label(when {
+            packLoading -> "İndiriliyor ve doğrulanıyor…"
+            installed != null -> "Yüklü ve doğrulanmış: " + installed.entries + " Türkçe satır"
+            else -> "Sunucudaki GTA 6 Türkçe paketi • yaklaşık 475 bin satır. İlk indirme internet gerektirir."
+        }, 14, MUTED), 8)
+        gta.append(label("Eşleşen İngilizce satır doğrudan paketten gelir. Bulunmayan satırlarda yerel çeviri devreye girer.", 13, MINT), 8)
+        gta.append(button(if (packLoading) "Paket yükleniyor…" else if (installed == null) "GTA 6 paketini indir" else "GTA 6 paketini kontrol et / güncelle") {
+            AlertDialog.Builder(this)
+                .setTitle("GTA 6 Türkçe oyun paketi")
+                .setMessage("Paket yaklaşık 25 MB indirir ve telefonda yer kaplar. Dosya SHA-256 ve satır sayısıyla doğrulanır. Devam edilsin mi?")
+                .setNegativeButton("Vazgeç", null)
+                .setPositiveButton("İndir / Güncelle") { _, _ ->
+                    installPack { app ->
+                        val result = Gta6PackInstaller.install(app)
+                        "GTA 6 · " + result.entries + " Türkçe satır"
+                    }
+                }.show()
+        }.apply { isEnabled = !packLoading; styleButton(this, MINT to ACCENT) }, 14)
+        content.append(gta, 19)
+
         val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
         val versionCard = card()
         versionCard.addView(label("DraBornTranslate  v" + version, 17, WHITE, true))
@@ -709,8 +735,9 @@ class MainActivity : Activity() {
     }
 
     private fun installPack(load: (Context) -> String) {
+        if (packLoading) return
         packLoading = true
-        render()
+        refreshCurrentMode()
         val app = applicationContext
         Thread({
             val result = runCatching { load(app) }
@@ -723,9 +750,17 @@ class MainActivity : Activity() {
                     onFailure = { error -> "Paket yüklenemedi: " + (error.message ?: "Bağlantı veya dosya hatası") },
                 )
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                render()
+                refreshCurrentMode()
             }
         }, "DraBornTranslate-pack-import").start()
+    }
+
+    private fun refreshCurrentMode() {
+        when (entryMode) {
+            EntryMode.HOME -> buildLandingUi()
+            EntryMode.PORTAL -> render()
+            EntryMode.PS5_TV -> Unit
+        }
     }
 
     private fun renderPortalPanel(state: SessionState.State) {
