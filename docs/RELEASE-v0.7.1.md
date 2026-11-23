@@ -44,6 +44,14 @@ Ses tanıma **önce cihaz içi** Android `SpeechRecognizer.createOnDeviceSpeechR
 
 Bu kaynaklar referans araştırmasıdır; kodları veya GPL lisans yükümlülükleri ihlal edilerek yeniden markalanıp projeye kopyalanmaz.
 
+### Deneysel üçüncü yol: bulut oyununu doğrudan Android'de açmak (Portal'dan bağımsız)
+
+Araştırmada [Con-app](https://github.com/houqai/Con-app), [CloudPad-Android](https://github.com/Chazq2023/CloudPad-Android) ve [Asobi](https://play.google.com/store/apps/details?id=com.asobi.droid) gibi **resmî olmayan** PS Plus bulut istemcileri bulundu. Bu çözümler teorik olarak oyun görüntüsünü doğrudan telefonda gösterebildiği için Android ekran üstü OCR/altyazı yaklaşımına kapı açabilir. **Portal'daki mevcut bulut oturumunu aynalamazlar**; aynı hesapta eşzamanlı ikinci oturumun çalıştığı doğrulanmamıştır.
+
+Bu istemcilerin PSN kimlik doğrulaması, güvenliği, kullanım şartları ve hesap riski bağımsız olarak doğrulanmadı. Bu yüzden DraBornTranslate v0.7.1 bunların hiçbirine PSN şifresi/tokenı vermez, otomatik bağlantı veya entegrasyon yapmaz. Özellikle CloudPad kendi belgelerinde PSN hesabının kısıtlanabileceğine dikkat çeker.
+
+**Önerilen güvenli yol:** Önce resmi PS Portal Cloud Streaming + telefon mikrofonu/kamera modlarını kullan; yalnızca resmî olmayan istemcileri ayrı araştırma konusu olarak değerlendir.
+
 ## Kurulum, kalite ve güvenlik
 
 - `versionName 0.7.1` / `versionCode 6` / Android 10+ (ses cihaz-içi tanıma desteği Android 12+ ve servis varlığına bağlı).
