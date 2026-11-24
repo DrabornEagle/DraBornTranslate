@@ -23,18 +23,20 @@ class GamePackPriorityTest {
     fun readyPackResultCanOvertakeAnEarlierModelRequest() {
         val captions = mutableListOf<Caption>()
         var older: ((TranslationReply) -> Unit)? = null
+        var now = 0L
         val session = CaptionSession(
             translate = { _, done -> older = done },
             show = { if (it != null) captions.add(it) },
             onFailure = { error("Unexpected failure: $it") },
-            stabilizer = SubtitleStabilizer(stableFrames = 1, exactText = true, minTextLength = 2),
+            stabilizer = SubtitleStabilizer(stableFrames = 1, clock = { now }, exactText = true, minTextLength = 2),
             lookup = { input, done ->
                 done(if ("Kolt" in input.text) TranslationReply("Kolt ve Ortakları:") else null)
             },
         )
-        repeat(2) { session.read(listOf("An older line is still being translated.")) }
+        session.read(listOf("An older line is still being translated."))
         assertTrue(older != null)
-        repeat(2) { session.read(listOf("Kolt & Associates:")) }
+        now += 340
+        session.read(listOf("Kolt & Associates:"))
         assertEquals("Kolt ve Ortakları:", captions.last().turkish)
         older?.invoke(TranslationReply("Artık ekranda olmayan satır."))
         assertEquals(1, captions.size)

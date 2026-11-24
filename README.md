@@ -19,7 +19,7 @@
 
 Altyazılar akarken oyun telefonundaki mesajı, tabelayı veya Brief metnini seç. **DraBorn Odak** Türkçeyi okuduğu görüntünün üstüne yerleştirir ve çevirinin tamamını metin olarak da gösterir. Android 14 ve üzerindeki uygulama paylaşımında seçili alan canlı olarak yenilenebilir.
 
-**GTA 6 Türkçe paketini al** seçeneği Türkçe oyun paketini telefona indirir. Pakette eşleşen replikler yerel olarak döner. Diğer metinleri telefondaki Töz-Çevir modeli çevirir. Çeviri için hesap, ücretli servis, kamera, mikrofon veya bilgisayar gerekmez.
+**GTA 6 Türkçe paketini al** seçeneği 475.893 satırlık Türkçe oyun paketini telefona indirir. Pakette eşleşen replikler yerel olarak döner. Diğer metinleri telefondaki Töz-Çevir modeli çevirir. Çeviri için hesap, ücretli servis, kamera, mikrofon veya bilgisayar gerekmez.
 
 ### PS App yakalamaları
 
