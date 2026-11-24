@@ -12,6 +12,8 @@ internal object SessionState {
 
     internal data class State(
         val active: Boolean = false,
+        val source: Source? = null,
+        val videoVisible: Boolean = false,
         val status: String = "Canlı altyazı kapalı.",
         val caption: Caption? = null,
         val lastCaption: Caption? = null,

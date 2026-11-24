@@ -53,11 +53,17 @@ class FocusActivity : Activity() {
             name = intent.getStringExtra("captureName") ?: source.name,
             modified = intent.getLongExtra("captureModified", source.modified),
             size = intent.getLongExtra("captureSize", source.size),
+            added = intent.getLongExtra("captureAdded", source.added),
         )
         reader = FocusTranslator(this)
-        val content = page()
-        content.addView(heading("DraBorn Odak"))
-        content.addView(text(capture?.name ?: "Oyun görüntüsü").apply { setTextColor(0xFFA6D9EA.toInt()) })
+        val content = contentPage("DraBorn Odak", Palette.peach)
+        val selected = capture
+        val title = when {
+            selected == null -> "Oyun görüntüsü"
+            selected.added > 0 -> "${if (selected.video) "Klip" else "Görüntü"} · ${captureDate(selected.added)}"
+            else -> selected.name
+        }
+        content.addView(copy(title, 16, Palette.peach, true))
         canvas = FocusCanvas(this) { area ->
             if (!busy) {
                 followsLive = false
@@ -98,6 +104,10 @@ class FocusActivity : Activity() {
         }.apply { visibility = View.GONE }
         content.addView(sample)
         if (capture == null) {
+            content.addView(action("Fotoğraf veya klip seç") {
+                @Suppress("DEPRECATION")
+                startActivityForResult(mediaPicker(), 51)
+            })
             content.addView(action("Güncel oyun karesini al") { showLive() })
             content.addView(action("Canlı alanı takip et") {
                 followsLive = !followsLive
@@ -133,7 +143,7 @@ class FocusActivity : Activity() {
         lastLiveCheck = android.os.SystemClock.elapsedRealtime()
         val bitmap = LiveFocusFrames.snapshot()
         if (bitmap == null) {
-            status.text = "Canlı çeviriyi DraBorn Odak ile başlat ve oyunu aç. İlk kare geldiğinde burada görünecek."
+            status.text = "Fotoğraf veya klip seç. Canlı çeviriyi açarsan oyun karesi burada görünür."
             return
         }
         setFrame(CaptureFrame(bitmap))
@@ -228,116 +238,19 @@ class FocusActivity : Activity() {
         sample.isEnabled = !value
     }
 
+    @Deprecated("Android activity result")
+    override fun onActivityResult(code: Int, result: Int, data: Intent?) {
+        super.onActivityResult(code, result, data)
+        if (code != 51 || result != RESULT_OK) return
+        val uri = data?.data ?: return
+        val video = contentResolver.getType(uri)?.startsWith("video/") == true
+        startActivity(captureIntent(SavedCapture(uri, if (video) "Seçilen klip" else "Seçilen görüntü", video, 0, 0)))
+    }
+
     override fun onDestroy() {
         serial++
         reader.close()
         current?.bitmap?.recycle()
-        disk.shutdownNow()
-        super.onDestroy()
-    }
-}
-
-class CaptureInboxActivity : Activity() {
-    private val disk = Executors.newSingleThreadExecutor()
-    private lateinit var records: LinearLayout
-    private lateinit var toggle: Button
-    private var refresh = 0
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val content = page()
-        content.addView(heading("PS App yakalamaları"))
-        content.addView(text("PS App’te İndir’e dokun veya yakalamayı doğrudan DraBornTranslate ile paylaş."))
-        toggle = action("", primary = true) { toggleAutomatic() }
-        content.addView(toggle)
-        content.addView(action("Fotoğraf veya klip seç") { pickMedia() })
-        content.addView(action("Listeyi yenile") { reload() })
-        records = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        content.addView(records)
-        content.addView(action("Geri dön") { finish() })
-    }
-
-    override fun onResume() {
-        super.onResume()
-        CaptureInbox.watch(this)
-        CaptureInbox.enqueue(this)
-        reload()
-    }
-
-    private fun reload() {
-        toggle.text = if (CaptureInbox.enabled(this)) "Otomatik çeviriyi durdur" else "Otomatik çeviriyi aç"
-        val id = ++refresh
-        disk.execute {
-            val files = CaptureInbox.items(this)
-            val results = files.map { it to CaptureInbox.cached(this, it).orEmpty().count { line -> line.turkish != null } }
-            runOnUiThread {
-                if (isDestroyed || id != refresh) return@runOnUiThread
-                records.removeAllViews()
-                if (files.isEmpty()) records.addView(text("Telefonda erişilebilir PS App yakalaması yok."))
-                for ((capture, count) in results) {
-                    val type = if (capture.video) "Klip" else "Görüntü"
-                    val suffix = if (count > 0) " · $count çeviri" else ""
-                    records.addView(action("$type$suffix\n${capture.name}") { open(capture) })
-                }
-            }
-        }
-    }
-
-    private fun toggleAutomatic() {
-        if (CaptureInbox.enabled(this)) {
-            CaptureInbox.setEnabled(this, false)
-            reload()
-            return
-        }
-        if (CaptureInbox.canRead(this)) enable()
-        else requestPermissions(CaptureInbox.permissions(), 41)
-    }
-
-    private fun enable() {
-        CaptureInbox.setEnabled(this, true)
-        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
-            != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 43)
-        }
-        reload()
-    }
-
-    @Deprecated("Android permission callback")
-    override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, grants: IntArray) {
-        super.onRequestPermissionsResult(code, permissions, grants)
-        if (code == 41 && CaptureInbox.canRead(this)) enable()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun pickMedia() {
-        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            type = "*/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "video/*"))
-        }, 42)
-    }
-
-    @Deprecated("Android Activity result callback")
-    override fun onActivityResult(code: Int, result: Int, data: Intent?) {
-        super.onActivityResult(code, result, data)
-        if (code != 42 || result != RESULT_OK) return
-        val uri = data?.data ?: return
-        val clip = contentResolver.getType(uri)?.startsWith("video/") == true
-        open(SavedCapture(uri, if (clip) "Seçilen klip" else "Seçilen görüntü", clip, 0, 0))
-    }
-
-    private fun open(capture: SavedCapture) {
-        startActivity(Intent(this, FocusActivity::class.java).apply {
-            action = Intent.ACTION_VIEW
-            setDataAndType(capture.uri, if (capture.video) "video/*" else "image/*")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            putExtra("captureName", capture.name)
-            putExtra("captureModified", capture.modified)
-            putExtra("captureSize", capture.size)
-        })
-    }
-
-    override fun onDestroy() {
         disk.shutdownNow()
         super.onDestroy()
     }

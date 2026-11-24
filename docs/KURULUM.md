@@ -1,19 +1,19 @@
-# DraBornTranslate v5.0
+# DraBornTranslate v5.0.1
 
-**Android 10+ · ARM64 · Android sürüm kodu 1**
+**Android 10+ · ARM64 · Android sürüm kodu 2**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.1)
 
-v5.0 yeni paket kimliğiyle kurulur. v0.4.x ve v5.0 aynı telefonda açık kalabilir. İlk açılışta **GTA 6 Türkçe paketini al → GTA 6 Türkçe paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v5.0.1’i mevcut v5.0 kurulumunun üzerine yükleyebilirsin. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
 1. PS5’i ve telefonu aynı ev ağına bağla. PS5’te **Ayarlar → Sistem → Uzaktan Oynama** ayarını aç.
 2. TV’de ana hesabınla oynarken görüntüyü telefona almak için PS5’e ikinci hesap ekle. **Cihazı Eşleştir** ekranındaki kodu kullan. Eşlenen hesabın sayısal PSN kimliğini, PS5’in IP adresini ve konsoldaki kodu **PS5 ve TV’ye bağlan → PS5’i eşleştir** bölümüne gir.
-3. Oyunun İngilizce altyazısını aç. **Canlı çeviriyi başlat** seçeneğine dokun.
-4. Türkçeyi telefonda okumak için **Çeviri çıkışı → Telefon** seç. TV tarayıcısı için **Telefon ve TV tarayıcısı** seçeneğini kullan ve panel adresini aynı ağdaki tarayıcıda aç. Oyun ile tarayıcıyı yan yana göstermek, TV’nin çoklu görüntü desteğine bağlıdır.
+3. Oyunun İngilizce altyazısını aç. **Çeviri → Çeviriyi başlat** seçeneğine dokun.
+4. **Ayarlar → Çeviri çıkışı** ekranından telefon veya TV çıkışını seç. TV için **TV ekranını hazırla** sayfasındaki adresi aynı ağdaki TV tarayıcısında aç. Oyun ile tarayıcıyı yan yana göstermek, TV’nin çoklu görüntü desteğine bağlıdır.
 
-PS5’te ikinci Remote Play oturumu kabul edilmezse uygulamadaki **PS Remote Play ile telefonda oyna** yolunu kullan. PS Remote Play’i aç ve Android ekran paylaşımında onu seç.
+PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oyna** yolunu kullan. PS Remote Play’i aç ve Android ekran paylaşımında onu seç.
 
 ## PlayStation Portal
 
@@ -36,9 +36,9 @@ Canlı altyazı ve alanın OCR işlemi bağımsızdır. Ekranda küçük veya bu
 
 PS App’te **Kütüphane → Yakalamalar** bölümüne geç. Brief’in birden çok sayfasını okuyacaksan her sayfa için bir yakalama oluştur.
 
-- **Hemen çevir:** PS App’te **Paylaş → DraBornTranslate** seç.
-- **Otomatik çeviri:** DraBornTranslate’te **PS App yakalamaları → Otomatik çeviriyi aç** seç ve medya izni ver. PS App’te **İndir** dediğinde görüntüler `Pictures/PS App`, klipler `Movies/PS App` klasöründen okunur.
-- **Klip:** İnceleme ekranında istediğin zaman konumunu seçip **Kareyi seç** düğmesine dokun.
+- PS App’te **Paylaş → DraBornTranslate** seçerek yakalamayı doğrudan çeviriye açabilirsin.
+- **Yakalamalar → Otomatik çeviriyi aç** yolunu kullan ve yeni yakalamalar için tam medya erişimi ver. PS App’te **İndir** dediğinde görüntüler `Pictures/PS App`, klipler `Movies/PS App` klasöründen okunur.
+- Galeri en yeni dosyayı üstte gösterir. Önizlemeye dokunarak görüntünün çevirisini açabilirsin. Klipte istediğin zamana git ve **Kareyi seç** düğmesine dokun.
 
 PS5’in otomatik yüklemesi yakalamaları PS App’e getirir. Telefona kaydetmek için PlayStation App’te **İndir** veya **Paylaş** kullanılır. İndirilmiş dosyaların arka planda işlenme zamanını Android pil ve arka plan ayarları belirler. [PlayStation yakalama rehberi](https://www.playstation.com/tr-tr/support/games/ps5-game-captures-ps-app/)
 
