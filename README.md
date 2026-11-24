@@ -23,6 +23,10 @@
 
 ## ⚡ v0.8.1 · Auto Capture Sync
 
+<p align="center"><a href="https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45371391171/artifacts/14908739821"><img alt="v0.8.1 Android DEBUG APK ZIP indir" src="https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.8.1%20DEBUG-22C55E?style=for-the-badge&logo=android&logoColor=white"></a></p>
+
+**v0.8.1 test APK hazır:** [APK paketi (ZIP)](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45371391171/artifacts/14908739821) · [Başarılı CI ve APK imza kontrolü](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45371391171) · ARM64 · Android 10+ · versionCode 9. Gerçek cihazda PS App erişilebilirlik uyumluluğu ve üretim imzası ayrı doğrulanır.
+
 - PS App'in Pictures/PS App ve Movies/PS App klasörlerindeki yeni fotoğraflar ve MP4 videolar otomatik işlenir.
 - ML Kit görüntü OCR, GTA 6 paket öncelikli Türkçe çeviri, Brief bölgesi, kayan panel ve yerel geçmiş.
 - Deneysel erişilebilirlik indirme yardımı yalnızca açıkça tanınan GTA VI yakalama/indirme düğmelerinde çalışır. Gerçek cihaz testi gereklidir; manuel indirme desteklenir.
@@ -101,7 +105,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 
 **Sürüm kimliği:** `versionName 0.8.1` / `versionCode 9` / `applicationId com.draborneagle.draborntranslate`.
 
-**Önemli:** v0.8 Debug APK derleme, birim testleri, lint ve APK imza/sürüm doğrulamasından geçti. Üretim imzalı Release ve gerçek Portal cihaz testi ayrı doğrulanır. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
+**Önemli:** v0.8.1 Debug APK derleme, birim testleri, lint ve APK imza/sürüm doğrulamasından geçti. Üretim imzalı Release ve gerçek Portal cihaz testi ayrı doğrulanır. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
 ### Android kaynak derleme
 
