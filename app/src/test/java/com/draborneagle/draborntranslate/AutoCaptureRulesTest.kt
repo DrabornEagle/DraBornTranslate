@@ -2,6 +2,13 @@ package com.draborneagle.draborntranslate
 import org.junit.Assert.*
 import org.junit.Test
 class AutoCaptureRulesTest {
+    @Test fun reviewedCompleteLines(){
+        assertEquals("Kirk: Şu anda Skunk Ape'in peşindeyim; bu yüzden radyo frekansı yayılımımı sınırlamam gerekiyor.",
+            AutoCaptureRules.reviewed("Kirk: I am in active pursuit of skunk ape and have to limit my RF radiation."))
+        assertEquals("Öldürülmek mi istiyorsun? Bugün bir otostopçu al!",
+            AutoCaptureRules.reviewed("WANNA GET MURDERED? PICK UP A HITCHHIKER TODAY!"))
+        assertNull(AutoCaptureRules.reviewed("it of skunk ape and have to limit my RF"))
+    }
     @Test fun folders(){
         assertTrue(AutoCaptureRules.allowed("Pictures/PS App/","1a20-screenshotUrl.jpg",false))
         assertTrue(AutoCaptureRules.allowed("Movies/PS App/","1a20-master_playlist.mp4",true))
