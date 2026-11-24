@@ -108,7 +108,7 @@ class CaptureService : Service() {
         }
         val previousPanel = SessionState.current.portalPanel
         panel?.publish(null)
-        sourceName = config.source.appName
+        sourceName = if (intent.getBooleanExtra("externalCloudCapture", false)) "Android bulut istemcisi" else config.source.appName
         readingArea = config.readingArea
         captureSettings = config
         SessionState.update(SessionState.State(
@@ -616,13 +616,14 @@ class CaptureService : Service() {
         private const val EXTRA_LENS_WIDTH = "lensWidth"
         private const val EXTRA_LENS_HEIGHT = "lensHeight"
 
-        internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
+        internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings, externalCloudCapture: Boolean = false) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
                 putExtra(EXTRA_GRANT, grant)
                 putExtra(EXTRA_RESULT, resultCode)
                 putExtra(EXTRA_TOP, config.bandTop)
                 putExtra(EXTRA_SIZE, config.textSize)
                 putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
+                putExtra("externalCloudCapture", externalCloudCapture)
                 putExtra(EXTRA_DISPLAY, config.display.name)
                 putExtra(EXTRA_READING_AREA, config.readingArea.name)
                 putExtra(EXTRA_LENS_LEFT, config.lensLeft)
