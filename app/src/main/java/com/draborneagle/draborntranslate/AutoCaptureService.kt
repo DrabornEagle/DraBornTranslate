@@ -29,6 +29,7 @@ internal object AutoCaptureState {
     const val HISTORY="capture_history"
     @Volatile var running=false
     @Volatile var status="Hazır"
+    @Volatile var downloadSerial=0L
     @Volatile var accessConnected=false
     @Volatile var accessStatus="Servis bağlantısı yok"
 }
@@ -43,6 +44,7 @@ class AutoCaptureService:Service() {
     private var busy=false
     private var overlay:TextView?=null
     private val seen=linkedSetOf<String>()
+    private val observed=linkedSetOf<String>()
     private val failures=mutableMapOf<String,Int>()
     private val stable=mutableMapOf<String,Long>()
     private var since=0L
@@ -106,6 +108,7 @@ class AutoCaptureService:Service() {
             if(stopped)return
             if(m.key in seen || (failures[m.key]?:0)>=3)continue
             if(stable.put(m.key,m.size)!=m.size)continue // two scans, unchanged size and finalized by MediaStore
+            if(observed.add(m.key) && m.date>=since)AutoCaptureState.downloadSerial++
             publish("Okunuyor · "+m.name)
             val lines=mutableListOf<String>()
             try{
