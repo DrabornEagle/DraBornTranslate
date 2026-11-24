@@ -1,10 +1,10 @@
-name: DraBornTranslate v0.7.2 · production-signed Android release (manual)
+name: DraBornTranslate v0.8 · production-signed Android release (manual)
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['docs/RELEASE-v0.7.2.md']
+    paths: ['docs/RELEASE-v0.8.md']
 
 concurrency:
   group: draborntranslate-signed-v0.6-release
@@ -55,13 +55,13 @@ jobs:
           set -euo pipefail
           ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk dist/DraBornTranslate-v0.7.2-Android-arm64.apk
+          cp app/build/outputs/apk/release/app-release.apk dist/DraBornTranslate-v0.8-Android-arm64.apk
       - name: Verify APK signature and build version
         run: |
           set -euo pipefail
-          APK="dist/DraBornTranslate-v0.7.2-Android-arm64.apk"
+          APK="dist/DraBornTranslate-v0.8-Android-arm64.apk"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "versionCode='7' versionName='0.7.2'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "versionCode='8' versionName='0.8'"
           curl --retry 3 --fail --location             "https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.4.11/DraBornTranslate-v0.4.11-Android-arm64.apk"             --output "$RUNNER_TEMP/previous-release.apk"
           OLD_CERT=$("$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$RUNNER_TEMP/previous-release.apk" | awk -F ': ' '/Signer #1 certificate SHA-256 digest/ { print $2; exit }')
           NEW_CERT=$("$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" | awk -F ': ' '/Signer #1 certificate SHA-256 digest/ { print $2; exit }')
@@ -69,26 +69,26 @@ jobs:
             echo "::error::Release certificate mismatch. Publishing stopped."
             exit 1
           fi
-          (cd dist && sha256sum DraBornTranslate-v0.7.2-Android-arm64.apk > SHA256SUMS.txt)
+          (cd dist && sha256sum DraBornTranslate-v0.8-Android-arm64.apk > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
         with:
-          name: DraBornTranslate-v0.7.2-signed-arm64
+          name: DraBornTranslate-v0.8-signed-arm64
           path: dist/
           if-no-files-found: error
-      - name: Publish verified v0.7.2 preview to GitHub Releases
+      - name: Publish verified v0.8 preview to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.DRABORNTRANSLATE_RELEASE_TOKEN }}
         run: |
           set -euo pipefail
           test -n "${GH_TOKEN:-}" || { echo "Missing DRABORNTRANSLATE_RELEASE_TOKEN"; exit 1; }
-          if gh release view v0.7.2 >/dev/null 2>&1; then
-            echo "Release v0.7.2 already exists; refusing to overwrite."
+          if gh release view v0.8 >/dev/null 2>&1; then
+            echo "Release v0.8 already exists; refusing to overwrite."
             exit 1
           fi
-          gh release create v0.7.2 \
-            dist/DraBornTranslate-v0.7.2-Android-arm64.apk \
+          gh release create v0.8 \
+            dist/DraBornTranslate-v0.8-Android-arm64.apk \
             dist/SHA256SUMS.txt \
             --target "$GITHUB_SHA" \
-            --title "DraBornTranslate v0.7.2 · Live Stream Translate · İmzalı Android" \
+            --title "DraBornTranslate v0.8 · Smart Dialogue Sync · İmzalı Android" \
             --prerelease \
-            --notes-file docs/RELEASE-v0.7.2.md
+            --notes-file docs/RELEASE-v0.8.md
