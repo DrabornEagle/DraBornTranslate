@@ -25,6 +25,7 @@
 
 - CameraX: yatay, dikey ve otomatik yön, OCR/önizleme koordinat uyumu.
 - İki bağımsız sürüklenebilir ve boyutlandırılabilir alan, hassas yüzde ayarı, yakınlaştırma, yazı boyutu ve okuma modu.
+- PS App yakalamaları: Portal Create ile alınan ve telefona indirilen ekran görüntülerini kamera/mikrofon olmadan OCR ve paket öncelikli motorla çevirir (canlı değildir).
 - Deneysel kamerasız Android istemcisi modu: mevcut ekran paylaşımı ile ayrı bir istemcinin görüntüsünü çevirir. Portal bulut oturumunu aynalamaz; korumalı görüntü okunamaz.
 - [v0.7.1 sürüm notları ve test planı](docs/RELEASE-v0.7.1.md). Kaynak önizlemesi; gerçek cihaz testi ve imzalı APK doğrulaması gereklidir.
 
