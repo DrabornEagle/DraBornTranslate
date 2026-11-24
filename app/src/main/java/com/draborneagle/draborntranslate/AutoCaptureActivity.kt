@@ -17,12 +17,14 @@ class AutoCaptureActivity:Activity(){
     private val prefs by lazy{getSharedPreferences(AutoCaptureState.PREF,MODE_PRIVATE)}
     private val main=Handler(Looper.getMainLooper())
     private lateinit var status:TextView
+    private lateinit var accessStatus:TextView
     private lateinit var history:TextView
     private lateinit var start:Button
     private var lastHistory=""
     private val refresh=object:Runnable{
         override fun run(){
             status.text=(if(AutoCaptureState.running)"● Aktif · " else "○ Durdu · ")+AutoCaptureState.status
+            accessStatus.text=(if(AutoCaptureState.accessConnected)"● Erişilebilirlik bağlı · " else "○ Erişilebilirlik bağlı değil · ")+AutoCaptureState.accessStatus
             start.text=if(AutoCaptureState.running)"Takibi durdur" else "Otomatik çeviriyi başlat"
             val raw=prefs.getString(AutoCaptureState.HISTORY,"[]").orEmpty()
             if(raw!=lastHistory){
@@ -55,7 +57,7 @@ class AutoCaptureActivity:Activity(){
                 };ins
             }
         }
-        layout.addView(label("AUTO CAPTURE SYNC · v0.8.1",23,0xFF8CEBFF.toInt()))
+        layout.addView(label("AUTO CAPTURE SYNC · v0.8.2",23,0xFF8CEBFF.toInt()))
         layout.addView(label("PS App → Pictures/PS App ve Movies/PS App. İndirilen fotoğraf ve videolar otomatik okunur. Canlı yayın değildir.",15))
         layout.addView(check("Brief · yalnızca sağdaki konuşma alanı","brief",true))
         layout.addView(check("Kayan Türkçe panel (üstte gösterme izni)","overlay",false))
@@ -66,6 +68,10 @@ class AutoCaptureActivity:Activity(){
         layout.addView(label("İndirme yardımı yalnızca PS App açıkken, GTA VI ekranında erişilebilir ve açıkça etiketlenmiş yakalama/indirme düğmelerinde çalışır. Etiket yoksa elle indir. Hesap bilgilerine dokunmaz.",13,0xFFBAC7D7.toInt()))
         layout.addView(button("Erişilebilirlik ayarları"){
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        })
+        accessStatus=label("Erişilebilirlik bağlantısı kontrol ediliyor",14,0xFF8CEBFF.toInt());layout.addView(accessStatus)
+        layout.addView(button("Erişilebilirlik bağlantısını yenile"){
+            android.app.AlertDialog.Builder(this).setTitle("Bağlantıyı yenile").setMessage("Android erişilebilirlik sayfasında DraBornTranslate hizmetini kapat ve yeniden aç. Sonra buraya dön; gerçek bağlantı durumu gösterilecek.").setPositiveButton("Ayarları aç"){_,_->startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))}.setNegativeButton("İptal",null).show()
         })
         start=button("Otomatik çeviriyi başlat"){if(AutoCaptureState.running)stopService(Intent(this,AutoCaptureService::class.java))else begin(false)}
         layout.addView(start)

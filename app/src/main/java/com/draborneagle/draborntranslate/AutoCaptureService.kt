@@ -29,6 +29,8 @@ internal object AutoCaptureState {
     const val HISTORY="capture_history"
     @Volatile var running=false
     @Volatile var status="Hazır"
+    @Volatile var accessConnected=false
+    @Volatile var accessStatus="Servis bağlantısı yok"
 }
 class AutoCaptureService:Service() {
     private val main=Handler(Looper.getMainLooper())
@@ -99,6 +101,7 @@ class AutoCaptureService:Service() {
     }
     private fun scan(){
         val all=(list(false)+list(true)).sortedBy{it.date}
+        if(all.isEmpty() && includeOld)publish("PS App klasörlerinde MediaStore dosyası bulunamadı · medya izinlerini kontrol et")
         for(m in all){
             if(stopped)return
             if(m.key in seen || (failures[m.key]?:0)>=3)continue
@@ -129,7 +132,7 @@ class AutoCaptureService:Service() {
                 seen.add(m.key);while(seen.size>1000)seen.remove(seen.first())
                 prefs.edit().putString(AutoCaptureState.HISTORY,result.toString()).putStringSet("seen",seen.toSet()).apply()
                 val latest=(0 until rows.length()).map{rows.getJSONObject(it).optString("tr")}.filter{it.isNotBlank()}.takeLast(2).joinToString("\n")
-                publish(if(lines.isEmpty())"Metin bulunamadı" else if(latest.isBlank())"Metin okundu · çeviri bulunamadı" else latest)
+                publish(if(lines.isEmpty())"Metin bulunamadı · Brief ayarını kapatıp yeniden tara" else if(latest.isBlank())"Metin okundu · çeviri bulunamadı" else latest)
             }catch(e:Exception){
                 if(stopped)return
                 failures[m.key]=(failures[m.key]?:0)+1
@@ -207,13 +210,12 @@ class AutoCaptureService:Service() {
         val wm=getSystemService(WindowManager::class.java)
         val lp=WindowManager.LayoutParams(-1,-2,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,android.graphics.PixelFormat.TRANSLUCENT)
-        lp.gravity=Gravity.TOP;lp.y=90
+        lp.gravity=Gravity.BOTTOM;lp.y=150;lp.alpha=0.78f
         runCatching{wm.addView(view,lp);overlay=view}
     }
     override fun onTimeout(startId:Int,fgsType:Int){stopSelf()}
     override fun onDestroy(){
         stopped=true;AutoCaptureState.running=false;AutoCaptureState.status="Durduruldu"
-        prefs.edit().putBoolean("autoDownload",false).apply()
         main.removeCallbacksAndMessages(null);runCatching{contentResolver.unregisterContentObserver(observer)}
         overlay?.let{runCatching{getSystemService(WindowManager::class.java).removeView(it)}};overlay=null
         worker.shutdownNow();runCatching{recognizer.close()};engine.close()
