@@ -326,6 +326,9 @@ class MainActivity : Activity() {
         cloud.append(button("Cloud Gaming Translate başlat") {
             startActivity(Intent(this, CloudCameraActivity::class.java))
         }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        cloud.append(button("Kamerasız · PS App ekran görüntüsü") {
+            startActivity(Intent(this, CloudCaptureActivity::class.java))
+        }.apply { styleButton(this, MINT to ACCENT) }, 10)
         cloud.append(button("Kamerasız · Android bulut istemcisi") {
             AlertDialog.Builder(this)
                 .setTitle("Kamerasız ekran çevirisi · Deneysel")
