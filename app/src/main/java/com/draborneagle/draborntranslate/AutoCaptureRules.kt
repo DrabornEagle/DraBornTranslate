@@ -10,6 +10,13 @@ internal object AutoCaptureRules {
             else listOf(".jpg",".jpeg",".png",".webp").any { name.endsWith(it,true) }
     }
     fun normalize(s:String)=s.lowercase(Locale.ROOT).replace(Regex("[^\\p{L}\\p{N}]+")," ").trim()
+    private val reviewedLines=mapOf(
+        "kirk i am in active pursuit of skunk ape and have to limit my rf radiation" to "Kirk: Şu anda Skunk Ape'in peşindeyim; bu yüzden radyo frekansı yayılımımı sınırlamam gerekiyor.",
+        "wanna get murdered pick up a hitchhiker today" to "Öldürülmek mi istiyorsun? Bugün bir otostopçu al!",
+        "pick up a hitchhiker today" to "Bugün bir otostopçu al!",
+        "lucia hey what you doing wanna have a little fun" to "Lucia: Hey, ne yapıyorsun? Biraz eğlenmek ister misin?"
+    )
+    fun reviewed(text:String):String?=reviewedLines[normalize(text)]
     fun addLine(lines:MutableList<String>,raw:String):Boolean {
         val s=raw.trim().replace(Regex("\\s+")," ").take(500)
         val key=normalize(s)
