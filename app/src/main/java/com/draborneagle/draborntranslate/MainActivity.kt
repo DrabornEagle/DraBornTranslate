@@ -88,6 +88,7 @@ class MainActivity : Activity() {
     private var updateResultPending = false
 
     private lateinit var portal: Button
+    private var externalCloudCapture = false
     private lateinit var phone: Button
     private lateinit var instructions: TextView
     private lateinit var openSource: Button
@@ -319,12 +320,28 @@ class MainActivity : Activity() {
                 0xFF173D59.toInt(), 0xFF3B2867.toInt(), 22)
                 .apply { setStroke(dp(2), 0xFF5FE5D6.toInt()) }
         }
-        cloud.addView(label("☁  Cloud Gaming Translate · v0.7", 21, WHITE, true))
+        cloud.addView(label("☁  Cloud Gaming Pro · v0.7.1", 21, WHITE, true))
         cloud.append(label("PS Portal bulut oyunları • Telefon kamerasıyla oyunun ekranını oku • GTA 6 paketiyle anında Türkçe", 14, MUTED), 10)
         cloud.append(label("🎮 Konuşma altyazısı + 📱 oyun telefonu mesajları aynı anda. Ekran görüntüleri hiçbir yere yüklenmez.", 13, MINT), 9)
         cloud.append(button("Cloud Gaming Translate başlat") {
             startActivity(Intent(this, CloudCameraActivity::class.java))
         }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        cloud.append(button("Kamerasız · Android bulut istemcisi") {
+            AlertDialog.Builder(this)
+                .setTitle("Kamerasız ekran çevirisi · Deneysel")
+                .setMessage("Telefonda ayrı bir bulut oyun istemcisi açmalısın. PS Portal oturumunu aynalamaz. Android ekran paylaşımı izin verirse altyazı ve Lens birlikte çalışabilir. Korumalı siyah ekranlar desteklenmez. Android 13 ve altında paylaşım başladıktan sonra istemciye kendin geç.")
+                .setNeutralButton("Con GitHub") { _, _ ->
+                    runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/houqai/Con-app"))) }
+                }
+                .setNegativeButton("İptal", null)
+                .setPositiveButton("Ekran çevirisini ayarla") { _, _ ->
+                    if (!SessionState.current.active) {
+                        externalCloudCapture = true
+                        config = config.copy(source = Source.MOBILE, display = SubtitleDisplay.PHONE, readingArea = ReadingArea.DUAL)
+                        navigate(EntryMode.PORTAL)
+                    } else Toast.makeText(this, "Önce mevcut çeviriyi durdur.", Toast.LENGTH_LONG).show()
+                }.show()
+        }.apply { styleButton(this, LAVENDER to ACCENT) }, 10)
         cloud.append(label("Not: Türkçe altyazılar telefonda gösterilir. PS Portal'ın fiziksel ekranına doğrudan yazı yerleştirilmez.", 12, MUTED), 10)
         content.append(cloud, 15)
 
@@ -521,7 +538,7 @@ class MainActivity : Activity() {
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
         styleButton(startStop, ACCENT to LAVENDER)
         capture.append(startStop, 10)
-        openSource = button("") { openSourceApp(config.source, offerInstall = true) }
+        openSource = button("") { if (externalCloudCapture) Toast.makeText(this, "Bulut istemcisini Android ana ekranından kendin aç.", Toast.LENGTH_LONG).show() else openSourceApp(config.source, offerInstall = true) }
         capture.append(openSource, 6)
 
         val live = card(highlight = true)
@@ -688,7 +705,9 @@ class MainActivity : Activity() {
             ReadingArea.GAME_TEXT -> "Çevirmek istediğin menüyü veya görevi açıp metni birkaç saniye ekranda tut."
             ReadingArea.SUBTITLES -> "Oyunun İngilizce altyazısını aç."
         }
-        instructions.text = if (mobile) {
+        instructions.text = if (externalCloudCapture) {
+            "1. Telefonda kurulu bulut oyun istemcisini aç.\n2. Altyazıyı başlat ve Android paylaşımında o istemciyi seç.\n3. Android 13 veya altında istemciye kendin dön. Portal oturumunu aynalamaz. Korumalı görüntü okunamaz."
+        } else if (mobile) {
             "1. PS Remote Play ile telefondan konsola bağlan.\n" +
                 "2. Yatay tam ekrana geç. $textInstructions\n" +
                 "3. Buraya dön, altyazıyı başlat ve Android paylaşımında PS Remote Play’i seç."
@@ -698,7 +717,7 @@ class MainActivity : Activity() {
                 "3. DraBornTranslate’te başlat ve Android paylaşımında Tek uygulama → PlayStation App’i seç. Yayını önde tut.\n" +
                 "4. $textInstructions"
         }
-        openSource.text = "${config.source.appName} uygulamasını aç"
+        openSource.text = if (externalCloudCapture) "Bulut istemcisini kendin aç" else "${config.source.appName} uygulamasını aç"
         portal.isSelected = !mobile
         phone.isSelected = mobile
         val panelTesting = state.portalPanel?.testing == true
@@ -762,6 +781,8 @@ class MainActivity : Activity() {
         if (demoMessage != null) demoSource else displayedCaption()?.source
 
     private fun select(value: Source) {
+        if (SessionState.current.active) return
+        externalCloudCapture = false
         config = config.copy(source = value)
         prefs.edit().putBoolean("mobile", value == Source.MOBILE).apply()
         render()
@@ -1086,7 +1107,7 @@ class MainActivity : Activity() {
         }
         voicePreview?.close()
         voicePreview = null
-        if (packageManager.getLaunchIntentForPackage(config.source.packageName) == null) {
+        if (!externalCloudCapture && packageManager.getLaunchIntentForPackage(config.source.packageName) == null) {
             openSourceApp(config.source, offerInstall = true)
             return
         }
@@ -1144,8 +1165,8 @@ class MainActivity : Activity() {
                 pending = false
                 try {
                     SessionState.update(SessionState.current.copy(active = true, status = "Ekran paylaşımı başlatılıyor…"))
-                    CaptureService.start(this, resultCode, data, config)
-                    if (Build.VERSION.SDK_INT < 34) openSourceApp(config.source, offerInstall = false)
+                    CaptureService.start(this, resultCode, data, config, externalCloudCapture)
+                    if (Build.VERSION.SDK_INT < 34 && !externalCloudCapture) openSourceApp(config.source, offerInstall = false)
                 } catch (error: RuntimeException) {
                     showIdle("Canlı altyazı servisinin açılması için tekrar izin ver.")
                 }
