@@ -4,19 +4,41 @@ plugins {
 }
 
 def targetAbi = providers.gradleProperty('targetAbi').getOrElse('arm64-v8a')
+def withPs5 = !providers.gradleProperty('skipPs5').isPresent()
 def modelDir = layout.buildDirectory.dir('generated/toz/assets')
 
 android {
     namespace 'com.draborneagle.draborntranslate'
     compileSdk 35
+    ndkVersion '28.2.13676358'
+
+    if (withPs5) {
+        buildFeatures { prefab true }
+        externalNativeBuild {
+            cmake {
+                path 'src/main/cpp/CMakeLists.txt'
+                version '3.22.1'
+            }
+        }
+    }
 
     defaultConfig {
-        applicationId 'com.draborneagle.draborntranslate'
+        applicationId 'com.draborneagle.draborntranslate.v5'
         minSdk 29
         targetSdk 35
-        versionCode 20
-        versionName '0.4.11'
+        versionCode 1
+        versionName '5.0.0'
         ndk { abiFilters targetAbi }
+        if (withPs5) {
+            externalNativeBuild {
+                cmake {
+                    arguments "-DCHIAKI_DIR=${rootProject.file('third-party/chiaki-ng')}",
+                        '-DANDROID_STL=c++_shared', '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                    def python = System.getenv('DRA_PS5_PYTHON')
+                    if (python) arguments "-DPYTHON_EXECUTABLE=${python}"
+                }
+            }
+        }
     }
 
     compileOptions {
@@ -33,6 +55,7 @@ kotlin {
 }
 
 dependencies {
+    if (withPs5) implementation 'com.android.ndk.thirdparty:openssl:1.1.1q-beta-1'
     implementation 'com.google.mlkit:text-recognition:16.0.1'
     implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.22.0'
     implementation 'com.google.protobuf:protobuf-javalite:4.31.1'

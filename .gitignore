@@ -5,3 +5,8 @@
 *.keystore
 .kotlin/
 **/.cxx/
+
+/third-party/
+*.jks
+*.p12
+/.release-signing/
