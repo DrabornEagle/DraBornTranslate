@@ -23,6 +23,10 @@
 
 ## 🚀 v0.7.2 · Live Stream Translate
 
+<p align="center"><a href="https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45296228883/artifacts/14876487480"><img alt="v0.7.2 DEBUG APK ZIP indir" src="https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.7.2%20DEBUG-22C55E?style=for-the-badge&logo=android&logoColor=white"></a></p>
+
+**İlk test APK hazır:** [99,06 MB ZIP paketi](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45296228883/artifacts/14876487480) · [Başarılı CI](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45296228883) · ARM64 · Android 10+ · versionCode 7. GitHub oturumu gerekebilir. Paket 24 Aralık 2026 tarihinde sona erer. ZIP içindeki APK debug sertifikasıyla imzalanmıştır; üretim imzalı güncelleme değildir.
+
 - **Canlı ağ altyazısı:** LunaTranslator'ın belgelenmiş orijinal metin WebSocket akışından İngilizce metin alır, Android'de paket öncelikli Türkçe çeviri yapar. Bilgisayarda okunabilir oyun görüntüsü ve aynı güvenilir Wi-Fi gerekir.
 - Android bulut istemcisi OCR + Lens, CameraX ve PS App yakalama seçenekleri korunur.
 - **Fiziksel Portal'ın devam eden bulut oturumu aynalanmaz.** PS App görüntüleri canlı değildir.
@@ -79,7 +83,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 
 **Sürüm kimliği:** `versionName 0.7.2` / `versionCode 7` / `applicationId com.draborneagle.draborntranslate`.
 
-**Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.7.2 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
+**Önemli:** v0.7.2 Debug APK derlenmiş, birim testleri ve lint kontrolleri tamamlanmıştır. Üretim imzalı Release APK ve gerçek cihaz testi henüz doğrulanmamıştır. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
 ### Android kaynak derleme
 
