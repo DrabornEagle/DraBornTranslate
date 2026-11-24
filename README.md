@@ -21,6 +21,12 @@
 
 ---
 
+## ⚡ v0.8.3 · Auto Capture OCR ve görsel galeri takibi
+
+- Tam görüntü OCR, otomatik / altyazı / Brief / Lens modları; satır birleştirme ve bağlamlı çeviri.
+- İsteğe bağlı görsel PS App yenileme ve ilk GTA VI yakalaması indirme denemesi. Dikey ekran, GTA VI en üstte, PS App ön planda gerekli. Gerçek cihaz doğrulaması bekleniyor.
+- [Kurulum ve sınırlamalar](docs/RELEASE-v0.8.3.md)
+
 ## ⚡ v0.8.2 · Auto Capture Sync bağlantı düzeltmesi
 
 [![v0.8.2 APK indir](https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.8.2%20DEBUG-22C55E?style=for-the-badge&logo=android)](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45376988313/artifacts/14911457411)
