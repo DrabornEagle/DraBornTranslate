@@ -2,37 +2,20 @@
 package com.draborneagle.draborntranslate
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.SurfaceTexture
+import android.graphics.RectF
 import android.graphics.drawable.GradientDrawable
-import android.hardware.camera2.CameraAccessException
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
-import android.hardware.camera2.CaptureRequest
-import android.media.Image
-import android.media.ImageReader
-import android.graphics.ImageFormat
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
 import android.os.SystemClock
-import android.util.Size
 import android.view.Gravity
-import android.view.Surface
-import android.view.TextureView
+import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.FrameLayout
@@ -40,502 +23,387 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
-import com.google.mlkit.vision.common.InputImage
+import androidx.activity.ComponentActivity
+import androidx.camera.core.CameraSelector
+import androidx.camera.mlkit.vision.MlKitAnalyzer
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
+import androidx.camera.view.PreviewView
 import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.abs
-import kotlin.math.min
 
-/**
- * PS Portal CLOUD stream has no supported live capture/Share Screen API.
- * This activity ONLY reads physical light from the user's Portal display via
- * the phone's back camera, and renders translated captions on the PHONE.
- *
- * No stream interception, Sony authentication, video recording or uploads.
- */
-class CloudCameraActivity : Activity() {
-    private val main = Handler(Looper.getMainLooper())
-    private val cameraThread = HandlerThread("DraBornTranslate-cloud-camera").apply { start() }
-    private val cameraHandler = Handler(cameraThread.looper)
-    private val manager by lazy { getSystemService(Context.CAMERA_SERVICE) as CameraManager }
-    private val recognizer: TextRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    private val translator: GameTranslatorEngine by lazy { GameTranslatorEngine(this) }
-    private val busy = AtomicBoolean(false)
-    private val opening = AtomicBoolean(false)
-    private val prefs by lazy { getSharedPreferences("cloud-camera-v07", MODE_PRIVATE) }
-    private var config = CaptureSettings(readingArea = ReadingArea.DUAL)
-    private var camera: CameraDevice? = null
-    private var capture: CameraCaptureSession? = null
-    private var reader: ImageReader? = null
-    private var cameraId: String? = null
-    private var sensorOrientation = 90
-    @Volatile private var cameraActive = false
-    @Volatile private var destroyed = false
-    @Volatile private var ready = false
-    private var lastReadAt = 0L
-    private lateinit var preview: TextureView
-    private lateinit var guides: CloudRegionView
+/** Optical mode. No access to the Portal cloud session or system overlay. */
+class CloudCameraActivity : ComponentActivity() {
+    private val prefs by lazy { getSharedPreferences("cloud-camera-v071", MODE_PRIVATE) }
+    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    private val translator by lazy { GameTranslatorEngine(this) }
+    private lateinit var controller: LifecycleCameraController
+    private lateinit var preview: PreviewView
+    private lateinit var guides: RegionView
     private lateinit var status: TextView
     private lateinit var subtitle: TextView
     private lateinit var message: TextView
-
+    private lateinit var footer: LinearLayout
+    private var sub = CloudRegion(6, 65, 88, 30)
+    private var lensRegion = CloudRegion(52, 6, 46, 48)
+    private var selected = 0
+    private var mode = 0
+    private var editing = false
+    private var readerOnly = false
+    private var ready = false
+    private var resumed = false
+    private var destroyed = false
+    private var bound = false
+    private var lastRead = 0L
+    private var interval = 340L
+    private var lensCues = emptyList<LensCue>()
+    private var captionSize = 22
+    private var lensSize = 15
+    private var zoom = 0
+    private var showLensOverlay = true
+    private var fitPreview = true
     private val captions by lazy {
-        CaptionSession(
-            translate = translator::translate,
-            show = { line ->
-                if (!destroyed && line != null) subtitle.text = line.turkish
-            },
-            onFailure = { problem -> problem?.let(::showStatus) },
-        )
+        CaptionSession(translate = translator::translate, show = { line ->
+            if (!destroyed) subtitle.text = line?.turkish.orEmpty()
+        }, onFailure = { it?.let(::showStatus) })
     }
-
     private val lens by lazy {
-        LensSession(
-            translate = translator::translate,
-            show = { translated, _ ->
-                if (!destroyed && translated.isNotEmpty()) {
-                    val text = translated.take(3).joinToString("\n") { it.turkish }
-                    message.text = text
-                    if (::guides.isInitialized) guides.setTranslation(text)
-                }
-            },
-            onFailure = { problem -> problem?.let(::showStatus) },
-        )
+        LensSession(translate = translator::translate, show = { cues, _ ->
+            if (!destroyed) {
+                lensCues = cues
+                message.text = cues.joinToString("\n") { it.turkish }
+                guides.invalidate()
+            }
+        }, onFailure = { it?.let(::showStatus) })
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    override fun onCreate(state: Bundle?) {
+        super.onCreate(state)
+        requestedOrientation = when (prefs.getInt("orientation", 0)) {
+            1 -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            2 -> ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        config = config.copy(
-            bandTop = prefs.getInt("band", 65).coerceIn(0, CaptureSettings.MAX_TOP),
-            lensLeft = prefs.getInt("lensLeft", 52),
-            lensTop = prefs.getInt("lensTop", 6),
-            lensWidth = prefs.getInt("lensWidth", 46),
-            lensHeight = prefs.getInt("lensHeight", 48),
-        )
+        sub = load("sub", sub)
+        lensRegion = load("lens", lensRegion)
+        mode = prefs.getInt("mode", 0).coerceIn(0, 2)
+        captionSize = prefs.getInt("captionSize", 22).coerceIn(16, 40)
+        lensSize = prefs.getInt("lensSize", 15).coerceIn(12, 28)
+        zoom = prefs.getInt("zoom", 0).coerceIn(0, 100)
+        interval = prefs.getLong("interval", 340L).coerceIn(250L, 900L)
+        showLensOverlay = prefs.getBoolean("overlay", true)
+        fitPreview = prefs.getBoolean("fitPreview", true)
         makeUi()
-        showStatus("GTA 6 Türkçe paketi ve çeviri motoru hazırlanıyor…")
+        controller = LifecycleCameraController(this).apply {
+            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
+            setImageAnalysisAnalyzer(mainExecutor, MlKitAnalyzer(
+                listOf(recognizer), CameraController.COORDINATE_SYSTEM_VIEW_REFERENCED,
+                mainExecutor
+            ) { result ->
+                val now = SystemClock.elapsedRealtime()
+                if (ready && resumed && !destroyed && !editing &&
+                    now - lastRead >= interval && guides.width > 0 && guides.height > 0) {
+                    lastRead = now
+                    result.getValue(recognizer)?.let(::readText)
+                }
+            })
+        }
+        preview.controller = controller
+        preview.previewStreamState.observe(this) { state ->
+            if (state == PreviewView.StreamState.STREAMING) {
+                controller.setLinearZoom(zoom / 100f)
+                showStatus("Kamera hazır · Mavi altyazı / yeşil Lens")
+            }
+        }
+        showStatus("Türkçe çeviri motoru hazırlanıyor…")
         translator.prepare { ok ->
             ready = ok
-            showStatus(if (ok) "Portal ekranını kameraya göster. Mavi: altyazı, yeşil: mesaj."
-                       else "Çeviri motoru hazırlanamadı. GTA 6 paketini ve boş alanı kontrol et.")
+            showStatus(if (ok) "Hazır · İngilizce altyazıları aç." else "Çeviri motoru hazırlanamadı.")
         }
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) bindCamera()
+        else requestPermissions(arrayOf(Manifest.permission.CAMERA), 701)
+    }
+
+    private fun bindCamera() {
+        if (bound || destroyed) return
+        try {
+            controller.bindToLifecycle(this)
+            bound = true
+        } catch (e: Exception) { showStatus("Kamera başlatılamadı: " + e.message.orEmpty()) }
     }
 
     private fun makeUi() {
-        val root = FrameLayout(this).apply { setBackgroundColor(0xFF0B0F22.toInt()) }
-        preview = TextureView(this).apply {
-            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) {
-                    if (cameraActive) startCamera()
-                }
-                override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) = Unit
-                override fun onSurfaceTextureUpdated(texture: SurfaceTexture) = Unit
-                override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
-                    stopCamera()
-                    return true
-                }
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF090D1B.toInt())
+            setOnApplyWindowInsetsListener { view, insets ->
+                if (android.os.Build.VERSION.SDK_INT >= 30) {
+                    val safe = insets.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+                    view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+                } else view.setPadding(insets.systemWindowInsetLeft, insets.systemWindowInsetTop, insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
+                insets
             }
         }
-        root.addView(preview, FrameLayout.LayoutParams(-1, -1))
-        guides = CloudRegionView()
-        root.addView(guides, FrameLayout.LayoutParams(-1, -1))
-
+        val landscape = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        val viewport = FrameLayout(this)
+        val body = LinearLayout(this).apply { orientation = if (landscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL }
+        preview = PreviewView(this).apply {
+            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+            scaleType = if (fitPreview) PreviewView.ScaleType.FIT_CENTER else PreviewView.ScaleType.FILL_CENTER
+        }
+        viewport.addView(preview, FrameLayout.LayoutParams(-1, -1))
+        guides = RegionView()
+        viewport.addView(guides, FrameLayout.LayoutParams(-1, -1))
         val header = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = if (landscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(12), dp(8), dp(12), dp(8))
-            background = panel(0xDF1C2040.toInt(), 12)
+            setPadding(dp(8), dp(3), dp(8), dp(3))
+            background = panel(0xE51B2341.toInt(), 15)
         }
-        header.addView(action("← Geri") { finish() })
-        header.addView(TextView(this).apply {
-            text = "☁  Cloud Gaming Translate · v0.7"
-            setTextColor(Color.WHITE)
-            textSize = 17f
-            gravity = Gravity.CENTER
+        val top = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
+        top.addView(action("‹ Geri") { finish() })
+        top.addView(TextView(this).apply {
+            text = "Cloud Gaming Pro · 0.7.1"
+            setTextColor(Color.WHITE); textSize = 15f; gravity = Gravity.CENTER
         }, LinearLayout.LayoutParams(0, -2, 1f))
-        header.addView(action("⚙ Alanları ayarla") { showRegionEditor() })
-        root.addView(header, FrameLayout.LayoutParams(-1, -2, Gravity.TOP).apply {
-            setMargins(dp(10), dp(8), dp(10), 0)
-        })
-
-        val bottom = LinearLayout(this).apply {
+        top.addView(action("Ayarlar") { settings() })
+        if (landscape) header.addView(top, LinearLayout.LayoutParams(0, -2, 1f)) else header.addView(top)
+        val tools = LinearLayout(this).apply { gravity = Gravity.CENTER }
+        tools.addView(action("Altyazı") { editRegion(0) }, LinearLayout.LayoutParams(0, -2, 1f))
+        tools.addView(action("Lens") { editRegion(1) }, LinearLayout.LayoutParams(0, -2, 1f))
+        tools.addView(action("Bitir") { editing = false; footer.visibility = View.VISIBLE; guides.invalidate(); resetReads() }, LinearLayout.LayoutParams(0, -2, 1f))
+        tools.addView(action("Okuma") {
+            editing = false; readerOnly = !readerOnly; footer.visibility = View.VISIBLE; guides.invalidate()
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        if (landscape) header.addView(tools, LinearLayout.LayoutParams(0, -2, 1f)) else header.addView(tools)
+        root.addView(header, LinearLayout.LayoutParams(-1, -2).apply { setMargins(dp(8), dp(5), dp(8), dp(4)) })
+        root.addView(body, LinearLayout.LayoutParams(-1, 0, 1f))
+        body.addView(viewport, if (landscape) LinearLayout.LayoutParams(0, -1, 1f) else LinearLayout.LayoutParams(-1, 0, 1f))
+        footer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(15), dp(9), dp(15), dp(10))
-            background = panel(0xE518213B.toInt(), 16)
+            setPadding(dp(14), dp(8), dp(14), dp(8))
+            background = panel(0xEF131E36.toInt(), 15)
         }
-        status = TextView(this).apply {
-            textSize = 12f
-            setTextColor(0xFFA6E9FE.toInt())
-        }
-        bottom.addView(status)
-        subtitle = TextView(this).apply {
-            text = "🎮 Türkçe konuşma altyazıları burada görünecek."
-            textSize = 20f
-            setTextColor(Color.WHITE)
-            maxLines = 3
-            gravity = Gravity.CENTER
-            setPadding(0, dp(6), 0, dp(6))
-        }
-        bottom.addView(subtitle)
-        message = TextView(this).apply {
-            text = "📱 Telefon mesajları Lens alanından okunacak."
-            textSize = 15f
-            setTextColor(0xFF8FF2C7.toInt())
-            maxLines = 4
-        }
-        bottom.addView(message)
-        root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply {
-            setMargins(dp(9), 0, dp(9), dp(8))
-        })
+        status = TextView(this).apply { textSize = 12f; setTextColor(0xFF8CEBFF.toInt()) }
+        subtitle = TextView(this).apply { textSize = captionSize.toFloat(); setTextColor(Color.WHITE); gravity = Gravity.CENTER }
+        message = TextView(this).apply { textSize = lensSize.toFloat(); setTextColor(0xFF8EF3BF.toInt()) }
+        footer.addView(status)
+        subtitle.maxLines = 3
+        footer.addView(subtitle)
+        footer.addView(ScrollView(this).apply { addView(message) }, if (landscape) LinearLayout.LayoutParams(-1, 0, 1f) else LinearLayout.LayoutParams(-1, dp(48)))
+        body.addView(footer, (if (landscape) LinearLayout.LayoutParams(dp(220), -1) else LinearLayout.LayoutParams(-1, -2)).apply { setMargins(dp(4), dp(4), dp(4), dp(6)) })
         setContentView(root)
     }
 
-    private fun showRegionEditor() {
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(8), dp(20), dp(12))
+    private fun editRegion(which: Int) {
+        selected = which
+        readerOnly = false
+        editing = true
+        footer.visibility = View.INVISIBLE
+        guides.invalidate()
+    }
+
+    private fun settings() {
+        val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(6), dp(18), dp(12)) }
+        fun heading(s: String) { content.addView(TextView(this).apply {
+            text = s; textSize = 16f; setTextColor(0xFF8CEBFF.toInt()); setPadding(0, dp(12), 0, dp(5))
+        }) }
+        fun choice(title: String, options: Array<String>, initial: Int, change: (Int) -> Unit) {
+            content.addView(action(title + " · " + options[initial]) {
+                AlertDialog.Builder(this).setTitle(title).setSingleChoiceItems(options, initial) { dialog, index ->
+                    dialog.dismiss(); change(index)
+                }.setNegativeButton("Kapat", null).show()
+            })
         }
-        layout.addView(TextView(this).apply {
-            text = "Telefon kamerasını Portal ekranına sabitle. Mavi alan konuşma altyazısı, yeşil alan oyun telefonu/mesajları içindir. Bu alanlar kamera görüntüsünün yüzdesidir."
-            textSize = 14f
-        })
-        fun setting(title: String, key: String, initial: Int, max: Int, change: (Int) -> Unit) {
-            val label = TextView(this).apply { text = "$title: %$initial"; textSize = 15f }
-            layout.addView(label, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
-            layout.addView(SeekBar(this).apply {
-                this.max = max
-                progress = initial.coerceIn(0, max)
+        fun slider(title: String, min: Int, max: Int, initial: Int, change: (Int) -> Unit) {
+            val label = TextView(this).apply { text = "$title: $initial" }
+            content.addView(label)
+            content.addView(SeekBar(this).apply {
+                this.max = max - min; progress = (initial - min).coerceIn(0, this.max)
                 setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onStartTrackingTouch(bar: SeekBar) = Unit
-                    override fun onStopTrackingTouch(bar: SeekBar) = Unit
+                    override fun onStopTrackingTouch(bar: SeekBar) { resetReads() }
                     override fun onProgressChanged(bar: SeekBar, value: Int, user: Boolean) {
-                        if (!user) return
-                        change(value)
-                        prefs.edit().putInt(key, value).apply()
-                        label.text = "$title: %$value"
-                        guides.invalidate()
+                        if (user) { label.text = "$title: ${value + min}"; change(value + min) }
                     }
                 })
             })
         }
-        setting("Altyazı bandı", "band", config.bandTop, 70) {
-            config = config.copy(bandTop = it)
-        }
-        setting("Lens soldan", "lensLeft", config.lensLeft, 85) {
-            config = config.copy(lensLeft = it)
-        }
-        setting("Lens üstten", "lensTop", config.lensTop, 85) {
-            config = config.copy(lensTop = it)
-        }
-        setting("Lens genişlik", "lensWidth", config.lensWidth, 100) {
-            config = config.copy(lensWidth = it.coerceAtLeast(15))
-        }
-        setting("Lens yükseklik", "lensHeight", config.lensHeight, 100) {
-            config = config.copy(lensHeight = it.coerceAtLeast(15))
-        }
-        val scroll = ScrollView(this).apply { addView(layout) }
-        AlertDialog.Builder(this)
-            .setTitle("Cloud Gaming · İki okuma alanı")
-            .setView(scroll)
-            .setPositiveButton("Kaydet", null)
-            .setNeutralButton("Varsayılan") { _, _ ->
-                config = config.copy(bandTop = 65, lensLeft = 52, lensTop = 6,
-                    lensWidth = 46, lensHeight = 48)
-                prefs.edit().clear().apply()
-                guides.invalidate()
-            }
-            .show()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        cameraActive = true
-        if (::preview.isInitialized && preview.isAvailable) startCamera()
-    }
-
-    override fun onPause() {
-        cameraActive = false
-        stopCamera()
-        super.onPause()
-    }
-
-    private fun startCamera() {
-        if (!cameraActive || camera != null || destroyed || !preview.isAvailable) return
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA), 701)
-            return
-        }
-        if (!opening.compareAndSet(false, true)) return
-        try {
-            val id = manager.cameraIdList.firstOrNull { candidate ->
-                manager.getCameraCharacteristics(candidate)
-                    .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK
-            } ?: manager.cameraIdList.firstOrNull()
-            if (id == null) {
-                opening.set(false)
-                showStatus("Bu telefonda kullanılabilir kamera bulunamadı.")
-                return
-            }
-            cameraId = id
-            val characteristics = manager.getCameraCharacteristics(id)
-            sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 90
-            @Suppress("MissingPermission")
-            manager.openCamera(id, object : CameraDevice.StateCallback() {
-                override fun onOpened(device: CameraDevice) {
-                    opening.set(false)
-                    if (!cameraActive || destroyed) {
-                        device.close()
-                        return
-                    }
-                    camera = device
-                    configureCamera(device)
-                }
-                override fun onDisconnected(device: CameraDevice) {
-                    opening.set(false)
-                    device.close()
-                    camera = null
-                    showStatus("Kamera bağlantısı kesildi. Tekrar aç.")
-                }
-                override fun onError(device: CameraDevice, error: Int) {
-                    opening.set(false)
-                    device.close()
-                    camera = null
-                    showStatus("Kamera açılamadı ($error). Kamera iznini kontrol et.")
-                }
-            }, cameraHandler)
-        } catch (error: Exception) {
-            opening.set(false)
-            showStatus("Kamera açılamadı: ${error.message ?: "Cihaz kamerasını kontrol et."}")
-        }
-    }
-
-    private fun configureCamera(device: CameraDevice) {
-        try {
-            val id = cameraId ?: return
-            val sizes = manager.getCameraCharacteristics(id)
-                .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                ?.getOutputSizes(ImageFormat.YUV_420_888)
-                ?.toList().orEmpty()
-            val selected = sizes.filter { it.width <= 1920 && it.height <= 1080 }
-                .minByOrNull { abs(it.width - 1280) + abs(it.height - 720) }
-                ?: sizes.minByOrNull { abs(it.width - 1280) + abs(it.height - 720) }
-                ?: Size(1280, 720)
-            val texture = preview.surfaceTexture ?: return
-            texture.setDefaultBufferSize(selected.width, selected.height)
-            val display = Surface(texture)
-            val images = ImageReader.newInstance(
-                selected.width, selected.height, ImageFormat.YUV_420_888, 2
-            )
-            reader = images
-            images.setOnImageAvailableListener({ source -> onImage(source) }, cameraHandler)
-            @Suppress("DEPRECATION")
-            device.createCaptureSession(listOf(display, images.surface),
-                object : CameraCaptureSession.StateCallback() {
-                    override fun onConfigured(session: CameraCaptureSession) {
-                        if (!cameraActive || destroyed) {
-                            session.close()
-                            return
-                        }
-                        capture = session
-                        try {
-                            val request = device.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                            request.addTarget(display)
-                            request.addTarget(images.surface)
-                            request.set(CaptureRequest.CONTROL_AF_MODE,
-                                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                            session.setRepeatingRequest(request.build(), null, cameraHandler)
-                            showStatus("Kamera açık · Portal bulut ekranını kadraja al.")
-                        } catch (error: CameraAccessException) {
-                            showStatus("Kamera önizlemesi başlatılamadı.")
-                        }
-                    }
-                    override fun onConfigureFailed(session: CameraCaptureSession) {
-                        showStatus("Telefon kamera çözünürlüğü uyumsuz. Yeniden dene.")
-                    }
-                }, cameraHandler)
-        } catch (error: Exception) {
-            showStatus("Kamera görüntüsü hazırlanamadı: ${error.message.orEmpty()}")
-        }
-    }
-
-    private fun onImage(source: ImageReader) {
-        val image = try { source.acquireLatestImage() } catch (_: IllegalStateException) { null } ?: return
-        val now = SystemClock.elapsedRealtime()
-        if (!ready || !cameraActive || destroyed || now - lastReadAt < 620L ||
-            !busy.compareAndSet(false, true)) {
-            image.close()
-            return
-        }
-        lastReadAt = now
-        val orientation = when (windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_90 -> 90
-            Surface.ROTATION_180 -> 180
-            Surface.ROTATION_270 -> 270
-            else -> 0
-        }
-        val rotation = (sensorOrientation - orientation + 360) % 360
-        try {
-            val input = InputImage.fromMediaImage(image, rotation)
-            recognizer.process(input)
-                .addOnSuccessListener { result ->
-                    if (cameraActive && !destroyed) onRecognized(
-                        result, if (rotation % 180 == 0) image.width else image.height,
-                        if (rotation % 180 == 0) image.height else image.width,
-                    )
-                }
-                .addOnFailureListener {
-                    showStatus("Kamera OCR metni okuyamadı. Portal ekranına odaklan.")
-                }
-                .addOnCompleteListener {
-                    image.close()
-                    busy.set(false)
-                }
-        } catch (_: RuntimeException) {
-            image.close()
-            busy.set(false)
-        }
-    }
-
-    private fun onRecognized(result: com.google.mlkit.vision.text.Text, width: Int, height: Int) {
-        val area = Pixels(0, 0, width, height)
-        val lines = result.textBlocks.flatMap { block ->
-            block.lines.mapNotNull { line ->
-                line.boundingBox?.let { box ->
-                    CloudTextBlock(line.text, box.left, box.top, box.right, box.bottom)
-                }
+        heading("Görüntü ve çalışma modu")
+        choice("Ekran yönü", arrayOf("Yatay", "Dikey", "Otomatik"), prefs.getInt("orientation", 0).coerceIn(0, 2)) {
+            prefs.edit().putInt("orientation", it).apply()
+            requestedOrientation = when (it) {
+                1 -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                2 -> ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+                else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
         }
-        captions.read(CloudTextLayout.subtitles(area, config.bandTop, lines))
-        val blocks = result.textBlocks.mapNotNull { block ->
-            block.boundingBox?.let { box ->
-                CloudTextBlock(block.text, box.left, box.top, box.right, box.bottom)
-            }
+        choice("Çeviri modu", arrayOf("Altyazı + Lens", "Altyazı", "Lens"), mode) {
+            mode = it; prefs.edit().putInt("mode", it).apply(); resetReads(); guides.invalidate()
         }
-        val selected = CloudTextLayout.messages(area, config, blocks)
-        lens.read(
-            selected.map {
-                DetectedLine(it.text, Rect(it.left, it.top, it.right, it.bottom))
-            },
-            FrameRegion(0, 0, width, height),
-        )
+        choice("Görüntü ölçeği", arrayOf("Ekrana sığdır", "Alanı doldur"), if (fitPreview) 0 else 1) {
+            fitPreview = it == 0
+            prefs.edit().putBoolean("fitPreview", fitPreview).apply()
+            preview.scaleType = if (fitPreview) PreviewView.ScaleType.FIT_CENTER else PreviewView.ScaleType.FILL_CENTER
+            resetReads()
+        }
+        slider("Kamera yakınlaştırma %", 0, 100, zoom) {
+            zoom = it; prefs.edit().putInt("zoom", it).apply()
+            if (bound) controller.setLinearZoom(it / 100f)
+        }
+        slider("OCR sonuç aralığı (ms)", 250, 900, interval.toInt()) {
+            interval = it.toLong(); prefs.edit().putLong("interval", interval).apply()
+        }
+        heading("Altyazı ve Lens · bağımsız alanlar (%)")
+        fun regionControls(name: String, initial: CloudRegion, get: () -> CloudRegion, set: (CloudRegion) -> Unit) {
+            heading(name)
+            slider("Sol", 0, 95, initial.left) { set(get().copy(left = it).normalized()) }
+            slider("Üst", 0, 95, initial.top) { set(get().copy(top = it).normalized()) }
+            slider("Genişlik", 5, 100, initial.width) { set(get().copy(width = it).normalized()) }
+            slider("Yükseklik", 5, 100, initial.height) { set(get().copy(height = it).normalized()) }
+        }
+        regionControls("Mavi · Altyazı", sub, { sub }) { sub = it; save("sub", it); guides.invalidate() }
+        regionControls("Yeşil · Lens", lensRegion, { lensRegion }) { lensRegion = it; save("lens", it); guides.invalidate() }
+        heading("Türkçe metin görünümü")
+        slider("Altyazı punto", 16, 40, captionSize) {
+            captionSize = it; subtitle.textSize = it.toFloat(); prefs.edit().putInt("captionSize", it).apply()
+        }
+        slider("Lens punto", 12, 28, lensSize) {
+            lensSize = it; message.textSize = it.toFloat(); prefs.edit().putInt("lensSize", it).apply(); guides.invalidate()
+        }
+        choice("Lens katmanı", arrayOf("Kapalı", "Açık"), if (showLensOverlay) 1 else 0) {
+            showLensOverlay = it == 1; prefs.edit().putBoolean("overlay", showLensOverlay).apply(); guides.invalidate()
+        }
+        AlertDialog.Builder(this).setTitle("Cloud Gaming Pro · Kontrol merkezi")
+            .setView(ScrollView(this).apply { addView(content) })
+            .setPositiveButton("Tamam", null)
+            .setNeutralButton("Alanları sıfırla") { _, _ ->
+                sub = CloudRegion(6, 65, 88, 30); lensRegion = CloudRegion(52, 6, 46, 48)
+                save("sub", sub); save("lens", lensRegion); resetReads(); guides.invalidate()
+            }.show()
     }
 
-    private fun stopCamera() {
-        opening.set(false)
-        cameraHandler.post {
-            runCatching { capture?.close() }
-            capture = null
-            runCatching { camera?.close() }
-            camera = null
-            runCatching { reader?.close() }
-            reader = null
+    private fun resetReads() { captions.reset(); lens.reset(); subtitle.text = ""; message.text = ""; lensCues = emptyList(); guides.invalidate() }
+    private fun load(key: String, fallback: CloudRegion): CloudRegion = CloudRegion(
+        prefs.getInt(key+"L", fallback.left), prefs.getInt(key+"T", fallback.top),
+        prefs.getInt(key+"W", fallback.width), prefs.getInt(key+"H", fallback.height)
+    ).normalized()
+    private fun save(key: String, area: CloudRegion) {
+        prefs.edit().putInt(key+"L", area.left).putInt(key+"T", area.top)
+            .putInt(key+"W", area.width).putInt(key+"H", area.height).apply()
+    }
+    private fun readText(result: com.google.mlkit.vision.text.Text) {
+        val frame = Pixels(0, 0, guides.width, guides.height)
+        val lines = result.textBlocks.flatMap { block -> block.lines.mapNotNull { line ->
+            line.boundingBox?.let { CloudTextBlock(line.text, it.left, it.top, it.right, it.bottom) }
+        } }
+        if (mode != 2) captions.read(lines.filter { CloudTextLayout.containsCenter(sub.pixels(frame), it) }
+            .sortedWith(compareBy({ it.top }, { it.left })).map { it.text }.distinct().take(4))
+        if (mode != 1) {
+            val blocks = result.textBlocks.mapNotNull { block -> block.boundingBox?.let {
+                CloudTextBlock(block.text, it.left, it.top, it.right, it.bottom)
+            } }.filter { CloudTextLayout.containsCenter(lensRegion.pixels(frame), it) }
+            lens.read(blocks.map { DetectedLine(it.text, Rect(it.left, it.top, it.right, it.bottom)) },
+                FrameRegion(0, 0, guides.width, guides.height))
         }
     }
-
-    private fun showStatus(text: String) {
-        main.post { if (!destroyed && ::status.isInitialized) status.text = text }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray,
-    ) {
+    override fun onResume() { super.onResume(); resumed = true }
+    override fun onPause() { resumed = false; if (::guides.isInitialized) resetReads(); super.onPause() }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 701) {
-            if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) startCamera()
-            else showStatus("Bulut oyunlarını canlı okumak için kamera izni gerekiyor.")
-        }
+        if (requestCode == 701 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) bindCamera()
+        else if (requestCode == 701) showStatus("Kamera izni verilmedi. Kamerasız mod ana ekranda.")
     }
-
     override fun onDestroy() {
         destroyed = true
-        cameraActive = false
-        stopCamera()
-        cameraThread.quitSafely()
-        captions.close()
-        lens.close()
-        recognizer.close()
-        translator.close()
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        if (::controller.isInitialized) { controller.clearImageAnalysisAnalyzer(); controller.unbind() }
+        captions.close(); lens.close(); recognizer.close(); translator.close()
         super.onDestroy()
     }
-
-
-    private fun action(text: String, click: () -> Unit): Button = Button(this).apply {
-        this.text = text
-        textSize = 12f
-        isAllCaps = false
-        setTextColor(Color.WHITE)
-        background = panel(0xFF3A3563.toInt(), 10)
-        setOnClickListener { click() }
+    private fun showStatus(s: String) { runOnUiThread { if (!destroyed && ::status.isInitialized) status.text = s } }
+    private fun action(s: String, click: () -> Unit) = Button(this).apply {
+        text = s; textSize = 12f; isAllCaps = false; setTextColor(Color.WHITE)
+        background = panel(0xFF37436A.toInt(), 10); setOnClickListener { click() }
     }
+    private fun panel(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
+    private fun dp(n: Int) = (n * resources.displayMetrics.density + .5f).toInt()
 
-    private fun panel(color: Int, radius: Int): GradientDrawable = GradientDrawable().apply {
-        setColor(color)
-        cornerRadius = dp(radius).toFloat()
-    }
-
-    private fun dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()
-
-    private inner class CloudRegionView : View(this@CloudCameraActivity) {
-        private val brush = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = dp(2).toFloat() }
-        private val glyph = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = dp(14).toFloat(); color = Color.WHITE }
-        private val shade = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xE8192033.toInt() }
-        private var translated = ""
-
-        fun setTranslation(value: String) {
-            if (translated != value) {
-                translated = value
-                invalidate()
-            }
+    private inner class RegionView : View(this@CloudCameraActivity) {
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var startX = 0f
+        private var startY = 0f
+        private var original = sub
+        private var resize = false
+        private fun bounds(r: CloudRegion): RectF {
+            val p = r.pixels(Pixels(0, 0, width, height))
+            return RectF(p.x.toFloat(), p.y.toFloat(), (p.x+p.width).toFloat(), (p.y+p.height).toFloat())
         }
-
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
-            val frame = Pixels(0, 0, width, height)
-            val subtitles = config.subtitleArea(frame)
-            val messages = config.lensArea(frame)
-            brush.color = 0xFF58C8FF.toInt()
-            canvas.drawRoundRect(
-                subtitles.x.toFloat(), subtitles.y.toFloat(),
-                (subtitles.x + subtitles.width).toFloat(),
-                (subtitles.y + subtitles.height).toFloat(), 12f, 12f, brush,
-            )
-            brush.color = 0xFF55E3B5.toInt()
-            canvas.drawRoundRect(
-                messages.x.toFloat(), messages.y.toFloat(),
-                (messages.x + messages.width).toFloat(),
-                (messages.y + messages.height).toFloat(), 12f, 12f, brush,
-            )
-            if (translated.isNotBlank() && messages.width > dp(100)) {
-                val left = messages.x + dp(7).toFloat()
-                val top = messages.y + dp(7).toFloat()
-                val maxWidth = (messages.width - dp(20)).toFloat()
-                val rows = mutableListOf<String>()
-                var row = ""
-                for (word in translated.replace('\n', ' ').split(Regex("\\s+"))) {
-                    val candidate = if (row.isEmpty()) word else "$row $word"
-                    if (row.isNotEmpty() && glyph.measureText(candidate) > maxWidth) {
-                        rows.add(row)
-                        row = word
-                    } else row = candidate
-                    if (rows.size >= 3) break
-                }
-                if (row.isNotEmpty() && rows.size < 4) rows.add(row)
-                val visible = rows.take(4)
-                val lineStep = dp(19).toFloat()
-                val heightNeeded = visible.size * lineStep + dp(12)
-                canvas.drawRoundRect(
-                    left, top, left + maxWidth, top + heightNeeded,
-                    dp(8).toFloat(), dp(8).toFloat(), shade
-                )
-                visible.forEachIndexed { index, line ->
-                    canvas.drawText(line, left + dp(5), top + dp(17) + index * lineStep, glyph)
+            if (readerOnly) { canvas.drawColor(0xFF0B1022.toInt()); return }
+            fun drawRegion(region: CloudRegion, color: Int, title: String, active: Boolean) {
+                val box = bounds(region)
+                paint.color = color; paint.style = Paint.Style.STROKE; paint.strokeWidth = dp(if (active) 3 else 1).toFloat()
+                canvas.drawRoundRect(box, dp(8).toFloat(), dp(8).toFloat(), paint)
+                paint.style = Paint.Style.FILL; paint.textSize = dp(12).toFloat()
+                canvas.drawText(title, box.left+dp(6), (box.top+dp(17)).coerceAtMost(box.bottom), paint)
+                if (active) canvas.drawCircle(box.right-dp(8), box.bottom-dp(8), dp(10).toFloat(), paint)
+            }
+            if (mode != 2 || editing) drawRegion(sub, 0xFF58C8FF.toInt(), "ALTYAZI", editing && selected == 0)
+            if (mode != 1 || editing) drawRegion(lensRegion, 0xFF55E3B5.toInt(), "LENS", editing && selected == 1)
+            if (!editing && showLensOverlay && mode != 1) {
+                lensCues.forEach { cue ->
+                    val r = RectF(cue.bounds)
+                    if (!r.intersect(0f, 0f, width.toFloat(), height.toFloat())) return@forEach
+                    canvas.save(); canvas.clipRect(r)
+                    paint.color = 0xE8192033.toInt(); paint.style = Paint.Style.FILL
+                    canvas.drawRoundRect(r, dp(4).toFloat(), dp(4).toFloat(), paint)
+                    paint.color = Color.WHITE; paint.textSize = lensSize * resources.displayMetrics.scaledDensity
+                    val available = r.width() - dp(6)
+                    if (available > 0) {
+                        var remaining = cue.turkish.replace('\n', ' ')
+                        var y = r.top - paint.ascent()
+                        while (remaining.isNotEmpty() && y + paint.descent() <= r.bottom) {
+                            val count = paint.breakText(remaining, true, available, null)
+                            if (count < 1) break
+                            val wordEnd = if (count < remaining.length) remaining.take(count).lastIndexOf(' ') else -1
+                            val end = if (wordEnd > 0) wordEnd else count
+                            canvas.drawText(remaining.take(end), r.left+dp(3), y, paint)
+                            remaining = remaining.drop(end).trimStart(); y += paint.fontSpacing
+                        }
+                    }
+                    canvas.restore()
                 }
             }
         }
+        override fun onTouchEvent(event: MotionEvent): Boolean {
+            if (!editing || width == 0 || height == 0) return false
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    original = if (selected == 0) sub else lensRegion
+                    val r = bounds(original)
+                    if (!r.contains(event.x, event.y)) return false
+                    startX = event.x; startY = event.y
+                    resize = event.x >= r.right - dp(30) && event.y >= r.bottom - dp(30)
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = ((event.x-startX)*100/width).toInt()
+                    val dy = ((event.y-startY)*100/height).toInt()
+                    val next = if (resize) original.copy(width = original.width+dx, height = original.height+dy).normalized()
+                    else original.move(dx, dy)
+                    if (selected == 0) sub = next else lensRegion = next
+                    invalidate(); return true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (selected == 0) save("sub", sub) else save("lens", lensRegion)
+                    performClick(); return true
+                }
+            }
+            return true
+        }
+        override fun performClick(): Boolean { super.performClick(); return true }
     }
 }

@@ -21,7 +21,22 @@
 
 ---
 
-## 🚀 v0.7.0 · Cloud Gaming Translate (PS Portal bulut oyunları)
+## 🚀 v0.7.2 · Live Stream Translate
+
+- **Canlı ağ altyazısı:** LunaTranslator'ın belgelenmiş orijinal metin WebSocket akışından İngilizce metin alır, Android'de paket öncelikli Türkçe çeviri yapar. Bilgisayarda okunabilir oyun görüntüsü ve aynı güvenilir Wi-Fi gerekir.
+- Android bulut istemcisi OCR + Lens, CameraX ve PS App yakalama seçenekleri korunur.
+- **Fiziksel Portal'ın devam eden bulut oturumu aynalanmaz.** PS App görüntüleri canlı değildir.
+- [v0.7.2 sürüm notları, bağlantı ve sınırlamalar](docs/RELEASE-v0.7.2.md). Kaynak ve CI doğrulaması gerçek cihaz uyumluluğundan ayrıdır.
+
+## 🚀 v0.7.1 · Cloud Gaming Pro
+
+- CameraX: yatay, dikey ve otomatik yön, OCR/önizleme koordinat uyumu.
+- İki bağımsız sürüklenebilir ve boyutlandırılabilir alan, hassas yüzde ayarı, yakınlaştırma, yazı boyutu ve okuma modu.
+- PS App yakalamaları: Portal Create ile alınan ve telefona indirilen ekran görüntülerini kamera/mikrofon olmadan OCR ve paket öncelikli motorla çevirir (canlı değildir).
+- Deneysel kamerasız Android istemcisi modu: mevcut ekran paylaşımı ile ayrı bir istemcinin görüntüsünü çevirir. Portal bulut oturumunu aynalamaz; korumalı görüntü okunamaz.
+- [v0.7.1 sürüm notları ve test planı](docs/RELEASE-v0.7.1.md). Kaynak önizlemesi; gerçek cihaz testi ve imzalı APK doğrulaması gereklidir.
+
+### v0.7.0 · Cloud Gaming Translate (PS Portal bulut oyunları)
 
 PS Portal Cloud Streaming'de Sony'nin belgelenmiş canlı Share Screen desteği bulunmadığı için, oyunu buluttan oynarken telefon kamerasıyla Türkçe çeviren yeni mod geliştirildi.
 
@@ -62,9 +77,9 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.7.0` / `versionCode 5` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.7.2` / `versionCode 7` / `applicationId com.draborneagle.draborntranslate`.
 
-**Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
+**Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.7.2 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
 ### Android kaynak derleme
 
