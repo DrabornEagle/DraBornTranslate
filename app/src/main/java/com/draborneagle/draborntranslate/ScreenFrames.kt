@@ -29,6 +29,7 @@ internal class ScreenFrames(
     private val reserveFrame: () -> Boolean,
     private val discardFrame: () -> Unit,
     private val onFrame: (Bitmap) -> Unit,
+    private val onFocusFrame: (Bitmap) -> Unit,
     private val onSource: (FrameSource) -> Unit,
     private val onEnded: (String) -> Unit,
 ) : AutoCloseable {
@@ -45,6 +46,8 @@ internal class ScreenFrames(
     private var scan = Pixels(0, 0, 0, 0)
     private var scanBuffer: ByteBuffer? = null
     private var lastSampleAt = 0L
+    private var lastFocusAt = 0L
+    private var focusBuffer: ByteBuffer? = null
     private var darkSince = 0L
     private var signal = FrameSource.WAITING
     private var visible = true
@@ -140,6 +143,8 @@ internal class ScreenFrames(
         video = nextVideo
         scan = nextScan
         scanBuffer = null
+        focusBuffer = null
+        lastFocusAt = 0L
         lastSampleAt = 0L
         darkSince = 0L
         previous?.close()
@@ -157,8 +162,11 @@ internal class ScreenFrames(
             if (!visible) return
             val now = SystemClock.elapsedRealtime()
             lastFrameAt = now
-            if (now - lastSampleAt < settings.readingArea.sampleIntervalMs) return
-            lastSampleAt = now
+            val wantsCaption = settings.captionEnabled && now - lastSampleAt >= settings.readingArea.sampleIntervalMs
+            val wantsFocus = settings.focus && now - lastFocusAt >= 950L
+            if (!wantsCaption && !wantsFocus) return
+            if (wantsCaption) lastSampleAt = now
+            if (wantsFocus) lastFocusAt = now
 
             val plane = image.planes.firstOrNull() ?: return
             val rgba = plane.buffer
@@ -172,9 +180,15 @@ internal class ScreenFrames(
             }
             darkSince = 0L
             setSignal(FrameSource.VISIBLE)
-            if (!reserveFrame()) return
+            if (wantsFocus) {
+                val whole = Pixels(0, 0, image.width, image.height)
+                val storage = focusBuffer ?: ByteBuffer.allocate(whole.width * whole.height * 4).also { focusBuffer = it }
+                runCatching { readRgba(rgba, rowStride, whole, storage) }.getOrNull()?.let(onFocusFrame)
+            }
+            if (!wantsCaption || !reserveFrame()) return
             val bitmap = try {
-                copyScanArea(rgba, rowStride)
+                val storage = scanBuffer ?: ByteBuffer.allocate(scan.width * scan.height * 4).also { scanBuffer = it }
+                readRgba(rgba, rowStride, scan, storage)
             } catch (error: RuntimeException) {
                 discardFrame()
                 onEnded("Oyun karesi okunamadı. Kaynağı açıp yeniden dene.")
@@ -213,25 +227,6 @@ internal class ScreenFrames(
         return true
     }
 
-    private fun copyScanArea(source: ByteBuffer, stride: Int): Bitmap? {
-        val rowBytes = scan.width * 4
-        val offset = source.position() + scan.y * stride + scan.x * 4
-        if (offset + (scan.height - 1) * stride + rowBytes > source.limit()) return null
-        val input = source.duplicate()
-        val output = scanBuffer ?: ByteBuffer.allocateDirect(rowBytes * scan.height).also { scanBuffer = it }
-        output.clear()
-        for (row in 0 until scan.height) {
-            val start = offset + row * stride
-            input.limit(start + rowBytes)
-            input.position(start)
-            output.put(input)
-        }
-        output.flip()
-        return Bitmap.createBitmap(scan.width, scan.height, Bitmap.Config.ARGB_8888).also {
-            it.copyPixelsFromBuffer(output)
-        }
-    }
-
     private fun setSignal(next: FrameSource) {
         if (signal == next) return
         signal = next
@@ -259,6 +254,7 @@ internal class ScreenFrames(
             projection?.unregisterCallback(callback)
             projection?.stop()
             scanBuffer = null
+            focusBuffer = null
             thread.quitSafely()
         }
     }

@@ -25,6 +25,8 @@ class CaptureService : Service() {
     private val main = Handler(Looper.getMainLooper())
     private val ocrPending = AtomicBoolean(false)
     private var frames: ScreenFrames? = null
+    private var consoleFrames: ConsoleFrames? = null
+    private var focus: LiveFocus? = null
     private var ocr: SubtitleReader? = null
     private var translator: CaptionTranslator? = null
     private var captions: CaptionSession? = null
@@ -34,6 +36,7 @@ class CaptureService : Service() {
     private var sourceName = "PlayStation App"
     private var source = FrameSource.WAITING
     private var readingArea = ReadingArea.SUBTITLES
+    private var captionEnabled = true
     private var epoch = 0
     @Volatile private var modelReady = false
     private var ended = false
@@ -49,42 +52,54 @@ class CaptureService : Service() {
             togglePanelPreview()
             return START_NOT_STICKY
         }
-        if (frames != null || ended) return START_NOT_STICKY
+        if (frames != null || consoleFrames != null || ended) return START_NOT_STICKY
         if (intent?.action == ACTION_TEST_PANEL) {
             if (panel == null) startPanelTest(intent.getIntExtra(EXTRA_SIZE, 22))
             return START_NOT_STICKY
         }
 
-        val grant = intent?.let(::readGrant)
-        if (grant == null || intent.getIntExtra(EXTRA_RESULT, Activity.RESULT_CANCELED) != Activity.RESULT_OK) {
-            captureStartFailed("Android ekran paylaşımı izni gerekiyor.")
-            return START_NOT_STICKY
-        }
-        try {
-            startForeground(NOTIFICATION_ID, notification("Türkçe çeviri modeli hazırlanıyor…"),
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
-        } catch (_: SecurityException) {
-            captureStartFailed("Ekran paylaşımı iznini yeniden ver.")
-            return START_NOT_STICKY
-        } catch (_: IllegalStateException) {
-            captureStartFailed("Canlı altyazıyı uygulama açıkken yeniden başlat.")
-            return START_NOT_STICKY
-        }
-        main.removeCallbacks(panelTestTick)
-        main.removeCallbacks(panelTestTimeout)
+        if (intent == null) return START_NOT_STICKY
         val config = CaptureSettings(
             intent.getIntExtra(EXTRA_TOP, CaptureSettings.DEFAULT_BAND_TOP),
             intent.getIntExtra(EXTRA_SIZE, 22),
-            if (intent.getBooleanExtra(EXTRA_MOBILE, false)) Source.MOBILE else Source.PORTAL,
+            Source.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_SOURCE) } ?: Source.PORTAL,
             SubtitleDisplay.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_DISPLAY) }
                 ?: SubtitleDisplay.PHONE,
             ReadingArea.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_READING_AREA) }
                 ?: ReadingArea.SUBTITLES,
+            intent.getBooleanExtra(EXTRA_FOCUS, false),
+            intent.getBooleanExtra(EXTRA_CAPTION, true),
         )
-        if (config.showOnPhone && !Settings.canDrawOverlays(this)) {
-            finish("Telefonda altyazı göstermek için üstte gösterme izni gerekiyor.")
+        val direct = config.source == Source.PS5
+        val paired = if (direct) ConsolePairing.load(this) else null
+        val grant = if (direct) null else readGrant(intent)
+        if (direct && (paired == null || !ConsolePairing.available)) {
+            captureStartFailed("Önce PS5’i aynı Wi-Fi ağında eşleştir.")
             return START_NOT_STICKY
         }
+        if (!direct && (grant == null || intent.getIntExtra(EXTRA_RESULT, Activity.RESULT_CANCELED) != Activity.RESULT_OK)) {
+            captureStartFailed("Android ekran paylaşımı izni gerekiyor.")
+            return START_NOT_STICKY
+        }
+        val serviceType = if (direct) ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+            else ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+        try {
+            startForeground(NOTIFICATION_ID, notification("Türkçe çeviri hazırlanıyor…"), serviceType)
+        } catch (_: SecurityException) {
+            captureStartFailed("Bağlantı için gereken Android iznini yeniden ver.")
+            return START_NOT_STICKY
+        } catch (_: IllegalStateException) {
+            captureStartFailed("Canlı çeviriyi uygulama açıkken yeniden başlat.")
+            return START_NOT_STICKY
+        }
+        main.removeCallbacks(panelTestTick)
+        main.removeCallbacks(panelTestTimeout)
+        if (config.overlayOnPhone && !Settings.canDrawOverlays(this)) {
+            finish("Telefonda canlı çeviri göstermek için üstte gösterme izni gerekiyor.")
+            return START_NOT_STICKY
+        }
+        CaptureInbox.watch(this)
+        CaptureInbox.enqueue(this)
         val language = GameTranslatorEngine(this)
         translator = language
         if (!config.showOnPortal) closePanel()
@@ -97,16 +112,19 @@ class CaptureService : Service() {
         panel?.publish(null)
         sourceName = config.source.appName
         readingArea = config.readingArea
+        captionEnabled = config.captionEnabled
+        LiveFocusFrames.clear()
+        if (config.focus) focus = LiveFocus(this, !direct && Build.VERSION.SDK_INT >= 34)
         SessionState.update(SessionState.State(
             active = true,
-            status = "Telefondaki Türkçe çeviri modeli hazırlanıyor…",
+            status = if (direct) "PS5 görüntüsü ve Türkçe paket hazırlanıyor…" else "Türkçe oyun paketi hazırlanıyor…",
             portalPanel = panel?.let {
                 SessionState.PortalPanel(it.url, opened = previousPanel?.opened == true && previousPanel.url == it.url)
             },
             portalIssue = panelIssue,
         ))
-        ocr = SubtitleReader(readingArea)
-        if (config.showOnPhone) overlay = CaptionOverlay(this, config)
+        if (config.captionEnabled) ocr = SubtitleReader(readingArea)
+        if (config.captionEnabled && !direct && config.showOnPhone) overlay = CaptionOverlay(this, config)
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
             if (!ended) {
                 SessionState.update(SessionState.current.copy(voiceIssue = issue))
@@ -114,28 +132,46 @@ class CaptureService : Service() {
             }
         }
         captions = CaptionSession(
-            translate = language::translate,
+            translate = language::translateFallback,
             show = ::showCaption,
+            lookup = language::lookupPack,
             onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
         )
-        frames = ScreenFrames(
-            context = this,
-            settings = config,
-            reserveFrame = { modelReady && ocrPending.compareAndSet(false, true) },
-            discardFrame = { ocrPending.set(false) },
-            onFrame = { bitmap -> main.post { recognize(bitmap) } },
-            onSource = { value -> main.post { sourceChanged(value) } },
-            onEnded = { message -> main.post { finish(message) } },
-        ).also { it.start(Activity.RESULT_OK, grant) }
+        val reserve = { modelReady && ocrPending.compareAndSet(false, true) }
+        val discard: () -> Unit = { ocrPending.set(false) }
+        val onFrame: (Bitmap) -> Unit = { bitmap -> main.post { recognize(bitmap) } }
+        val onFocus: (Bitmap) -> Unit = { bitmap -> main.post {
+            val target = focus
+            if (ended || target == null) bitmap.recycle()
+            else {
+                if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
+                target.frame(bitmap)
+            }
+        } }
+        if (paired != null) {
+            consoleFrames = ConsoleFrames(
+                paired, config, onFrame, reserve, discard, onFocus,
+                onConnected = { main.post { updateStatus("PS5 bağlandı. Oyun görüntüsü bekleniyor.") } },
+                onEnded = { message -> main.post { finish(message) } },
+            ).also(ConsoleFrames::start)
+        } else if (grant != null) {
+            frames = ScreenFrames(
+                context = this,
+                settings = config,
+                reserveFrame = reserve,
+                discardFrame = discard,
+                onFrame = onFrame,
+                onFocusFrame = onFocus,
+                onSource = { value -> main.post { sourceChanged(value) } },
+                onEnded = { message -> main.post { finish(message) } },
+            ).also { it.start(Activity.RESULT_OK, grant) }
+        }
         main.postDelayed(modelTimeout, 180_000L)
         language.prepare { ok ->
             main.removeCallbacks(modelTimeout)
             if (ended) return@prepare
-            if (!ok) {
-                finish("Türkçe çeviri modeli açılamadı. Telefonda boş yer kontrolü yapıp oturumu yeniden başlat.")
-                return@prepare
-            }
+            if (!ok) updateTranslationIssue("Oyun paketi açılamadı. Çevrimdışı çeviri kullanılacak.")
             modelReady = true
             sourceChanged(source)
             main.post(checkFrames)
@@ -273,20 +309,26 @@ class CaptureService : Service() {
         if (source != value) {
             source = value
             epoch++
-            if (value != FrameSource.VISIBLE) voice?.pause()
+            if (value != FrameSource.VISIBLE) {
+                voice?.pause()
+                focus?.clear()
+            }
             captions?.reset()
         }
         if (!modelReady) return
         updateStatus(when (value) {
-            FrameSource.WAITING -> "${sourceName} üzerinde tam ekran oyun görüntüsünü aç."
+            FrameSource.WAITING -> if (consoleFrames != null) "PS5’ten oyun görüntüsü bekleniyor."
+                else "${sourceName} üzerinde tam ekran oyun görüntüsünü aç."
             FrameSource.VISIBLE -> waitingForText()
             FrameSource.DARK -> "Görüntü karanlık. Yayını ve ekran paylaşımı iznini kontrol et."
         })
     }
 
-    private fun waitingForText() = if (readingArea == ReadingArea.GAME_TEXT) {
-        "Görüntü alınıyor. Okunabilir oyun metni bekleniyor."
-    } else "Görüntü alınıyor. Altyazı bekleniyor."
+    private fun waitingForText() = when {
+        !captionEnabled -> "Görüntü alınıyor. DraBorn Odak’ta alanını seç."
+        readingArea == ReadingArea.GAME_TEXT -> "Görüntü alınıyor. Oyun metni bekleniyor."
+        else -> "Görüntü alınıyor. Altyazı bekleniyor."
+    }
 
     private fun updateStatus(message: String) {
         val state = SessionState.current
@@ -339,6 +381,8 @@ class CaptureService : Service() {
         main.removeCallbacks(panelTestTimeout)
         main.removeCallbacks(endPanelPreview)
         frames?.close()
+        consoleFrames?.close()
+        focus?.close()
         captions?.close()
         overlay?.close()
         voice?.close()
@@ -397,7 +441,7 @@ class CaptureService : Service() {
     private val checkFrames = object : Runnable {
         override fun run() {
             if (ended) return
-            val arrived = frames?.lastFrameAt ?: 0L
+            val arrived = frames?.lastFrameAt ?: consoleFrames?.lastFrameAt ?: 0L
             if (arrived == 0L || SystemClock.elapsedRealtime() - arrived > 5000L) {
                 sourceChanged(FrameSource.WAITING)
             }
@@ -414,7 +458,7 @@ class CaptureService : Service() {
             this, 1, Intent(this, CaptureService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE,
         )
         val open = PendingIntent.getActivity(this, 2, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-        return Notification.Builder(this, CHANNEL)
+        val builder = Notification.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("DraBornTranslate")
             .setContentText(message)
@@ -424,7 +468,11 @@ class CaptureService : Service() {
             .setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .addAction(Notification.Action.Builder(null, "Durdur", stop).build())
-            .build()
+        if (focus != null) {
+            val editor = PendingIntent.getActivity(this, 3, Intent(this, FocusActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
+            builder.addAction(Notification.Action.Builder(null, "DraBorn Odak", editor).build())
+        }
+        return builder.build()
     }
 
     @Suppress("DEPRECATION")
@@ -442,20 +490,31 @@ class CaptureService : Service() {
         private const val EXTRA_RESULT = "resultCode"
         private const val EXTRA_TOP = "bandTop"
         private const val EXTRA_SIZE = "textSize"
-        private const val EXTRA_MOBILE = "mobile"
+        private const val EXTRA_SOURCE = "source"
+        private const val EXTRA_FOCUS = "focus"
+        private const val EXTRA_CAPTION = "captionEnabled"
         private const val EXTRA_DISPLAY = "display"
         private const val EXTRA_READING_AREA = "readingArea"
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
-            context.startForegroundService(Intent(context, CaptureService::class.java).apply {
+            context.startForegroundService(captureIntent(context, config).apply {
                 putExtra(EXTRA_GRANT, grant)
                 putExtra(EXTRA_RESULT, resultCode)
-                putExtra(EXTRA_TOP, config.bandTop)
-                putExtra(EXTRA_SIZE, config.textSize)
-                putExtra(EXTRA_MOBILE, config.source == Source.MOBILE)
-                putExtra(EXTRA_DISPLAY, config.display.name)
-                putExtra(EXTRA_READING_AREA, config.readingArea.name)
             })
+        }
+
+        internal fun startConsole(context: Context, config: CaptureSettings) {
+            context.startForegroundService(captureIntent(context, config))
+        }
+
+        private fun captureIntent(context: Context, config: CaptureSettings) = Intent(context, CaptureService::class.java).apply {
+            putExtra(EXTRA_TOP, config.bandTop)
+            putExtra(EXTRA_SIZE, config.textSize)
+            putExtra(EXTRA_SOURCE, config.source.name)
+            putExtra(EXTRA_DISPLAY, config.display.name)
+            putExtra(EXTRA_READING_AREA, config.readingArea.name)
+            putExtra(EXTRA_FOCUS, config.focus)
+            putExtra(EXTRA_CAPTION, config.captionEnabled)
         }
 
         internal fun stop(context: Context) {

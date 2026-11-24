@@ -27,7 +27,7 @@ android {
         minSdk 29
         targetSdk 35
         versionCode 1
-        versionName '5.0.0'
+        versionName '5.0'
         ndk { abiFilters targetAbi }
         if (withPs5) {
             externalNativeBuild {
