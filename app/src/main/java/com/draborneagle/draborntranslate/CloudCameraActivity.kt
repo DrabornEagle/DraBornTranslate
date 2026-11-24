@@ -61,6 +61,7 @@ class CloudCameraActivity : ComponentActivity() {
     private var lensSize = 15
     private var zoom = 0
     private var showLensOverlay = true
+    private var fitPreview = true
     private val captions by lazy {
         CaptionSession(translate = translator::translate, show = { line ->
             if (!destroyed) subtitle.text = line?.turkish.orEmpty()
@@ -92,6 +93,7 @@ class CloudCameraActivity : ComponentActivity() {
         zoom = prefs.getInt("zoom", 0).coerceIn(0, 100)
         interval = prefs.getLong("interval", 340L).coerceIn(250L, 900L)
         showLensOverlay = prefs.getBoolean("overlay", true)
+        fitPreview = prefs.getBoolean("fitPreview", true)
         makeUi()
         controller = LifecycleCameraController(this).apply {
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -144,17 +146,20 @@ class CloudCameraActivity : ComponentActivity() {
                 insets
             }
         }
+        val landscape = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
         val viewport = FrameLayout(this)
+        val body = LinearLayout(this).apply { orientation = if (landscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL }
         preview = PreviewView(this).apply {
             implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-            scaleType = PreviewView.ScaleType.FILL_CENTER
+            scaleType = if (fitPreview) PreviewView.ScaleType.FIT_CENTER else PreviewView.ScaleType.FILL_CENTER
         }
         viewport.addView(preview, FrameLayout.LayoutParams(-1, -1))
         guides = RegionView()
         viewport.addView(guides, FrameLayout.LayoutParams(-1, -1))
         val header = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(8), dp(5), dp(8), dp(5))
+            orientation = if (landscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(8), dp(3), dp(8), dp(3))
             background = panel(0xE51B2341.toInt(), 15)
         }
         val top = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
@@ -164,7 +169,7 @@ class CloudCameraActivity : ComponentActivity() {
             setTextColor(Color.WHITE); textSize = 15f; gravity = Gravity.CENTER
         }, LinearLayout.LayoutParams(0, -2, 1f))
         top.addView(action("Ayarlar") { settings() })
-        header.addView(top)
+        if (landscape) header.addView(top, LinearLayout.LayoutParams(0, -2, 1f)) else header.addView(top)
         val tools = LinearLayout(this).apply { gravity = Gravity.CENTER }
         tools.addView(action("Altyazı") { editRegion(0) }, LinearLayout.LayoutParams(0, -2, 1f))
         tools.addView(action("Lens") { editRegion(1) }, LinearLayout.LayoutParams(0, -2, 1f))
@@ -172,9 +177,10 @@ class CloudCameraActivity : ComponentActivity() {
         tools.addView(action("Okuma") {
             editing = false; readerOnly = !readerOnly; footer.visibility = View.VISIBLE; guides.invalidate()
         }, LinearLayout.LayoutParams(0, -2, 1f))
-        header.addView(tools)
+        if (landscape) header.addView(tools, LinearLayout.LayoutParams(0, -2, 1f)) else header.addView(tools)
         root.addView(header, LinearLayout.LayoutParams(-1, -2).apply { setMargins(dp(8), dp(5), dp(8), dp(4)) })
-        root.addView(viewport, LinearLayout.LayoutParams(-1, 0, 1f))
+        root.addView(body, LinearLayout.LayoutParams(-1, 0, 1f))
+        body.addView(viewport, if (landscape) LinearLayout.LayoutParams(0, -1, 1f) else LinearLayout.LayoutParams(-1, 0, 1f))
         footer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(14), dp(8), dp(14), dp(8))
@@ -186,8 +192,8 @@ class CloudCameraActivity : ComponentActivity() {
         footer.addView(status)
         subtitle.maxLines = 3
         footer.addView(subtitle)
-        footer.addView(ScrollView(this).apply { addView(message) }, LinearLayout.LayoutParams(-1, dp(48)))
-        root.addView(footer, LinearLayout.LayoutParams(-1, -2).apply { setMargins(dp(8), dp(4), dp(8), dp(6)) })
+        footer.addView(ScrollView(this).apply { addView(message) }, if (landscape) LinearLayout.LayoutParams(-1, 0, 1f) else LinearLayout.LayoutParams(-1, dp(48)))
+        body.addView(footer, (if (landscape) LinearLayout.LayoutParams(dp(220), -1) else LinearLayout.LayoutParams(-1, -2)).apply { setMargins(dp(4), dp(4), dp(4), dp(6)) })
         setContentView(root)
     }
 
@@ -236,6 +242,12 @@ class CloudCameraActivity : ComponentActivity() {
         }
         choice("Çeviri modu", arrayOf("Altyazı + Lens", "Altyazı", "Lens"), mode) {
             mode = it; prefs.edit().putInt("mode", it).apply(); resetReads(); guides.invalidate()
+        }
+        choice("Görüntü ölçeği", arrayOf("Ekrana sığdır", "Alanı doldur"), if (fitPreview) 0 else 1) {
+            fitPreview = it == 0
+            prefs.edit().putBoolean("fitPreview", fitPreview).apply()
+            preview.scaleType = if (fitPreview) PreviewView.ScaleType.FIT_CENTER else PreviewView.ScaleType.FILL_CENTER
+            resetReads()
         }
         slider("Kamera yakınlaştırma %", 0, 100, zoom) {
             zoom = it; prefs.edit().putInt("zoom", it).apply()
