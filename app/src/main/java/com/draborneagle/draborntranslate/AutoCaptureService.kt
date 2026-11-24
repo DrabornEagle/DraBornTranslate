@@ -122,17 +122,20 @@ class AutoCaptureService:Service() {
                 for((i,line) in lines.withIndex()){
                     if(stopped)return
                     publish("Türkçeye çevriliyor · "+(i+1)+"/"+lines.size)
-                    val tr=translate(line)
+                    val tr=translate(line,lines.getOrNull(i-1))
                     rows.put(JSONObject().put("en",line).put("tr",tr.orEmpty()))
                 }
                 if(stopped)return
                 val entries=runCatching{JSONArray(prefs.getString(AutoCaptureState.HISTORY,"[]"))}.getOrDefault(JSONArray())
                 val result=JSONArray().put(JSONObject().put("name",m.name).put("date",System.currentTimeMillis()).put("rows",rows))
-                for(i in 0 until minOf(entries.length(),29))result.put(entries.getJSONObject(i))
+                for(i in 0 until entries.length()){
+                    val old=entries.getJSONObject(i)
+                    if(old.optString("name")!=m.name && result.length()<30)result.put(old)
+                }
                 seen.add(m.key);while(seen.size>1000)seen.remove(seen.first())
                 prefs.edit().putString(AutoCaptureState.HISTORY,result.toString()).putStringSet("seen",seen.toSet()).apply()
                 val latest=(0 until rows.length()).map{rows.getJSONObject(it).optString("tr")}.filter{it.isNotBlank()}.takeLast(2).joinToString("\n")
-                publish(if(lines.isEmpty())"Metin bulunamadı · Brief ayarını kapatıp yeniden tara" else if(latest.isBlank())"Metin okundu · çeviri bulunamadı" else latest)
+                publish(if(lines.isEmpty())"Metin bulunamadı · okuma modunu değiştirip yeniden tara" else if(latest.isBlank())"Metin okundu · çeviri bulunamadı" else latest)
             }catch(e:Exception){
                 if(stopped)return
                 failures[m.key]=(failures[m.key]?:0)+1
@@ -141,36 +144,65 @@ class AutoCaptureService:Service() {
         }
     }
     private fun readBitmap(bitmap:Bitmap,lines:MutableList<String>){
-        var crop:Bitmap?=null
+        var enlarged:Bitmap?=null
         try{
             if(stopped)return
-            // Brief dialogue is on the right; ordinary screenshot mode uses the whole image.
-            val input=if(prefs.getBoolean("brief",true)){
-                val x=(bitmap.width*.44).toInt().coerceIn(0,bitmap.width-1)
-                val y=(bitmap.height*.10).toInt().coerceIn(0,bitmap.height-1)
-                Bitmap.createBitmap(bitmap,x,y,bitmap.width-x,(bitmap.height*.78).toInt().coerceIn(1,bitmap.height-y)).also{crop=it}
+            // Preserve full frame before filtering. Never cut words at a fixed crop boundary.
+            val input=if(bitmap.width<1920 && bitmap.width>=600){
+                val h=(bitmap.height*1920.0/bitmap.width).toInt()
+                Bitmap.createScaledBitmap(bitmap,1920,h,true).also{enlarged=it}
             }else bitmap
             val result=Tasks.await(recognizer.process(InputImage.fromBitmap(input,0)),20,TimeUnit.SECONDS)
-            result.textBlocks.forEach{block->
-                val current=StringBuilder()
-                block.lines.forEach{line->
-                    val s=line.text.trim()
-                    if(s.contains(':')&&current.isNotEmpty()){
-                        AutoCaptureRules.addLine(lines,current.toString());current.clear()
+            val mode=prefs.getString("captureMode","auto")?:"auto"
+            val detectedBrief=result.textBlocks.flatMap{it.lines}.any{
+                val rect=it.boundingBox
+                rect!=null && rect.centerY()<input.height*.20 && it.text.trim().equals("brief",true)
+            } && result.textBlocks.flatMap{it.lines}.any{it.text.trim().equals("dialogue",true)}
+            val effective=if(mode=="auto")if(detectedBrief)"brief" else "subtitle" else mode
+            val selected=mutableListOf<Pair<android.graphics.Rect,String>>()
+            for(block in result.textBlocks){
+                for(line in block.lines){
+                    val box=line.boundingBox?:continue
+                    val x=box.centerX().toDouble()/input.width
+                    val y=box.centerY().toDouble()/input.height
+                    val keep=when(effective){
+                        "brief" -> x>=.43 && y in .12..0.94
+                        "subtitle" -> x in .20..0.80 && y in .76..0.94
+                        else -> true
                     }
-                    if(current.isNotEmpty())current.append(' ')
-                    current.append(s)
+                    if(keep)selected.add(box to line.text.trim())
                 }
-                if(current.isNotEmpty())AutoCaptureRules.addLine(lines,current.toString())
             }
-        }finally{if(crop!=null&&crop!==bitmap)crop?.recycle();bitmap.recycle()}
+            val ordered=selected.sortedWith(compareBy({it.first.top},{it.first.left}))
+            if(effective=="subtitle"){
+                // Two-line subtitle, including speaker and continuation, as a single sentence.
+                val sentence=ordered.joinToString(" "){it.second}
+                AutoCaptureRules.addLine(lines,sentence)
+            }else if(effective=="brief"){
+                var current=""
+                var last:android.graphics.Rect?=null
+                for((box,text) in ordered){
+                    val previous=last
+                    val newTurn=Regex("^[\\p{L}][\\p{L} .'-]{0,30}:").containsMatchIn(text)
+                    val separated=previous!=null && box.top-previous.bottom>maxOf(previous.height(),box.height())*.85
+                    if(current.isNotBlank()&&(newTurn||separated)){AutoCaptureRules.addLine(lines,current);current=""}
+                    current=(current+" "+text).trim();last=box
+                }
+                if(current.isNotBlank())AutoCaptureRules.addLine(lines,current)
+            }else{
+                for(block in result.textBlocks){
+                    val text=block.lines.joinToString(" "){it.text.trim()}
+                    AutoCaptureRules.addLine(lines,text)
+                }
+            }
+        }finally{if(enlarged!=null&&enlarged!==bitmap)enlarged?.recycle();bitmap.recycle()}
     }
     private fun readVideo(uri:Uri,lines:MutableList<String>){
         val retriever=MediaMetadataRetriever()
         try{
             retriever.setDataSource(this,uri)
             val duration=retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()?.coerceAtMost(180_000)?:error("Video süresi okunamadı")
-            val step=if(prefs.getBoolean("brief",true))1000L else 750L
+            val step=1000L
             var t=0L
             while(t<duration&&!stopped&&lines.size<300){
                 publish("Video OCR · "+t/1000+" / "+duration/1000+" sn")
@@ -180,9 +212,10 @@ class AutoCaptureService:Service() {
             }
         }finally{retriever.release()}
     }
-    private fun translate(line:String):String?{
+    private fun translate(line:String,previous:String?):String?{
+        AutoCaptureRules.reviewed(line)?.let{return it}
         val latch=CountDownLatch(1);var result:String?=null
-        engine.translate(TranslationInput(line,readingArea=ReadingArea.GAME_TEXT)){reply->result=reply.text;latch.countDown()}
+        engine.translate(TranslationInput(line,readingArea=if(prefs.getString("captureMode","auto")=="lens")ReadingArea.GAME_TEXT else ReadingArea.SUBTITLES,previousSubtitle=previous)){reply->result=reply.text;latch.countDown()}
         if(!latch.await(45,TimeUnit.SECONDS))return null
         return result
     }
