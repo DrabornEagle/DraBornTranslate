@@ -320,13 +320,16 @@ class MainActivity : Activity() {
                 0xFF173D59.toInt(), 0xFF3B2867.toInt(), 22)
                 .apply { setStroke(dp(2), 0xFF5FE5D6.toInt()) }
         }
-        cloud.addView(label("☁  Cloud Gaming Pro · v0.7.1", 21, WHITE, true))
-        cloud.append(label("PS Portal bulut oyunları • Telefon kamerasıyla oyunun ekranını oku • GTA 6 paketiyle anında Türkçe", 14, MUTED), 10)
+        cloud.addView(label("☁  Live Stream Translate · v0.7.2", 21, WHITE, true))
+        cloud.append(label("Canlı ağ altyazısı • Android ekran çevirisi • Portal optik modu", 14, MUTED), 10)
         cloud.append(label("🎮 Konuşma altyazısı + 📱 oyun telefonu mesajları aynı anda. Ekran görüntüleri hiçbir yere yüklenmez.", 13, MINT), 9)
-        cloud.append(button("Cloud Gaming Translate başlat") {
+        cloud.append(button("Canlı ağ altyazısı · LunaTranslator") {
+            startActivity(Intent(this, LiveTextActivity::class.java))
+        }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        cloud.append(button("Cloud Gaming Translate · kamera") {
             startActivity(Intent(this, CloudCameraActivity::class.java))
         }.apply { styleButton(this, MINT to ACCENT) }, 16)
-        cloud.append(button("Kamerasız · PS App ekran görüntüsü") {
+        cloud.append(button("PS App ekran görüntüsü · canlı değil") {
             startActivity(Intent(this, CloudCaptureActivity::class.java))
         }.apply { styleButton(this, MINT to ACCENT) }, 10)
         cloud.append(button("Kamerasız · Android bulut istemcisi") {
