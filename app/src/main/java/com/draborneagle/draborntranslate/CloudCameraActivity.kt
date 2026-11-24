@@ -133,14 +133,25 @@ class CloudCameraActivity : ComponentActivity() {
     }
 
     private fun makeUi() {
-        val root = FrameLayout(this).apply { setBackgroundColor(0xFF090D1B.toInt()) }
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF090D1B.toInt())
+            setOnApplyWindowInsetsListener { view, insets ->
+                if (android.os.Build.VERSION.SDK_INT >= 30) {
+                    val safe = insets.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+                    view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+                } else view.setPadding(insets.systemWindowInsetLeft, insets.systemWindowInsetTop, insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
+                insets
+            }
+        }
+        val viewport = FrameLayout(this)
         preview = PreviewView(this).apply {
             implementationMode = PreviewView.ImplementationMode.COMPATIBLE
             scaleType = PreviewView.ScaleType.FILL_CENTER
         }
-        root.addView(preview, FrameLayout.LayoutParams(-1, -1))
+        viewport.addView(preview, FrameLayout.LayoutParams(-1, -1))
         guides = RegionView()
-        root.addView(guides, FrameLayout.LayoutParams(-1, -1))
+        viewport.addView(guides, FrameLayout.LayoutParams(-1, -1))
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(8), dp(5), dp(8), dp(5))
@@ -162,7 +173,8 @@ class CloudCameraActivity : ComponentActivity() {
             editing = false; readerOnly = !readerOnly; footer.visibility = View.VISIBLE; guides.invalidate()
         }, LinearLayout.LayoutParams(0, -2, 1f))
         header.addView(tools)
-        root.addView(header, FrameLayout.LayoutParams(-1, -2, Gravity.TOP).apply { setMargins(dp(8), dp(5), dp(8), 0) })
+        root.addView(header, LinearLayout.LayoutParams(-1, -2).apply { setMargins(dp(8), dp(5), dp(8), dp(4)) })
+        root.addView(viewport, LinearLayout.LayoutParams(-1, 0, 1f))
         footer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(14), dp(8), dp(14), dp(8))
@@ -172,9 +184,10 @@ class CloudCameraActivity : ComponentActivity() {
         subtitle = TextView(this).apply { textSize = captionSize.toFloat(); setTextColor(Color.WHITE); gravity = Gravity.CENTER }
         message = TextView(this).apply { textSize = lensSize.toFloat(); setTextColor(0xFF8EF3BF.toInt()) }
         footer.addView(status)
+        subtitle.maxLines = 3
         footer.addView(subtitle)
-        footer.addView(ScrollView(this).apply { addView(message) }, LinearLayout.LayoutParams(-1, dp(72)))
-        root.addView(footer, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply { setMargins(dp(8), 0, dp(8), dp(6)) })
+        footer.addView(ScrollView(this).apply { addView(message) }, LinearLayout.LayoutParams(-1, dp(48)))
+        root.addView(footer, LinearLayout.LayoutParams(-1, -2).apply { setMargins(dp(8), dp(4), dp(8), dp(6)) })
         setContentView(root)
     }
 
@@ -182,7 +195,7 @@ class CloudCameraActivity : ComponentActivity() {
         selected = which
         readerOnly = false
         editing = true
-        footer.visibility = View.GONE
+        footer.visibility = View.INVISIBLE
         guides.invalidate()
     }
 
