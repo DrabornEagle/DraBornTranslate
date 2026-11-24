@@ -1,0 +1,3 @@
+# v0.8.2 — Auto Capture Sync bağlantı düzeltmesi
+
+Android ayarlarında hizmet açık olsa bile bağlı olmayabilir. Yeni ekran gerçek onServiceConnected durumunu gösterir. Bağlantıyı yenile düğmesi Android ayarlarına gider; hizmeti kullanıcı kapatıp açar. PS App uygulama penceresi kayan panelden ayrılır. Ekran okuma hataları yakalanır. Etiketler yoksa manuel indirme gerekir. Kayan panel aşağı taşındı ve opaklığı düşürüldü. Otomatik indirme ayarı takibi durdurunca sıfırlanmaz. Medya klasörü boşsa tanı görünür. İlk testte mevcut dosyaları tara. Android 15/HyperOS gerçek cihaz bağlantısı ve PS App etiketleri doğrulanmadı. Canlı yayın değildir.
