@@ -5,11 +5,13 @@ import android.app.Activity
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -63,6 +65,10 @@ class ScreenNavigationTest {
                 val fresh = saveSample("new-screenshotUrl.png", Color.rgb(180, 65, 123)).also(files::add)
                 waitFor { firstCapture()?.endsWith("/${fresh.lastPathSegment}") == true }
                 assertTrue(onMain { currentGrid()?.adapter?.count == 2 })
+                waitFor {
+                    val grid = currentGrid() ?: return@waitFor false
+                    grid.getChildAt(0)?.hasThumbnail() == true && grid.getChildAt(1)?.hasThumbnail() == true
+                }
                 screenshot("04-yakalamalar")
                 onMain { val grid = checkNotNull(currentGrid()); grid.performItemClick(grid.getChildAt(0), 0, grid.adapter.getItemId(0)) }
                 waitFor { resumed() is FocusActivity }
@@ -81,7 +87,8 @@ class ScreenNavigationTest {
             put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/PS App/")
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
-        val uri = checkNotNull(resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values))
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val uri = checkNotNull(resolver.insert(collection, values))
         val bitmap = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888)
         bitmap.eraseColor(color)
         resolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
@@ -93,6 +100,7 @@ class ScreenNavigationTest {
     private fun firstCapture(): String? = onMain { currentGrid()?.getChildAt(0)?.tag?.toString() }
 
     private fun currentGrid(): GridView? = resumed()?.window?.decorView?.findChild { it is GridView } as? GridView
+    private fun View.hasThumbnail(): Boolean = findChild { it is ImageView && it.drawable is BitmapDrawable } != null
     private fun resumed(): Activity? =
         ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).lastOrNull()
 
