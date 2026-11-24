@@ -286,7 +286,7 @@ class CloudCameraActivity : ComponentActivity() {
     }
     override fun onResume() { super.onResume(); resumed = true }
     override fun onPause() { resumed = false; if (::guides.isInitialized) resetReads(); super.onPause() }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 701 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) bindCamera()
         else if (requestCode == 701) showStatus("Kamera izni verilmedi. Kamerasız mod ana ekranda.")
