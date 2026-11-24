@@ -193,16 +193,16 @@ class CaptureService : Service() {
         try {
             startForeground(NOTIFICATION_ID, notification(message), type)
         } catch (_: IllegalStateException) {
-            finish("Portal bağlantısını uygulama açıkken yeniden başlat.")
+            finish("Bağlantıyı uygulama açıkken yeniden başlat.")
             return
         } catch (_: SecurityException) {
-            finish("Android Portal bağlantısını başlatmaya izin vermedi.")
+            finish("Android yerel bağlantıyı başlatmaya izin vermedi.")
             return
         }
         val issue = ensurePanel(textSize)
         val server = panel
         if (server == null) {
-            finish(issue ?: "Portal paneli açılamadı.")
+            finish(issue ?: "Altyazı paneli açılamadı.")
             return
         }
         SessionState.update(SessionState.State(
@@ -300,7 +300,7 @@ class CaptureService : Service() {
             panel = openPanel(textSize)
             null
         } catch (error: IOException) {
-            error.message ?: "Portal paneli açılamadı."
+            error.message ?: "Altyazı paneli açılamadı."
         } catch (_: SecurityException) {
             "Android yerel ağ erişimine izin vermedi."
         }
@@ -365,7 +365,7 @@ class CaptureService : Service() {
     }
 
     private fun stopMessage() = if (SessionState.current.portalPanel?.testing == true) {
-        "Portal bağlantısı durduruldu."
+        if (connection == Source.PS5) "TV paneli durduruldu." else "Portal bağlantısı durduruldu."
     } else {
         "Canlı altyazı durduruldu."
     }
@@ -407,7 +407,7 @@ class CaptureService : Service() {
     }
 
     private val panelTestTimeout = Runnable {
-        if (SessionState.current.portalPanel?.testing == true) finish("Portal örnek yazı oturumu sona erdi.")
+        if (SessionState.current.portalPanel?.testing == true) finish("Örnek altyazı oturumu sona erdi.")
     }
 
     private val endPanelPreview = Runnable { setPanelPreview(false) }

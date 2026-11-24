@@ -182,13 +182,13 @@ internal object CaptureInbox {
         val path = MediaStore.MediaColumns.RELATIVE_PATH
         val modified = MediaStore.MediaColumns.DATE_MODIFIED
         val added = MediaStore.MediaColumns.DATE_ADDED
-        val size = MediaStore.MediaColumns.SIZE
+        val sizeColumn = MediaStore.MediaColumns.SIZE
         val duration = MediaStore.Video.VideoColumns.DURATION
-        val fields = arrayOf(id, name, modified, size, added) + if (video) arrayOf(duration) else emptyArray()
+        val fields = arrayOf(id, name, modified, sizeColumn, added) + if (video) arrayOf(duration) else emptyArray()
         val matchName = if (video) "%-master_playlist.%" else "%-screenshotUrl.%"
         val args = Bundle().apply {
             putString(ContentResolver.QUERY_ARG_SQL_SELECTION,
-                "($path LIKE ? OR $path LIKE ? OR ($path LIKE ? AND $name LIKE ?)) AND $size > 0 AND ${MediaStore.MediaColumns.IS_PENDING} = 0")
+                "($path LIKE ? OR $path LIKE ? OR ($path LIKE ? AND $name LIKE ?)) AND $sizeColumn > 0 AND ${MediaStore.MediaColumns.IS_PENDING} = 0")
             putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
                 arrayOf("%/PS App/%", "%/PlayStation App/%", "Download/%", matchName))
             putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "$added DESC, $id DESC")
@@ -294,6 +294,8 @@ class CaptureInboxJob : JobService() {
         if (params.jobId == CaptureInbox.MEDIA_CHANGE_JOB) {
             rearmMedia = true
             CaptureInbox.notifyChanged()
+        } else {
+            CaptureInbox.armChanges(this)
         }
         if (active != null) {
             scanAgain = true

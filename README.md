@@ -2,7 +2,7 @@
   <img src="app/src/main/res/drawable-nodpi/brand_mark.webp" width="104" height="104" alt="DraBornTranslate logosu">
   <h1>DraBornTranslate</h1>
   <p><strong>PlayStation oyunlarını Türkçe oku</strong></p>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0"><img alt="İmzalı Android APK v5.0" src="https://img.shields.io/badge/ANDROID-v5.0_APK-55e6c1?style=for-the-badge&logo=android&logoColor=14213a"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.1"><img alt="İmzalı Android APK v5.0.1" src="https://img.shields.io/badge/ANDROID-v5.0.1_APK-55e6c1?style=for-the-badge&logo=android&logoColor=14213a"></a>
   <a href="docs/KURULUM.md"><img alt="Kurulum" src="https://img.shields.io/badge/KURULUM-REHBERİ-9b8dff?style=for-the-badge"></a>
   <a href="https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml"><img alt="Derleme sonucu" src="https://img.shields.io/github/actions/workflow/status/DrabornEagle/DraBornTranslate/android.yml?style=for-the-badge&label=ANDROID"></a>
 </div>
@@ -13,23 +13,25 @@
 | --- | --- | --- |
 | PS5 ve TV | **PS5 ve TV’ye bağlan** | Telefon veya aynı ağdaki TV tarayıcısı |
 | PlayStation Portal | **Portal’a bağlan** | Telefon veya desteklenirse Portal yan paneli |
-| Telefondaki PS Remote Play | **PS5 ve TV’ye bağlan → PS Remote Play ile telefonda oyna** | Oyunun üzerindeki Android altyazı katmanı |
+| Telefondaki PS Remote Play | **Telefonda oyna** | Oyunun üzerindeki Android altyazı katmanı |
+
+**PS5 ve TV’ye bağlan** ekranında konsol eşleştirme, canlı görüntü ve TV altyazı paneli bulunur. **Portal’a bağlan** ekranında PS App üzerinden paylaşımlı ekran, altyazı bandı ve Portal paneli bulunur.
 
 ### Altyazı + DraBorn Odak
 
 Altyazılar akarken oyun telefonundaki mesajı, tabelayı veya Brief metnini seç. **DraBorn Odak** Türkçeyi okuduğu görüntünün üstüne yerleştirir ve çevirinin tamamını metin olarak da gösterir. Android 14 ve üzerindeki uygulama paylaşımında seçili alan canlı olarak yenilenebilir.
 
-**GTA 6 Türkçe paketini al** seçeneği 475.893 satırlık Türkçe oyun paketini telefona indirir. Pakette eşleşen replikler yerel olarak döner. Diğer metinleri telefondaki Töz-Çevir modeli çevirir. Çeviri için hesap, ücretli servis, kamera, mikrofon veya bilgisayar gerekmez.
+**Oyun paketleri → Türkçe paketi indir** yolu 475.893 satırlık Türkçe oyun paketini telefona indirir. Pakette eşleşen replikler telefondaki tablodan okunur. Diğer metinleri telefondaki Töz-Çevir modeli çevirir. Çeviri için hesap, ücretli servis, kamera, mikrofon veya bilgisayar gerekmez.
 
 ### PS App yakalamaları
 
-PS App’ten telefona indirilen görüntüler **PS App yakalamaları** bölümünde açılır. **Otomatik çeviriyi aç** seçildiğinde Android’in erişim verdiği PS App klasörlerindeki yeni dosyalar sıraya alınır. Bir klipte ilerleme çubuğuyla Brief’in göründüğü kare seçilebilir.
+**Yakalamalar** ekranı telefona indirilen görüntü ve klipleri önizleme, tarih ve çeviri durumuyla gösterir. Yeni kayıtlar en üstte görünür. PS App’te **İndir** seçildiğinde **Otomatik çeviri** yeni yerel dosyayı sıraya alır. **Paylaş → DraBornTranslate** ile bir yakalamayı doğrudan açabilirsin. Bir klipte ilerleme çubuğuyla Brief’in göründüğü kare seçilebilir.
 
 ## İndir ve kur
 
-[İmzalı DraBornTranslate v5.0 APK](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v5.0/DraBornTranslate-v5.0-Android-arm64.apk) · [Sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0) · [Kurulum rehberi](docs/KURULUM.md)
+[İmzalı DraBornTranslate v5.0.1 APK](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v5.0.1/DraBornTranslate-v5.0.1-Android-arm64.apk) · [Sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.1) · [Kurulum rehberi](docs/KURULUM.md)
 
-Android 10 ve üzeri ARM64 telefonlar desteklenir. v5.0, Android sürüm kodu 1 ile yeni paket kimliğine kurulur ve önceki DraBornTranslate sürümüyle yan yana kullanılabilir. v5 serisinin güncellemeleri ana ekrandaki **Yeni sürüm kontrolü** üzerinden indirilir.
+Android 10 ve üzeri ARM64 telefonlar desteklenir. v5.0.1, v5.0’ın paket kimliğini ve imzasını kullanır. **⋮ → Yeni sürüm kontrolü** üzerinden mevcut kurulumun üzerine yüklenebilir. Android sürüm kodu 2’dir.
 
 ## Güncellemeler ve kaynak kodu
 

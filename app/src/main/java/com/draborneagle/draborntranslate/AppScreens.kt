@@ -205,6 +205,7 @@ class HomeActivity : Activity() {
             navTile("Telefonda oyna", null, R.drawable.ic_phone_screen, Palette.blue) { startActivity(connectionIntent(this, Source.MOBILE)) },
             navTile("Oyun paketleri", null, R.drawable.ic_game_package, Palette.purple) { open(GamePacksActivity::class.java) },
         ), 8)
+        if (savedInstanceState == null && ImportedGamePack.hasGta(this)) checkInstalledPack()
     }
 
     override fun onResume() {
@@ -214,6 +215,14 @@ class HomeActivity : Activity() {
     }
 
     private fun open(target: Class<out Activity>) = startActivity(Intent(this, target))
+
+    private fun checkInstalledPack() {
+        val app = applicationContext
+        Thread({
+            val title = runCatching { ImportedGamePack.downloadGta(app, force = false) }.getOrNull()
+            if (title != null) app.capturePreferences().edit().putString("gtaPackTitle", title).apply()
+        }, "DraBornTranslate-pack-update").start()
+    }
 
     private fun toolRow(first: View, second: View) = row().apply {
         addView(first, LinearLayout.LayoutParams(0, -1, 1f).apply { marginEnd = dp(4) })

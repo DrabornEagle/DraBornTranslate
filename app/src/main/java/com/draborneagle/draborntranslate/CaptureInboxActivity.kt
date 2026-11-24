@@ -57,7 +57,7 @@ class CaptureInboxActivity : Activity() {
         statusCard.addBelow(copy("PS App’ten telefona inen görüntüler burada görünür.", 13), 4)
         auto = press("Otomatik çeviri", Palette.mint) { toggleAutomatic() }
         statusCard.addBelow(auto, 9)
-        access = press("Medya erişimini düzenle") { requestMedia() }.apply { visibility = View.GONE }
+        access = press("Medya erişimini düzenle") { requestMedia(enable = false) }.apply { visibility = View.GONE }
         statusCard.addBelow(access, 6)
         tools.addBelow(statusCard)
 
@@ -151,11 +151,11 @@ class CaptureInboxActivity : Activity() {
             CaptureInbox.setEnabled(this, false)
             reload()
         } else if (CaptureInbox.canRead(this)) enableAutomatic()
-        else requestMedia()
+        else requestMedia(enable = true)
     }
 
-    private fun requestMedia() {
-        requestPermissions(CaptureInbox.permissions(), MEDIA_PERMISSION)
+    private fun requestMedia(enable: Boolean) {
+        requestPermissions(CaptureInbox.permissions(), if (enable) ENABLE_AUTO_PERMISSION else MEDIA_PERMISSION)
     }
 
     private fun enableAutomatic() {
@@ -170,7 +170,13 @@ class CaptureInboxActivity : Activity() {
     @Deprecated("Android permission callback")
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, grants: IntArray) {
         super.onRequestPermissionsResult(code, permissions, grants)
-        if (code == MEDIA_PERMISSION && CaptureInbox.canRead(this)) enableAutomatic() else reload()
+        if (code == ENABLE_AUTO_PERMISSION && CaptureInbox.canRead(this)) {
+            enableAutomatic()
+        } else {
+            CaptureInbox.watch(this)
+            CaptureInbox.enqueue(this)
+            reload()
+        }
     }
 
     private fun launchPlayStation() {
@@ -304,6 +310,7 @@ class CaptureInboxActivity : Activity() {
         private const val MEDIA_PERMISSION = 41
         private const val PICK_CAPTURE = 42
         private const val NOTIFICATION_PERMISSION = 43
+        private const val ENABLE_AUTO_PERMISSION = 44
     }
 }
 

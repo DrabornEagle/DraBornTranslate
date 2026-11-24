@@ -383,8 +383,14 @@ class MainActivity : Activity() {
         val recognized = recognizedText()
         val source = caption?.source
         val differentReading = recognized?.takeUnless { it == source }
-        status.text = if (state.active || panelTesting) state.voiceIssue ?: state.translationIssue ?: state.status
-        else demoMessage ?: state.status
+        status.text = when {
+            state.active && state.source != config.source -> "Diğer bağlantıda canlı çeviri açık."
+            panelTesting && state.source != config.source -> "Diğer bağlantı panelinde örnek altyazı açık."
+            state.active || panelTesting -> state.voiceIssue ?: state.translationIssue ?: state.status
+            demoMessage != null -> demoMessage
+            state.source == null || state.source == config.source -> state.status
+            else -> "Çeviriyi başlatmak için oyun görüntüsünü aç."
+        }
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = source?.let { "Çevirinin İngilizce metni\n$it" }.orEmpty()
         recognizedLabel.text = differentReading?.let { "Okunan İngilizce\n$it" }.orEmpty()
@@ -396,7 +402,8 @@ class MainActivity : Activity() {
     }
 
     private fun displayedCaption(): Caption? =
-        if (demoMessage != null) demoCaption else SessionState.current.let { if (it.active) it.caption else it.lastCaption }
+        if (demoMessage != null) demoCaption else SessionState.current.takeIf { it.source == config.source }
+            ?.let { if (it.active) it.caption else it.lastCaption }
 
     private fun recognizedText(): String? =
         if (demoMessage != null) demoSource else displayedCaption()?.source
@@ -461,23 +468,26 @@ class MainActivity : Activity() {
         previewPanel.visibility = if (state.active && panel != null && !panel.testing) View.VISIBLE else View.GONE
         previewPanel.text = if (panel?.previewing == true) "Canlı çeviriye dön" else "Portal’da örnek yazı göster"
         launchPanelTest.visibility = if (state.active) View.GONE else View.VISIBLE
-        launchPanelTest.isEnabled = !pending && demoTranslator == null
+        launchPanelTest.isEnabled = !pending && demoTranslator == null &&
+            !(state.source != config.source && state.portalPanel?.testing == true)
         launchPanelTest.isActivated = panel?.testing == true
         launchPanelTest.text = if (launchPanelTest.isActivated) PORTAL_STOP else PORTAL_START
-        panelStatus.text = state.portalIssue ?: when {
+        panelStatus.text = state.portalIssue?.takeIf { state.source == config.source } ?: when {
             panel?.previewing == true -> "Örnek yazı 3 dakika gösterilir. Portal’da oyuna dönüp yazının değiştiğini kontrol et."
             panel?.testing == true && panel.opened -> "Panel açıldı. Oyuna dönüp örnek yazının Portal ekranında değiştiğini kontrol et."
             panel?.testing == true -> "Portal bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
             panel?.opened == true -> "Bir tarayıcı altyazıyı alıyor. Portal’da Yana Sabitle görünüyorsa seç."
             panel != null -> "PS5 evdeki ağdaysa yerel bağlantıyı kullan. PS5 uzaktaysa dış bağlantıyı hazırla."
-            state.active -> "Portal bağlantısı hazırlanıyor…"
+            state.active && state.source == config.source -> "Portal bağlantısı hazırlanıyor…"
+            state.active || state.portalPanel?.testing == true -> "Portal paneli için diğer bağlantıyı durdur."
             else -> "Bağlantıyı başlatıp Portal’da örnek yazıyı gör. Canlı çeviriye aynı panelden geçebilirsin."
         }
     }
 
     private fun togglePanelTest() {
-        if (SessionState.current.portalPanel?.testing == true) {
-            CaptureService.stop(this)
+        val state = SessionState.current
+        if (state.portalPanel?.testing == true) {
+            if (state.source == config.source) CaptureService.stop(this)
             return
         }
         demoMessage = null
@@ -696,7 +706,8 @@ class MainActivity : Activity() {
         pending = false
         val state = SessionState.current
         SessionState.update(if (state.portalPanel?.testing == true) state.copy(active = false, status = message)
-            else SessionState.State(status = message, lastCaption = state.lastCaption))
+            else SessionState.State(source = config.source, status = message,
+                lastCaption = state.lastCaption?.takeIf { state.source == config.source }))
         render()
     }
 
