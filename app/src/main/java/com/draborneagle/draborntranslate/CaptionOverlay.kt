@@ -66,7 +66,7 @@ internal class CaptionOverlay(
             gravity = (if (settings.captionsAtTop) Gravity.TOP else Gravity.BOTTOM) or Gravity.CENTER_HORIZONTAL
             y = margin
             // Android 12+ bu değerin altında kalan tek dokunulmaz katmandan dokunmaları iletir.
-            alpha = 0.79f
+            alpha = if (settings.focus) 0.55f else 0.79f
         }
         windows.addView(view, params)
         panel = view

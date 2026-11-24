@@ -2,16 +2,21 @@ name: Android APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'codex/v5.0']
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -22,9 +27,80 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
-      - run: ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+      - name: Prepare the pinned offline model
+        run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
+      - name: Run Android unit tests and lint
+        run: |
+          ./gradlew --no-daemon -PskipPs5 -PtozModelDir="$RUNNER_TEMP/toz-model" :app:testDebugUnitTest :app:lintDebug
+          python3 - <<'PYTEST'
+          from pathlib import Path
+          import xml.etree.ElementTree as xml
+          suites = [xml.parse(path).getroot() for path in Path("app/build/test-results/testDebugUnitTest").glob("TEST-*.xml")]
+          print("Unit tests:", sum(int(s.attrib["tests"]) for s in suites))
+          PYTEST
+      - name: Check the Turkish pack catalog
+        if: always()
+        continue-on-error: true
+        run: python3 scripts/check-gta-pack.py
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache/restore@v4
+        id: chiaki
+        with:
+          path: third-party/chiaki-ng
+          key: chiaki-ng-${{ runner.os }}-${{ hashFiles('scripts/prepare-ps5.sh') }}
+      - name: Prepare PS5 connection library
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y protobuf-compiler
+          ./scripts/prepare-ps5.sh
+          python3 -m venv "$RUNNER_TEMP/ps5-python"
+          "$RUNNER_TEMP/ps5-python/bin/pip" install --only-binary=:all: protobuf==5.29.5 grpcio-tools==1.71.0
+          echo "DRA_PS5_PYTHON=$RUNNER_TEMP/ps5-python/bin/python" >> "$GITHUB_ENV"
+      - uses: actions/cache/save@v4
+        if: steps.chiaki.outputs.cache-hit != 'true'
+        with:
+          path: third-party/chiaki-ng
+          key: ${{ steps.chiaki.outputs.cache-primary-key }}
+      - uses: actions/cache@v4
+        with:
+          path: third-party/openssl
+          key: android-openssl-${{ runner.os }}-${{ hashFiles('scripts/prepare-openssl.sh') }}
+      - name: Prepare OpenSSL for the Android NDK
+        run: ./scripts/prepare-openssl.sh
+      - name: Prepare the pinned offline model
+        run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
+      - name: Assemble the release
+        run: ./gradlew --no-daemon -PtargetAbi=arm64-v8a -PtozModelDir="$RUNNER_TEMP/toz-model" :app:assembleRelease
+      - name: Confirm release metadata
+        run: |
+          zipinfo -1 app/build/outputs/apk/release/app-release-unsigned.apk | grep -Fx lib/arm64-v8a/libgtnative.so
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging app/build/outputs/apk/release/app-release-unsigned.apk | sed -n '1p'
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 4 app/build/outputs/apk/release/app-release-unsigned.apk
+          python3 scripts/check-apk-alignment.py app/build/outputs/apk/release/app-release-unsigned.apk
+      - name: Collect signing and inspection tools
+        run: |
+          mkdir -p release-artifacts
+          cp app/build/outputs/apk/release/app-release-unsigned.apk release-artifacts/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" release-artifacts/
+          cp "$ANDROID_HOME/build-tools/35.0.0/zipalign" "$ANDROID_HOME/build-tools/35.0.0/aapt" release-artifacts/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib64/libc++.so" release-artifacts/
       - uses: actions/upload-artifact@v4
         with:
-          name: DraBornTranslate-Android-onizleme
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: DraBornTranslate-Android-release
+          path: release-artifacts/
           if-no-files-found: error

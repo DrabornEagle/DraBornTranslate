@@ -22,6 +22,7 @@ internal class CaptionSession(
         minTextLength = 2,
     ),
     private val contextClock: () -> Long = { System.nanoTime() / 1_000_000L },
+    private val lookup: ((TranslationInput, (TranslationReply?) -> Unit) -> Unit)? = null,
 ) {
     private data class Request(
         val number: Int,
@@ -62,8 +63,17 @@ internal class CaptionSession(
                 if (cached != null) {
                     deliver(source, cached)
                 } else {
-                    waiting = Request(number, source, input)
-                    translateNext()
+                    val request = Request(number, source, input)
+                    val find = lookup
+                    if (find == null) enqueue(request) else find(input) { reply ->
+                        if (!closed && number == request.number) {
+                            if (reply == null) enqueue(request)
+                            else {
+                                cache[input] = reply
+                                deliver(source, reply)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -107,6 +117,11 @@ internal class CaptionSession(
         number++
         waiting = null
         if (hide) show(null)
+    }
+
+    private fun enqueue(request: Request) {
+        waiting = request
+        translateNext()
     }
 
     private fun translateNext() {

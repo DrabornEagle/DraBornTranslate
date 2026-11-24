@@ -1,0 +1,96 @@
+name: Çeviri bileşeni eşitleme
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: translation-source-sync
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    outputs:
+      changed: ${{ steps.sync.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read the upstream release
+        id: sync
+        run: |
+          python3 scripts/sync-translation-source.py
+          if git diff --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add -u
+          python3 scripts/sync-translation-source.py --check-index
+          git diff --cached --check
+          git diff --cached --binary > "$RUNNER_TEMP/translation-source.patch"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v4
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.sync.outputs.changed == 'true'
+      - uses: android-actions/setup-android@v4
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+      - uses: actions/setup-python@v5
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          python-version: '3.12'
+      - name: Validate updated Android components
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y protobuf-compiler
+          ./scripts/prepare-ps5.sh
+          ./scripts/prepare-openssl.sh
+          python3 -m venv "$RUNNER_TEMP/ps5-python"
+          "$RUNNER_TEMP/ps5-python/bin/pip" install --only-binary=:all: protobuf==5.29.5 grpcio-tools==1.71.0
+          export DRA_PS5_PYTHON="$RUNNER_TEMP/ps5-python/bin/python"
+          ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
+          ./gradlew --no-daemon -PtozModelDir="$RUNNER_TEMP/toz-model" :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
+          python3 scripts/check-apk-alignment.py app/build/outputs/apk/release/app-release-unsigned.apk
+      - uses: actions/upload-artifact@v4
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          name: validated-translation-source
+          path: ${{ runner.temp }}/translation-source.patch
+          if-no-files-found: error
+          retention-days: 3
+
+  sync:
+    needs: check
+    if: needs.check.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: validated-translation-source
+          path: ${{ runner.temp }}/translation
+      - name: Update the repository
+        run: |
+          git apply --index "$RUNNER_TEMP/translation/translation-source.patch"
+          python3 scripts/sync-translation-source.py --check-index
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          revision="$(python3 -c 'import json; print(json.load(open("scripts/upstream-revision.json"))["tag"])')"
+          git commit -m "Sync Android translation components ($revision)"
+          git push origin HEAD:refs/heads/main

@@ -22,7 +22,7 @@ internal object GitHubUpdate {
     private const val REPOSITORY = "DrabornEagle/DraBornTranslate"
     private val latestUrl = URI("https://api.github.com/repos/$REPOSITORY/releases/latest")
     private val downloadHosts = setOf("github.com", "release-assets.githubusercontent.com", "objects.githubusercontent.com")
-    private val stableVersion = Regex("""(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)""")
+    private val stableVersion = Regex("""(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?""")
     private val digestFormat = Regex("sha256:([a-f0-9]{64})")
 
     fun latest(installedVersion: String): GitHubRelease? {
@@ -98,8 +98,11 @@ internal object GitHubUpdate {
     }
 
     private fun versionParts(version: String): List<Int> {
-        val parts = stableVersion.matchEntire(version)?.groupValues?.drop(1)?.mapNotNull(String::toIntOrNull)
-        return parts?.takeIf { it.size == 3 } ?: throw UpdateException("GitHub sürüm numarası doğrulanamadı.")
+        val parts = stableVersion.matchEntire(version)?.groupValues?.drop(1)
+            ?: throw UpdateException("GitHub sürüm numarası doğrulanamadı.")
+        return parts.map { part ->
+            part.ifEmpty { "0" }.toIntOrNull() ?: throw UpdateException("GitHub sürüm numarası doğrulanamadı.")
+        }
     }
 
     private fun connect(url: URI): HttpsURLConnection = (url.toURL().openConnection() as HttpsURLConnection).apply {

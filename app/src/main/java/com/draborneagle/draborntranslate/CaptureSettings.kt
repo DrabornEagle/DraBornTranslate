@@ -3,9 +3,10 @@ package com.draborneagle.draborntranslate
 
 import kotlin.math.roundToInt
 
-internal enum class Source(val appName: String, val packageName: String) {
+internal enum class Source(val appName: String, val packageName: String?) {
     PORTAL("PlayStation App", "com.scee.psxandroid"),
     MOBILE("PS Remote Play", "com.playstation.remoteplay"),
+    PS5("PS5 yerel yayın", null),
 }
 
 internal enum class SubtitleDisplay(val label: String, val phone: Boolean, val portal: Boolean) {
@@ -26,10 +27,13 @@ internal data class CaptureSettings(
     val source: Source = Source.PORTAL,
     val display: SubtitleDisplay = SubtitleDisplay.PHONE,
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
+    val focus: Boolean = false,
+    val captionEnabled: Boolean = true,
 ) {
     val captionsAtTop: Boolean get() = bandTop >= 35
     val showOnPhone: Boolean get() = source == Source.MOBILE || display.phone
-    val showOnPortal: Boolean get() = source == Source.PORTAL && display.portal
+    val showOnPortal: Boolean get() = source != Source.MOBILE && display.portal
+    val overlayOnPhone: Boolean get() = source != Source.PS5 && (showOnPhone || focus)
     val speakOnPhone: Boolean get() = source == Source.PORTAL && display == SubtitleDisplay.VOICE
     fun scanArea(video: Pixels): Pixels = if (readingArea == ReadingArea.GAME_TEXT) video else subtitleBand(video, bandTop)
 

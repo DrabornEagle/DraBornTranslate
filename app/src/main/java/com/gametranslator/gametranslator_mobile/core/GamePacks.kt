@@ -310,6 +310,8 @@ class GamePackLibrary(
      */
     private val bundled: (() -> List<Pair<String, () -> ByteArray>>)?,
     private val userDirectory: File?,
+    /** Kullanıcı klasöründe en düşük öncelikli sayılan paketler (önceki paket sunucusundan kalanlar): önce yüklenir. */
+    private val lowPriority: (() -> Set<String>)? = null,
 ) {
     data class Info(val id: String, val title: String, val entries: Int, val builtIn: Boolean)
 
@@ -322,6 +324,8 @@ class GamePackLibrary(
      * çok pakette varsa kapsam o paketlerden biri değilse ilkine geçer; hiç tam eşleşme olmadıysa bulanık arama yapılmaz.
      */
     private var scope: Int? = null
+    /** Son yüklemede düşük öncelikli sayılanlar. */
+    private var lowLoaded: Set<String> = emptySet()
 
     val infos: List<Info>
         get() = synchronized(lock) {
@@ -333,6 +337,41 @@ class GamePackLibrary(
     fun setDisabled(ids: Set<String>) {
         disabled = ids
     }
+
+    @Volatile private var detectedId: String? = null
+
+    /**
+     * PS5'te çalışan oyunun paketi (bkz. [Ps5Status]; Windows: GamePackLibrary.Detected). Verilmişse elle seçilmiş gibi
+     * davranılır: yalnız o paket aranır, bulanık arama ilk satırdan itibaren onda yapılır. Kapatılmış paket sayılmaz.
+     */
+    var detected: String?
+        get() = detectedId
+        set(value) {
+            detectedId = value?.takeIf { it.isNotBlank() }
+        }
+
+    /**
+     * PS5'in bildirdiği oyun adına uyan paketin kimliği ("Mafia: The Old Country" ↔ "mafia-the-old-country"); harf ve
+     * rakamlar karşılaştırılır, biri öbürünü içeriyorsa uyar (en uzun başlık seçilir). Yoksa null. Paketleri yükler.
+     */
+    fun findByGameName(name: String?): String? {
+        fun plain(text: String) = text.lowercase(java.util.Locale.ROOT).filter { it.isLetterOrDigit() }
+        if (name.isNullOrBlank()) return null
+        val wanted = plain(name)
+        if (wanted.length < 3) return null
+        return infos.filter { info -> plain(info.title).let { it.length >= 3 && (it.contains(wanted) || wanted.contains(it)) } }
+            .maxByOrNull { it.title.length }?.id
+    }
+
+    /** Oyun belli ([detected]) ve paketi yüklü, kapatılmamışsa onun sırası; kilit altında çağrılır. */
+    private fun pinnedIndex(current: List<Pair<GamePack, Boolean>>): Int? {
+        val id = detectedId ?: return null
+        if (id in disabled) return null
+        return current.indices.firstOrNull { current[it].first.id == id }
+    }
+
+    /** Oyun belli mi: PS5'in bildirdiği oyunun paketi var (paket beklemeden, kapıya bakmadan kullanılır). */
+    val gameKnown: Boolean get() = synchronized(lock) { loaded && pinnedIndex(packs) != null }
 
     fun reload() = synchronized(lock) {
         loaded = false
@@ -354,6 +393,12 @@ class GamePackLibrary(
         }
         if (current.isEmpty()) return null
         val number = PackKey.keyNumber(text) ?: return null
+        synchronized(lock) { if (packs === current) pinnedIndex(current) else null }?.let { only ->
+            // Oyun belli: yalnız onun paketi (aynı satır başka oyunda başka çevrilmiş olabilir).
+            val pack = current[only].first
+            synchronized(lock) { if (packs === current) scope = only }
+            return (pack[number] ?: pack.segment(number))?.let { PackMatch(it, pack.id) }
+        }
         val found = lookup(current, number) ?: return null
         noteHit(current, number)
         return found
@@ -364,22 +409,36 @@ class GamePackLibrary(
      * düzeltmesiyle ([PackFuzzy.variants]) tam anahtar, sonra bulanık imza. Hiç tam eşleşme olmadıysa null.
      */
     fun nearestWithPack(text: String): PackMatch? {
-        val (current, chosen) = synchronized(lock) {
+        val (current, chosen, pinned) = synchronized(lock) {
             loadIfNeeded()
-            packs to scope
+            Triple(packs, scope, pinnedIndex(packs))
+        }
+        if (pinned != null) {
+            // Oyun belli: bulanık arama ilk satırdan itibaren onun paketinde, Türkçesi de o paketten.
+            val only = current[pinned].first
+            val own = { key: Long -> (only[key] ?: only.segment(key))?.let { PackMatch(it, only.id) } }
+            var found: PackMatch? = null
+            for (variant in PackFuzzy.variants(text)) {
+                val number = (if (variant.all { it.code < 128 }) PackKey.canonNumber(variant) else PackKey.keyNumber(variant)) ?: continue
+                val turkish = own(number) ?: continue
+                if (found != null && found.text != turkish.text) { found = null; break }
+                found = turkish
+            }
+            found?.let { return it }
+            val key = only.fuzzy?.nearest(text) { own(it)?.text } ?: return null
+            return own(key)
         }
         val pack = chosen?.let { current.getOrNull(it)?.first }?.takeIf { it.id !in disabled } ?: return null
         corrected(text, pack, current)?.let { return it }
-        if (!PackFuzzy.damaged(text)) return null
         val key = pack.fuzzy?.nearest(text) { lookup(current, it)?.text } ?: return null
         return lookup(current, key)
     }
 
     /** Bulanık aramanın yapılacağı paketin kimliği (son tam eşleşmenin paketi); yoksa null. */
-    val searchScope: String? get() = synchronized(lock) { scope?.let { packs.getOrNull(it)?.first?.id } }
+    val searchScope: String? get() = synchronized(lock) { (pinnedIndex(packs) ?: scope)?.let { packs.getOrNull(it)?.first?.id } }
 
-    /** Oynanan oyunun adı: son tam eşleşmenin geldiği paketin başlığı; yoksa null. */
-    val scopeTitle: String? get() = synchronized(lock) { scope?.let { packs.getOrNull(it)?.first?.title } }
+    /** Oynanan oyunun adı: PS5'in bildirdiği oyunun ya da son tam eşleşmenin geldiği paketin başlığı; yoksa null. */
+    val scopeTitle: String? get() = synchronized(lock) { (pinnedIndex(packs) ?: scope)?.let { packs.getOrNull(it)?.first?.title } }
 
     /** Tek OCR düzeltmesiyle [pack]'te tam bulunan satırın Türkçesi; düzeltmelerin hepsi aynı Türkçeye çıkmıyorsa null. */
     private fun corrected(text: String, pack: GamePack, current: List<Pair<GamePack, Boolean>>): PackMatch? {
@@ -397,10 +456,12 @@ class GamePackLibrary(
 
     private fun noteHit(current: List<Pair<GamePack, Boolean>>, number: Long) {
         val off = disabled
-        val owners = current.indices.filter { current[it].first.id !in off && current[it].first.contains(number) }
-        val first = owners.firstOrNull() ?: return
+        val all = current.indices.filter { current[it].first.id !in off && current[it].first.contains(number) }
         synchronized(lock) {
             if (packs !== current) return
+            // Önceki sunucudan kalan paket, satır başka bir pakette de varsa oynanan oyun sayılmaz.
+            val owners = all.filter { current[it].first.id !in lowLoaded }.ifEmpty { all }
+            val first = owners.firstOrNull() ?: return
             if (owners.size == 1 || scope !in owners) scope = first
         }
     }
@@ -446,7 +507,11 @@ class GamePackLibrary(
             }
             add(name, data, true)
         }
-        userDirectory?.listFiles()?.filter { it.isFile && isPackFile(it.name) }?.sortedBy { it.name }?.forEach { file ->
+        // Arama listenin sonundan başlar: düşük öncelikliler başa.
+        val low = lowPriority?.invoke() ?: emptySet()
+        lowLoaded = low
+        userDirectory?.listFiles()?.filter { it.isFile && isPackFile(it.name) }
+            ?.sortedWith(compareBy({ baseName(it.name) !in low }, { it.name }))?.forEach { file ->
             val data = try {
                 file.readBytes()
             } catch (error: IOException) {
