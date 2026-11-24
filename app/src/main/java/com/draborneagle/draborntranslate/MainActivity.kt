@@ -315,6 +315,18 @@ class MainActivity : Activity() {
         }, 16)
         content.append(portalCard, 14)
 
+        val auto = card(true).apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF173E55.toInt(), 0xFF3C2868.toInt(), 22)
+                .apply { setStroke(dp(2), 0xFF5FE5D6.toInt()) }
+        }
+        auto.addView(label("⚡ Auto Capture Sync · v0.8.1", 21, WHITE, true))
+        auto.append(label("PS App fotoğraf ve video klasörlerini otomatik izle, metinleri Türkçeye çevir. Deneysel indirme yardımı.", 14, MUTED), 10)
+        auto.append(button("Auto Capture Sync başlat") {
+            startActivity(Intent(this, AutoCaptureActivity::class.java))
+        }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        content.append(auto, 15)
+
         val smart = card(true).apply {
             background = gradient(GradientDrawable.Orientation.TL_BR,
                 0xFF224D54.toInt(), 0xFF40306F.toInt(), 22)
