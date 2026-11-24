@@ -21,6 +21,12 @@
 
 ---
 
+## ⚡ v0.8.2 · Auto Capture Sync bağlantı düzeltmesi
+
+- Gerçek erişilebilirlik bağlantı durumu ve hata tanısı; PS App ön plan penceresi seçimi; kayan panel altta, dokunma engelini azaltan opaklık.
+- Galeri etiketi yoksa yakalamayı elle aç; indirme etiketi yoksa elle indir. Otomatik indirme uyumluluğu gerçek cihazda doğrulanmalıdır.
+- [v0.8.2 sürüm notları](docs/RELEASE-v0.8.2.md)
+
 ## ⚡ v0.8.1 · Auto Capture Sync
 
 <p align="center"><a href="https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45371391171/artifacts/14908739821"><img alt="v0.8.1 Android DEBUG APK ZIP indir" src="https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.8.1%20DEBUG-22C55E?style=for-the-badge&logo=android&logoColor=white"></a></p>
@@ -103,7 +109,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.8.1` / `versionCode 9` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.8.2` / `versionCode 10` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** v0.8.1 Debug APK derleme, birim testleri, lint ve APK imza/sürüm doğrulamasından geçti. Üretim imzalı Release ve gerçek Portal cihaz testi ayrı doğrulanır. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
