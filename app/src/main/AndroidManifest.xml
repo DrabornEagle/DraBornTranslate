@@ -25,6 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:label="DraBornTranslate"
         android:theme="@style/Theme.DraBornTranslate">
+        <activity android:name=".CloudCaptureActivity" android:exported="false" />
         <activity
             android:name=".CloudCameraActivity"
             android:exported="false"
