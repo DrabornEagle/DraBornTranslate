@@ -55,6 +55,9 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - uses: actions/cache/restore@v4
         id: chiaki
         with:
@@ -66,7 +69,7 @@ jobs:
           sudo apt-get install -y protobuf-compiler
           ./scripts/prepare-ps5.sh
           python3 -m venv "$RUNNER_TEMP/ps5-python"
-          "$RUNNER_TEMP/ps5-python/bin/pip" install protobuf==5.29.5 grpcio-tools==1.71.0
+          "$RUNNER_TEMP/ps5-python/bin/pip" install --only-binary=:all: protobuf==5.29.5 grpcio-tools==1.71.0
           echo "DRA_PS5_PYTHON=$RUNNER_TEMP/ps5-python/bin/python" >> "$GITHUB_ENV"
       - uses: actions/cache/save@v4
         if: steps.chiaki.outputs.cache-hit != 'true'
