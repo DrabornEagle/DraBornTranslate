@@ -23,6 +23,10 @@
 
 ## ⚡ v0.8.2 · Auto Capture Sync bağlantı düzeltmesi
 
+[![v0.8.2 APK indir](https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.8.2%20DEBUG-22C55E?style=for-the-badge&logo=android)](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45376988313/artifacts/14911457411)
+
+**Android ARM64 · versionCode 10.** [Başarılı CI](https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45376988313). Debug test APK; gerçek cihazda otomatik indirme ve üretim imzası henüz doğrulanmadı.
+
 - Gerçek erişilebilirlik bağlantı durumu ve hata tanısı; PS App ön plan penceresi seçimi; kayan panel altta, dokunma engelini azaltan opaklık.
 - Galeri etiketi yoksa yakalamayı elle aç; indirme etiketi yoksa elle indir. Otomatik indirme uyumluluğu gerçek cihazda doğrulanmalıdır.
 - [v0.8.2 sürüm notları](docs/RELEASE-v0.8.2.md)
