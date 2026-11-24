@@ -57,15 +57,27 @@ class AutoCaptureActivity:Activity(){
                 };ins
             }
         }
-        layout.addView(label("AUTO CAPTURE SYNC · v0.8.2",23,0xFF8CEBFF.toInt()))
+        layout.addView(label("AUTO CAPTURE SYNC · v0.8.3",23,0xFF8CEBFF.toInt()))
         layout.addView(label("PS App → Pictures/PS App ve Movies/PS App. İndirilen fotoğraf ve videolar otomatik okunur. Canlı yayın değildir.",15))
-        layout.addView(check("Brief · yalnızca sağdaki konuşma alanı","brief",true))
+        layout.addView(label("Okuma modu",16,0xFF8CEBFF.toInt()))
+        val modes=listOf("auto","subtitle","brief","lens")
+        val mode=Spinner(this).apply{
+            adapter=ArrayAdapter(this@AutoCaptureActivity,android.R.layout.simple_spinner_dropdown_item,
+                listOf("Otomatik · altyazı / Brief","Oyun altyazısı · alt orta","Brief · konuşma geçmişi","Lens · tüm görüntü"))
+            setSelection(modes.indexOf(prefs.getString("captureMode","auto")).coerceAtLeast(0))
+            onItemSelectedListener=object:android.widget.AdapterView.OnItemSelectedListener{
+                override fun onItemSelected(parent:android.widget.AdapterView<*>?,view:android.view.View?,position:Int,id:Long){prefs.edit().putString("captureMode",modes[position]).apply()}
+                override fun onNothingSelected(parent:android.widget.AdapterView<*>?){}
+            }
+        }
+        layout.addView(mode)
         layout.addView(check("Kayan Türkçe panel (üstte gösterme izni)","overlay",false))
         layout.addView(button("Kayan panel izni"){
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:"+packageName)))
         })
         layout.addView(check("Deneysel PS App indirme yardımı","autoDownload",false))
-        layout.addView(label("İndirme yardımı yalnızca PS App açıkken, GTA VI ekranında erişilebilir ve açıkça etiketlenmiş yakalama/indirme düğmelerinde çalışır. Etiket yoksa elle indir. Hesap bilgilerine dokunmaz.",13,0xFFBAC7D7.toInt()))
+        layout.addView(check("Görsel otomatik yenile ve indir · deneysel","visualDownload",false))
+        layout.addView(label("Görsel mod yalnızca PS App ön planda, dikey ekranda ve GTA VI galerisi en üstteyken çalışır. Ekranı cihazda analiz eder, 12 sn aralıkla aşağı kaydırarak yeniler, değişen ilk kartı açar ve bilinen indirme düğmesine dokunur. PSN bilgisi toplamaz. Çalışmazsa kapatıp elle indir.",13,0xFFBAC7D7.toInt()))
         layout.addView(button("Erişilebilirlik ayarları"){
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         })
