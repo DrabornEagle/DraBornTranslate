@@ -1,17 +1,17 @@
-name: DraBornTranslate v0.7.2 · Live Stream Android preview
+name: DraBornTranslate v0.8 · Smart Dialogue Android preview
 
 on:
   pull_request:
     paths:
       - 'app/**'
       - '.github/workflows/android-cloud-v0.7.yml'
-      - 'docs/RELEASE-v0.7.2.md'
+      - 'docs/RELEASE-v0.8.md'
   push:
     branches: [main]
     paths:
       - 'app/**'
       - '.github/workflows/android-cloud-v0.7.yml'
-      - 'docs/RELEASE-v0.7.2.md'
+      - 'docs/RELEASE-v0.8.md'
   workflow_dispatch:
 
 permissions:
@@ -31,18 +31,18 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
-      - name: Test and build Android v0.7.2 Debug
+      - name: Test and build Android v0.8 Debug
         run: |
           set -euo pipefail
           ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/DraBornTranslate-v0.7.2-LiveStream-DEBUG-arm64.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs dist/DraBornTranslate-v0.7.2-LiveStream-DEBUG-arm64.apk
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/DraBornTranslate-v0.7.2-LiveStream-DEBUG-arm64.apk | grep -F "versionCode='7' versionName='0.7.2'"
-          (cd dist && sha256sum DraBornTranslate-v0.7.2-LiveStream-DEBUG-arm64.apk > SHA256SUMS.txt)
+          cp app/build/outputs/apk/debug/app-debug.apk dist/DraBornTranslate-v0.8-SmartDialogue-DEBUG-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs dist/DraBornTranslate-v0.8-SmartDialogue-DEBUG-arm64.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/DraBornTranslate-v0.8-SmartDialogue-DEBUG-arm64.apk | grep -F "versionCode='8' versionName='0.8'"
+          (cd dist && sha256sum DraBornTranslate-v0.8-SmartDialogue-DEBUG-arm64.apk > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
         with:
-          name: DraBornTranslate-v0.7.2-LiveStream-DEBUG-arm64
+          name: DraBornTranslate-v0.8-SmartDialogue-DEBUG-arm64
           path: dist/
           if-no-files-found: error
           retention-days: 30
