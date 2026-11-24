@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: android-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   check:
@@ -27,13 +27,21 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
-      - run: ./gradlew --no-daemon -PskipPs5 :app:testDebugUnitTest :app:lintDebug
+      - name: Prepare the pinned offline model
+        run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
+      - name: Run Android unit tests and lint
+        run: |
+          ./gradlew --no-daemon -PskipPs5 -PtozModelDir="$RUNNER_TEMP/toz-model" :app:testDebugUnitTest :app:lintDebug
+          python3 - <<'PYTEST'
+          from pathlib import Path
+          import xml.etree.ElementTree as xml
+          suites = [xml.parse(path).getroot() for path in Path("app/build/test-results/testDebugUnitTest").glob("TEST-*.xml")]
+          print("Unit tests:", sum(int(s.attrib["tests"]) for s in suites))
+          PYTEST
       - name: Check the Turkish pack catalog
         if: always()
         continue-on-error: true
-        run: |
-          curl --fail --silent --show-error --max-time 30             https://gametranslator-packs.gametranslator-pool.workers.dev/v1/packs |
-            python3 -c 'import json,sys; p=next(x for x in json.load(sys.stdin)["packs"] if x["id"]=="gta-6" and x.get("lang","tr")=="tr"); print({k:p[k] for k in ("id","size","entries","version")})'
+        run: python3 scripts/check-gta-pack.py
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 24
@@ -65,8 +73,10 @@ jobs:
         with:
           path: third-party/chiaki-ng
           key: ${{ steps.chiaki.outputs.cache-primary-key }}
-      - name: Test and assemble
-        run: ./gradlew --no-daemon -PtargetAbi=arm64-v8a :app:assembleRelease
+      - name: Prepare the pinned offline model
+        run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
+      - name: Assemble the release
+        run: ./gradlew --no-daemon -PtargetAbi=arm64-v8a -PtozModelDir="$RUNNER_TEMP/toz-model" :app:assembleRelease
       - name: Confirm release metadata
         run: |
           zipinfo -1 app/build/outputs/apk/release/app-release-unsigned.apk | grep -Fx lib/arm64-v8a/libgtnative.so

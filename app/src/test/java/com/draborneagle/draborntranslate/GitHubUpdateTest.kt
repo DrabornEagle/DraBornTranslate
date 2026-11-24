@@ -31,6 +31,15 @@ class GitHubUpdateTest {
     }
 
     @Test
+    fun acceptsTheV5InitialTwoPartTag() {
+        val name = "DraBornTranslate-v5.0-Android-arm64.apk"
+        val url = "https://github.com/DrabornEagle/DraBornTranslate/releases/download/v5.0/$name"
+        val initial = release(url = url, assetName = name).put("tag_name", "v5.0")
+        assertEquals("5.0", GitHubUpdate.parse(initial, "0.4.11")?.version)
+        assertNull(GitHubUpdate.parse(initial, "5.0.0"))
+    }
+
+    @Test
     fun skipsDraftsAndPrereleases() {
         assertNull(GitHubUpdate.parse(release().put("draft", true), "0.4.9"))
         assertNull(GitHubUpdate.parse(release().put("prerelease", true), "0.4.9"))

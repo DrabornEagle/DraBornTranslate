@@ -399,7 +399,6 @@ class MainActivity : Activity() {
                 "4. $textInstructions"
         }
         val paired = if (direct) ConsolePairing.load(this) else null
-        panelHelp.contentDescription = "Portal panelini açma rehberi"
         openSource.text = if (direct) paired?.let { "PS5 eşlemesi · ${it.name}" } ?: "PS5’i eşleştir"
             else "${config.source.appName} uygulamasını aç"
         remoteSource.visibility = if (config.source == Source.PORTAL) View.GONE else View.VISIBLE
@@ -613,6 +612,8 @@ class MainActivity : Activity() {
         launchPanelTest.isActivated = panel?.testing == true
         launchPanelTest.text = if (launchPanelTest.isActivated) PORTAL_STOP else PORTAL_START
         panelStatus.text = state.portalIssue ?: when {
+            direct && panel != null -> "Panel adresini aynı ağdaki TV tarayıcısında aç."
+            direct -> "PS5’e bağlanınca TV paneli adresi burada görünecek."
             panel?.previewing == true -> "Örnek yazı 3 dakika gösterilir. Portal’da oyuna dönüp yazının değiştiğini kontrol et."
             panel?.testing == true && panel.opened -> "Panel açıldı. Oyuna dönüp örnek yazının Portal ekranında değiştiğini kontrol et."
             panel?.testing == true -> "Portal bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."

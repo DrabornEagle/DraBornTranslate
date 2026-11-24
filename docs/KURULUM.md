@@ -1,55 +1,59 @@
-# DraBornTranslate kurulum rehberi
+# DraBornTranslate v5.0
 
-DraBornTranslate, Android 10 ve üzeri ARM64 telefonlarda çalışır. İmzalı APK’yı [v0.4.11 sürüm sayfasından](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.4.11) indir. Uygulamaya dahil çevrimdışı modeli **Çeviriyi dene** ile kontrol et.
+**Android 10+ · ARM64 · Android sürüm kodu 1**
 
-Çeviri cihazda çevrimdışı çalışır. PlayStation yayını ve uzaktaki PS5 için açılan panel internet bağlantısını kullanır.
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0)
 
-Sağ üstteki üç noktadan **Hakkında** penceresini aç ve **Yeni sürüm kontrolü** düğmesine dokun. Uygulama daha yeni APK’yı indirip doğruladığında kurulumu başlatır. Android uygulama kurma izni veya onay gösterirse ekrandaki adımları tamamla.
+v5.0 yeni paket kimliğiyle kurulur. v0.4.x ve v5.0 aynı telefonda açık kalabilir. İlk açılışta **GTA 6 Türkçe paketini al → GTA 6 Türkçe paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
-**Altyazı bölgesi** modu, v0.3.3’teki ekran okuma ve replik takibiyle çalışır. Türkçe repliğin ilk görünme süresi telefonun ekran okuma ve çeviri hızına bağlıdır. Portal ekranındaki toplam gecikmeyi, PlayStation App yayınının telefona ulaşma süresi ve panel bağlantısı da etkiler.
+## PS5 ve TV
 
-## PlayStation App yayınını hazırla
+1. PS5’i ve telefonu aynı ev ağına bağla. PS5’te **Ayarlar → Sistem → Uzaktan Oynama** ayarını aç.
+2. TV’de ana hesabınla oynarken görüntüyü telefona almak için PS5’e ikinci hesap ekle. **Cihazı Eşleştir** ekranındaki kodu kullan. Eşlenen hesabın sayısal PSN kimliğini, PS5’in IP adresini ve konsoldaki kodu **PS5 ve TV’ye bağlan → PS5’i eşleştir** bölümüne gir.
+3. Oyunun İngilizce altyazısını aç. **Canlı çeviriyi başlat** seçeneğine dokun.
+4. Türkçeyi telefonda okumak için **Çeviri çıkışı → Telefon** seç. TV tarayıcısı için **Telefon ve TV tarayıcısı** seçeneğini kullan ve panel adresini aynı ağdaki tarayıcıda aç. Oyun ile tarayıcıyı yan yana göstermek, TV’nin çoklu görüntü desteğine bağlıdır.
 
-1. Uzak PS5’te **Ayarlar → Sistem → Uzaktan Oynama → Uzaktan Oynama’yı Etkinleştir** ayarını aç. Dinlenme modundan bağlanacaksan **Sistem → Güç Tasarrufu → Dinlenme Modunda Kullanılabilen Özellikler** altında internet bağlantısını ve ağdan açmayı etkinleştir.
-2. Portal’da oyunun olduğu hesapla PS5’e **Uzaktan Oynama** üzerinden bağlan. Oyunun dilini İngilizce seç ve altyazıyı aç.
-3. Telefonda **PlayStation App**’e ikinci hesabınla giriş yap. Ana hesabınla aynı Game Base sesli sohbetine katıl. PS5’te **PS düğmesi → Game Base → sesli sohbet → Paylaşımlı Ekran’ı Başlat** yolunu kullan.
-4. Telefonda takım kartındaki oyun önizlemesine dokun. Oyunun canlı görüntüsünü yatay tam ekrana al. Ekranda İngilizce repliği görebildiğini doğrula.
-5. DraBornTranslate’te **PS Portal → Çevrilecek alan → Altyazı bölgesi** seç. **Çeviri çıkışı** seçeneklerinden okumak veya dinlemek istediğin yeri seç.
+PS5’te ikinci Remote Play oturumu kabul edilmezse uygulamadaki **PS Remote Play ile telefonda oyna** yolunu kullan. PS Remote Play’i aç ve Android ekran paylaşımında onu seç.
 
-[PS Portal Uzaktan Oynama](https://www.playstation.com/tr-tr/support/hardware/playstation-remote-play-on-psportal/) · [Paylaşımlı Ekran](https://www.playstation.com/tr-tr/support/games/ps5-share-screen/) · [PlayStation App](https://www.playstation.com/tr-tr/support/games/playstation-app-features/)
+## PlayStation Portal
 
-## PS5 uzaktaysa Portal yan panelini dene
+1. Portal’da PS5’e normal şekilde bağlan. Oyunda İngilizce altyazıyı aç.
+2. PS5’te **Game Base → Paylaşımlı Ekran’ı Başlat** yolunu kullan. Telefonda PlayStation App’te ikinci hesabınla yayını yatay olarak aç.
+3. DraBornTranslate’te **Portal’a bağlan → Canlı çeviriyi başlat** seç. Android 14 ve üzerinde **Tek uygulama → PlayStation App** seçeneğiyle yayın görüntüsünü paylaş. Telefon ekranındaki Türkçe katman için **Üstte gösterme** izni ver.
+4. Telefonu yanında ikinci ekran olarak kullanabilirsin. Portal yan paneli, PS5’in Game Base bağlantısını açmasına ve **Yana Sabitle** seçeneğini göstermesine bağlıdır. Uygulamadaki panel testinde bu seçenek doğrulanabilir.
 
-Portal yan paneli deneysel. Oyunun yanında görünmesi, PS5’in panel bağlantısını açmasına ve sabitlenmiş sayfayı Uzaktan Oynama’ya aktarmasına bağlı. Bu davranış fiziksel bir PS Portal oturumunda doğrulanmadı.
+[PlayStation App Paylaşımlı Ekran](https://www.playstation.com/tr-tr/support/games/playstation-app-features/) · [PS Portal Uzaktan Oynama](https://www.playstation.com/tr-tr/support/hardware/playstation-remote-play-on-psportal/)
 
-1. DraBornTranslate’te **Çeviri çıkışı → Portal yan paneli (deneysel)** seç. PS App yayını hazırsa **Canlı çeviriyi başlat** ve Android 14 ve üzerinde **Tek uygulama → PlayStation App** seç. Android 10–13’te tüm ekran izni kullanılır.
-2. PS5’e gönderilecek bağlantı için DraBornTranslate’e dön. **PS5 uzakta · Bağlantıyı hazırla → Komutu kopyala ve Termux’u aç** seç. Eski bir tünel açıksa Termux’ta `Ctrl+C` ile durdur ve yeni kopyalanan komutu yapıştırıp çalıştır. Komut, telefonun güncel IP’sini ve portunu içerir.
-3. Termux’ta görünen güncel `https://…trycloudflare.com` adresini kopyala. Termux’u çalışır bırak. DraBornTranslate’teki bağlantı sihirbazına dön, adresi yapıştır ve **Dış bağlantıyı kontrol et** seçeneğine dokun.
-4. Dış bağlantı kontrolü başarılı olunca **Tam Portal bağlantısını kopyala** seç. Uygulama adresin sonuna mevcut oturumun özel yolunu ekler. Tam bağlantıyı PlayStation App’te ikinci hesabından ana hesabına mesajla gönder.
-5. DraBornTranslate’te **Portal’da örnek yazı göster** seç. Portal’da **PS düğmesi → Game Base → gelen mesaj → bağlantı** yolunu izle. Web sayfası açılır ve **Options → Yana Sabitle** görünürse seçip oyuna dön. Örnek Türkçe metnin oyunun yanında değişmeye devam ettiğini kontrol et.
-6. Telefonda **Canlı çeviriye dön** seç. PlayStation App’teki yatay canlı yayını tekrar öne getir ve ekranı açık tut. Oyunda İngilizce altyazı çıktığında, okunan Türkçe satır panele gönderilir.
+## Altyazı ve DraBorn Odak
 
-**Örnek yazıyla başlamak için Portal Bağlantısını Başlat** seç. Örnek yazı ekran paylaşımı izni gerektirmeden 2,5 dakika boyunca gösterilir. Bu sırada uzak PS5 bağlantısını da hazırlayabilirsin. Süre dolmadan canlı altyazıya geçersen panel bağlantın korunur. Örnek yazıyı kapatmak için **Portal Bağlantısını Durdur** seç.
+1. Çeviri modundan **Altyazı + DraBorn Odak** seç. İngilizce altyazı açıkken oyundaki telefon mesajını, Brief bölümünü veya tabelayı aç.
+2. **DraBorn Odak · Alan seç** ekranında görüntü üzerinden bir dikdörtgen çiz. **Alanı çevir** seçeneği Türkçeyi görüntünün üstünde gösterir ve bu alanı canlı oturum için saklar.
+3. Android 14+ uygulama paylaşımında oyun ekranına dönünce seçili alan canlı taranır. Android 10–13’te Odak sonucu görüntü inceleme ekranından okunur. PS5 eşleme oturumunda **Canlı alanı takip et** seçeneği telefon ekranındaki kareyi günceller.
 
-**PS5 aynı yerel ağdaysa** tünel adımlarını atlayıp **Panel bağlantısını kopyala** ile yerel adresi aynı şekilde mesajla PS5’e gönder. Telefonun ve Portal’ın aynı Wi-Fi’da olması, başka ağdaki PS5’in yerel adrese erişmesi için yeterli değildir.
+Canlı altyazı ve alanın OCR işlemi bağımsızdır. Ekranda küçük veya bulanık bir satır varsa oyunda HUD yazı boyutunu büyütmek ve tam ekran görüntü kullanmak okumayı iyileştirir.
 
-[Tünel komutu ve geçici adresler](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/)
+## PS App yakalamaları
 
-## Takıldığında
+PS App’te **Kütüphane → Yakalamalar** bölümüne geç. Brief’in birden çok sayfasını okuyacaksan her sayfa için bir yakalama oluştur.
 
-| Belirti | Kontrol |
-| --- | --- |
-| Termux’ta kırmızı satırlar var | `Registered tunnel connection` göründükten sonra asıl kontrolü uygulamadaki **Dış bağlantıyı kontrol et** ile yap. |
-| Bağlantı yanıt vermiyor | Termux’un çalıştığını ve sihirbazdaki komutla o oturumdan aldığın güncel adresi kullandığını kontrol et. Oturum veya tünel değişince yeni bağlantı hazırla. |
-| Telefon tarayıcısında panel var, Portal’da yok | Telefondaki açılış yalnızca paneli doğrular. Portal’da **Game Base** mesajını ve **Yana Sabitle** seçeneğini ayrıca kontrol et. Seçenek yoksa veya sayfa oyuna dönünce kapanıyorsa Portal ekranında bu yöntemle altyazı gösterilemez. |
-| Portal’da örnek yazı var, oyun yazısı yok | **Canlı çeviriye dön**, telefonda PS App yayınını yatay tam ekranda bırak ve oyunda İngilizce altyazının çıktığını kontrol et. **Altyazı hizası** bandını repliğe ayarla. |
-| Telefonda yayın karanlık | PS App’te izlediğin yayını tekrar aç ve Android ekran paylaşımında PS App’i seç. Bazı oyun sahneleri ve korumalı görüntüler ekran paylaşımına yansımayabilir. |
-| Portal’da sabitleme çıkmıyor | **Çeviri çıkışı → Telefon** Türkçeyi PS App videosu üzerinde gösterir. İlk kullanımda üstte gösterme iznini aç. **Sesli Türkçe** seçeneği telefonundan okur ve Termux istemez. |
+- **Hemen çevir:** PS App’te **Paylaş → DraBornTranslate** seç.
+- **Otomatik çeviri:** DraBornTranslate’te **PS App yakalamaları → Otomatik çeviriyi aç** seç ve medya izni ver. PS App’te **İndir** dediğinde görüntüler `Pictures/PS App`, klipler `Movies/PS App` klasöründen okunur.
+- **Klip:** İnceleme ekranında istediğin zaman konumunu seçip **Kareyi seç** düğmesine dokun.
 
-Portal’ın **Bulut Akışı** modunda PS5 Paylaşımlı Ekran yayını sağlanmadığı için bu kurulum **Uzaktan Oynama** ile kullanılır. Oturumu bitirince DraBornTranslate’te **Canlı çeviriyi durdur** seç ve Termux’ta tüneli `Ctrl+C` ile kapat. Özel panel bağlantısını yalnızca kullandığın hesaplar arasında paylaş.
+PS5’in otomatik yüklemesi yakalamaları PS App’e getirir. Telefona kaydetmek için PlayStation App’te **İndir** veya **Paylaş** kullanılır. İndirilmiş dosyaların arka planda işlenme zamanını Android pil ve arka plan ayarları belirler. [PlayStation yakalama rehberi](https://www.playstation.com/tr-tr/support/games/ps5-game-captures-ps-app/)
 
-## PS App menüsü ve telefonda oyun
+## Kaynak koddan derleme
 
-- **Çevrilecek alan → Tüm oyun metinleri** menüleri ve görev metinlerini okur. Çevirmek istediğin ekranı yazılar okunana kadar açık tut. Uygulama algıladığı sabit metinleri birlikte çevirir. **Son çeviri** kartından sonucu okuyabilir ve kopyalayabilirsin.
-- **Telefonda oyna** seçeneğinde PS Remote Play ile oyunu aç. Android paylaşım ekranında **PS Remote Play**’i seç.
-- **Sesli Türkçe** için **Türkçe sesi dene** düğmesini kullan. Gerekirse Android metin okuma ayarlarında Türkçe ses verisini yükle.
+Android SDK 35, Build Tools 35.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
+
+```bash
+./scripts/prepare-ps5.sh
+python3 -m venv .venv
+.venv/bin/pip install protobuf==5.29.5 grpcio-tools==1.71.0
+DRA_PS5_PYTHON="$PWD/.venv/bin/python" ./gradlew --no-daemon :app:assembleRelease
+./gradlew --no-daemon -PskipPs5 :app:testDebugUnitTest :app:lintDebug
+```
+
+ARM64 imzasız derleme `app/build/outputs/apk/release/app-release-unsigned.apk` yoluna yazılır. GitHub Actions çıktısı imzalama ve APK doğrulama araçlarını da içerir. Yayımlanmış v5 APK’ları güncellenirken aynı sürüm anahtarı ve artan Android sürüm kodu kullanılır. İmza sertifikası APK ile birlikte doğrulanır.
+
+[Açık kaynak bileşenleri](KAYNAKLAR.md)

@@ -129,6 +129,7 @@ internal object ImportedGamePack {
             connection.connectTimeout = 15_000
             connection.readTimeout = 45_000
             connection.instanceFollowRedirects = false
+            connection.setRequestProperty("Accept-Encoding", "identity")
             if (connection.responseCode != 200) throw IOException("Paket sunucusu HTTP ${connection.responseCode} döndürdü.")
             return connection.inputStream.use { readLimited(it, maxBytes) }
         } finally {
