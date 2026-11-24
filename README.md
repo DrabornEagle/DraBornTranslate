@@ -21,6 +21,13 @@
 
 ---
 
+## ⚡ v0.8.1 · Auto Capture Sync
+
+- PS App'in Pictures/PS App ve Movies/PS App klasörlerindeki yeni fotoğraflar ve MP4 videolar otomatik işlenir.
+- ML Kit görüntü OCR, GTA 6 paket öncelikli Türkçe çeviri, Brief bölgesi, kayan panel ve yerel geçmiş.
+- Deneysel erişilebilirlik indirme yardımı yalnızca açıkça tanınan GTA VI yakalama/indirme düğmelerinde çalışır. Gerçek cihaz testi gereklidir; manuel indirme desteklenir.
+- [Kurulum ve sınırlamalar](docs/RELEASE-v0.8.1.md). Canlı yayın değildir; PS App aktarım gecikmesi geçerlidir.
+
 ## ✨ v0.8 · Smart Dialogue Sync
 
 <p align="center"><a href="https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45299786600/artifacts/14877314168"><img alt="v0.8 Android DEBUG APK ZIP indir" src="https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.8%20DEBUG-22C55E?style=for-the-badge&logo=android&logoColor=white"></a></p>
@@ -92,7 +99,7 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.8` / `versionCode 8` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.8.1` / `versionCode 9` / `applicationId com.draborneagle.draborntranslate`.
 
 **Önemli:** v0.8 Debug APK derleme, birim testleri, lint ve APK imza/sürüm doğrulamasından geçti. Üretim imzalı Release ve gerçek Portal cihaz testi ayrı doğrulanır. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 

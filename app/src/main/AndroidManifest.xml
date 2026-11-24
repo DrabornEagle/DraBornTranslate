@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -26,6 +30,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:label="DraBornTranslate"
         android:theme="@style/Theme.DraBornTranslate">
+        <activity android:name=".AutoCaptureActivity" android:exported="false" />
         <activity android:name=".SmartDialogueActivity" android:exported="false" />
         <activity android:name=".LiveTextActivity" android:exported="false" />
         <activity android:name=".CloudCaptureActivity" android:exported="false" />
@@ -42,6 +47,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".AutoCaptureService" android:exported="false" android:foregroundServiceType="dataSync" />
+        <service android:name=".PsCaptureAccessibility" android:label="DraBornTranslate PS App indirme yardımı" android:exported="true" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/ps_capture_accessibility" />
+        </service>
         <service
             android:name=".CaptureService"
             android:exported="false"
