@@ -21,6 +21,13 @@
 
 ---
 
+## ✨ v0.8 · Smart Dialogue Sync
+
+- Görev kütüphanesi ve replik arama, ileri/geri, kaldığın yerden devam.
+- TXT/SRT/JSON dosyası veya yapıştırılmış metin, zaman bazlı tahmini ilerleme.
+- Mevcut GTA 6 paket öncelikli Türkçe çeviri; kamera, mikrofon ve PC gerekmez.
+- [Kullanım ve dosya örneği](docs/RELEASE-v0.8.md). Otomatik Portal senkronu değildir. Hazır oyun diyalogları dağıtılmaz.
+
 ## 🚀 v0.7.2 · Live Stream Translate
 
 <p align="center"><a href="https://github.com/DrabornEagle/DraBornTranslate/actions/runs/45296228883/artifacts/14876487480"><img alt="v0.7.2 DEBUG APK ZIP indir" src="https://img.shields.io/badge/APK%20%C4%B0ND%C4%B0R-v0.7.2%20DEBUG-22C55E?style=for-the-badge&logo=android&logoColor=white"></a></p>
@@ -81,9 +88,9 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.7.2` / `versionCode 7` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.8` / `versionCode 8` / `applicationId com.draborneagle.draborntranslate`.
 
-**Önemli:** v0.7.2 Debug APK derlenmiş, birim testleri ve lint kontrolleri tamamlanmıştır. Üretim imzalı Release APK ve gerçek cihaz testi henüz doğrulanmamıştır. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
+**Önemli:** v0.8 kaynak kodu için CI ve gerçek cihaz doğrulamasını kontrol et. v0.7.2 Debug APK önceki doğrulanmış önizlemedir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
 ### Android kaynak derleme
 
