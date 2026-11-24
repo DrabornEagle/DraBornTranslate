@@ -1,10 +1,14 @@
 # DraBornTranslate v0.7.1 · Cloud Gaming Pro
 
 ## Source preview — not a device-tested release
-- CameraX replaces the manually managed Camera2 preview; ML Kit returns OCR boxes in PreviewView coordinates. Both landscape directions, portrait and automatic orientation.
+- CameraX replaces the manually managed Camera2 preview; ML Kit returns OCR boxes in PreviewView coordinates. Both landscape directions, portrait and automatic orientation. Dedicated camera viewport, separate reader sidebar in landscape and bottom panel in portrait, fit/fill scaling and safe insets.
 - Two independent draggable/resizable OCR rectangles and precise percentage controls. Separate subtitle/Lens sizes, three translation modes, zoom, saved preferences and text-only view.
 - Existing pack-first translation engine retained. The camera stays active in optical text-only view.
 - Experimental camera-free Android mode: start a separately installed cloud client, select it in Android screen sharing, and use the existing overlay. On Android 13 and below manually return to the client. Protected or black frames cannot be translated. This does not mirror a running Portal cloud session.
+
+## PS App captures (camera-free, non-live)
+On Portal use Create to capture a screenshot, then download it via PS App → Game Library → Captures. Open DraBornTranslate → Kamerasız · PS App ekran görüntüsü and select the file. Local OCR and the existing pack-first engine translate up to 40 detected lines. Original and translated text can be selected. No PSN credentials or camera/mic permissions are required for this mode. Capture upload can be delayed; not a live subtitle feed.
+Sony announcement: https://blog.playstation.com/?p=403496
 
 ## Research and limits
 Sony explicitly excludes Share Screen, Share Play and broadcasting during Portal cloud streaming:
