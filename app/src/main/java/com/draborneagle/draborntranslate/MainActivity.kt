@@ -315,6 +315,18 @@ class MainActivity : Activity() {
         }, 16)
         content.append(portalCard, 14)
 
+        val smart = card(true).apply {
+            background = gradient(GradientDrawable.Orientation.TL_BR,
+                0xFF224D54.toInt(), 0xFF40306F.toInt(), 22)
+                .apply { setStroke(dp(2), 0xFF5FE5D6.toInt()) }
+        }
+        smart.addView(label("✨ Smart Dialogue Sync · v0.8", 21, WHITE, true))
+        smart.append(label("Görev seç • Replik ara • Türkçe takip • Kamera, mikrofon ve PC gerekmez. Otomatik oyun senkronu değildir.", 14, MUTED), 10)
+        smart.append(button("Smart Dialogue Sync başlat") {
+            startActivity(Intent(this, SmartDialogueActivity::class.java))
+        }.apply { styleButton(this, MINT to ACCENT) }, 16)
+        content.append(smart, 15)
+
         val cloud = card(true).apply {
             background = gradient(GradientDrawable.Orientation.TL_BR,
                 0xFF173D59.toInt(), 0xFF3B2867.toInt(), 22)
