@@ -109,12 +109,11 @@ class CloudCameraActivity : ComponentActivity() {
             })
         }
         preview.controller = controller
-        controller.cameraState.observe(this) { state ->
-            if (state.type == androidx.camera.core.CameraState.Type.OPEN) {
+        preview.previewStreamState.observe(this) { state ->
+            if (state == PreviewView.StreamState.STREAMING) {
                 controller.setLinearZoom(zoom / 100f)
                 showStatus("Kamera hazır · Mavi altyazı / yeşil Lens")
             }
-            if (state.error != null) showStatus("Kamera bağlantısı başarısız. İzni ve diğer kamera uygulamalarını kontrol et.")
         }
         showStatus("Türkçe çeviri motoru hazırlanıyor…")
         translator.prepare { ok ->
