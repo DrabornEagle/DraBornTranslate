@@ -33,7 +33,7 @@ class SmartDialogueActivity : Activity() {
     private val cache=object:LinkedHashMap<String,String>(128,.75f,true){
         override fun removeEldestEntry(eldest:MutableMap.MutableEntry<String,String>?):Boolean=size>200
     }
-    private lateinit var title:TextView
+    private lateinit var missionTitle:TextView
     private lateinit var status:TextView
     private lateinit var original:TextView
     private lateinit var turkish:TextView
@@ -79,7 +79,7 @@ class SmartDialogueActivity : Activity() {
         row(button("Metin yapıştır"){paste()},button("GTA VI Explorer"){
             runCatching { startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://six.mics.dev/dialogue"))) }
         })
-        title=label("",20,0xFF8EF3BF.toInt());layout.addView(title)
+        missionTitle=label("",20,0xFF8EF3BF.toInt());layout.addView(missionTitle)
         status=label("Çeviri motoru hazırlanıyor…",13,0xFF8CEBFF.toInt());layout.addView(status)
         search=EditText(this).apply {
             hint="İngilizce replikten 2–3 kelime";setSingleLine(true)
@@ -124,7 +124,7 @@ class SmartDialogueActivity : Activity() {
         val token=++generation
         val rows=cues()
         index=index.coerceIn(0,(rows.size-1).coerceAtLeast(0))
-        title.text=missions.getOrNull(mission)?.name ?: "Görev ekle"
+        missionTitle.text=missions.getOrNull(mission)?.name ?: "Görev ekle"
         position.text=if(rows.isEmpty())"Replik yok" else "Replik ${index+1} / ${rows.size}"
         slider.max=(rows.size-1).coerceAtLeast(0);slider.progress=index;slider.isEnabled=rows.isNotEmpty()
         prefs.edit().putInt("mission",mission).putInt("index",index).apply()
@@ -178,7 +178,7 @@ class SmartDialogueActivity : Activity() {
         val name=EditText(this).apply{hint="Görev adı";setSingleLine(true)}
         val text=EditText(this).apply{hint="Her satır bir İngilizce replik veya SRT / JSON";minLines=5}
         box.addView(name);box.addView(text)
-        AlertDialog.Builder(this).setTitle("Diyalog ekle").setView(box).setPositiveButton("Kaydet"){_,_->import(text.text.toString(),name.text.toString())}.setNegativeButton("İptal",null).show()
+        AlertDialog.Builder(this).setTitle("Diyalog ekle").setView(box).setPositiveButton("Kaydet"){_,_->importDialogue(text.text.toString(),name.text.toString())}.setNegativeButton("İptal",null).show()
     }
     @Suppress("DEPRECATION")
     private fun pickFile(){
@@ -197,11 +197,11 @@ class SmartDialogueActivity : Activity() {
                     while(true){val n=reader.read(buf);if(n<0)break;require(out.length+n<=2_000_000){"Dosya çok büyük."};out.append(buf,0,n)}
                     out.toString()
                 }?:error("Dosya açılamadı.")}
-                runOnUiThread{if(!closed)result.fold({import(it,name)},{status.text=it.message?:"Dosya okunamadı."})}
+                runOnUiThread{if(!closed)result.fold({importDialogue(it,name)},{status.text=it.message?:"Dosya okunamadı."})}
             }.start()
         }
     }
-    private fun import(raw:String,name:String){
+    private fun importDialogue(raw:String,name:String){
         pause()
         runCatching{
             val added=DialogueImport.parse(raw,name)
