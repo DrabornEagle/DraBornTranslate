@@ -320,7 +320,7 @@ class MainActivity : Activity() {
                 0xFF173E55.toInt(), 0xFF3C2868.toInt(), 22)
                 .apply { setStroke(dp(2), 0xFF5FE5D6.toInt()) }
         }
-        auto.addView(label("⚡ Auto Capture Sync · v0.8.1", 21, WHITE, true))
+        auto.addView(label("⚡ Auto Capture Sync · v0.8.2", 21, WHITE, true))
         auto.append(label("PS App fotoğraf ve video klasörlerini otomatik izle, metinleri Türkçeye çevir. Deneysel indirme yardımı.", 14, MUTED), 10)
         auto.append(button("Auto Capture Sync başlat") {
             startActivity(Intent(this, AutoCaptureActivity::class.java))
