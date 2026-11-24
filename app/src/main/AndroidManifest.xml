@@ -30,7 +30,7 @@
         android:label="DraBornTranslate"
         android:theme="@style/Theme.DraBornTranslate">
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="true"
             android:launchMode="singleTop">
             <intent-filter>
@@ -38,6 +38,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".PsTvActivity" android:exported="false" />
+        <activity android:name=".TvPanelActivity" android:exported="false" />
+        <activity android:name=".UpdatesActivity" android:exported="false" />
+        <activity android:name=".GamePacksActivity" android:exported="false" />
         <activity android:name=".ConsoleSetupActivity" android:exported="false" />
         <activity android:name=".CaptureInboxActivity" android:exported="false" />
         <activity android:name=".FocusActivity" android:exported="true">

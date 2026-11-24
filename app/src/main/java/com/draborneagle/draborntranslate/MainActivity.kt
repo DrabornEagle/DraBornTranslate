@@ -73,23 +73,15 @@ class MainActivity : Activity() {
     private var demoTranslator: CaptionTranslator? = null
     private var demoReader: SubtitleReader? = null
     private var voicePreview: TurkishVoice? = null
-    private var packLoading = false
     private var tunnelAddress = ""
     private var tunnelSession: String? = null
     private val popups = mutableSetOf<Dialog>()
     private var aboutDialog: Dialog? = null
     private var renderAboutUpdate: ((UpdateState) -> Unit)? = null
     private var updateResultPending = false
-    private var sourceSelected = false
-    private lateinit var workspace: LinearLayout
-    private lateinit var remoteSource: Button
     private lateinit var focusArea: Button
-    private lateinit var panelTitle: TextView
     private lateinit var panelHelp: Button
-    private lateinit var selectPack: Button
 
-    private lateinit var portal: Button
-    private lateinit var phone: Button
     private lateinit var instructions: TextView
     private lateinit var openSource: Button
     private lateinit var startStop: Button
@@ -130,18 +122,8 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         removeOldTranslationCredentials()
-        config = CaptureSettings(
-            prefs.getInt("band", CaptureSettings.DEFAULT_BAND_TOP).coerceIn(0, CaptureSettings.MAX_TOP),
-            prefs.getInt("size", 22).coerceIn(CaptureSettings.MIN_SIZE, CaptureSettings.MAX_SIZE),
-            Source.entries.firstOrNull { it.name == prefs.getString("source", null) } ?: Source.PORTAL,
-            SubtitleDisplay.entries.firstOrNull { it.name == prefs.getString("display", null) }
-                ?: SubtitleDisplay.PHONE,
-            ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
-                ?: ReadingArea.SUBTITLES,
-            prefs.getBoolean("focus", true),
-            prefs.getBoolean("subtitles", true),
-        )
-        sourceSelected = savedInstanceState?.getBoolean("sourceSelected") == true || SessionState.current.active
+        val route = if (intent.getStringExtra("connection") == Source.MOBILE.name) Source.MOBILE else Source.PORTAL
+        config = readCaptureSettings(route)
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
@@ -151,7 +133,6 @@ class MainActivity : Activity() {
         if (savedInstanceState?.getBoolean("aboutOpen") == true) showAbout()
         CaptureInbox.watch(this)
         CaptureInbox.enqueue(this)
-        updateInstalledPack()
     }
 
     private fun removeOldTranslationCredentials() {
@@ -185,7 +166,6 @@ class MainActivity : Activity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("sourceSelected", sourceSelected)
         outState.putBoolean("pending", pending)
         outState.putString("tunnelAddress", tunnelAddress)
         outState.putString("tunnelSession", tunnelSession)
@@ -250,32 +230,14 @@ class MainActivity : Activity() {
             tooltipText = contentDescription
             setOnClickListener { showAbout() }
         }, LinearLayout.LayoutParams(dp(48), dp(48)))
-        content.append(hero, 0)
-
-        val inputs = column()
-        phone = button("PS5 ve TV’ye bağlan") { select(Source.PS5) }
-        styleButton(phone, MINT to ACCENT)
-        inputs.append(phone, 0)
-        portal = button("Portal’a bağlan") { select(Source.PORTAL) }
-        styleButton(portal, LAVENDER to PEACH)
-        inputs.append(portal, 8)
-        content.append(inputs, 18)
-        content.append(button("PS App yakalamaları") {
-            startActivity(Intent(this, CaptureInboxActivity::class.java))
-        }, 8)
-        selectPack = button("GTA 6 Türkçe paketi") { showPackMenu() }
-        content.append(selectPack, 8)
-        content.append(button("Yeni sürüm kontrolü") { showAbout(checkNow = true) }, 6)
-        workspace = column()
-        content.append(workspace, 14)
+        content.append(titleBar(if (config.source == Source.MOBILE) "Telefonda oyna" else "PlayStation Portal"), 0)
+        content.append(hero, 5)
 
         val capture = card()
-        workspace.append(capture, 14)
+        content.append(capture, 14)
         capture.addView(sectionTitle("Canlı çeviri"))
-        remoteSource = button("") {
-            select(if (config.source == Source.MOBILE) Source.PS5 else Source.MOBILE)
-        }
-        capture.append(remoteSource, 7)
+        openSource = button("") { openSourceApp(config.source, offerInstall = true) }
+        capture.append(openSource, 8)
         displayChoice = button("") { selectDisplay() }
         capture.append(displayChoice, 10)
         readingChoice = button("") { selectReadingArea() }
@@ -286,11 +248,9 @@ class MainActivity : Activity() {
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
         styleButton(startStop, ACCENT to LAVENDER)
         capture.append(startStop, 10)
-        openSource = button("") { openSourceApp(config.source, offerInstall = true) }
-        capture.append(openSource, 6)
 
         val live = card(highlight = true)
-        workspace.append(live, 14)
+        content.append(live, 14)
         live.addView(sectionTitle("Son çeviri"))
         status = label("", 14, ACCENT, bold = true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         live.append(status, 7)
@@ -310,9 +270,8 @@ class MainActivity : Activity() {
         live.append(copySource, 6)
 
         panelCard = card()
-        workspace.append(panelCard, 14)
-        panelTitle = sectionTitle("Portal yan paneli")
-        panelCard.addView(panelTitle)
+        content.append(panelCard, 14)
+        panelCard.addView(sectionTitle("Portal yan paneli"))
         panelStatus = label("", 14, MUTED)
         panelCard.append(panelStatus, 6)
         copyPanel = button("Panel bağlantısını kopyala") { copyPanelLink() }
@@ -334,11 +293,11 @@ class MainActivity : Activity() {
         panelHelp = button("Portal’da paneli açma adımları") { showPortalHelp() }
         panelCard.append(panelHelp, 6)
 
-        val guide = workspace.addDetails("Bağlantı ve ekran paylaşımı")
+        val guide = content.addDetails("Bağlantı ve ekran paylaşımı")
         instructions = label("", 15, MUTED).apply { setLineSpacing(dp(4).toFloat(), 1f) }
         guide.append(instructions, 10)
 
-        val settings = workspace.addDetails("Görünüm ve oyun paketi")
+        val settings = content.addDetails("Görünüm ve oyun paketi")
         bandSettings = column()
         settings.append(bandSettings, 12)
         bandSettings.addView(label("Altyazı hizası", 16, WHITE, bold = true))
@@ -362,7 +321,7 @@ class MainActivity : Activity() {
             sizeLabel.text = "Altyazı boyutu · $size"
         }
         settings.addView(sizeControl)
-        packButton = button("") { showPackMenu() }
+        packButton = button("Oyun paketleri") { startActivity(Intent(this, GamePacksActivity::class.java)) }
         settings.append(packButton, 8)
         settings.append(button("Açık kaynak lisansı") { showLegalNotices() }.apply {
             background = RippleDrawable(ColorStateList.valueOf(0x22B6A8FF), null, shape(WHITE, WHITE, 12))
@@ -371,24 +330,18 @@ class MainActivity : Activity() {
             textSize = 13f
         }, 4)
         testButton = button("Çeviriyi dene") { showTranslationTest() }
-        workspace.append(testButton, 12)
+        content.append(testButton, 12)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
-        workspace.append(voiceButton, 6)
+        content.append(voiceButton, 6)
     }
 
     private fun render() {
         val state = SessionState.current
         val mobile = config.source == Source.MOBILE
-        val direct = config.source == Source.PS5
-        workspace.visibility = if (sourceSelected) View.VISIBLE else View.GONE
         val textInstructions = if (config.readingArea == ReadingArea.GAME_TEXT) {
             "Çevirmek istediğin menüyü veya görevi açıp metni birkaç saniye ekranda tut."
         } else "Oyunun İngilizce altyazısını aç."
-        instructions.text = if (direct) {
-            "1. PS5’i ve telefonu aynı Wi-Fi ağına bağla. Konsol açıkken eşlemeyi tamamla.\n" +
-                "2. TV’de ana hesapla oyna. Eşleştirilen ikinci hesabın oturumu görüntüyü telefona getirir. $textInstructions\n" +
-                "3. Çeviriyi telefonda oku veya aynı ağdaki TV tarayıcısında panel adresini aç."
-        } else if (mobile) {
+        instructions.text = if (mobile) {
             "1. PS Remote Play ile telefondan konsola bağlan.\n" +
                 "2. Yatay tam ekrana geç. $textInstructions\n" +
                 "3. Buraya dön, altyazıyı başlat ve Android paylaşımında PS Remote Play’i seç."
@@ -398,19 +351,13 @@ class MainActivity : Activity() {
                 "3. DraBornTranslate’te başlat ve Android paylaşımında Tek uygulama → PlayStation App’i seç. Yayını önde tut.\n" +
                 "4. $textInstructions"
         }
-        val paired = if (direct) ConsolePairing.load(this) else null
-        openSource.text = if (direct) paired?.let { "PS5 eşlemesi · ${it.name}" } ?: "PS5’i eşleştir"
-            else "${config.source.appName} uygulamasını aç"
-        remoteSource.visibility = if (config.source == Source.PORTAL) View.GONE else View.VISIBLE
-        remoteSource.text = if (mobile) "PS5 ve TV bağlantısına dön" else "PS Remote Play ile telefonda oyna"
-        portal.isSelected = sourceSelected && config.source == Source.PORTAL
-        phone.isSelected = sourceSelected && config.source != Source.PORTAL
+        openSource.text = "${config.source.appName} uygulamasını aç"
         val panelTesting = state.portalPanel?.testing == true
-        val controlsAvailable = !state.active && !pending && !panelTesting && !packLoading
-        listOf(portal, phone, bandControl, sizeControl, remoteSource, openSource).forEach { it.isEnabled = controlsAvailable }
+        val controlsAvailable = !state.active && !pending && !panelTesting
+        listOf(bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
         displayChoice.isEnabled = controlsAvailable
-        displayChoice.text = "Çeviri çıkışı · ${displayName(config.display)}"
+        displayChoice.text = "Çeviri çıkışı · ${config.display.label}"
         readingChoice.isEnabled = controlsAvailable
         readingChoice.text = when {
             config.focus && config.captionEnabled -> "Altyazı + DraBorn Odak"
@@ -419,23 +366,16 @@ class MainActivity : Activity() {
         }
         focusArea.visibility = if (config.focus) View.VISIBLE else View.GONE
         packButton.isEnabled = controlsAvailable && demoTranslator == null
-        packButton.text = when {
-            packLoading -> "Oyun paketi yükleniyor…"
-            ImportedGamePack.hasPack(this) -> "Oyun paketi · ${prefs.getString("packTitle", "Yüklü")}"
-            else -> "Diğer oyun paketleri"
-        }
-        selectPack.isEnabled = !packLoading && !state.active
-        selectPack.text = when {
-            packLoading -> "Oyun paketi hazırlanıyor…"
-            ImportedGamePack.hasGta(this) -> prefs.getString("gtaPackTitle", "GTA 6 Türkçe · Hazır").orEmpty()
-            else -> "GTA 6 Türkçe paketini al"
-        }
+        packButton.text = if (ImportedGamePack.hasGta(this)) "GTA 6 Türkçe paketi hazır" else "Oyun paketleri"
         bandSettings.visibility = if (config.captionEnabled && config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
-        startStop.isEnabled = !pending && demoTranslator == null && !packLoading
-        startStop.text = if (state.active) "Canlı çeviriyi durdur" else if (direct && paired == null) "PS5’i eşleştir"
-            else "Canlı çeviriyi başlat"
+        startStop.isEnabled = !pending && demoTranslator == null
+        startStop.text = when {
+            !state.active -> "Canlı çeviriyi başlat"
+            state.source == config.source -> "Canlı çeviriyi durdur"
+            else -> "Açık çeviriye dön"
+        }
         testButton.isEnabled = controlsAvailable && demoTranslator == null
         renderPortalPanel(state)
 
@@ -461,25 +401,11 @@ class MainActivity : Activity() {
     private fun recognizedText(): String? =
         if (demoMessage != null) demoSource else displayedCaption()?.source
 
-    private fun select(value: Source) {
-        sourceSelected = true
-        val output = SubtitleDisplay.entries.firstOrNull { it.name == prefs.getString("display.${value.name}", null) }
-            ?: if (value == Source.PS5) SubtitleDisplay.BOTH else SubtitleDisplay.PHONE
-        config = config.copy(source = value, display = output)
-        prefs.edit().putString("source", value.name).putString("display", output.name).apply()
-        render()
-    }
-
-    private fun displayName(display: SubtitleDisplay): String =
-        if (config.source == Source.PS5 && display == SubtitleDisplay.BOTH) "Telefon ve TV tarayıcısı"
-        else if (config.source == Source.PS5 && display == SubtitleDisplay.PORTAL) "TV tarayıcısı"
-        else display.label
-
     private fun selectDisplay() {
-        val choices = SubtitleDisplay.entries.filter { config.source != Source.PS5 || it != SubtitleDisplay.VOICE }
+        val choices = SubtitleDisplay.entries
         AlertDialog.Builder(this)
             .setTitle("Çeviri çıkışı")
-            .setSingleChoiceItems(choices.map(::displayName).toTypedArray(), choices.indexOf(config.display)) { dialog, index ->
+            .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.display)) { dialog, index ->
                 setDisplay(choices[index])
                 dialog.dismiss()
                 render()
@@ -521,99 +447,24 @@ class MainActivity : Activity() {
         }.also { it.speak("Bu bir Türkçe altyazı ses testidir.") }
     }
 
-    private fun showPackMenu() {
-        if (packLoading) return
-        val actions = linkedMapOf<String, () -> Unit>()
-        val gta = ImportedGamePack.hasGta(this)
-        actions[if (gta) "GTA 6 Türkçe paketini güncelle" else "GTA 6 Türkçe paketini indir"] = {
-            installPack("gtaPackTitle") { app -> ImportedGamePack.downloadGta(app) ?: throw IOException("Paket indirilemedi.") }
-        }
-        actions["Telefondan .json veya .json.gz seç"] = ::pickGamePack
-        if (gta) actions["GTA 6 paketini kaldır"] = {
-            ImportedGamePack.remove(this, gta = true)
-            prefs.edit().remove("gtaPackTitle").apply()
-            render()
-        }
-        if (ImportedGamePack.hasPack(this)) actions["İçe aktarılan paketi kaldır"] = {
-            ImportedGamePack.remove(this)
-            prefs.edit().remove("packTitle").apply()
-            render()
-        }
-        val entries = actions.entries.toList()
-        AlertDialog.Builder(this)
-            .setTitle("Türkçe oyun paketleri")
-            .setItems(entries.map { it.key }.toTypedArray()) { _, index -> entries[index].value() }
-            .setNegativeButton("Kapat", null)
-            .show()
-    }
-
-    private fun updateInstalledPack() {
-        if (!ImportedGamePack.hasGta(this)) return
-        val app = applicationContext
-        Thread({
-            val title = runCatching { ImportedGamePack.downloadGta(app, force = false) }.getOrNull()
-            if (title != null) {
-                prefs.edit().putString("gtaPackTitle", title).apply()
-                runOnUiThread { if (!isDestroyed) render() }
-            }
-        }, "DraBornTranslate-pack-update").start()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun pickGamePack() {
-        try {
-            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "*/*"
-            }, GAME_PACK)
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, "Dosya seçici açılamadı.", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun installPack(titleKey: String = "packTitle", load: (Context) -> String) {
-        packLoading = true
-        render()
-        val app = applicationContext
-        Thread({
-            val result = runCatching { load(app) }
-            val title = result.getOrNull()
-            if (title != null) prefs.edit().putString(titleKey, title).apply()
-            runOnUiThread {
-                if (isDestroyed) return@runOnUiThread
-                packLoading = false
-                Toast.makeText(this,
-                    if (title == null) result.exceptionOrNull()?.message ?: "Oyun paketi yüklenemedi." else "$title yüklendi.",
-                    Toast.LENGTH_LONG,
-                ).show()
-                render()
-            }
-        }, "DraBornTranslate-pack-import").start()
-    }
-
     private fun renderPortalPanel(state: SessionState.State) {
         panelCard.visibility = if (config.showOnPortal) View.VISIBLE else View.GONE
-        val direct = config.source == Source.PS5
-        panelTitle.text = if (direct) "TV tarayıcısı" else "Portal yan paneli"
-        panelHelp.visibility = if (direct) View.GONE else View.VISIBLE
-        val panel = state.portalPanel
+        val panel = state.portalPanel?.takeIf { state.source == config.source }
         if (tunnelSession != panel?.url) {
             tunnelAddress = ""
             tunnelSession = panel?.url
         }
         copyPanel.visibility = if (panel == null) View.GONE else View.VISIBLE
         testPanel.visibility = copyPanel.visibility
-        tunnelWizard.visibility = if (direct) View.GONE else copyPanel.visibility
+        tunnelWizard.visibility = copyPanel.visibility
         tunnelWizard.isEnabled = panel != null && !pending
-        previewPanel.visibility = if (!direct && state.active && panel != null && !panel.testing) View.VISIBLE else View.GONE
+        previewPanel.visibility = if (state.active && panel != null && !panel.testing) View.VISIBLE else View.GONE
         previewPanel.text = if (panel?.previewing == true) "Canlı çeviriye dön" else "Portal’da örnek yazı göster"
-        launchPanelTest.visibility = if (direct || state.active) View.GONE else View.VISIBLE
+        launchPanelTest.visibility = if (state.active) View.GONE else View.VISIBLE
         launchPanelTest.isEnabled = !pending && demoTranslator == null
         launchPanelTest.isActivated = panel?.testing == true
         launchPanelTest.text = if (launchPanelTest.isActivated) PORTAL_STOP else PORTAL_START
         panelStatus.text = state.portalIssue ?: when {
-            direct && panel != null -> "Panel adresini aynı ağdaki TV tarayıcısında aç."
-            direct -> "PS5’e bağlanınca TV paneli adresi burada görünecek."
             panel?.previewing == true -> "Örnek yazı 3 dakika gösterilir. Portal’da oyuna dönüp yazının değiştiğini kontrol et."
             panel?.testing == true && panel.opened -> "Panel açıldı. Oyuna dönüp örnek yazının Portal ekranında değiştiğini kontrol et."
             panel?.testing == true -> "Portal bağlantısı hazır. Kopyalayıp Game Base üzerinden Portal’da aç."
@@ -766,23 +617,15 @@ class MainActivity : Activity() {
     }
 
     private fun beginOrStop() {
-        if (SessionState.current.active) {
-            CaptureService.stop(this)
+        val state = SessionState.current
+        if (state.active) {
+            val other = state.source
+            if (other != null && other != config.source) startActivity(connectionIntent(this, other))
+            else CaptureService.stop(this)
             return
         }
         voicePreview?.close()
         voicePreview = null
-        if (config.source == Source.PS5) {
-            if (ConsolePairing.load(this) == null) openSourceApp(Source.PS5, offerInstall = false)
-            else {
-                demoMessage = null
-                demoCaption = null
-                SessionState.update(SessionState.current.copy(active = true, status = "PS5 bağlantısı başlatılıyor…"))
-                runCatching { CaptureService.startConsole(this, config) }
-                    .onFailure { showIdle("PS5 bağlantısı başlatılamadı.") }
-            }
-            return
-        }
         val sourcePackage = config.source.packageName ?: return
         if (packageManager.getLaunchIntentForPackage(sourcePackage) == null) {
             openSourceApp(config.source, offerInstall = true)
@@ -823,9 +666,6 @@ class MainActivity : Activity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            GAME_PACK -> if (resultCode == RESULT_OK) data?.data?.let { uri ->
-                installPack { app -> ImportedGamePack.install(app, uri) }
-            }
             OVERLAY -> {
                 if (Settings.canDrawOverlays(this)) requestCapture()
                 else showIdle("Canlı altyazı için diğer uygulamaların üzerinde gösterme iznini aç.")
@@ -837,7 +677,7 @@ class MainActivity : Activity() {
                 }
                 pending = false
                 try {
-                    SessionState.update(SessionState.current.copy(active = true, status = "Ekran paylaşımı başlatılıyor…"))
+                    SessionState.update(SessionState.current.copy(active = true, source = config.source, status = "Ekran paylaşımı başlatılıyor…"))
                     CaptureService.start(this, resultCode, data, config)
                     if (Build.VERSION.SDK_INT < 34) openSourceApp(config.source, offerInstall = false)
                 } catch (error: RuntimeException) {
@@ -861,10 +701,6 @@ class MainActivity : Activity() {
     }
 
     private fun openSourceApp(source: Source, offerInstall: Boolean) {
-        if (source == Source.PS5) {
-            startActivity(Intent(this, ConsoleSetupActivity::class.java))
-            return
-        }
         val packageId = source.packageName ?: return
         val intent = packageManager.getLaunchIntentForPackage(packageId)
         if (intent != null) {
@@ -1298,6 +1134,5 @@ class MainActivity : Activity() {
         private const val OVERLAY = 10
         private const val NOTIFICATION = 11
         private const val PROJECTION = 12
-        private const val GAME_PACK = 13
     }
 }

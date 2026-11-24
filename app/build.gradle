@@ -25,8 +25,9 @@ android {
         applicationId 'com.draborneagle.draborntranslate.v5'
         minSdk 29
         targetSdk 35
-        versionCode 1
-        versionName '5.0'
+        versionCode 2
+        versionName '5.0.1'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         ndk { abiFilters targetAbi }
         if (withPs5) {
             externalNativeBuild {
@@ -58,6 +59,9 @@ dependencies {
     implementation 'com.google.mlkit:text-recognition:16.0.1'
     implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.22.0'
     implementation 'com.google.protobuf:protobuf-javalite:4.31.1'
+    androidTestImplementation 'androidx.test:core:1.6.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20250517'
 }

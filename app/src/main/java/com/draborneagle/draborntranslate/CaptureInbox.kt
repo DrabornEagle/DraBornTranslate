@@ -11,6 +11,7 @@ import android.app.job.JobParameters
 import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.util.AtomicFile
 import org.json.JSONArray
@@ -40,6 +42,8 @@ internal data class SavedCapture(
     val video: Boolean,
     val modified: Long,
     val size: Long,
+    val added: Long = modified,
+    val durationMs: Long = 0,
 ) {
     val key: String get() = MessageDigest.getInstance("SHA-256")
         .digest("$uri:$modified:$size".toByteArray()).joinToString("") { "%02x".format(it.toInt() and 255) }
@@ -50,9 +54,14 @@ internal data class CaptureFrame(val bitmap: Bitmap, val durationMs: Long = 0L, 
 internal object CaptureInbox {
     private const val PERIODIC_JOB = 521
     private const val NEW_FILES_JOB = 522
-    private const val MAX_RECENT = 48
+    internal const val MEDIA_CHANGE_JOB = 523
+    private const val MAX_RECENT = 120
+    private val collections = listOf(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
     private val handler = Handler(Looper.getMainLooper())
+    private val listeners = mutableSetOf<() -> Unit>()
     private var observer: ContentObserver? = null
+    @Volatile var processing: String? = null
+        private set
     private fun prefs(context: Context) = context.getSharedPreferences("captures", Context.MODE_PRIVATE)
 
     fun enabled(context: Context) = prefs(context).getBoolean("auto", false)
@@ -68,67 +77,132 @@ internal object CaptureInbox {
 
     fun canRead(context: Context): Boolean = permissions().any { context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
 
+    fun fullAccess(context: Context): Boolean = when {
+        Build.VERSION.SDK_INT >= 33 ->
+            context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
+                context.checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
+        else -> canRead(context)
+    }
+
     fun setEnabled(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean("auto", value).apply()
         val scheduler = context.getSystemService(JobScheduler::class.java)
-        if (!value) {
-            observer?.let(context.contentResolver::unregisterContentObserver)
-            observer = null
-            scheduler.cancel(PERIODIC_JOB)
-            scheduler.cancel(NEW_FILES_JOB)
-            return
+        if (value) {
+            watch(context)
+            enqueue(context)
+        } else {
+            for (job in listOf(PERIODIC_JOB, NEW_FILES_JOB, MEDIA_CHANGE_JOB)) scheduler.cancel(job)
+            stopWatchingIfIdle(context)
         }
+        notifyChanged()
+    }
+
+    fun observe(context: Context, listener: () -> Unit) {
+        listeners.add(listener)
         watch(context)
-        val service = ComponentName(context, CaptureInboxJob::class.java)
-        scheduler.schedule(JobInfo.Builder(PERIODIC_JOB, service).setPeriodic(15 * 60 * 1000L).setPersisted(true).build())
-        enqueue(context)
+    }
+
+    fun removeObserver(context: Context, listener: () -> Unit) {
+        listeners.remove(listener)
+        stopWatchingIfIdle(context)
+    }
+
+    private fun stopWatchingIfIdle(context: Context) {
+        if (listeners.isNotEmpty() || enabled(context)) return
+        observer?.let(context.contentResolver::unregisterContentObserver)
+        observer = null
     }
 
     fun watch(context: Context) {
-        if (observer != null || !enabled(context) || !canRead(context)) return
         val app = context.applicationContext
-        val registered = object : ContentObserver(handler) {
-            override fun onChange(selfChange: Boolean, uri: Uri?) { enqueue(app) }
+        if (enabled(app) && canRead(app)) {
+            val scheduler = app.getSystemService(JobScheduler::class.java)
+            if (scheduler.getPendingJob(PERIODIC_JOB) == null) scheduler.schedule(
+                job(app, PERIODIC_JOB).setPeriodic(15 * 60 * 1000L).setPersisted(true).build(),
+            )
+            armChanges(app)
         }
-        app.contentResolver.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, registered)
-        app.contentResolver.registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, registered)
+        if (observer != null || (listeners.isEmpty() && !enabled(app))) return
+        val refresh = Runnable {
+            notifyChanged()
+            enqueue(app)
+        }
+        val registered = object : ContentObserver(handler) {
+            override fun onChange(selfChange: Boolean, uri: Uri?) {
+                handler.removeCallbacks(refresh)
+                handler.postDelayed(refresh, 320L)
+            }
+        }
+        for (uri in collections) app.contentResolver.registerContentObserver(uri, true, registered)
         observer = registered
+    }
+
+    fun armChanges(context: Context) {
+        if (!enabled(context) || !canRead(context)) return
+        val scheduler = context.getSystemService(JobScheduler::class.java)
+        if (scheduler.getPendingJob(MEDIA_CHANGE_JOB) != null) return
+        val trigger = job(context, MEDIA_CHANGE_JOB)
+            .setTriggerContentUpdateDelay(400L).setTriggerContentMaxDelay(2_000L)
+        for (uri in collections) trigger.addTriggerContentUri(
+            JobInfo.TriggerContentUri(uri, JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS),
+        )
+        scheduler.schedule(trigger.build())
     }
 
     fun enqueue(context: Context) {
         if (!enabled(context) || !canRead(context)) return
         val scheduler = context.getSystemService(JobScheduler::class.java)
-        if (scheduler.getPendingJob(NEW_FILES_JOB) != null) return
-        val service = ComponentName(context, CaptureInboxJob::class.java)
-        scheduler.schedule(JobInfo.Builder(NEW_FILES_JOB, service).setMinimumLatency(1_500L).build())
+        if (scheduler.getPendingJob(NEW_FILES_JOB) == null) scheduler.schedule(
+            job(context, NEW_FILES_JOB).setMinimumLatency(600L).build(),
+        )
+    }
+
+    private fun job(context: Context, id: Int) = JobInfo.Builder(id, ComponentName(context, CaptureInboxJob::class.java))
+
+    fun notifyChanged() {
+        handler.post { listeners.toList().forEach { it() } }
+    }
+
+    fun markProcessing(key: String?) {
+        if (processing == key) return
+        processing = key
+        notifyChanged()
     }
 
     fun items(context: Context): List<SavedCapture> = buildList {
-        if (!canRead(context)) return@buildList
-        addAll(query(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "Pictures/PS App/", false))
-        addAll(query(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "Movies/PS App/", true))
-    }.sortedByDescending { it.modified }.take(MAX_RECENT)
+        addAll(query(context, collections[0], video = false))
+        addAll(query(context, collections[1], video = true))
+    }.sortedWith(compareByDescending<SavedCapture> { it.added }
+        .thenByDescending { it.uri.lastPathSegment?.toLongOrNull() ?: 0 })
+        .take(MAX_RECENT)
 
-    private fun query(context: Context, collection: Uri, folder: String, video: Boolean): List<SavedCapture> {
-        val names = arrayOf(
-            android.provider.BaseColumns._ID, MediaStore.MediaColumns.DISPLAY_NAME,
-            MediaStore.MediaColumns.DATE_MODIFIED, MediaStore.MediaColumns.SIZE,
-        )
-        val selection = Bundle().apply {
-            putString(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION,
-                "${MediaStore.MediaColumns.RELATIVE_PATH} = ? AND ${MediaStore.MediaColumns.SIZE} > 0")
-            putStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, arrayOf(folder))
-            putStringArray(android.content.ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(MediaStore.MediaColumns.DATE_MODIFIED))
-            putInt(android.content.ContentResolver.QUERY_ARG_SORT_DIRECTION, android.content.ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
-            putInt(android.content.ContentResolver.QUERY_ARG_LIMIT, MAX_RECENT)
+    private fun query(context: Context, collection: Uri, video: Boolean): List<SavedCapture> {
+        val id = BaseColumns._ID
+        val name = MediaStore.MediaColumns.DISPLAY_NAME
+        val path = MediaStore.MediaColumns.RELATIVE_PATH
+        val modified = MediaStore.MediaColumns.DATE_MODIFIED
+        val added = MediaStore.MediaColumns.DATE_ADDED
+        val size = MediaStore.MediaColumns.SIZE
+        val duration = MediaStore.Video.VideoColumns.DURATION
+        val fields = arrayOf(id, name, modified, size, added) + if (video) arrayOf(duration) else emptyArray()
+        val matchName = if (video) "%-master_playlist.%" else "%-screenshotUrl.%"
+        val args = Bundle().apply {
+            putString(ContentResolver.QUERY_ARG_SQL_SELECTION,
+                "($path LIKE ? OR $path LIKE ? OR ($path LIKE ? AND $name LIKE ?)) AND $size > 0 AND ${MediaStore.MediaColumns.IS_PENDING} = 0")
+            putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
+                arrayOf("%/PS App/%", "%/PlayStation App/%", "Download/%", matchName))
+            putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "$added DESC, $id DESC")
+            putInt(ContentResolver.QUERY_ARG_LIMIT, MAX_RECENT)
         }
         return runCatching {
-            context.contentResolver.query(collection, names, selection, null)?.use { cursor ->
+            context.contentResolver.query(collection, fields, args, null)?.use { cursor ->
                 buildList {
                     while (size < MAX_RECENT && cursor.moveToNext()) {
                         add(SavedCapture(
                             ContentUris.withAppendedId(collection, cursor.getLong(0)),
                             cursor.getString(1) ?: "PlayStation yakalaması", video, cursor.getLong(2), cursor.getLong(3),
+                            cursor.getLong(4).takeIf { it > 0 } ?: cursor.getLong(2),
+                            if (video) cursor.getLong(5) else 0L,
                         ))
                     }
                 }
@@ -191,6 +265,7 @@ internal object CaptureInbox {
         }
         target.baseFile.parentFile?.listFiles { entry -> entry.extension == "json" }
             ?.sortedByDescending(File::lastModified)?.drop(MAX_RECENT)?.forEach(File::delete)
+        notifyChanged()
     }
 
     private fun file(context: Context, capture: SavedCapture) =
@@ -211,16 +286,22 @@ class CaptureInboxJob : JobService() {
     private var active: JobParameters? = null
     private var translator: FocusTranslator? = null
     private var completed = 0
+    private var scanAgain = false
+    private var rearmMedia = false
 
     override fun onStartJob(params: JobParameters): Boolean {
         if (!CaptureInbox.enabled(this) || !CaptureInbox.canRead(this)) return false
+        if (params.jobId == CaptureInbox.MEDIA_CHANGE_JOB) {
+            rearmMedia = true
+            CaptureInbox.notifyChanged()
+        }
         if (active != null) {
-            // OS can dispatch the periodic and change-triggered jobs together.
-            main.post { jobFinished(params, true) }
-            return true
+            scanAgain = true
+            return false
         }
         active = params
         completed = 0
+        scanAgain = false
         translator = FocusTranslator(this)
         disk.execute {
             val work = CaptureInbox.items(this).filter { CaptureInbox.cached(this, it) == null }.take(6)
@@ -236,10 +317,21 @@ class CaptureInboxJob : JobService() {
             translator?.close()
             translator = null
             active = null
+            CaptureInbox.markProcessing(null)
             jobFinished(params, false)
+            val again = scanAgain
+            val rearm = rearmMedia
+            scanAgain = false
+            rearmMedia = false
+            val app = applicationContext
+            main.postDelayed({
+                if (rearm) CaptureInbox.armChanges(app)
+                if (again) CaptureInbox.enqueue(app)
+            }, 500L)
             return
         }
         val capture = files.next()
+        CaptureInbox.markProcessing(capture.key)
         disk.execute {
             val frame = runCatching { CaptureInbox.load(this, capture) }.getOrNull()
             main.post {
@@ -283,12 +375,19 @@ class CaptureInboxJob : JobService() {
             active = null
             translator?.close()
             translator = null
+            CaptureInbox.markProcessing(null)
+        }
+        if (rearmMedia) {
+            rearmMedia = false
+            val app = applicationContext
+            main.postDelayed({ CaptureInbox.armChanges(app) }, 500L)
         }
         return CaptureInbox.enabled(this)
     }
 
     override fun onDestroy() {
         active = null
+        CaptureInbox.markProcessing(null)
         translator?.close()
         disk.shutdownNow()
         super.onDestroy()

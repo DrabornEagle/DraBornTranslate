@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
+import android.content.Context
 import kotlin.math.roundToInt
 
 internal enum class Source(val appName: String, val packageName: String?) {
@@ -44,6 +45,25 @@ internal data class CaptureSettings(
         const val MIN_SIZE = 16
         const val MAX_SIZE = 32
     }
+}
+
+internal fun Context.capturePreferences() = getSharedPreferences("capture", Context.MODE_PRIVATE)
+
+internal fun Context.readCaptureSettings(source: Source): CaptureSettings {
+    val prefs = capturePreferences()
+    val display = prefs.getString("display.${source.name}", null)
+        ?: prefs.getString("display", null).takeIf { prefs.getString("source", null) == source.name }
+    return CaptureSettings(
+        bandTop = prefs.getInt("band", CaptureSettings.DEFAULT_BAND_TOP).coerceIn(0, CaptureSettings.MAX_TOP),
+        textSize = prefs.getInt("size", 22).coerceIn(CaptureSettings.MIN_SIZE, CaptureSettings.MAX_SIZE),
+        source = source,
+        display = SubtitleDisplay.entries.firstOrNull { it.name == display && (source != Source.PS5 || it != SubtitleDisplay.VOICE) }
+            ?: if (source == Source.PS5) SubtitleDisplay.BOTH else SubtitleDisplay.PHONE,
+        readingArea = ReadingArea.entries.firstOrNull { it.name == prefs.getString("readingArea", null) }
+            ?: ReadingArea.SUBTITLES,
+        focus = prefs.getBoolean("focus", true),
+        captionEnabled = prefs.getBoolean("subtitles", true),
+    )
 }
 
 internal data class Pixels(val x: Int, val y: Int, val width: Int, val height: Int)

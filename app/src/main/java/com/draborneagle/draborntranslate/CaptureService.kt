@@ -34,6 +34,7 @@ class CaptureService : Service() {
     private var voice: TurkishVoice? = null
     private var panel: PortalPanelServer? = null
     private var sourceName = "PlayStation App"
+    private var connection = Source.PORTAL
     private var source = FrameSource.WAITING
     private var readingArea = ReadingArea.SUBTITLES
     private var captionEnabled = true
@@ -54,7 +55,10 @@ class CaptureService : Service() {
         }
         if (frames != null || consoleFrames != null || ended) return START_NOT_STICKY
         if (intent?.action == ACTION_TEST_PANEL) {
-            if (panel == null) startPanelTest(intent.getIntExtra(EXTRA_SIZE, 22))
+            if (panel == null) {
+                connection = if (intent.getStringExtra(EXTRA_SOURCE) == Source.PS5.name) Source.PS5 else Source.PORTAL
+                startPanelTest(intent.getIntExtra(EXTRA_SIZE, 22))
+            }
             return START_NOT_STICKY
         }
 
@@ -70,6 +74,7 @@ class CaptureService : Service() {
             intent.getBooleanExtra(EXTRA_FOCUS, false),
             intent.getBooleanExtra(EXTRA_CAPTION, true),
         )
+        connection = config.source
         val direct = config.source == Source.PS5
         val paired = if (direct) ConsolePairing.load(this) else null
         val grant = if (direct) null else readGrant(intent)
@@ -117,6 +122,7 @@ class CaptureService : Service() {
         if (config.focus) focus = LiveFocus(this, !direct && Build.VERSION.SDK_INT >= 34)
         SessionState.update(SessionState.State(
             active = true,
+            source = connection,
             status = if (direct) "PS5 görüntüsü ve Türkçe paket hazırlanıyor…" else "Türkçe oyun paketi hazırlanıyor…",
             portalPanel = panel?.let {
                 SessionState.PortalPanel(it.url, opened = previousPanel?.opened == true && previousPanel.url == it.url)
@@ -182,7 +188,8 @@ class CaptureService : Service() {
     private fun startPanelTest(textSize: Int) {
         val type = if (Build.VERSION.SDK_INT >= 34) ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
         else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
-        val message = "Portal bağlantısı açık · Örnek yazı 2,5 dakika"
+        val panelName = if (connection == Source.PS5) "TV paneli" else "Portal bağlantısı"
+        val message = "$panelName açık. Örnek altyazı 2,5 dakika görünür."
         try {
             startForeground(NOTIFICATION_ID, notification(message), type)
         } catch (_: IllegalStateException) {
@@ -199,6 +206,7 @@ class CaptureService : Service() {
             return
         }
         SessionState.update(SessionState.State(
+            source = connection,
             status = message,
             portalPanel = SessionState.PortalPanel(server.url, testing = true),
         ))
@@ -315,6 +323,7 @@ class CaptureService : Service() {
             }
             captions?.reset()
         }
+        SessionState.update(SessionState.current.copy(videoVisible = value == FrameSource.VISIBLE))
         if (!modelReady) return
         updateStatus(when (value) {
             FrameSource.WAITING -> if (consoleFrames != null) "PS5’ten oyun görüntüsü bekleniyor."
@@ -351,7 +360,7 @@ class CaptureService : Service() {
     private fun finish(message: String) {
         if (ended) return
         ended = true
-        SessionState.update(SessionState.State(status = message, lastCaption = SessionState.current.lastCaption))
+        SessionState.update(SessionState.State(source = connection, status = message, lastCaption = SessionState.current.lastCaption))
         stopSelf()
     }
 
@@ -372,7 +381,7 @@ class CaptureService : Service() {
     override fun onDestroy() {
         if (!ended) {
             ended = true
-            SessionState.update(SessionState.State(status = stopMessage(), lastCaption = SessionState.current.lastCaption))
+            SessionState.update(SessionState.State(source = connection, status = stopMessage(), lastCaption = SessionState.current.lastCaption))
         }
         modelReady = false
         main.removeCallbacks(modelTimeout)
@@ -457,7 +466,10 @@ class CaptureService : Service() {
         val stop = PendingIntent.getService(
             this, 1, Intent(this, CaptureService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE,
         )
-        val open = PendingIntent.getActivity(this, 2, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
+        val openIntent = if (connection == Source.PS5 && SessionState.current.portalPanel?.testing == true)
+            Intent(this, TvPanelActivity::class.java)
+        else connectionIntent(this, connection)
+        val open = PendingIntent.getActivity(this, 2, openIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val builder = Notification.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("DraBornTranslate")
@@ -521,10 +533,11 @@ class CaptureService : Service() {
             context.stopService(Intent(context, CaptureService::class.java))
         }
 
-        internal fun testPanel(context: Context, textSize: Int) {
+        internal fun testPanel(context: Context, textSize: Int, source: Source = Source.PORTAL) {
             context.startForegroundService(Intent(context, CaptureService::class.java).apply {
                 action = ACTION_TEST_PANEL
                 putExtra(EXTRA_SIZE, textSize)
+                putExtra(EXTRA_SOURCE, source.name)
             })
         }
 
