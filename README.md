@@ -21,7 +21,14 @@
 
 ---
 
-## 🚀 v0.7.0 · Cloud Gaming Translate (PS Portal bulut oyunları)
+## 🚀 v0.7.1 · Cloud Gaming Pro
+
+- CameraX: yatay, dikey ve otomatik yön, OCR/önizleme koordinat uyumu.
+- İki bağımsız sürüklenebilir ve boyutlandırılabilir alan, hassas yüzde ayarı, yakınlaştırma, yazı boyutu ve okuma modu.
+- Deneysel kamerasız Android istemcisi modu: mevcut ekran paylaşımı ile ayrı bir istemcinin görüntüsünü çevirir. Portal bulut oturumunu aynalamaz; korumalı görüntü okunamaz.
+- [v0.7.1 sürüm notları ve test planı](docs/RELEASE-v0.7.1.md). Kaynak önizlemesi; gerçek cihaz testi ve imzalı APK doğrulaması gereklidir.
+
+### v0.7.0 · Cloud Gaming Translate (PS Portal bulut oyunları)
 
 PS Portal Cloud Streaming'de Sony'nin belgelenmiş canlı Share Screen desteği bulunmadığı için, oyunu buluttan oynarken telefon kamerasıyla Türkçe çeviren yeni mod geliştirildi.
 
@@ -62,9 +69,9 @@ DraBornTranslate açılışta **iki büyük seçenek** gösterir. Kurulum ve alt
 2. Ana ekrandan **PS5 ve TV'ye Bağlan** veya **PS Portal'a Bağlan** modunu seç.
 3. Güncelleme için ana sayfadaki **GitHub'da yeni sürüm kontrolü** seçeneğini kullan.
 
-**Sürüm kimliği:** `versionName 0.7.0` / `versionCode 5` / `applicationId com.draborneagle.draborntranslate`.
+**Sürüm kimliği:** `versionName 0.7.1` / `versionCode 6` / `applicationId com.draborneagle.draborntranslate`.
 
-**Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.6.0 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
+**Önemli:** Bu kaynak kodunun derlenmiş, imzalı ve test edilmiş v0.7.1 APK'sı henüz yayımlanmış kabul edilmemelidir. Android, mevcut uygulamadaki `versionCode` daha yüksekse veya imzalama sertifikası farklıysa üzerine kurulum yapmaz. Uygulamayı kaldırmadan önce yedek al.
 
 ### Android kaynak derleme
 
