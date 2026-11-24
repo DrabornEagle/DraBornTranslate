@@ -48,6 +48,7 @@ Android SDK 35, Build Tools 35.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `
 
 ```bash
 ./scripts/prepare-ps5.sh
+./scripts/prepare-openssl.sh
 python3 -m venv .venv
 .venv/bin/pip install protobuf==5.29.5 grpcio-tools==1.71.0
 DRA_PS5_PYTHON="$PWD/.venv/bin/python" ./gradlew --no-daemon :app:assembleRelease

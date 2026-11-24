@@ -76,6 +76,12 @@ jobs:
         with:
           path: third-party/chiaki-ng
           key: ${{ steps.chiaki.outputs.cache-primary-key }}
+      - uses: actions/cache@v4
+        with:
+          path: third-party/openssl
+          key: android-openssl-${{ runner.os }}-${{ hashFiles('scripts/prepare-openssl.sh') }}
+      - name: Prepare OpenSSL for the Android NDK
+        run: ./scripts/prepare-openssl.sh
       - name: Prepare the pinned offline model
         run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
       - name: Assemble the release
@@ -84,12 +90,15 @@ jobs:
         run: |
           zipinfo -1 app/build/outputs/apk/release/app-release-unsigned.apk | grep -Fx lib/arm64-v8a/libgtnative.so
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging app/build/outputs/apk/release/app-release-unsigned.apk | sed -n '1p'
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 4 app/build/outputs/apk/release/app-release-unsigned.apk
+          python3 scripts/check-apk-alignment.py app/build/outputs/apk/release/app-release-unsigned.apk
       - name: Collect signing and inspection tools
         run: |
           mkdir -p release-artifacts
           cp app/build/outputs/apk/release/app-release-unsigned.apk release-artifacts/
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" release-artifacts/
           cp "$ANDROID_HOME/build-tools/35.0.0/zipalign" "$ANDROID_HOME/build-tools/35.0.0/aapt" release-artifacts/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib64/libc++.so" release-artifacts/
       - uses: actions/upload-artifact@v4
         with:
           name: DraBornTranslate-Android-release

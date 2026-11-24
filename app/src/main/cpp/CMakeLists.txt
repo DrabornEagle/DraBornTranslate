@@ -42,15 +42,16 @@ if(PYTHON_EXECUTABLE)
 endif()
 find_package(PythonInterp 3 REQUIRED)
 
-# OpenSSL: Google'ın hazır derlenmiş paketi (prefab, com.android.ndk.thirdparty:openssl). chiaki-ng'nin kendi
-# yolu OpenSSL'i kaynaktan make ile derler; Windows'ta çalışmaz.
-find_package(openssl REQUIRED CONFIG)
-get_target_property(GT_OPENSSL_INCLUDE openssl::crypto INTERFACE_INCLUDE_DIRECTORIES)
-get_target_property(GT_CRYPTO_LIB openssl::crypto IMPORTED_LOCATION)
-get_target_property(GT_SSL_LIB openssl::ssl IMPORTED_LOCATION)
-set(OPENSSL_INCLUDE_DIR "${GT_OPENSSL_INCLUDE}" CACHE PATH "" FORCE)
-set(OPENSSL_CRYPTO_LIBRARY "${GT_CRYPTO_LIB}" CACHE FILEPATH "" FORCE)
-set(OPENSSL_SSL_LIBRARY "${GT_SSL_LIB}" CACHE FILEPATH "" FORCE)
+# Build OpenSSL as static archives for Android's 4 KB and 16 KB devices.
+set(DRA_OPENSSL_DIR "" CACHE PATH "Android OpenSSL installation")
+if(NOT EXISTS "${DRA_OPENSSL_DIR}/lib/libcrypto.a" OR NOT EXISTS "${DRA_OPENSSL_DIR}/lib/libssl.a")
+    message(FATAL_ERROR "Install the Android OpenSSL archives with scripts/prepare-openssl.sh")
+endif()
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+set(OPENSSL_ROOT_DIR "${DRA_OPENSSL_DIR}")
+set(OPENSSL_INCLUDE_DIR "${DRA_OPENSSL_DIR}/include" CACHE PATH "" FORCE)
+set(OPENSSL_CRYPTO_LIBRARY "${DRA_OPENSSL_DIR}/lib/libcrypto.a" CACHE FILEPATH "" FORCE)
+set(OPENSSL_SSL_LIBRARY "${DRA_OPENSSL_DIR}/lib/libssl.a" CACHE FILEPATH "" FORCE)
 find_package(OpenSSL REQUIRED)
 
 add_subdirectory("${CHIAKI_DIR}/third-party" chiaki-third-party EXCLUDE_FROM_ALL)
@@ -93,4 +94,5 @@ add_subdirectory("${CHIAKI_DIR}/lib" chiaki-lib EXCLUDE_FROM_ALL)
 
 add_library(gtnative SHARED gt_native.c gt_jni.c)
 target_compile_options(gtnative PRIVATE -Wall)
+target_link_options(gtnative PRIVATE "-Wl,--exclude-libs,libcrypto.a:libssl.a")
 target_link_libraries(gtnative chiaki-lib mediandk log android)

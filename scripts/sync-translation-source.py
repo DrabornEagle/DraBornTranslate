@@ -23,7 +23,7 @@ FILES = {
     f"{ANDROID}/kotlin/{PACKAGE}/Native.kt": f"{APP}/java/{PACKAGE}/Native.kt",
     **{
         f"{ANDROID}/cpp/{name}": f"{APP}/cpp/{name}"
-        for name in ("CMakeLists.txt", "gt_jni.c", "gt_native.c", "gt_native.h")
+        for name in ("gt_jni.c", "gt_native.c", "gt_native.h")
     },
     "LICENSE": f"{APP}/assets/LICENSE",
     "NOTICE": f"{APP}/assets/NOTICE",
