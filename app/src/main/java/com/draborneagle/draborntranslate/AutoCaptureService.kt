@@ -142,7 +142,7 @@ class AutoCaptureService:Service() {
         try{
             if(stopped)return
             // Brief dialogue is on the right; ordinary screenshot mode uses the whole image.
-            val input=if(prefs.getBoolean("brief",false)){
+            val input=if(prefs.getBoolean("brief",true)){
                 val x=(bitmap.width*.44).toInt().coerceIn(0,bitmap.width-1)
                 val y=(bitmap.height*.10).toInt().coerceIn(0,bitmap.height-1)
                 Bitmap.createBitmap(bitmap,x,y,bitmap.width-x,(bitmap.height*.78).toInt().coerceIn(1,bitmap.height-y)).also{crop=it}
@@ -167,7 +167,7 @@ class AutoCaptureService:Service() {
         try{
             retriever.setDataSource(this,uri)
             val duration=retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()?.coerceAtMost(180_000)?:error("Video süresi okunamadı")
-            val step=if(prefs.getBoolean("brief",false))1000L else 750L
+            val step=if(prefs.getBoolean("brief",true))1000L else 750L
             var t=0L
             while(t<duration&&!stopped&&lines.size<300){
                 publish("Video OCR · "+t/1000+" / "+duration/1000+" sn")
@@ -210,6 +210,7 @@ class AutoCaptureService:Service() {
         lp.gravity=Gravity.TOP;lp.y=90
         runCatching{wm.addView(view,lp);overlay=view}
     }
+    override fun onTimeout(startId:Int,fgsType:Int){stopSelf()}
     override fun onDestroy(){
         stopped=true;AutoCaptureState.running=false;AutoCaptureState.status="Durduruldu"
         prefs.edit().putBoolean("autoDownload",false).apply()
