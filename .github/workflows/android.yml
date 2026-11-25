@@ -14,7 +14,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  console-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.50.1'
+          channel: stable
+          cache: true
+      - run: bash scripts/build-console-ui.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DraBornTranslate-console-aar
+          path: console-ui/build/host/outputs/repo/
+          if-no-files-found: error
   check:
+    needs: console-ui
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -26,7 +50,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: DraBornTranslate-console-aar
+          path: console-ui/build/host/outputs/repo/
       - name: Prepare the pinned offline model
         run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
       - name: Run Android unit tests and lint
@@ -43,7 +71,8 @@ jobs:
         continue-on-error: true
         run: python3 scripts/check-gta-pack.py
   screens:
-    if: github.ref == 'refs/heads/codex/v5.0.1' || github.event_name == 'workflow_dispatch'
+    needs: console-ui
+    if: startsWith(github.ref, 'refs/heads/codex/v5.0') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
@@ -55,7 +84,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: DraBornTranslate-console-aar
+          path: console-ui/build/host/outputs/repo/
       - name: Prepare the pinned offline model
         run: ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
       - name: Enable emulator acceleration
@@ -78,6 +111,7 @@ jobs:
           path: screen-tests/
           if-no-files-found: ignore
   build:
+    needs: console-ui
     runs-on: ubuntu-latest
     timeout-minutes: 24
     steps:
@@ -89,7 +123,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: DraBornTranslate-console-aar
+          path: console-ui/build/host/outputs/repo/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

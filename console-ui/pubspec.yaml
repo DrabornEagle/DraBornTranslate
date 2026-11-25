@@ -1,0 +1,45 @@
+name: draborn_console
+description: DraBornTranslate konsol ve TV arayüzü.
+publish_to: none
+version: 5.0.2+3
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  material_ui: ^1.1.0
+  cupertino_ui: ^1.1.6
+  cupertino_icons: ^1.0.8
+  webview_flutter: ^4.14.1
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  module:
+    androidX: true
+    androidPackage: com.draborneagle.draborn_console
+    iosBundleIdentifier: com.draborneagle.drabornConsole
+  assets:
+    - assets/logo.png
+    - assets/intro_scene.jpg
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Inter-ExtraBold.ttf
+          weight: 800

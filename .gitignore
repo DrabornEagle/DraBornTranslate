@@ -10,3 +10,7 @@
 *.jks
 *.p12
 /.release-signing/
+console-ui/.android/
+console-ui/.ios/
+console-ui/.dart_tool/
+console-ui/.flutter-plugins-dependencies
