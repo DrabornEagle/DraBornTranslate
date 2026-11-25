@@ -7,10 +7,12 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.SystemClock
 import android.provider.MediaStore
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.KeyEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.GridView
 import android.widget.ImageView
 import android.widget.TextView
@@ -46,7 +48,7 @@ class ScreenNavigationTest {
             screenshot("01-home")
             click("PS5 ve TV’ye bağlan")
             waitFor { resumed() is ConsoleStudioActivity }
-            waitForAccessible("Kurulum")
+            waitForAccessible("Kurulum", "02-ps5-tv")
             screenshot("02-ps5-tv")
             instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
             waitFor { resumed() is HomeActivity }
@@ -74,21 +76,22 @@ class ScreenNavigationTest {
                 waitFor { resumed() is FocusActivity }
                 screenshot("05-odak")
                 click("Güncel oyun karesini al")
-                waitForAccessible("Oyun görüntüsü kaynağı")
+                waitForAccessible("Oyun görüntüsü kaynağı", "05-odak-source")
                 instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
                 onMain {
-                    SessionState.update(SessionState.State(active = true, source = Source.PS5))
+                    assertTrue(ConsoleSession.begin())
                 }
                 click("Güncel oyun karesini al")
                 assertTrue(hasText("İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç."))
                 onMain {
                     val sample = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888).apply { eraseColor(Color.rgb(29, 88, 140)) }
-                    LiveFocusFrames.replace(sample, Source.PS5)
+                    ConsoleSession.frame(sample, SystemClock.elapsedRealtime())
                 }
                 waitFor { hasText("Konsol · Oyun karesi") }
             }
         } finally {
             onMain {
+                ConsoleSession.end()
                 LiveFocusFrames.clear()
                 SessionState.update(SessionState.State())
             }
@@ -149,13 +152,21 @@ class ScreenNavigationTest {
     }
 
     private fun hasAccessibleText(value: String): Boolean =
-        instrumentation.uiAutomation.rootInActiveWindow?.findAccessibilityNodeInfosByText(value)?.isNotEmpty() == true
+        instrumentation.uiAutomation.rootInActiveWindow?.containsLabel(value) == true
 
-    private fun waitForAccessible(value: String) {
-        repeat(70) {
+    private fun AccessibilityNodeInfo.containsLabel(value: String): Boolean {
+        if (isVisibleToUser && packageName == app.packageName &&
+            (text?.contains(value) == true || contentDescription?.contains(value) == true)
+        ) return true
+        return (0 until childCount).any { index -> getChild(index)?.containsLabel(value) == true }
+    }
+
+    private fun waitForAccessible(value: String, diagnostic: String) {
+        repeat(100) {
             if (hasAccessibleText(value)) return
             Thread.sleep(175)
         }
+        screenshot("$diagnostic-failed")
         assertTrue("Expected visible text: $value", hasAccessibleText(value))
     }
 
