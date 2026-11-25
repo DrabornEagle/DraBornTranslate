@@ -115,8 +115,8 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            adb shell settings put global hide_error_dialogs 1
-            ./scripts/test-android-screens.sh
+            adb shell pm disable-user --user 0 com.google.android.apps.nexuslauncher &&
+              ./scripts/test-android-screens.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
