@@ -2,7 +2,7 @@ name: Android APK
 
 on:
   push:
-    branches: [main, 'codex/v5.0*', 'codex/v0.5*']
+    branches: [main, 'codex/v*']
   pull_request:
   workflow_dispatch:
 
@@ -81,7 +81,7 @@ jobs:
         run: python3 scripts/check-gta-pack.py
   screens:
     needs: console-ui
-    if: startsWith(github.ref, 'refs/heads/codex/v5.0') || startsWith(github.ref, 'refs/heads/codex/v0.5') || github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/heads/codex/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:

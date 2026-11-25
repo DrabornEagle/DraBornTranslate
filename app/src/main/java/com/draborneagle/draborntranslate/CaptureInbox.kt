@@ -169,18 +169,14 @@ internal object CaptureInbox {
         notifyChanged()
     }
 
-    fun latest(context: Context): SavedCapture? = recent(context, limit = 1).firstOrNull()
-
-    fun items(context: Context): List<SavedCapture> = recent(context, limit = MAX_RECENT)
-
-    private fun recent(context: Context, limit: Int): List<SavedCapture> = buildList {
-        addAll(query(context, collections[0], video = false, limit = limit))
-        addAll(query(context, collections[1], video = true, limit = limit))
+    fun items(context: Context): List<SavedCapture> = buildList {
+        addAll(query(context, collections[0], video = false))
+        addAll(query(context, collections[1], video = true))
     }.sortedWith(compareByDescending<SavedCapture> { it.added }
         .thenByDescending { it.uri.lastPathSegment?.toLongOrNull() ?: 0 })
-        .take(limit)
+        .take(MAX_RECENT)
 
-    private fun query(context: Context, collection: Uri, video: Boolean, limit: Int): List<SavedCapture> {
+    private fun query(context: Context, collection: Uri, video: Boolean): List<SavedCapture> {
         val id = BaseColumns._ID
         val name = MediaStore.MediaColumns.DISPLAY_NAME
         val path = MediaStore.MediaColumns.RELATIVE_PATH
@@ -196,12 +192,12 @@ internal object CaptureInbox {
             putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
                 arrayOf("%/PS App/%", "%/PlayStation App/%", "Download/%", matchName))
             putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "$added DESC, $id DESC")
-            putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
+            putInt(ContentResolver.QUERY_ARG_LIMIT, MAX_RECENT)
         }
         return runCatching {
             context.contentResolver.query(collection, fields, args, null)?.use { cursor ->
                 buildList {
-                    while (size < limit && cursor.moveToNext()) {
+                    while (size < MAX_RECENT && cursor.moveToNext()) {
                         add(SavedCapture(
                             ContentUris.withAppendedId(collection, cursor.getLong(0)),
                             cursor.getString(1) ?: "PlayStation yakalaması", video, cursor.getLong(2), cursor.getLong(3),

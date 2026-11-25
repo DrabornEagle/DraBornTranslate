@@ -55,7 +55,7 @@ class ScreenNavigationTest {
             screenshot("01-home")
             click("Sürüm ve güncellemeler")
             waitFor { resumed() is UpdatesActivity }
-            assertTrue(hasText("Sürüm 0.5.4"))
+            assertTrue(hasText("Sürüm 5.5"))
             assertFalse(hasText("Açık kaynak lisansı"))
             screenshot("09-surum-ve-guncellemeler")
             click("Geri")
@@ -92,22 +92,29 @@ class ScreenNavigationTest {
             click("Telefonda oyna")
             waitFor { resumed() is MainActivity }
             assertTrue(hasText("PS Remote Play uygulamasını aç"))
+            assertFalse(hasText("Açık kaynak lisansı"))
         }
     }
 
     @Test
-    fun livePortalFrameTakesPriorityOverSavedCaptureEvenWhenTheShareIsPaused() {
+    fun currentFramePromptsForASourceAndDisplaysPortraitPortalFrames() {
         val saved = saveSample("recent-screenshotUrl.png", Color.RED)
         try {
             onMain {
                 LiveFocusFrames.clear()
-                SessionState.update(SessionState.State(active = true, source = Source.PORTAL))
+                SessionState.update(SessionState.State())
             }
             ActivityScenario.launch(FocusActivity::class.java).use {
                 waitFor { resumed() is FocusActivity }
                 click("Güncel oyun karesini al")
-                waitFor { hasText("İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç.") }
-                onMain { cachePortalFrame(Color.BLUE) }
+                waitForAccessible("Portal yayınını paylaş", "06a-yayin-kaynagi")
+                assertFalse(hasAccessibleText("Son PS App yakalaması"))
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                onMain {
+                    SessionState.update(SessionState.State(active = true, source = Source.PORTAL))
+                    cachePortalFrame(Color.BLUE)
+                }
+                click("Güncel oyun karesini al")
                 waitFor { hasText("PS App · Son görülen kare") && focusFrameColor() == Color.BLUE }
                 onMain { cachePortalFrame(Color.GREEN) }
                 assertEquals(Color.BLUE, onMain { focusFrameColor() })
@@ -138,7 +145,7 @@ class ScreenNavigationTest {
                 screenshot("05-gorsel-ceviri")
                 click("Güncel oyun karesini al")
                 waitForAccessible("Oyun görüntüsü kaynağı", "06-kaynak-secimi")
-                assertTrue(hasAccessibleText("Son PS App yakalaması"))
+                assertTrue(hasAccessibleText("Portal yayınını paylaş"))
                 screenshot("06-kaynak-secimi")
                 instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
                 onMain {
@@ -162,15 +169,15 @@ class ScreenNavigationTest {
     }
 
     @Test
-    fun newestPlayStationClipOpensFromTheCurrentFrameButton() {
+    fun newestPlayStationClipOpensFromTheCaptureGallery() {
         val files = mutableListOf<Uri>()
         try {
             saveSample("older-screenshotUrl.png", Color.BLUE).also(files::add)
             val clip = saveClip().also(files::add)
             saveSample("unrelated.png", Color.RED, "Pictures/Screenshots/").also(files::add)
-            ActivityScenario.launch(FocusActivity::class.java).use {
-                waitFor { resumed() is FocusActivity }
-                click("Güncel oyun karesini al")
+            ActivityScenario.launch(CaptureInboxActivity::class.java).use {
+                waitFor { firstCapture()?.endsWith("/${clip.lastPathSegment}") == true }
+                openFirstCapture()
                 waitFor { resumed()?.intent?.data?.lastPathSegment == clip.lastPathSegment }
                 waitFor {
                     resumed()?.window?.decorView?.findChild { view ->
@@ -188,12 +195,12 @@ class ScreenNavigationTest {
     @Test
     fun newestPlayStationImageCanBeDraggedAndOpenedFullScreen() {
         val photo = saveSample("newest-screenshotUrl.png", Color.rgb(45, 86, 146))
-        val capture = checkNotNull(CaptureInbox.latest(app))
+        val capture = CaptureInbox.items(app).first { it.uri.lastPathSegment == photo.lastPathSegment }
         try {
             CaptureInbox.save(app, capture, listOf(FocusText(Rect(152, 136, 448, 211), "Look around.", "Etrafına bak.", Color.BLUE)))
-            ActivityScenario.launch(FocusActivity::class.java).use {
-                waitFor { resumed() is FocusActivity }
-                click("Güncel oyun karesini al")
+            ActivityScenario.launch(CaptureInboxActivity::class.java).use {
+                waitFor { firstCapture()?.endsWith("/${photo.lastPathSegment}") == true }
+                openFirstCapture()
                 waitFor { resumed()?.intent?.data?.lastPathSegment == photo.lastPathSegment }
                 waitFor { hasText("1 Türkçe çeviri · 1 okunan metin") }
                 touchFrame(drag = true)
@@ -226,7 +233,7 @@ class ScreenNavigationTest {
                     grid.getChildAt(0)?.hasThumbnail() == true && grid.getChildAt(1)?.hasThumbnail() == true
                 }
                 screenshot("04-yakalamalar")
-                onMain { val grid = checkNotNull(currentGrid()); grid.performItemClick(grid.getChildAt(0), 0, grid.adapter.getItemId(0)) }
+                openFirstCapture()
                 waitFor { resumed() is FocusActivity }
                 assertEquals(fresh.lastPathSegment, onMain { resumed()?.intent?.data?.lastPathSegment })
             }
@@ -270,7 +277,7 @@ class ScreenNavigationTest {
     }
 
     private fun cachePortalFrame(color: Int) {
-        val frame = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888).apply { eraseColor(color) }
+        val frame = Bitmap.createBitmap(360, 640, Bitmap.Config.ARGB_8888).apply { eraseColor(color) }
         LiveFocusFrames.replace(frame, Source.PORTAL, SystemClock.elapsedRealtime() - 15_000L)
     }
 
@@ -303,6 +310,11 @@ class ScreenNavigationTest {
     }
 
     private fun firstCapture(): String? = onMain { currentGrid()?.getChildAt(0)?.tag?.toString() }
+
+    private fun openFirstCapture() = onMain {
+        val grid = checkNotNull(currentGrid())
+        grid.performItemClick(grid.getChildAt(0), 0, grid.adapter.getItemId(0))
+    }
 
     private fun currentGrid(): GridView? = resumed()?.window?.decorView?.findChild { it is GridView } as? GridView
     private fun View.hasThumbnail(): Boolean = findChild { it is ImageView && it.drawable is BitmapDrawable } != null

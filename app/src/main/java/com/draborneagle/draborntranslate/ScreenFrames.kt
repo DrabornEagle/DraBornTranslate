@@ -167,9 +167,7 @@ internal class ScreenFrames(
             val now = SystemClock.elapsedRealtime()
             lastFrameAt = now
             val wantsCaption = settings.captionEnabled && now - lastSampleAt >= settings.readingArea.sampleIntervalMs
-            // Portal's shared game is viewed in landscape. Keep the game frame when PS App returns to its portrait menus.
-            val gameVisible = settings.source != Source.PORTAL || image.width > image.height
-            val wantsFocus = gameVisible && now - lastFocusAt >= 950L
+            val wantsFocus = now - lastFocusAt >= 950L
             if (!wantsCaption && !wantsFocus) return
             if (wantsCaption) lastSampleAt = now
             if (wantsFocus) lastFocusAt = now

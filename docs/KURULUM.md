@@ -1,10 +1,10 @@
-# DraBornTranslate v0.5.4
+# DraBornTranslate v5.5
 
-**Android 10+ · ARM64 · Android sürüm kodu 5**
+**Android 10+ · ARM64 · Android sürüm kodu 6**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.5.4)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.5)
 
-v0.5.4 imzalı APK’yı indir ve mevcut v5 serisi kurulumunun üzerine yükle. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v5.5 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -26,7 +26,7 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 ## Altyazı ve Görsel Çeviri
 
-1. **Görsel Çeviri → Güncel oyun karesini al** düğmesi açık oturumdan alınan son oyun karesini açar. Portal yayınını PS App’te yatay tam ekranda aç. Canlı oturum kapalıyken düğme telefona indirilen son PS App fotoğrafını veya klibini açar. **Son PS App yakalaması** ile kaydı doğrudan seçebilirsin. Yeni kayıt için PS App’te **Kütüphane → Yakalamalar → İndir** yolunu kullan ve istenirse medya erişimi ver.
+1. **Görsel Çeviri → Güncel oyun karesini al** düğmesi oturumda alınan son kareyi açar. İlk kare henüz yoksa kaynak seçimiyle yayını açabilirsin. **Yakalamalar** veya **Fotoğraf veya klip seç** üzerinden telefona indirdiğin PS App kaydını açabilirsin.
 2. Görüntü üzerinde bir dikdörtgen çiz ve **Alanı çevir** düğmesine dokun. Görüntüye dokunarak tam ekrana geçebilir, yakınlaştırabilir ve Türkçe ile İngilizce arasında geçiş yapabilirsin. Klipte çevirilecek kareyi zaman çubuğuyla seç.
 3. Portal’ın canlı alan katmanı için **Altyazı + Görsel Çeviri** modunu aç. Android 14+ uygulama paylaşımında oyun ekranına dönünce seçili alan canlı taranır. Android 10–13’te çeviriyi Görsel Çeviri ekranından okuyabilirsin. PS5 eşleme oturumunda **Canlı alanı takip et** telefon ekranındaki kareyi günceller.
 

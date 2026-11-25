@@ -1,7 +1,7 @@
 name: draborn_console
 description: DraBornTranslate konsol ve TV arayüzü.
 publish_to: none
-version: 0.5.4+5
+version: 5.5.0+6
 
 environment:
   sdk: ^3.14.0

@@ -327,12 +327,6 @@ class MainActivity : Activity() {
         packButton = button("Oyun paketleri") { startActivity(Intent(this, GamePacksActivity::class.java)) }
         settings.append(packButton, 8)
         settings.append(button("Hakkında ve güncellemeler") { showAbout() }, 8)
-        settings.append(button("Açık kaynak lisansı") { showLegalNotices() }.apply {
-            background = RippleDrawable(ColorStateList.valueOf(0x22B6A8FF), null, shape(WHITE, WHITE, 12))
-            gravity = Gravity.START or Gravity.CENTER_VERTICAL
-            setTextColor(LAVENDER)
-            textSize = 13f
-        }, 4)
         testButton = button("Çeviriyi dene") { showTranslationTest() }
         content.append(testButton, 12)
         voiceButton = button("Türkçe sesi dene") { previewVoice() }
@@ -1012,21 +1006,6 @@ class MainActivity : Activity() {
         step.append(label(description, 14, MUTED).apply { setLineSpacing(dp(2).toFloat(), 1f) }, 8)
         append(step, 10)
         return step
-    }
-
-    private fun showLegalNotices() {
-        AlertDialog.Builder(this)
-            .setTitle("Yasal bildirimler")
-            .setMessage("GameTranslator v1.8.48 ve CouchSubs · © Sinan Yorulmaz ve Sefflex\n" +
-                "Bu uygulama GNU AGPL v3 koşullarıyla paylaşılabilir. Garanti verilmez.\n\n" +
-                "Töz-Çevir-1 · Apache 2.0\nGoogle ML Kit · Ekrandaki yazıyı tanıma")
-            .setPositiveButton("GNU AGPL v3") { _, _ ->
-                val terms = assets.open("LICENSE").bufferedReader().use { it.readText() }
-                AlertDialog.Builder(this).setTitle("GNU AGPL v3").setMessage(terms).setPositiveButton("Kapat", null).show()
-            }
-            .setNeutralButton("Model lisansı") { _, _ -> openLink("https://huggingface.co/TozAI/Toz-Cevir-1") }
-            .setNegativeButton("Kapat", null)
-            .show()
     }
 
     private fun openLink(url: String) {

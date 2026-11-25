@@ -100,12 +100,9 @@ internal object GitHubUpdate {
     private fun versionParts(version: String): List<Int> {
         val parts = stableVersion.matchEntire(version)?.groupValues?.drop(1)
             ?: throw UpdateException("GitHub sürüm numarası doğrulanamadı.")
-        val numbers = parts.map { part ->
+        return parts.map { part ->
             part.ifEmpty { "0" }.toIntOrNull() ?: throw UpdateException("GitHub sürüm numarası doğrulanamadı.")
         }
-        // The previous releases used 5.0.x for the first four builds of the 0.5 series.
-        val (major, minor, patch) = numbers
-        return if (major == 5 && minor == 0 && patch in 0..3) listOf(0, 5, patch) else numbers
     }
 
     private fun connect(url: URI): HttpsURLConnection = (url.toURL().openConnection() as HttpsURLConnection).apply {

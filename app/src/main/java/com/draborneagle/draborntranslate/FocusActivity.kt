@@ -41,8 +41,6 @@ class FocusActivity : Activity() {
     private lateinit var enlarge: Button
     private var sourcesDialog: Dialog? = null
     private var viewerDialog: Dialog? = null
-    private var resumeCaptureLookup = false
-    private var foreground = false
     private var pendingFrame = false
     private var revisionSeen = -1L
     private var current: CaptureFrame? = null
@@ -72,7 +70,6 @@ class FocusActivity : Activity() {
             size = intent.getLongExtra("captureSize", source.size),
             added = intent.getLongExtra("captureAdded", source.added),
         )
-        resumeCaptureLookup = savedInstanceState?.getBoolean("resumeCaptureLookup") == true
         reader = FocusTranslator(this)
         val content = contentPage(VISUAL_TRANSLATION, Palette.peach)
         val selected = capture
@@ -115,7 +112,7 @@ class FocusActivity : Activity() {
             setPadding(dp(18), dp(14), dp(18), dp(14))
             addView(glyph(R.drawable.ic_focus_region, Palette.peach), LinearLayout.LayoutParams(dp(49), dp(49)))
             addBelow(copy("Çevirilecek görüntüyü aç", 17, Palette.white, true).apply { gravity = Gravity.CENTER }, 10)
-            addBelow(copy("Canlı kare, PS App yakalaması veya telefondan bir dosya seç.", 13).apply {
+            addBelow(copy("Bir canlı kare al veya telefondan dosya seç.", 13).apply {
                 gravity = Gravity.CENTER
             }, 4)
         }
@@ -127,11 +124,7 @@ class FocusActivity : Activity() {
 
         if (selected == null) {
             val quick = stack().apply {
-                addView(press("Güncel oyun karesini al", Palette.peach) { takeCurrentFrame() })
-                addBelow(actionRow(
-                    press("Son PS App yakalaması", Palette.blue) { openLatestCapture() },
-                    press("Kaynak seç") { showSources(SessionState.current) },
-                ), 8)
+                addView(press("Güncel oyun karesini al", Palette.peach) { showLive(promptSource = true) })
                 addBelow(actionRow(
                     press("Fotoğraf veya klip seç") {
                         @Suppress("DEPRECATION")
@@ -185,7 +178,6 @@ class FocusActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
-        foreground = true
         if (capture == null) {
             LiveFocusFrames.observe(liveObserver)
             SessionState.observe(captionObserver)
@@ -193,7 +185,6 @@ class FocusActivity : Activity() {
     }
 
     override fun onStop() {
-        foreground = false
         LiveFocusFrames.remove(liveObserver)
         SessionState.remove(captionObserver)
         super.onStop()
@@ -201,17 +192,7 @@ class FocusActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        if (resumeCaptureLookup) {
-            resumeCaptureLookup = false
-            findLatestCapture {
-                status.text = "PS App’te Kütüphane → Yakalamalar → İndir yolunu kullan."
-            }
-        } else if (capture == null && (current == null || pendingFrame) && !busy) showLive()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("resumeCaptureLookup", resumeCaptureLookup)
-        super.onSaveInstanceState(outState)
+        if (capture == null && (current == null || pendingFrame) && !busy) showLive()
     }
 
     private fun updateFollow(enabled: Boolean) {
@@ -222,86 +203,37 @@ class FocusActivity : Activity() {
         }
     }
 
-    private fun showLive(promptSource: Boolean = false, force: Boolean = false) {
+    private fun showLive(promptSource: Boolean = false) {
         if (capture != null || busy) return
+        val sampled = LiveFocusFrames.sample()
+        if (sampled != null) {
+            pendingFrame = false
+            if (revisionSeen == LiveFocusFrames.revision && !promptSource) {
+                sampled.bitmap.recycle()
+                return
+            }
+            revisionSeen = LiveFocusFrames.revision
+            lastLiveCheck = SystemClock.elapsedRealtime()
+            setFrame(CaptureFrame(sampled.bitmap))
+            val age = ((lastLiveCheck - sampled.observedAt) / 1000L).coerceAtLeast(0L)
+            val source = when (sampled.source) {
+                Source.PS5 -> "Konsol"
+                Source.MOBILE -> "PS Remote Play"
+                Source.PORTAL -> "PS App"
+            }
+            frameLabel.text = if (age <= 3L) "$source · Oyun karesi" else "$source · Son görülen kare"
+            if (followsLive) translateArea()
+            return
+        }
         val state = SessionState.current
-        val activeSource = state.source?.takeIf { state.active }
-        if (activeSource != null && useLiveFrame(activeSource, force = force || promptSource)) return
         pendingFrame = state.active
         status.text = if (state.active) "İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç."
             else "Canlı kare için bir oyun bağlantısı seç."
-        if (promptSource && activeSource != Source.PS5) showSources(state)
+        if (promptSource) showSources(state)
     }
 
-    private fun useLiveFrame(activeSource: Source, force: Boolean): Boolean {
-        val sampled = LiveFocusFrames.sample(activeSource) ?: return false
-        val now = SystemClock.elapsedRealtime()
-        val fresh = now - sampled.observedAt < 4_000L
-        pendingFrame = false
-        if (revisionSeen == LiveFocusFrames.revision && !force) {
-            sampled.bitmap.recycle()
-            return true
-        }
-        revisionSeen = LiveFocusFrames.revision
-        lastLiveCheck = now
-        setFrame(CaptureFrame(sampled.bitmap))
-        val source = when (sampled.source) {
-            Source.PS5 -> "Konsol"
-            Source.MOBILE -> "PS Remote Play"
-            Source.PORTAL -> "PS App"
-        }
-        frameLabel.text = if (fresh) "$source · Oyun karesi" else "$source · Son görülen kare"
-        if (followsLive) translateArea()
-        return true
-    }
-
-    private fun takeCurrentFrame() {
-        if (busy) return
-        if (SessionState.current.active) {
-            showLive(force = true)
-        } else {
-            findLatestCapture(preferLive = true) { showLive(promptSource = true) }
-        }
-    }
-
-    private fun openLatestCapture(requestAccess: Boolean = true) {
-        findLatestCapture {
-            if (requestAccess && !CaptureInbox.canRead(this)) {
-                requestPermissions(CaptureInbox.permissions(), CAPTURE_ACCESS)
-            } else {
-                showSources(SessionState.current, downloadHint = true)
-            }
-        }
-    }
-
-    private fun findLatestCapture(preferLive: Boolean = false, onMissing: () -> Unit) {
-        if (busy) return
-        val request = ++serial
-        val priorStatus = status.text
-        setBusy(true)
-        status.text = "Son PS App yakalaması aranıyor…"
-        disk.execute {
-            val latest = CaptureInbox.latest(this)
-            runOnUiThread {
-                if (isDestroyed || isFinishing || request != serial) return@runOnUiThread
-                setBusy(false)
-                status.text = priorStatus
-                if (!foreground) return@runOnUiThread
-                if (preferLive && SessionState.current.active) {
-                    showLive(force = true)
-                } else if (latest == null) {
-                    onMissing()
-                } else {
-                    pendingFrame = false
-                    updateFollow(false)
-                    startActivity(captureIntent(latest))
-                }
-            }
-        }
-    }
-
-    private fun showSources(state: SessionState.State, downloadHint: Boolean = false) {
-        if (busy || isFinishing) return
+    private fun showSources(state: SessionState.State) {
+        if (busy || isFinishing || (state.active && state.source == Source.PS5)) return
         sourcesDialog?.dismiss()
         val dialog = Dialog(this).apply { requestWindowFeature(Window.FEATURE_NO_TITLE) }
         sourcesDialog = dialog
@@ -310,20 +242,6 @@ class FocusActivity : Activity() {
             background = blend(0xFF382650.toInt(), 0xFF171D35.toInt(), 26)
             setPadding(dp(16), dp(17), dp(16), dp(14))
             addView(copy("Oyun görüntüsü kaynağı", 22, Palette.white, true).apply { isAccessibilityHeading = true })
-            if (downloadHint) {
-                addBelow(copy("PS App’te Kütüphane → Yakalamalar → İndir yolunu kullan. Buraya döndüğünde son yakalama açılır.", 14), 7)
-            }
-            addBelow(navTile(
-                if (downloadHint) "PlayStation App’i aç" else "Son PS App yakalaması",
-                "Telefona indirilen fotoğraf veya klip",
-                R.drawable.ic_capture_album, Palette.mint, 0xFF23494E.toInt() to 0xFF202E45.toInt(),
-            ) {
-                dialog.dismiss()
-                if (downloadHint) {
-                    resumeCaptureLookup = openPlayStationApp()
-                    if (!resumeCaptureLookup) status.text = "PlayStation App açılamadı."
-                } else openLatestCapture()
-            }, 13)
             for (route in choices) {
                 val card = when (route) {
                     Source.PS5 -> Triple("PS5 ve TV’ye bağlan", R.drawable.ic_controller, Palette.blue)
@@ -522,14 +440,6 @@ class FocusActivity : Activity() {
         enlarge.isEnabled = hasFrame
     }
 
-    @Deprecated("Android permission callback")
-    override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, grants: IntArray) {
-        super.onRequestPermissionsResult(code, permissions, grants)
-        if (code != CAPTURE_ACCESS) return
-        if (CaptureInbox.canRead(this)) openLatestCapture(requestAccess = false)
-        else status.text = "Medya izni ver veya Fotoğraf veya klip seç düğmesini kullan."
-    }
-
     @Deprecated("Android activity result")
     override fun onActivityResult(code: Int, result: Int, data: Intent?) {
         super.onActivityResult(code, result, data)
@@ -551,6 +461,5 @@ class FocusActivity : Activity() {
 
     private companion object {
         const val PICK_MEDIA = 51
-        const val CAPTURE_ACCESS = 52
     }
 }

@@ -1,6 +1,6 @@
 # Açık kaynak bileşenleri
 
-DraBornTranslate, [GNU AGPL-3.0](../app/src/main/assets/LICENSE) kapsamında dağıtılır. [Telif bildirimleri](../app/src/main/assets/NOTICE) uygulamanın **Açık kaynak lisansı** ekranında da bulunur.
+DraBornTranslate, [GNU AGPL-3.0](../app/src/main/assets/LICENSE) kapsamında dağıtılır. [Telif bildirimleri](../app/src/main/assets/NOTICE) kaynak koduyla birlikte dağıtılır.
 
 Android paket okuma ve Remote Play köprüsü, [GameTranslator v1.8.51](https://gitlab.com/sefflex/GameTranslator/-/tree/90074239529de5b4738340d00bbb06f706adef59) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) çalışmalarından gelir. DraBornTranslate v5.0, Kasım 2026’da Android arayüzü, paket önceliği, DraBorn Odak, yakalama işleme ve Portal bağlantı akışını güncelledi. [Geçerli kaynak sürümü](../scripts/upstream-revision.json) depoda tutulur.
 

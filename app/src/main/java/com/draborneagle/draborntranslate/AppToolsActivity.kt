@@ -124,7 +124,12 @@ class GamePacksActivity : Activity() {
             runOnUiThread {
                 if (!isDestroyed) {
                     busy = false
-                    render(result.getOrElse { it.message ?: "Paket açılamadı." })
+                    render(result.getOrElse { error ->
+                        val message = error.message ?: "Paket açılamadı."
+                        if (key == "gtaPackTitle" && ImportedGamePack.hasGta(this)) {
+                            "$message Yüklü paket çevrimdışı kullanılabilir."
+                        } else message
+                    })
                 }
             }
         }

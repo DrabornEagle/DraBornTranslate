@@ -128,9 +128,8 @@ internal object LiveFocusFrames {
         observers.toList().forEach { it() }
     }
 
-    fun sample(origin: Source): Snapshot? =
-        frame?.takeIf { source == origin }?.copy(Bitmap.Config.ARGB_8888, false)
-            ?.let { Snapshot(it, source, observedAt) }
+    fun snapshot(): Bitmap? = frame?.copy(Bitmap.Config.ARGB_8888, false)
+    fun sample(): Snapshot? = snapshot()?.let { Snapshot(it, source, observedAt) }
     fun observe(observer: () -> Unit) { observers.add(observer) }
     fun remove(observer: () -> Unit) { observers.remove(observer) }
 
