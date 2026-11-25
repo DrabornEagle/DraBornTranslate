@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'bridge.dart';
+import 'language_section.dart' show languageChanges;
 import 'guide_page.dart';
 import 'history_page.dart';
 import 'home_page.dart';
