@@ -130,6 +130,10 @@ data class Settings(
         .withExtraRegion(2, Region.of(ExtraAreaPreset.HELP_BOX.region)).withExtraLive(2, true)
         .withExtraRegion(3, Region.of(ExtraAreaPreset.PHONE_MESSAGE.region)).withExtraLive(3, true)
 
+    val gta6Reading: Boolean get() = autoRegion &&
+        hasExtraPreset(ExtraAreaPreset.BOTTOM_OBJECTIVE) && hasExtraPreset(ExtraAreaPreset.HELP_BOX) &&
+        hasExtraPreset(ExtraAreaPreset.PHONE_MESSAGE)
+
     /** Sürekli okunan ek alanlar (bölgesi olan ve açık yuvalar). */
     fun watchedAreas(): List<WatchedArea> = (1..ExtraAreas.SLOTS).mapNotNull { slot ->
         val region = extraRegion(slot)

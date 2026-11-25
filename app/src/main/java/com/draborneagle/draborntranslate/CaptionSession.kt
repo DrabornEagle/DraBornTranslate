@@ -2,12 +2,20 @@
 package com.draborneagle.draborntranslate
 
 import com.gametranslator.gametranslator_mobile.core.OcrNoise
+import com.gametranslator.gametranslator_mobile.core.PackCaptionContinuity
 import com.gametranslator.gametranslator_mobile.core.SpeakerPrefix
 import com.gametranslator.gametranslator_mobile.core.StabilizerKind
 import com.gametranslator.gametranslator_mobile.core.SubtitleStabilizer
 import com.gametranslator.gametranslator_mobile.core.TextMatch
+import com.gametranslator.gametranslator_mobile.core.TextBox
 
-internal data class Caption(val source: String, val turkish: String)
+internal data class CaptionPosition(val box: TextBox, val speakerColor: String?)
+internal data class Caption(
+    val source: String,
+    val turkish: String,
+    val position: CaptionPosition? = null,
+    val packId: String? = null,
+)
 
 /** Tüm çağrılar ana iş parçacığından gelir. Çevirmene yalnızca en yeni bekleyen satır verilir. */
 internal class CaptionSession(
@@ -28,6 +36,8 @@ internal class CaptionSession(
         val number: Int,
         val source: String,
         val input: TranslationInput,
+        val position: CaptionPosition?,
+        val allowFallback: Boolean,
     )
 
     private val cache = object : LinkedHashMap<TranslationInput, TranslationReply>(128, 0.75f, true) {
@@ -40,8 +50,9 @@ internal class CaptionSession(
     private var previousGameLines = emptySet<String>()
     private var previousSubtitle: TranslationInput? = null
     private var previousSubtitleAt = 0L
+    private var shownPack: TranslationInput? = null
 
-    fun read(lines: List<String>) {
+    fun read(lines: List<String>, position: CaptionPosition? = null, allowFallback: Boolean = true) {
         if (closed) return
         val clean = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(lines) else lines.map { line ->
             val (prefix, body) = SpeakerPrefix.split(line)
@@ -54,23 +65,30 @@ internal class CaptionSession(
             StabilizerKind.NONE -> {
                 if (text == previousSubtitle?.text) previousSubtitleAt = contextClock()
             }
-            StabilizerKind.CLEAR -> clearCaption()
+            StabilizerKind.CLEAR -> {
+                shownPack = null
+                clearCaption()
+            }
             StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
                 val source = action.text ?: return
                 clearCaption(hide = readingArea == ReadingArea.GAME_TEXT)
                 val input = subtitleInput(source, action.kind)
                 val cached = cache[input]
-                if (cached != null) {
-                    deliver(source, cached)
+                if (cached?.fromPack == true) {
+                    deliver(source, cached, position)
                 } else {
-                    val request = Request(number, source, input)
+                    val request = Request(number, source, input, position, allowFallback)
                     val find = lookup
-                    if (find == null) enqueue(request) else find(input) { reply ->
+                    if (find == null || cached != null) {
+                        onPackMiss(request, cached)
+                    } else find(input) { reply ->
                         if (!closed && number == request.number) {
-                            if (reply == null) enqueue(request)
+                            if (reply == null) {
+                                onPackMiss(request, null)
+                            }
                             else {
                                 cache[input] = reply
-                                deliver(source, reply)
+                                deliver(source, reply, position)
                             }
                         }
                     }
@@ -82,6 +100,7 @@ internal class CaptionSession(
     fun reset() {
         previousGameLines = emptySet()
         previousSubtitle = null
+        shownPack = null
         stabilizer.reset()
         clearCaption()
     }
@@ -124,6 +143,23 @@ internal class CaptionSession(
         translateNext()
     }
 
+    private fun keepPackedReading(input: TranslationInput): Boolean {
+        val packed = shownPack ?: return false
+        if (!PackCaptionContinuity.isReread(input.text, packed.text)) return false
+        previousSubtitle = packed
+        previousSubtitleAt = contextClock()
+        return true
+    }
+
+    private fun onPackMiss(request: Request, cached: TranslationReply?) {
+        if (keepPackedReading(request.input)) return
+        when {
+            !request.allowFallback -> stabilizer.forgetSent()
+            cached != null -> deliver(request.source, cached, request.position)
+            else -> enqueue(request)
+        }
+    }
+
     private fun translateNext() {
         if (busy || closed) return
         val request = waiting ?: return
@@ -140,7 +176,7 @@ internal class CaptionSession(
                         show(null)
                         onFailure(reply.issue)
                     } else {
-                        deliver(request.source, reply)
+                        deliver(request.source, reply, request.position)
                     }
                 }
                 translateNext()
@@ -148,13 +184,14 @@ internal class CaptionSession(
         }
     }
 
-    private fun deliver(source: String, reply: TranslationReply) {
+    private fun deliver(source: String, reply: TranslationReply, position: CaptionPosition?) {
         val turkish = reply.text?.trim() ?: return
         val changed = if (readingArea == ReadingArea.GAME_TEXT) TextMatch.normalize(source) != TextMatch.normalize(turkish)
         else stabilizer.shouldSend(source, turkish)
-        val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(turkish) else turkish
-        if (changed) show(Caption(source, displayed))
-        else show(null)
+        val localized = if (position != null) Gta6Profile.localizeSpeaker(turkish) else turkish
+        val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(localized) else localized
+        shownPack = if (changed && reply.fromPack && readingArea == ReadingArea.SUBTITLES) previousSubtitle else null
+        show(if (changed) Caption(source, displayed, position, reply.packId) else null)
     }
 
     private companion object {

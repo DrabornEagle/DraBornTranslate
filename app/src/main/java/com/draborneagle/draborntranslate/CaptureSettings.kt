@@ -30,13 +30,17 @@ internal data class CaptureSettings(
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
     val focus: Boolean = false,
     val captionEnabled: Boolean = true,
+    val gameProfile: GameReadingProfile = GameReadingProfile.GENERAL,
+    val plainPhonePanel: Boolean = false,
 ) {
+    val gtaProfileActive: Boolean get() = gameProfile == GameReadingProfile.GTA_6 && readingArea == ReadingArea.SUBTITLES
     val captionsAtTop: Boolean get() = bandTop >= 35
     val showOnPhone: Boolean get() = source == Source.MOBILE || display.phone
     val showOnPortal: Boolean get() = source != Source.MOBILE && display.portal
     val overlayOnPhone: Boolean get() = source != Source.PS5 && (showOnPhone || focus)
     val speakOnPhone: Boolean get() = source == Source.PORTAL && display == SubtitleDisplay.VOICE
-    fun scanArea(video: Pixels): Pixels = if (readingArea == ReadingArea.GAME_TEXT) video else subtitleBand(video, bandTop)
+    fun scanArea(video: Pixels): Pixels =
+        if (gtaProfileActive || readingArea == ReadingArea.GAME_TEXT) video else subtitleBand(video, bandTop)
 
     companion object {
         const val DEFAULT_BAND_TOP = 65
@@ -63,6 +67,8 @@ internal fun Context.readCaptureSettings(source: Source): CaptureSettings {
             ?: ReadingArea.SUBTITLES,
         focus = prefs.getBoolean("focus", true),
         captionEnabled = prefs.getBoolean("subtitles", true),
+        gameProfile = GameReadingProfile.from(prefs.getString("gameProfile", null)),
+        plainPhonePanel = prefs.getBoolean("plainPhonePanel", false),
     )
 }
 

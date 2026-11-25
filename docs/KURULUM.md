@@ -1,10 +1,10 @@
-# DraBornTranslate v0.5.5
+# DraBornTranslate v0.6
 
-**Android 10+ · ARM64 · Android sürüm kodu 7**
+**Android 10+ · ARM64 · Android sürüm kodu 8**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.5.5)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6)
 
-v0.5.5 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.6 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -23,6 +23,12 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 4. Telefonu yanında ikinci ekran olarak kullanabilirsin. Portal yan paneli, PS5’in Game Base bağlantısını açmasına ve **Yana Sabitle** seçeneğini göstermesine bağlıdır. Uygulamadaki panel testinde bu seçenek doğrulanabilir.
 
 [PlayStation App Paylaşımlı Ekran](https://www.playstation.com/tr-tr/support/games/playstation-app-features/) · [PS Portal Uzaktan Oynama](https://www.playstation.com/tr-tr/support/hardware/playstation-remote-play-on-psportal/)
+
+## GTA 6 profili
+
+1. **Portal’a bağlan → Oyun profili → GTA 6** seç. Profili **Telefonda oyna** ekranında da açabilirsin. PS5/TV bağlantısı için **Ayarlar → Ek alanlar → GTA 6 için ayarla** seçeneğini kullan.
+2. **Telefon ve Portal paneli** çıkışı aynı Türkçe altyazıyı, görev ve ipucu metinlerini, mesajları ve tuş ipuçlarını iki ekrana gönderir. GTA 6 oyundaki telefon açılınca gönderici adları korunur ve mesajlar sohbet balonlarında gösterilir. **Oyun profili** penceresinden sade sütun görünümüne geçebilirsin.
+3. Oyunun İngilizce altyazısını açık tut. Hazır Türkçe paket bulunmadığında çeviri telefondaki modelle yapılır. İki OCR okuması belirgin biçimde ayrışırsa uygulama paketteki eşleşmeye öncelik verir ve çevrimdışı çeviri için daha tutarlı bir kare bekler.
 
 ## Altyazı ve Görsel Çeviri
 

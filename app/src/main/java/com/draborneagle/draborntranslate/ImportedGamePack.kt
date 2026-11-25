@@ -32,13 +32,23 @@ internal object ImportedGamePack {
     private val downloadLock = Any()
     private var gtaGeneration = 0L
     private var shared: GamePackLibrary? = null
+    private var gtaLibrary: GamePackLibrary? = null
 
     fun hasPack(context: Context): Boolean = file(context, IMPORTED_FILE).baseFile.isFile
     fun hasGta(context: Context): Boolean = file(context, GTA_FILE).baseFile.isFile
 
     @Synchronized
-    fun library(context: Context): GamePackLibrary {
+    fun library(context: Context, profile: GameReadingProfile = GameReadingProfile.GENERAL): GamePackLibrary {
         val app = context.applicationContext
+        if (profile == GameReadingProfile.GTA_6) {
+            return gtaLibrary ?: GamePackLibrary(
+                bundled = { sourceFiles(app).filter { it.first == GTA_FILE } },
+                userDirectory = null,
+            ).also {
+                it.detected = "gta-6"
+                gtaLibrary = it
+            }
+        }
         return shared ?: GamePackLibrary(
             bundled = { sourceFiles(app) },
             userDirectory = null,
@@ -94,6 +104,7 @@ internal object ImportedGamePack {
                 if (data != null) {
                     write(target, data)
                     shared = null
+                    gtaLibrary = null
                 }
                 prefs.edit().putString("sha256", checksum).putInt("entries", count)
                     .putLong("checked", System.currentTimeMillis()).apply()
@@ -108,6 +119,7 @@ internal object ImportedGamePack {
         file(context, if (gta) GTA_FILE else IMPORTED_FILE).delete()
         if (gta) {
             gtaGeneration++
+            gtaLibrary = null
             context.getSharedPreferences("pack_download", Context.MODE_PRIVATE).edit().clear().apply()
         }
         shared = null

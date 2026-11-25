@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
+import com.gametranslator.gametranslator_mobile.core.TextBox
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.IOException
@@ -48,6 +51,7 @@ internal class PortalPanelServer(
         val revision: Long,
         val body: ByteArray,
         val testing: Boolean = false,
+        val profile: ByteArray = EMPTY_STATE,
     )
 
     @Volatile private var caption = CaptionFrame(0, ByteArray(0))
@@ -57,11 +61,18 @@ internal class PortalPanelServer(
         start()
     }
 
-    fun publish(text: String?, testing: Boolean = false) {
+    fun publish(
+        text: String?,
+        testing: Boolean = false,
+        position: CaptionPosition? = null,
+        hud: List<HudBlock> = emptyList(),
+        plainPhone: Boolean = false,
+    ) {
         val body = text.orEmpty().toByteArray(Charsets.UTF_8)
+        val profile = panelState(text, testing, position, hud, plainPhone)
         synchronized(change) {
-            if (closed.get() || caption.testing == testing && caption.body.contentEquals(body)) return
-            caption = CaptionFrame(caption.revision + 1, body, testing)
+            if (closed.get() || caption.profile.contentEquals(profile)) return
+            caption = CaptionFrame(caption.revision + 1, body, testing, profile)
             change.notifyAll()
         }
     }
@@ -130,11 +141,13 @@ internal class PortalPanelServer(
                 send(client, "200 OK", "text/html; charset=utf-8", page, headOnly,
                     "X-DraBorn-Panel: ready\r\n")
             }
-            "${prefix}caption.txt" -> {
+            "${prefix}caption.txt", "${prefix}state.json" -> {
+                val json = request[1].substringBefore('?').endsWith("/state.json")
                 val after = request[1].substringAfter("?after=", "").toLongOrNull()
                 val frame = waitForCaption(if (headOnly) null else after)
                 val mode = if (frame.testing) "X-DraBorn-Panel: test\r\n" else ""
-                send(client, "200 OK", "text/plain; charset=utf-8", frame.body, headOnly,
+                val type = if (json) "application/json; charset=utf-8" else "text/plain; charset=utf-8"
+                send(client, "200 OK", type, if (json) frame.profile else frame.body, headOnly,
                     "X-DraBorn-Revision: ${frame.revision}\r\n$mode")
                 if (!headOnly && viewed.compareAndSet(false, true)) onViewed()
             }
@@ -215,3 +228,24 @@ internal class PortalPanelServer(
         }
     }
 }
+
+private val EMPTY_STATE = """{"caption":"","testing":false,"plainPhone":false,"hud":[]}""".toByteArray(Charsets.UTF_8)
+
+private fun panelState(
+    caption: String?, testing: Boolean, position: CaptionPosition?, blocks: List<HudBlock>, plainPhone: Boolean,
+): ByteArray {
+    if (caption.isNullOrEmpty() && !testing && position == null && blocks.isEmpty() && !plainPhone) return EMPTY_STATE
+    val hud = JSONArray()
+    for (block in blocks) {
+        hud.put(JSONObject().put("type", block.kind.name).put("label", block.kind.label)
+            .put("title", block.title).put("box", block.box.coordinates())
+            .put("rows", JSONArray(block.lines.map { line ->
+                JSONObject().put("text", line.text).put("style", line.style.name)
+            })))
+    }
+    return JSONObject().put("caption", caption.orEmpty()).put("testing", testing)
+        .put("position", position?.box?.coordinates()).put("speakerColor", position?.speakerColor)
+        .put("plainPhone", plainPhone).put("hud", hud).toString().toByteArray(Charsets.UTF_8)
+}
+
+private fun TextBox.coordinates() = JSONArray(listOf(left, top, right, bottom))

@@ -94,6 +94,8 @@ class MainActivity : Activity() {
     private var renderAboutUpdate: ((UpdateState) -> Unit)? = null
     private var updateResultPending = false
     private lateinit var panelHelp: Button
+    private lateinit var profileChoice: Button
+    private lateinit var gameHudLabel: TextView
     private var portalConnectionBadge: TextView? = null
 
     private lateinit var instructions: TextView
@@ -237,11 +239,13 @@ class MainActivity : Activity() {
         capture.append(openSource, 8)
         displayChoice = connectionOption("", R.drawable.ic_tv_screen, Palette.blue) { selectDisplay() }
         readingChoice = connectionOption("", R.drawable.ic_capture_album, Palette.rose) { selectReadingArea() }
+        profileChoice = connectionOption("", R.drawable.ic_controller, Palette.purple) { selectGameProfile() }
         val focusArea = connectionOption("Görüntüde alan seç", R.drawable.ic_focus_region, Palette.mint) {
             startActivity(Intent(this, FocusActivity::class.java))
         }
         if (mobile) {
             capture.append(readingChoice, 7)
+            capture.append(profileChoice, 7)
             capture.append(focusArea, 7)
         } else {
             content.append(copy("Çeviri seçenekleri", 22, Palette.white, true).apply {
@@ -249,6 +253,7 @@ class MainActivity : Activity() {
             }, 19)
             content.append(displayChoice, 9)
             content.append(readingChoice, 7)
+            content.append(profileChoice, 7)
             content.append(focusArea, 7)
         }
 
@@ -263,6 +268,8 @@ class MainActivity : Activity() {
         live.append(sourceLabel, 8)
         recognizedLabel = label("", 14, LAVENDER).apply { setLineSpacing(dp(2).toFloat(), 1f) }
         live.append(recognizedLabel, 8)
+        gameHudLabel = label("", 15, MINT).apply { setLineSpacing(dp(4).toFloat(), 1f) }
+        live.append(gameHudLabel, 8)
         copyTurkish = button("Türkçeyi kopyala") {
             displayedCaption()?.let { copyText("Türkçe çeviri", it.turkish) }
         }
@@ -390,9 +397,15 @@ class MainActivity : Activity() {
         readingChoice.isEnabled = controlsAvailable
         readingChoice.text = readingMode().label
         readingChoice.contentDescription = "Çeviri modu · ${readingChoice.text}"
+        profileChoice.isEnabled = controlsAvailable
+        profileChoice.text = when {
+            state.suggestGtaProfile && config.gameProfile == GameReadingProfile.GENERAL -> "Oyun profili · GTA 6 öneriliyor"
+            else -> "Oyun profili · ${config.gameProfile.label}"
+        }
         packButton.isEnabled = controlsAvailable && demoTranslator == null
         packButton.text = if (ImportedGamePack.hasGta(this)) "GTA 6 Türkçe paketi hazır" else "Oyun paketleri"
-        bandSettings.visibility = if (config.captionEnabled && config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
+        bandSettings.visibility = if (config.captionEnabled && config.readingArea == ReadingArea.SUBTITLES && !config.gtaProfileActive)
+            View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
         startStop.isEnabled = !pending && demoTranslator == null
@@ -420,6 +433,13 @@ class MainActivity : Activity() {
         captionLabel.text = caption?.turkish.orEmpty()
         sourceLabel.text = source?.let { "Çevirinin İngilizce metni\n$it" }.orEmpty()
         recognizedLabel.text = differentReading?.let { "Okunan İngilizce\n$it" }.orEmpty()
+        val hud = state.gameHud.takeIf { state.active && currentSource }.orEmpty()
+        gameHudLabel.text = hud.joinToString("\n\n") { block ->
+            val header = block.title ?: block.kind.label
+            val text = block.lines.joinToString("\n") { it.text.replace(coloredHudText, "$1") }
+            "$header\n$text"
+        }
+        gameHudLabel.visibility = if (hud.isEmpty()) View.GONE else View.VISIBLE
         captionLabel.visibility = if (caption == null) View.GONE else View.VISIBLE
         copyTurkish.visibility = captionLabel.visibility
         sourceLabel.visibility = if (source == null) View.GONE else View.VISIBLE
@@ -455,6 +475,41 @@ class MainActivity : Activity() {
     private fun setDisplay(display: SubtitleDisplay) {
         config = config.copy(display = display)
         prefs.edit().putString("display", display.name).putString("display.${config.source.name}", display.name).apply()
+    }
+
+    private fun selectGameProfile() {
+        showPopup("Oyun profili", R.drawable.ic_controller, Palette.purple) { dialog ->
+            append(label("GTA 6 profili altyazı, görev, ipucu ve telefon metninin yerini otomatik ayarlar.", 14, MUTED), 12)
+            GameReadingProfile.entries.forEach { profile ->
+                append(connectionOption(profile.label, R.drawable.ic_controller, Palette.purple,
+                    selected = profile == config.gameProfile) {
+                    config = if (profile == GameReadingProfile.GTA_6) {
+                        config.copy(gameProfile = profile, readingArea = ReadingArea.SUBTITLES, captionEnabled = true)
+                    } else config.copy(gameProfile = profile)
+                    prefs.edit().putString("gameProfile", profile.name)
+                        .putString("readingArea", config.readingArea.name).putBoolean("subtitles", config.captionEnabled).apply()
+                    render()
+                    dialog.dismiss()
+                }, 8)
+            }
+            if (config.gameProfile == GameReadingProfile.GTA_6) {
+                append(connectionOption(
+                    if (config.plainPhonePanel) "Telefon paneli · Sade" else "Telefon paneli · Sohbet",
+                    R.drawable.ic_phone_screen, MINT,
+                ) {
+                    config = config.copy(plainPhonePanel = !config.plainPhonePanel)
+                    prefs.edit().putBoolean("plainPhonePanel", config.plainPhonePanel).apply()
+                    dialog.dismiss()
+                    selectGameProfile()
+                }, 8)
+                if (!ImportedGamePack.hasGta(this)) {
+                    append(button("GTA 6 Türkçe paketini aç") {
+                        dialog.dismiss()
+                        startActivity(Intent(this, GamePacksActivity::class.java))
+                    }, 8)
+                }
+            }
+        }
     }
 
     private fun readingMode() = when {
@@ -1165,3 +1220,5 @@ class MainActivity : Activity() {
         private const val PROJECTION = 12
     }
 }
+
+private val coloredHudText = Regex("""⁅#[0-9a-fA-F]{6}\|([^⁆]*)⁆""")

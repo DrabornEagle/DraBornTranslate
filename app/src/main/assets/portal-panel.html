@@ -20,6 +20,33 @@
     color: #fff; background: #12162e; padding: 14px 10px; border-radius: 14px;
     border: 1px solid #393e6d; border-top: 2px solid #79e5ff;
     text-shadow: 0 1px 3px #000; }
+  #hud { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; }
+  .hud-card { min-width: 0; border: 1px solid #41486e; background: #181930; color: #f7f8ff;
+    border-radius: 10px; padding: 8px 10px; font-size: 15px; line-height: 1.22;
+    overflow-wrap: break-word; word-wrap: break-word; }
+  .hud-heading { margin: 0 0 5px; color: #bfb5ff; font-size: .83em; font-weight: bold; }
+  .hud-heading .initials { display: inline-block; margin-right: 6px; text-align: center; min-width: 1.8em;
+    line-height: 1.8; border-radius: 50%; color: #161c2d; background: #83e6d3; }
+  .hud-row + .hud-row { margin-top: 4px; }
+  .hud-row.name { font-weight: bold; color: #abe3ed; }
+  .hud-card.phone { max-height: 66vh; display: flex; flex-direction: column; background: #171b31; }
+  .hud-card.phone.plain { background: rgba(23, 27, 49, .75); }
+  .phone-rows { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .phone:not(.plain) .hud-row:not(.name) { padding: 4px 7px; border-radius: 7px; }
+  .phone:not(.plain) .incoming { margin-right: 9%; background: #2c3151; }
+  .phone:not(.plain) .outgoing { margin-left: 9%; background: #234c55; }
+  .phone:not(.plain) .reply { background: #3f3662; border-bottom: 1px solid #ad94f3; }
+  .hud-card.controls .hud-row { display: inline-block; margin: 0 8px 2px 0; }
+  .hud-card.objective { text-align: center; }
+  @media (min-aspect-ratio: 13/10) and (min-width: 600px) {
+    main.positioned { position: relative; max-width: none; height: 100vh; overflow: hidden; }
+    main.positioned .hud-card, main.positioned .subtitle { position: absolute; }
+    main.positioned .hud-card { font-size: min(2.45vh, 17px); }
+    main.positioned .subtitle { transform: translate(-50%, -50%); }
+    main.positioned #caption { background: rgba(16, 17, 27, .94); border: 0; padding: 4px 8px;
+      border-radius: 6px; font-size: min({{caption-size}}px, 5vh); }
+    main.positioned .hud-card.phone { max-height: 75vh; }
+  }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -27,7 +54,8 @@
 <main>
   <h1 id="title">DraBornTranslate</h1>
   <p id="status" role="status">Altyazı bağlantısı açılıyor…</p>
-  <div class="subtitle">
+  <div id="hud" hidden></div>
+  <div class="subtitle" id="subtitle">
     <p id="caption" aria-live="polite" hidden></p>
   </div>
 </main>
@@ -36,17 +64,131 @@
   var title = document.getElementById("title");
   var status = document.getElementById("status");
   var caption = document.getElementById("caption");
+  var subtitle = document.getElementById("subtitle");
+  var hud = document.getElementById("hud");
+  var main = document.querySelector("main");
   var revision = null;
+  var lastState = null;
+  var kinds = {OBJECTIVE:"objective",HELP:"help",MESSAGE:"message",PHONE:"phone",CONTROLS:"controls"};
+  var styles = {TEXT:"text",INCOMING:"incoming",OUTGOING:"outgoing",REPLY:"reply",NAME:"name"};
 
-  function display(text, connected, testing) {
+  function display(state, connected) {
+    lastState = state;
+    var text = state.caption || "";
+    var testing = state.testing;
+    var blocks = state.hud || [];
+    main.classList.toggle("positioned", !!state.position || blocks.length > 0);
     title.textContent = testing ? "Portal bağlantı testi" : "DraBornTranslate";
-    title.hidden = !!text && !testing;
-    if (caption.textContent !== text) caption.textContent = text;
+    title.hidden = (!!text || blocks.length > 0) && !testing;
+    renderCaption(text, state.position, state.speakerColor);
+    renderHud(blocks, state.plainPhone);
     caption.hidden = !text;
-    status.hidden = !!text;
+    status.hidden = !!text || blocks.length > 0;
     status.textContent = connected ? "Panel açık. Oyun metni bekleniyor." :
       "Bağlantı kesildi. Telefonda canlı çeviri oturumunu kontrol et.";
   }
+
+  function position(element, left, top, width) {
+    element.style.left = (100 * left) + "%";
+    element.style.top = (100 * top) + "%";
+    element.style.width = (100 * width) + "%";
+  }
+
+  function renderCaption(text, box, color) {
+    if (caption.textContent !== text || (color || "") !== caption.getAttribute("data-color")) {
+      caption.textContent = "";
+      caption.setAttribute("data-color", color || "");
+      var colon = text.indexOf(":");
+      if (colon > 0 && colon < 36 && /^#[0-9a-f]{6}$/i.test(color || "")) {
+        var name = document.createElement("span");
+        name.style.color = color;
+        name.textContent = text.slice(0, colon);
+        caption.appendChild(name);
+        caption.appendChild(document.createTextNode(text.slice(colon)));
+      } else caption.textContent = text;
+    }
+    if (main.classList.contains("positioned") && wide()) {
+      if (box) position(subtitle, (box[0] + box[2]) / 2, (box[1] + box[3]) / 2,
+        Math.min(.83, Math.max(.29, box[2] - box[0] + .06)));
+      else position(subtitle, .50, .87, .64);
+    } else subtitle.removeAttribute("style");
+  }
+
+  function appendColored(element, text) {
+    var pattern = /⁅(#[0-9a-f]{6})\|([^⁆]*)⁆/gi;
+    var start = 0;
+    var result;
+    while ((result = pattern.exec(text)) !== null) {
+      element.appendChild(document.createTextNode(text.slice(start, result.index)));
+      var span = document.createElement("span");
+      span.style.color = result[1];
+      span.textContent = result[2];
+      element.appendChild(span);
+      start = pattern.lastIndex;
+    }
+    element.appendChild(document.createTextNode(text.slice(start)));
+  }
+
+  function renderHud(blocks, plainPhone) {
+    hud.textContent = "";
+    hud.hidden = !blocks.length;
+    blocks.forEach(function (block) {
+      var kind = kinds[block.type];
+      if (!kind || !block.box || !block.rows || !block.rows.length) return;
+      var box = block.box;
+      var card = document.createElement("section");
+      card.className = "hud-card " + kind + (kind === "phone" && plainPhone ? " plain" : "");
+      var heading = document.createElement("h2");
+      heading.className = "hud-heading";
+      var title = block.title || block.label || "";
+      if (kind === "phone" && !plainPhone && title !== "Mesajlar") {
+        var initials = document.createElement("span");
+        initials.className = "initials";
+        initials.setAttribute("aria-hidden","true");
+        initials.textContent = title.trim().split(/\s+/).slice(0, 2).map(function (part) { return part.charAt(0); }).join("");
+        heading.appendChild(initials);
+      }
+      heading.appendChild(document.createTextNode(title));
+      card.appendChild(heading);
+      var inner = document.createElement("div");
+      if (kind === "phone") inner.className = "phone-rows";
+      block.rows.forEach(function (row) {
+        var div = document.createElement("p");
+        div.className = "hud-row " + (styles[row.style] || "text");
+        appendColored(div, row.text || "");
+        inner.appendChild(div);
+      });
+      card.appendChild(inner);
+      var width = kind === "phone" ? .33 : kind === "objective" || kind === "controls" ? .43 : .28;
+      var left = kind === "help" ? box[2] + .012 : kind === "objective" ? (box[0] + box[2] - width) / 2 :
+        kind === "phone" ? (box[0] >= width + .015 ? box[0] - width - .015 : box[2] + .015) : box[2] - width;
+      hud.appendChild(card);
+      if (wide()) {
+        position(card, Math.min(.99 - width, Math.max(.01, left)), Math.max(.01, box[1]), width);
+      }
+      if (kind === "phone") {
+        var size = parseFloat(window.getComputedStyle(card).fontSize) || 15;
+        while (inner.scrollHeight > inner.clientHeight && size > 10) {
+          size -= 1;
+          card.style.fontSize = size + "px";
+        }
+      }
+      if (wide()) {
+        var height = card.offsetHeight / Math.max(1, main.clientHeight);
+        position(card, Math.min(.99 - width, Math.max(.01, left)), Math.max(.01, Math.min(box[1], .99 - height)), width);
+      }
+    });
+  }
+
+  function wide() {
+    return window.matchMedia("(min-aspect-ratio: 13/10) and (min-width: 600px)").matches;
+  }
+
+  window.addEventListener("resize", function () {
+    if (!lastState) return;
+    renderCaption(lastState.caption || "", lastState.position, lastState.speakerColor);
+    renderHud(lastState.hud || [], lastState.plainPhone);
+  });
 
   function poll() {
     var request = new XMLHttpRequest();
@@ -54,19 +196,24 @@
     function finish(ok) {
       if (completed) return;
       completed = true;
-      var testing = ok && request.getResponseHeader("X-DraBorn-Panel") === "test";
-      display(ok ? request.responseText : "", ok, testing);
+      var received;
       if (ok) {
+        try { received = JSON.parse(request.responseText); } catch (ignored) { ok = false; }
+      }
+      if (ok) {
+        var previous = revision;
         revision = request.getResponseHeader("X-DraBorn-Revision");
+        if (revision !== previous || !lastState) display(received, true);
         if (revision !== null) poll();
         else window.setTimeout(poll, 140);
       } else {
+        display({}, false);
         revision = null;
         window.setTimeout(poll, 400);
       }
     }
 
-    request.open("GET", revision === null ? "caption.txt" : "caption.txt?after=" + revision, true);
+    request.open("GET", revision === null ? "state.json" : "state.json?after=" + revision, true);
     request.timeout = 3000;
     request.onreadystatechange = function () {
       if (request.readyState === 4) finish(request.status === 200);

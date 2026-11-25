@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
+import com.gametranslator.gametranslator_mobile.core.ExtraAreas
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
@@ -19,6 +20,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import java.io.IOException
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CaptureService : Service() {
@@ -28,6 +30,11 @@ class CaptureService : Service() {
     private var consoleFrames: ConsoleFrames? = null
     private var focus: LiveFocus? = null
     private var ocr: SubtitleReader? = null
+    private var profileReader: GtaProfileReader? = null
+    private var hudSession: HudTranslationSession? = null
+    private var gtaOverlay: GtaHudOverlay? = null
+    private var profile = GameReadingProfile.GENERAL
+    private var plainPhonePanel = false
     private var translator: CaptionTranslator? = null
     private var captions: CaptionSession? = null
     private var overlay: CaptionOverlay? = null
@@ -73,6 +80,8 @@ class CaptureService : Service() {
                 ?: ReadingArea.SUBTITLES,
             intent.getBooleanExtra(EXTRA_FOCUS, false),
             intent.getBooleanExtra(EXTRA_CAPTION, true),
+            GameReadingProfile.from(intent.getStringExtra(EXTRA_PROFILE)),
+            intent.getBooleanExtra(EXTRA_PLAIN_PHONE, false),
         )
         connection = config.source
         val direct = config.source == Source.PS5
@@ -105,7 +114,9 @@ class CaptureService : Service() {
         }
         CaptureInbox.watch(this)
         CaptureInbox.enqueue(this)
-        val language = GameTranslatorEngine(this)
+        profile = config.gameProfile
+        plainPhonePanel = config.plainPhonePanel
+        val language = GameTranslatorEngine(this, profile)
         translator = language
         if (!config.showOnPortal) closePanel()
         val panelIssue = if (config.showOnPortal) ensurePanel(config.textSize) else null
@@ -129,8 +140,14 @@ class CaptureService : Service() {
             },
             portalIssue = panelIssue,
         ))
-        if (config.captionEnabled) ocr = SubtitleReader(readingArea)
-        if (config.captionEnabled && !direct && config.showOnPhone) overlay = CaptionOverlay(this, config)
+        if (config.captionEnabled && config.gtaProfileActive) {
+            profileReader = GtaProfileReader(profileOcr)
+            hudSession = HudTranslationSession(language::translate, ::showHud)
+            if (!direct && config.showOnPhone) gtaOverlay = GtaHudOverlay(this, config)
+        } else if (config.captionEnabled) {
+            ocr = SubtitleReader(readingArea)
+            if (!direct && config.showOnPhone) overlay = CaptionOverlay(this, config)
+        }
         if (config.speakOnPhone) voice = TurkishVoice(this) { issue ->
             if (!ended) {
                 SessionState.update(SessionState.current.copy(voiceIssue = issue))
@@ -233,14 +250,32 @@ class CaptureService : Service() {
 
     private fun recognize(bitmap: Bitmap) {
         val reader = ocr
-        if (ended || reader == null) {
+        val gtaReader = profileReader
+        if (ended || reader == null && gtaReader == null) {
             bitmap.recycle()
             ocrPending.set(false)
             return
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
-        reader.read(bitmap) { lines ->
+        if (gtaReader != null) {
+            gtaReader.read(bitmap) { result ->
+                main.post {
+                    ocrPending.set(false)
+                    if (!ended && frameEpoch == epoch) {
+                        if (result == null) updateStatus("Yazı tanıma yanıtı alınamadı.")
+                        else {
+                            val lines = result.subtitles.map { it.text }
+                            updateStatus(if (lines.isEmpty() && result.hud.isEmpty()) waitingForText() else "GTA 6 oyun metni okunuyor.")
+                            captions?.read(lines, result.captionPosition(), result.allowFallback)
+                            hudSession?.read(result.hud)
+                        }
+                    }
+                }
+            }
+            return
+        }
+        reader?.read(bitmap) { lines ->
             ocrPending.set(false)
             if (ended || frameEpoch != epoch) return@read
             if (lines == null) {
@@ -259,20 +294,38 @@ class CaptureService : Service() {
     private fun showCaption(caption: Caption?) {
         if (ended) return
         val state = SessionState.current
-        if (state.portalPanel?.previewing != true) publishCaption(caption)
         voice?.speak(caption?.turkish)
+        val recommend = profile == GameReadingProfile.GENERAL && ExtraAreas.isGta6(null, caption?.packId) &&
+            !capturePreferences().getBoolean("gtaProfileSuggested", false)
+        if (recommend) capturePreferences().edit().putBoolean("gtaProfileSuggested", true).apply()
+        val next = state.copy(caption = caption, lastCaption = caption ?: state.lastCaption,
+            suggestGtaProfile = state.suggestGtaProfile || recommend)
+        SessionState.update(next)
+        renderTranslation(next)
+        if (caption != null) updateTranslationIssue(null)
+    }
+
+    private fun showHud(blocks: List<HudBlock>) {
+        if (ended) return
+        val state = SessionState.current.copy(gameHud = blocks)
+        SessionState.update(state)
+        renderTranslation(state)
+    }
+
+    private fun renderTranslation(state: SessionState.State) {
+        if (state.portalPanel?.previewing != true) publishTranslation(state)
         try {
-            overlay?.show(caption)
+            overlay?.show(state.caption)
+            gtaOverlay?.show(state.caption, state.gameHud)
         } catch (error: RuntimeException) {
             main.post { finish("Altyazı katmanı açılamadı. Üstte gösterme iznini kontrol et.") }
             return
         }
-        SessionState.update(SessionState.current.copy(caption = caption, lastCaption = caption ?: state.lastCaption))
-        if (caption != null) updateTranslationIssue(null)
     }
 
-    private fun publishCaption(caption: Caption?) {
-        panel?.publish(caption?.turkish)
+    private fun publishTranslation(state: SessionState.State) {
+        panel?.publish(state.caption?.turkish, position = state.caption?.position,
+            hud = state.gameHud, plainPhone = plainPhonePanel)
     }
 
     private fun openPanel(textSize: Int): PortalPanelServer {
@@ -322,6 +375,7 @@ class CaptureService : Service() {
                 focus?.clear()
             }
             captions?.reset()
+            hudSession?.reset()
         }
         SessionState.update(SessionState.current.copy(videoVisible = value == FrameSource.VISIBLE))
         if (!modelReady) return
@@ -395,10 +449,13 @@ class CaptureService : Service() {
         consoleFrames?.close()
         focus?.close()
         captions?.close()
+        hudSession?.reset()
         overlay?.close()
+        gtaOverlay?.close()
         voice?.close()
         closePanel()
         ocr?.close()
+        profileReader?.close()
         translator?.close()
         stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
@@ -431,7 +488,7 @@ class CaptureService : Service() {
             panelTestTick.run()
             main.postDelayed(endPanelPreview, 180_000L)
         } else {
-            publishCaption(state.caption)
+            publishTranslation(state)
         }
     }
 
@@ -509,6 +566,9 @@ class CaptureService : Service() {
         private const val EXTRA_CAPTION = "captionEnabled"
         private const val EXTRA_DISPLAY = "display"
         private const val EXTRA_READING_AREA = "readingArea"
+        private const val EXTRA_PROFILE = "gameProfile"
+        private const val EXTRA_PLAIN_PHONE = "plainPhonePanel"
+        private val profileOcr = Executors.newSingleThreadExecutor { r -> Thread(r, "dra-gta-ocr").apply { isDaemon = true } }
 
         internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
             context.startForegroundService(captureIntent(context, config).apply {
@@ -529,6 +589,8 @@ class CaptureService : Service() {
             putExtra(EXTRA_READING_AREA, config.readingArea.name)
             putExtra(EXTRA_FOCUS, config.focus)
             putExtra(EXTRA_CAPTION, config.captionEnabled)
+            putExtra(EXTRA_PROFILE, config.gameProfile.name)
+            putExtra(EXTRA_PLAIN_PHONE, config.plainPhonePanel)
         }
 
         internal fun stop(context: Context) {

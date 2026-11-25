@@ -21,6 +21,8 @@ internal object SessionState {
         val portalIssue: String? = null,
         val voiceIssue: String? = null,
         val translationIssue: String? = null,
+        val gameHud: List<HudBlock> = emptyList(),
+        val suggestGtaProfile: Boolean = false,
     )
 
     private val listeners = mutableSetOf<(State) -> Unit>()

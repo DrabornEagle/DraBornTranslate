@@ -17,7 +17,10 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Callable
 import java.util.concurrent.FutureTask
 
-internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
+internal class GameTranslatorEngine(
+    context: Context,
+    private val profile: GameReadingProfile = GameReadingProfile.GENERAL,
+) : CaptionTranslator {
     private val app = context.applicationContext
     private val main = Handler(Looper.getMainLooper())
     @Volatile private var closed = false
@@ -25,7 +28,7 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
     override fun prepare(done: (Boolean) -> Unit) {
         if (closed) return
         packExecutor.execute {
-            val ready = runCatching { ImportedGamePack.library(app).warmUp() }
+            val ready = runCatching { ImportedGamePack.library(app, profile).warmUp() }
                 .onFailure { Log.w(TAG, "Oyun paketi açılamadı", it) }.isSuccess
             if (!closed) main.post { if (!closed) done(ready) }
         }
@@ -39,7 +42,7 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
         packExecutor.execute {
             if (closed) return@execute
             val result = runCatching {
-                val library = ImportedGamePack.library(app)
+                val library = ImportedGamePack.library(app, profile)
                 val exact = PackTranslation.match(input.text) { line ->
                     PackLookup.match(line, find = library::find)
                 }
@@ -48,7 +51,9 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
                         com.gametranslator.gametranslator_mobile.core.TextMatch.endsQuestion(input.text) ==
                             com.gametranslator.gametranslator_mobile.core.TextMatch.endsQuestion(candidate.text)
                     }
-                match?.text?.trim()?.takeIf(String::isNotEmpty)?.let { TranslationReply(it) }
+                match?.text?.trim()?.takeIf(String::isNotEmpty)?.let {
+                    TranslationReply(it, fromPack = true, packId = match.packId ?: library.searchScope)
+                }
             }.getOrNull()
             main.post { if (!closed) done(result) }
         }
@@ -65,7 +70,7 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
         submit(priority = if (input.readingArea == ReadingArea.SUBTITLES) 0 else 1) {
             if (!closed) {
                 val pipeline = GameTranslationPipeline(
-                    packLookup = { text -> PackTranslation.match(ImportedGamePack.library(app), text) },
+                    packLookup = { text -> PackTranslation.match(ImportedGamePack.library(app, profile), text) },
                     model = { text -> model(app).translate(text) },
                 )
                 val reply = runCatching { pipeline.translate(input) }

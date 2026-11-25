@@ -44,13 +44,15 @@ class SubtitlePipeline(
     }
 
     private val lock = Any()
-    private val cache = object : LinkedHashMap<String, String>(64, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, String>?) = size > CACHE_SIZE
+    private data class CachedSubtitle(val text: String, val fromPack: Boolean)
+    private val cache = object : LinkedHashMap<String, CachedSubtitle>(64, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, CachedSubtitle>?) = size > CACHE_SIZE
     }
     private var latest = 0
     /** Ekranda duran satırın numarası; satır kalktıysa -1. */
     private var onScreen = -1
     private var lastShownSource: String? = null
+    private var shownPackSource: String? = null
 
     /** Çeviri gösterildiğinde (kaynak, çeviri). */
     var onPair: ((String, String) -> Unit)? = null
@@ -102,7 +104,7 @@ class SubtitlePipeline(
     }
 
     /** Bir karenin okuması: [lines] yukarıdan aşağı satırlar, [box] yazının ekrandaki yeri. */
-    fun onRead(lines: List<String>, box: TextBox?) {
+    fun onRead(lines: List<String>, box: TextBox?, allowFallback: Boolean = true) {
         val tidied = lines.map { tidy(it) }.filter { it.isNotEmpty() }
         val text = (repeats?.without(tidied) ?: tidied).joinToString("\n")
         onReadText?.invoke(text)
@@ -118,6 +120,7 @@ class SubtitlePipeline(
                 StabilizerKind.CLEAR -> {
                     readings.clear()
                     onScreen = -1
+                    shownPackSource = null
                     sink.clear()
                 }
                 StabilizerKind.RESTORE -> {
@@ -125,15 +128,19 @@ class SubtitlePipeline(
                     val source = action.text ?: return
                     val number = ++latest
                     onScreen = number
-                    cache[key(source)]?.let { show(source, it, box, ON_SCREEN_MS, replaces = false) }
-                        ?: request(number, source, box)
+                    val cached = cache[key(source)]?.takeIf { allowFallback || it.fromPack }
+                    if (cached != null) {
+                        if (cached.fromPack || !PackCaptionContinuity.isReread(source, shownPackSource)) {
+                            show(source, cached, box, ON_SCREEN_MS, replaces = false)
+                        }
+                    } else request(number, source, box, allowFallback)
                 }
                 StabilizerKind.TRANSLATE -> {
                     val source = settle(action.text ?: return)
                     val number = ++latest
                     onScreen = number
-                    val cached = cache[key(source)]
-                    if (cached != null) deliver(number, source, cached, box) else request(number, source, box)
+                    val cached = cache[key(source)]?.takeIf { allowFallback || it.fromPack }
+                    if (cached != null) deliver(number, source, cached, box) else request(number, source, box, allowFallback)
                 }
             }
         }
@@ -152,7 +159,7 @@ class SubtitlePipeline(
         return ReadingConsensus.merge(source, listOf(source) + related, check)
     }
 
-    private fun request(number: Int, source: String, box: TextBox?) {
+    private fun request(number: Int, source: String, box: TextBox?, allowFallback: Boolean) {
         firstSeenOf[number] = if (seenAt > 0) seenAt else clock()
         requestedAt[number] = clock()
         translateExecutor.execute {
@@ -162,6 +169,15 @@ class SubtitlePipeline(
             } catch (error: Exception) {
                 null
             }
+            if (packed == null && synchronized(lock) {
+                val keepPacked = number == onScreen && PackCaptionContinuity.isReread(source, shownPackSource)
+                if (!allowFallback || keepPacked) {
+                    if (!allowFallback && number == onScreen && !keepPacked) stabilizer.forgetSent()
+                    firstSeenOf.remove(number)
+                    requestedAt.remove(number)
+                    true
+                } else false
+            }) return@execute
             if (packed == null) try { onUnpacked?.invoke(source.replace('\n', ' ')) } catch (_: Exception) {}
             // İki satırlık altyazı tek cümledir; çevirmene tek satır olarak gider.
             val translated = packed?.text?.trim() ?: try {
@@ -181,17 +197,19 @@ class SubtitlePipeline(
                     onTranslateFailed?.invoke(source)
                     return@synchronized
                 }
-                cache[key(source)] = translated
-                deliver(number, source, translated, box)
+                val result = CachedSubtitle(translated, packed != null)
+                cache[key(source)] = result
+                deliver(number, source, result, box)
             }
         }
     }
 
     /** Kilit altında çağrılır. Yerine yenisi gelmiş satırın geç kalan çevirisi gösterilmez. */
-    private fun deliver(number: Int, source: String, translated: String, box: TextBox?) {
+    private fun deliver(number: Int, source: String, translated: CachedSubtitle, box: TextBox?) {
         if (number != latest) return
+        if (!translated.fromPack && PackCaptionContinuity.isReread(source, shownPackSource)) return
         // Çeviri kaynağıyla neredeyse aynıysa metin zaten hedef dildedir.
-        if (!stabilizer.shouldSend(source, translated)) return
+        if (!stabilizer.shouldSend(source, translated.text)) return
         val duration = if (number == onScreen) ON_SCREEN_MS else readingTime(translated)
         val replaces = lastShownSource?.let { TextMatch.isRevision(source, it) } ?: false
         show(source, translated, box, duration, replaces)
@@ -203,15 +221,19 @@ class SubtitlePipeline(
         if (requestedAt.size > 32) { requestedAt.clear(); firstSeenOf.clear(); translateMsOf.clear(); packedOf.clear() }
     }
 
-    private fun show(source: String, translated: String, box: TextBox?, duration: Int, replaces: Boolean) {
+    private fun show(source: String, translated: CachedSubtitle, box: TextBox?, duration: Int, replaces: Boolean) {
         lastShownSource = source
-        sink.show(translated, duration, box, replaces)
+        shownPackSource = source.takeIf { translated.fromPack }
+        sink.show(translated.text, duration, box, replaces)
         // Kısa sürede aynen yinelenen ve cümle gibi bitmeyen satır arayüz yazısıdır; bir süre okunmaz.
         repeats?.note(source)?.let { blocked -> onRepeatBlocked?.invoke(blocked) }
-        onPair?.invoke(source, translated)
+        onPair?.invoke(source, translated.text)
     }
 
-    private fun key(source: String) = TextMatch.normalize(source)
+    private fun key(source: String): String {
+        val normalized = TextMatch.normalize(source)
+        return if (TextMatch.endsQuestion(source)) "$normalized?" else normalized
+    }
 
     // --- Gecikme ölçümü (günlük için): satır ilk okunduğundan TV'ye gidene kadar geçen süre ---
     /** (kaynak, toplam ms, kararlılık bekleme ms, çeviri ms, paketten mi) */
@@ -237,6 +259,7 @@ class SubtitlePipeline(
             latest++
             onScreen = -1
             lastShownSource = null
+            shownPackSource = null
             readings.clear()
             if (stabilizer.reset().kind == StabilizerKind.CLEAR) sink.clear()
         }

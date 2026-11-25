@@ -4,6 +4,8 @@ DraBornTranslate, [GNU AGPL-3.0](../app/src/main/assets/LICENSE) kapsamında da�
 
 Android paket okuma ve Remote Play köprüsü, [GameTranslator v1.8.51](https://gitlab.com/sefflex/GameTranslator/-/tree/90074239529de5b4738340d00bbb06f706adef59) ve [CouchSubs](https://github.com/yorulmazsinan/couchsubs) çalışmalarından gelir. DraBornTranslate v5.0, Kasım 2026’da Android arayüzü, paket önceliği, DraBorn Odak, yakalama işleme ve Portal bağlantı akışını güncelledi. [Geçerli kaynak sürümü](../scripts/upstream-revision.json) depoda tutulur.
 
+DraBornTranslate v0.6, GameTranslator’ın Windows sürümünde yayımlanan GTA 6 bölgelerini, telefon panelini ve hatalı OCR karşısında paket çevirisini koruma davranışını Android ve Portal’a uyarlar. Android kodu ML Kit, mevcut oyun paketi okuyucusu ve Töz-Çevir altyapısını kullanır. [GameTranslator GTA okuma kaynakları](https://gitlab.com/sefflex/GameTranslator/-/tree/oyun-profilleri) · [1.8.55 sürüm notları](https://gitlab.com/sefflex/GameTranslator/-/releases/v1.8.55)
+
 | Bileşen | Kaynak |
 | --- | --- |
 | PS5 protokolü | [chiaki-ng v1.10.1](https://github.com/chiaki-ng/chiaki-ng/tree/f30da0aaeb96fc0026cc03683153f682352e7d7c) |

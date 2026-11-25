@@ -8,7 +8,13 @@ import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import com.draborneagle.draborntranslate.ConsoleSession
+import com.draborneagle.draborntranslate.GameReadingProfile
 import com.draborneagle.draborntranslate.GameTranslatorEngine
+import com.draborneagle.draborntranslate.Gta6Profile
+import com.draborneagle.draborntranslate.GtaProfileReader
+import com.draborneagle.draborntranslate.HudBlock
+import com.draborneagle.draborntranslate.HudKind
+import com.draborneagle.draborntranslate.HudTranslationSession
 import com.draborneagle.draborntranslate.ImportedGamePack
 import com.gametranslator.gametranslator_mobile.core.ContinuationTranslator
 import com.gametranslator.gametranslator_mobile.core.EnglishWords
@@ -146,6 +152,10 @@ object Engine : Native.SessionListener {
     private val scheduler = ReadScheduler()
     private var recognizer: TextRecognizer? = null
     @Volatile private var pipeline: SubtitlePipeline? = null
+    private var gtaReader: GtaProfileReader? = null
+    private var gtaTranslator: GameTranslatorEngine? = null
+    private var gtaHud: HudTranslationSession? = null
+    private var gtaReadAt = 0L
     private var lastLines: List<String> = emptyList()
     private var lastBox: TextBox? = null
 
@@ -406,6 +416,7 @@ object Engine : Native.SessionListener {
             closeSession()
             pipeline?.reset()
             pipeline = null
+            reader.execute(::resetGtaReading)
             // Ek alan kutuları da TV'den kalkar (süren tur bırakılır).
             regionWatcher?.reset()
             regionWatcher = null
@@ -437,6 +448,10 @@ object Engine : Native.SessionListener {
             if (now.region != before.region || now.autoRegion != before.autoRegion) {
                 scheduler.reset()
                 pipeline?.reset()
+            }
+            if (now.gta6Reading != before.gta6Reading) {
+                reader.execute(::resetGtaReading)
+                buildPipeline()
             }
             if (now.extraAreas != before.extraAreas) {
                 // Ek alan değişti: altyazı okuması alanları yeniden süzsün; okuyucu gerekiyorsa kurulur, gerekmiyorsa kalkar.
@@ -470,8 +485,10 @@ object Engine : Native.SessionListener {
         val translator: TextTranslator = ContinuationTranslator(joined,
             looksMisread = if (s.sourceLanguage == "en") { text -> englishWords != null && misspelling.looksMisread(text) } else null,
             phrasebook = if (turkishExtras) ShortPhrases::translate else null)
+        val gta = s.gta6Reading && turkishExtras
         val built = SubtitlePipeline(translator, object : SubtitleSink {
-            override fun show(text: String, durationMs: Int, box: TextBox?, replaces: Boolean) = showSubtitle(text, durationMs, box, replaces)
+            override fun show(text: String, durationMs: Int, box: TextBox?, replaces: Boolean) =
+                showSubtitle(if (gta) Gta6Profile.localizeSpeaker(text) else text, durationMs, box, replaces)
             override fun clear() = clearSubtitle()
         }, translating, joinLines = false)
         // Okuma onarımı ve okumaların birleştirilmesi İngilizce sözcük listesiyle (ilk kullanımda arka planda açılır).
@@ -616,7 +633,11 @@ object Engine : Native.SessionListener {
 
     /** PS5'in bildirdiği oyunun paketi (varsa) seçilir; paketler kapalıysa ya da oyun yoksa seçim kalkar. */
     private fun applyDetectedGame(library: GamePackLibrary) {
-        library.detected = if (settings.packsEnabled) library.findByGameName(ps5Game?.name) else null
+        library.detected = when {
+            !settings.packsEnabled -> null
+            settings.gta6Reading -> "gta-6"
+            else -> library.findByGameName(ps5Game?.name)
+        }
     }
 
     // --- Oyun paketleri ---
@@ -944,6 +965,10 @@ object Engine : Native.SessionListener {
 
     private fun readFrame() {
         val current = pipeline
+        if (current != null && settings.gta6Reading && PackTranslation.applies(settings.sourceLanguage, settings.targetLanguage)) {
+            readGtaFrame(current)
+            return
+        }
         val engine = recognizer
         val auto = settings.autoRegion
         if (auto) findSubtitles()
@@ -1002,6 +1027,68 @@ object Engine : Native.SessionListener {
                 reading.set(false)
             }
         }
+    }
+
+    private fun readGtaFrame(current: SubtitlePipeline) {
+        val now = SystemClock.elapsedRealtime()
+        if (now - gtaReadAt < 340L) {
+            reading.set(false)
+            return
+        }
+        val app = appContext
+        val bitmap = copyFrame(1280)
+        if (app == null || bitmap == null) {
+            bitmap?.recycle()
+            reading.set(false)
+            return
+        }
+        gtaReadAt = now
+        val ocr = gtaReader ?: GtaProfileReader(reader).also { gtaReader = it }
+        val hud = gtaHud ?: run {
+            val translator = GameTranslatorEngine(app, GameReadingProfile.GTA_6)
+            gtaTranslator = translator
+            HudTranslationSession({ input, done ->
+                val requested = if (settings.packsEnabled) translator::translate else translator::translateFallback
+                requested(input) { reply -> reader.execute { done(reply) } }
+            }, ::publishGtaHud).also { gtaHud = it }
+        }
+        ocr.read(bitmap) { result ->
+            try {
+                if (!running || pipeline !== current || gtaReader !== ocr || result == null) return@read
+                current.onRead(result.subtitles.map { it.text }, result.captionPosition()?.box, result.allowFallback)
+                hud.read(result.hud)
+            } finally {
+                reading.set(false)
+            }
+        }
+    }
+
+    private fun publishGtaHud(blocks: List<HudBlock>) {
+        for (kind in HudKind.entries) {
+            val block = blocks.firstOrNull { it.kind == kind }
+            val text = if (block == null) "" else (listOfNotNull(block.title) + block.lines.map { it.text }).joinToString("\n")
+            val box = block?.box?.let {
+                when (kind) {
+                    HudKind.HELP -> TextBox(it.right + 0.01, it.top, (it.right + 0.29).coerceAtMost(1.0), it.bottom)
+                    HudKind.PHONE -> {
+                        val left = if (it.left > 0.34) it.left - 0.33 else it.right.coerceAtMost(0.66)
+                        TextBox(left, it.top, left + 0.32, it.bottom)
+                    }
+                    else -> it
+                }
+            }
+            server.sendRegion("gta-${kind.name.lowercase(java.util.Locale.ROOT)}", text, box)
+        }
+    }
+
+    private fun resetGtaReading() {
+        gtaHud?.reset()
+        gtaHud = null
+        gtaReader?.close()
+        gtaReader = null
+        gtaTranslator?.close()
+        gtaTranslator = null
+        gtaReadAt = 0L
     }
 
     /** Bölgenin küçültülmüş parlaklık özeti; iki karenin aynı olup olmadığını anlamak için. */
@@ -1196,7 +1283,8 @@ object Engine : Native.SessionListener {
     /** Denetim iş parçacığında: ek alan okuyucusu gerekiyorsa kurulur ya da güncellenir, gerekmiyorsa kaldırılır. */
     private fun updateRegionWatcher() {
         val translator = regionTranslator
-        if (!running || pipeline == null || translator == null || settings.watchedAreas().isEmpty()) {
+        if (!running || pipeline == null || translator == null || settings.watchedAreas().isEmpty() ||
+            settings.gta6Reading && PackTranslation.applies(settings.sourceLanguage, settings.targetLanguage)) {
             regionWatcher?.let {
                 it.reset()
                 log(2, "ek alanlar kapandı")

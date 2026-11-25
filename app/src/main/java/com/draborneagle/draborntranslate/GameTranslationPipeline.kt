@@ -15,7 +15,12 @@ internal data class TranslationInput(
     val readingArea: ReadingArea = ReadingArea.SUBTITLES,
     val previousSubtitle: String? = null,
 )
-internal data class TranslationReply(val text: String? = null, val issue: String? = null)
+internal data class TranslationReply(
+    val text: String? = null,
+    val issue: String? = null,
+    val fromPack: Boolean = false,
+    val packId: String? = null,
+)
 
 /** Gives the sentence-level model complete sentences and keeps menu lines and speaker turns separate. */
 internal class GameTranslationPipeline(
