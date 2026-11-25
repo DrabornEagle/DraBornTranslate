@@ -18,8 +18,8 @@
     <th>PlayStation Portal</th>
   </tr>
   <tr>
-    <td align="center"><a href="docs/media/v0.5.4-ana-ekran.webp"><img src="docs/media/v0.5.4-ana-ekran.webp" width="270" alt="DraBornTranslate ana ekranı ve bağlantı seçenekleri"></a></td>
-    <td align="center"><a href="docs/media/v0.5.4-portal.webp"><img src="docs/media/v0.5.4-portal.webp" width="270" alt="PlayStation Portal yayın ve çeviri ekranı"></a></td>
+    <td align="center"><a href="docs/media/v0.5.5-ana-ekran.webp"><img src="docs/media/v0.5.5-ana-ekran.webp" width="270" alt="DraBornTranslate ana ekranı ve bağlantı seçenekleri"></a></td>
+    <td align="center"><a href="docs/media/v0.5.5-portal.webp"><img src="docs/media/v0.5.5-portal.webp" width="270" alt="PlayStation Portal yayın ve çeviri ekranı"></a></td>
   </tr>
 </table>
 
