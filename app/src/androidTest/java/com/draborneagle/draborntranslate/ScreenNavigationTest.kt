@@ -55,7 +55,8 @@ class ScreenNavigationTest {
             screenshot("01-home")
             click("Sürüm ve güncellemeler")
             waitFor { resumed() is UpdatesActivity }
-            assertTrue(hasText("Sürüm 0.5.5"))
+            val installedVersion = app.packageManager.getPackageInfo(app.packageName, 0).versionName
+            assertTrue(hasText("Sürüm $installedVersion"))
             assertFalse(hasText("Açık kaynak lisansı"))
             screenshot("09-surum-ve-guncellemeler")
             click("Geri")
@@ -87,6 +88,18 @@ class ScreenNavigationTest {
             assertTrue(optionNode(alternate.label)?.isSelected == true)
             assertTrue(optionNode(target.label)?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true)
             waitFor { hasText(target.label) }
+            val originalProfile = app.readCaptureSettings(Source.PORTAL).gameProfile
+            click("Oyun profili · ${originalProfile.label}")
+            waitForAccessible("GTA 6", "12-oyun-profili")
+            assertTrue(optionNode(originalProfile.label)?.isSelected == true)
+            assertTrue(optionNode(GameReadingProfile.GTA_6.label)?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true)
+            waitFor { hasText("Oyun profili · GTA 6") }
+            assertEquals(GameReadingProfile.GTA_6, app.readCaptureSettings(Source.PORTAL).gameProfile)
+            click("Oyun profili · GTA 6")
+            waitForAccessible("Telefon paneli", "12-oyun-profili")
+            screenshot("12-oyun-profili")
+            assertTrue(optionNode(originalProfile.label)?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true)
+            waitFor { hasText("Oyun profili · ${originalProfile.label}") }
             click("Geri")
             waitFor { resumed() is HomeActivity }
             click("Telefonda oyna")
