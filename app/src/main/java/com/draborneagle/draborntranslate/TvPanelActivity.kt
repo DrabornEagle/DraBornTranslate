@@ -47,7 +47,7 @@ class TvPanelActivity : Activity() {
         test = press("Örnek altyazıyı göster", Palette.purple) {
             test.isEnabled = false
             socket.execute {
-                val sent = runCatching { Engine.sendTestSubtitle() }.isSuccess
+                val sent = runCatching { Engine.sendTestSubtitle(applicationContext) }.isSuccess
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
                     test.isEnabled = true

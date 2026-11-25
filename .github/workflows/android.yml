@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: android-${{ github.ref }}
@@ -19,19 +20,41 @@ jobs:
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        id: console-package
+        with:
+          path: console-ui/build/host/outputs/repo/
+          key: console-aar-${{ runner.os }}-flutter-3.50.1-${{ hashFiles('console-ui/lib/**', 'console-ui/assets/**', 'console-ui/pubspec.*', 'console-ui/.metadata', 'scripts/build-console-ui.sh') }}
+      - id: console-reuse
+        if: steps.console-package.outputs.cache-hit != 'true'
+        run: |
+          if [[ "$(git rev-parse HEAD:console-ui)" == "644df49ee546a3346409211685910be7464566b8" ]]; then
+            echo 'verified=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.console-reuse.outputs.verified == 'true'
+        with:
+          name: DraBornTranslate-console-aar
+          path: console-ui/build/host/outputs/repo/
+          run-id: 45533344503
+          github-token: ${{ github.token }}
       - uses: actions/setup-java@v4
+        if: steps.console-package.outputs.cache-hit != 'true' && steps.console-reuse.outputs.verified != 'true'
         with:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v4
+        if: steps.console-package.outputs.cache-hit != 'true' && steps.console-reuse.outputs.verified != 'true'
         with:
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
       - uses: subosito/flutter-action@v2
+        if: steps.console-package.outputs.cache-hit != 'true' && steps.console-reuse.outputs.verified != 'true'
         with:
           flutter-version: '3.50.1'
           channel: stable
           cache: true
       - run: bash scripts/build-console-ui.sh
+        if: steps.console-package.outputs.cache-hit != 'true' && steps.console-reuse.outputs.verified != 'true'
       - uses: actions/upload-artifact@v4
         with:
           name: DraBornTranslate-console-aar
@@ -50,7 +73,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0'
       - uses: actions/download-artifact@v4
         with:
           name: DraBornTranslate-console-aar
@@ -84,7 +107,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0'
       - uses: actions/download-artifact@v4
         with:
           name: DraBornTranslate-console-aar
@@ -123,7 +146,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0 ndk;28.2.13676358 cmake;3.22.1'
       - uses: actions/download-artifact@v4
         with:
           name: DraBornTranslate-console-aar

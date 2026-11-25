@@ -366,6 +366,11 @@ object Engine : Native.SessionListener {
                 if (s.accountId == null || s.console == null) return@onControl setPhase("failed", UiText.code("need_ps_setup"))
             }
             running = true
+            lastDeliveredFrame = 0L
+            lastSource = ""
+            lastTranslation = ""
+            lastRead = ""
+            GameTranslatorEngine.primeConsoleModel(app)
             frameCount = 0
             translatedCount = 0
             packHits = 0
@@ -374,11 +379,7 @@ object Engine : Native.SessionListener {
             ps5Game = null
             setPhase("starting")
             refreshPacks(app)
-            // TV uygulaması kurulamayan cihazlar için: tarayıcıda http://telefon:8787/obs
-            if (server.overlayPage == null) server.overlayPage = runCatching { app.assets.open("obs-overlay.html").use { it.readBytes() } }.getOrNull()
-            // TV uygulaması kurulamayan TV'ler için ikinci ekran: tablette ya da başka telefonda http://telefon:8787/ekran
-            if (server.screenPage == null) server.screenPage = runCatching { app.assets.open("second-screen.html").use { it.readBytes() } }.getOrNull()
-            if (server.fontFile == null) server.fontFile = runCatching { app.assets.open("Quicksand-Bold.ttf").use { it.readBytes() } }.getOrNull()
+            loadServerAssets(app)
             val port = server.start()
             server.active = true
             watchForOtherServer()
@@ -1282,7 +1283,14 @@ object Engine : Native.SessionListener {
         }
     }
 
-    fun sendTestSubtitle() {
+    private fun loadServerAssets(context: Context) {
+        if (server.overlayPage == null) server.overlayPage = runCatching { context.assets.open("obs-overlay.html").use { it.readBytes() } }.getOrNull()
+        if (server.screenPage == null) server.screenPage = runCatching { context.assets.open("second-screen.html").use { it.readBytes() } }.getOrNull()
+        if (server.fontFile == null) server.fontFile = runCatching { context.assets.open("Quicksand-Bold.ttf").use { it.readBytes() } }.getOrNull()
+    }
+
+    fun sendTestSubtitle(context: Context) {
+        loadServerAssets(context)
         if (server.boundPort == 0) server.start()
         // Deneme sırasında da "çeviri yapan" sayılır: TV bilgisayardaki uygulamaya bağlıysa telefona geçsin.
         server.active = true

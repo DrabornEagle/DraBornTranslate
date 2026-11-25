@@ -38,6 +38,8 @@ class ConsoleStudioActivity : FlutterActivity() {
     private var displayRelay: LoopbackRelay? = null
     private var events: EventChannel.EventSink? = null
     private var subtitles: EventChannel.EventSink? = null
+    private val sendState: (Map<String, Any?>) -> Unit = { events?.success(it) }
+    private val sendSubtitle: (Map<String, Any?>) -> Unit = { subtitles?.success(it) }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -48,7 +50,7 @@ class ConsoleStudioActivity : FlutterActivity() {
         EventChannel(messenger, "gt/events").setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 this@ConsoleStudioActivity.events = events
-                Engine.onChanged = { state -> this@ConsoleStudioActivity.events?.success(state) }
+                Engine.onChanged = sendState
                 events.success(Engine.state())
             }
 
@@ -59,7 +61,7 @@ class ConsoleStudioActivity : FlutterActivity() {
         EventChannel(messenger, "gt/subtitles").setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 this@ConsoleStudioActivity.subtitles = events
-                Engine.onSubtitle = { event -> this@ConsoleStudioActivity.subtitles?.success(event) }
+                Engine.onSubtitle = sendSubtitle
             }
 
             override fun onCancel(arguments: Any?) {
@@ -69,6 +71,8 @@ class ConsoleStudioActivity : FlutterActivity() {
     }
 
     override fun onDestroy() {
+        if (Engine.onChanged === sendState) Engine.onChanged = null
+        if (Engine.onSubtitle === sendSubtitle) Engine.onSubtitle = null
         events = null
         subtitles = null
         closeDisplayRelay()
@@ -220,7 +224,7 @@ class ConsoleStudioActivity : FlutterActivity() {
                 }
             }
             "testSubtitle" -> {
-                background.execute { Engine.sendTestSubtitle() }
+                background.execute { Engine.sendTestSubtitle(applicationContext) }
                 result.success(null)
             }
             "logs" -> result.success(Engine.logLines())

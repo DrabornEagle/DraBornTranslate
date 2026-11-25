@@ -98,6 +98,13 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
             inference.execute(TranslationJob(priority, sequence.getAndIncrement(), task))
         }
 
+        internal fun primeConsoleModel(context: Context) {
+            val app = context.applicationContext
+            submit(2) {
+                runCatching { model(app) }.onFailure { Log.w(TAG, "Türkçe model açılamadı", it) }
+            }
+        }
+
         internal fun consoleTranslation(context: Context, text: String): String? {
             val work = FutureTask(Callable { model(context.applicationContext).translate(text) })
             submit(0) { work.run() }

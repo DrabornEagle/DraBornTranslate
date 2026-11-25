@@ -94,13 +94,14 @@ object TurkishSuffix {
         if (body.length > MAX_SUFFIX_LENGTH || !body.all { it.isLetter() }) return term + apostrophe + suffix
 
         val proper = term[0].isUpperCase()
-        val lastWord = term.substring(term.lastIndexOf(' ') + 1).lowercase(TURKISH)
+        val cityName = proper && term.endsWith(" City")
+        val lastWord = if (cityName) "siti" else term.substring(term.lastIndexOf(' ') + 1).lowercase(TURKISH)
         val lastLetter = lastWord.lastOrNull { it.isLetter() }
         var lastVowel = lastWord.lastOrNull { isVowel(it) }
         // Ünlüsüz kısaltma ("XP", "HP") harf adlarıyla okunur: "iks-pe" → ince, ünlüyle biter.
         val endsWithVowel = lastVowel == null || (lastLetter != null && isVowel(lastLetter))
         if (lastVowel == null) lastVowel = 'e'
-        val compound = term.contains(' ') && lastLetter != null && lastLetter in HIGH_VOWELS && lastWord.length >= 3
+        val compound = !cityName && term.contains(' ') && lastLetter != null && lastLetter in HIGH_VOWELS && lastWord.length >= 3
         val voiceless = !endsWithVowel && lastLetter != null && lastLetter in VOICELESS
 
         // Baştaki kaynaştırma harfi yer tutucuya göreydi ("Zarmon" ünsüzle biter, çoğu zaman yoktur); atılır.
