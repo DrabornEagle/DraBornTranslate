@@ -114,9 +114,7 @@ jobs:
           target: google_apis
           profile: pixel_6
           disable-animations: true
-          script: |
-            adb shell pm disable-user --user 0 com.google.android.apps.nexuslauncher &&
-              ./scripts/test-android-screens.sh
+          script: adb shell pm disable-user --user 0 com.google.android.apps.nexuslauncher && ./scripts/test-android-screens.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
