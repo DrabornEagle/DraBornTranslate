@@ -69,6 +69,7 @@
   var main = document.querySelector("main");
   var revision = null;
   var lastState = null;
+  var hudKey = null;
   var kinds = {OBJECTIVE:"objective",HELP:"help",MESSAGE:"message",PHONE:"phone",CONTROLS:"controls"};
   var styles = {TEXT:"text",INCOMING:"incoming",OUTGOING:"outgoing",REPLY:"reply",NAME:"name"};
 
@@ -129,7 +130,12 @@
     element.appendChild(document.createTextNode(text.slice(start)));
   }
 
-  function renderHud(blocks, plainPhone) {
+  function renderHud(blocks, plainPhone, layoutChanged) {
+    var key = JSON.stringify([blocks, plainPhone]);
+    if (!layoutChanged && key === hudKey) return;
+    hudKey = key;
+    var oldPhone = hud.querySelector(".phone-rows");
+    var scroll = oldPhone ? oldPhone.scrollTop : 0;
     hud.textContent = "";
     hud.hidden = !blocks.length;
     blocks.forEach(function (block) {
@@ -172,6 +178,7 @@
           size -= 1;
           card.style.fontSize = size + "px";
         }
+        inner.scrollTop = scroll;
       }
       if (wide()) {
         var height = card.offsetHeight / Math.max(1, main.clientHeight);
@@ -187,7 +194,7 @@
   window.addEventListener("resize", function () {
     if (!lastState) return;
     renderCaption(lastState.caption || "", lastState.position, lastState.speakerColor);
-    renderHud(lastState.hud || [], lastState.plainPhone);
+    renderHud(lastState.hud || [], lastState.plainPhone, true);
   });
 
   function poll() {

@@ -34,7 +34,13 @@ internal class GtaProfileReader(
             callbacks.execute { done(null) }
             return
         }
-        recognizer.process(InputImage.fromBitmap(bitmap, 0)).addOnCompleteListener(callbacks) { task ->
+        val original = runCatching { recognizer.process(InputImage.fromBitmap(bitmap, 0)) }.getOrNull()
+        if (original == null) {
+            bitmap.recycle()
+            callbacks.execute { done(null) }
+            return
+        }
+        original.addOnCompleteListener(callbacks) { task ->
             if (closed) {
                 bitmap.recycle()
                 done(null)
@@ -48,7 +54,13 @@ internal class GtaProfileReader(
             val source = PixelImage(width, height, pixels)
             val normal = if (task.isSuccessful) lines(task.result, source) else emptyList()
             val enhanced = Bitmap.createBitmap(emphasize(pixels), width, height, Bitmap.Config.ARGB_8888)
-            recognizer.process(InputImage.fromBitmap(enhanced, 0)).addOnCompleteListener(callbacks) { second ->
+            val secondPass = runCatching { recognizer.process(InputImage.fromBitmap(enhanced, 0)) }.getOrNull()
+            if (secondPass == null) {
+                enhanced.recycle()
+                done(normal.takeIf { !closed && task.isSuccessful }?.let { Gta6Profile.read(it, emptyList()) })
+                return@addOnCompleteListener
+            }
+            secondPass.addOnCompleteListener(callbacks) { second ->
                 enhanced.recycle()
                 done(
                     if (!closed && (task.isSuccessful || second.isSuccessful)) {

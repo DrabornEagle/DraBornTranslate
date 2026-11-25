@@ -502,10 +502,10 @@ class MainActivity : Activity() {
                     dialog.dismiss()
                     selectGameProfile()
                 }, 8)
-                if (!ImportedGamePack.hasGta(this)) {
+                if (!ImportedGamePack.hasGta(this@MainActivity)) {
                     append(button("GTA 6 Türkçe paketini aç") {
                         dialog.dismiss()
-                        startActivity(Intent(this, GamePacksActivity::class.java))
+                        startActivity(Intent(this@MainActivity, GamePacksActivity::class.java))
                     }, 8)
                 }
             }

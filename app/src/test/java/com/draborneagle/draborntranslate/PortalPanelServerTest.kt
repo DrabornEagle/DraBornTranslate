@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.draborneagle.draborntranslate
 
+import com.gametranslator.gametranslator_mobile.core.TextBox
+import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -44,6 +46,28 @@ class PortalPanelServerTest {
             assertEquals(404, get(server.url + "translate.png").code)
             server.publish(null)
             assertEquals("", get(captionUrl).body)
+        }
+    }
+
+    @Test
+    fun portalReceivesTheSamePositionAndHudWithNoSourceText() {
+        PortalPanelServer(loopback, "panel", 22) {}.use { server ->
+            val box = TextBox(0.42, 0.81, 0.61, 0.85)
+            val phone = HudBlock(HudKind.PHONE, box, listOf(HudLine("Yoldayım.", HudLineStyle.OUTGOING)), "Avery")
+            server.publish("Polis: Geri çekil.", position = CaptionPosition(box, "#23aaff"), hud = listOf(phone), plainPhone = true)
+            val response = get(server.url + "state.json")
+            val state = JSONObject(response.body)
+            assertEquals("application/json; charset=utf-8", response.contentType)
+            assertEquals("Polis: Geri çekil.", state.getString("caption"))
+            assertEquals(0.42, state.getJSONArray("position").getDouble(0), 0.001)
+            assertEquals("#23aaff", state.getString("speakerColor"))
+            assertTrue(state.getBoolean("plainPhone"))
+            val block = state.getJSONArray("hud").getJSONObject(0)
+            assertEquals("Avery", block.getString("title"))
+            assertEquals("OUTGOING", block.getJSONArray("rows").getJSONObject(0).getString("style"))
+            assertTrue(!state.has("source"))
+            server.publish(null)
+            assertEquals(0, JSONObject(get(server.url + "state.json").body).getJSONArray("hud").length())
         }
     }
 

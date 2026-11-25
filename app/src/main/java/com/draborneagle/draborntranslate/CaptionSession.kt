@@ -51,6 +51,7 @@ internal class CaptionSession(
     private var previousSubtitle: TranslationInput? = null
     private var previousSubtitleAt = 0L
     private var shownPack: TranslationInput? = null
+    private var shownSource: String? = null
 
     fun read(lines: List<String>, position: CaptionPosition? = null, allowFallback: Boolean = true) {
         if (closed) return
@@ -135,7 +136,11 @@ internal class CaptionSession(
     private fun clearCaption(hide: Boolean = true) {
         number++
         waiting = null
-        if (hide) show(null)
+        if (hide) {
+            shownPack = null
+            shownSource = null
+            show(null)
+        }
     }
 
     private fun enqueue(request: Request) {
@@ -154,7 +159,7 @@ internal class CaptionSession(
     private fun onPackMiss(request: Request, cached: TranslationReply?) {
         if (keepPackedReading(request.input)) return
         when {
-            !request.allowFallback -> stabilizer.forgetSent()
+            !request.allowFallback -> stabilizer.forgetSent(shownSource)
             cached != null -> deliver(request.source, cached, request.position)
             else -> enqueue(request)
         }
@@ -173,6 +178,8 @@ internal class CaptionSession(
                 if (request.number == number) {
                     if (turkish == null) {
                         stabilizer.forgetSent()
+                        shownPack = null
+                        shownSource = null
                         show(null)
                         onFailure(reply.issue)
                     } else {
@@ -191,6 +198,7 @@ internal class CaptionSession(
         val localized = if (position != null) Gta6Profile.localizeSpeaker(turkish) else turkish
         val displayed = if (readingArea == ReadingArea.SUBTITLES) formatDialogue(localized) else localized
         shownPack = if (changed && reply.fromPack && readingArea == ReadingArea.SUBTITLES) previousSubtitle else null
+        shownSource = source.takeIf { changed }
         show(if (changed) Caption(source, displayed, position, reply.packId) else null)
     }
 

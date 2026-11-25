@@ -150,11 +150,11 @@ class SubtitleStabilizer(
         !TextMatch.isSimilar(TextMatch.normalize(source), TextMatch.normalize(translation), 0.90)
 
     /** Son gönderilen satırı unutur (çevirisi başarısız oldu); satır ekranda kaldıkça en erken 1 sn sonra yeniden denenir. */
-    fun forgetSent() {
+    fun forgetSent(previouslyShown: String? = null) {
         if (sent.isNotEmpty()) forgotten = sent
         retryAt = clock() + RETRY_AFTER_MS
-        sent = ""
-        sentRaw = ""
+        sentRaw = previouslyShown.orEmpty()
+        sent = TextMatch.normalizeRows(sentRaw)
         candidate = ""
         candidateCount = 0
     }

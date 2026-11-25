@@ -121,6 +121,7 @@ class SubtitlePipeline(
                     readings.clear()
                     onScreen = -1
                     shownPackSource = null
+                    lastShownSource = null
                     sink.clear()
                 }
                 StabilizerKind.RESTORE -> {
@@ -172,7 +173,7 @@ class SubtitlePipeline(
             if (packed == null && synchronized(lock) {
                 val keepPacked = number == onScreen && PackCaptionContinuity.isReread(source, shownPackSource)
                 if (!allowFallback || keepPacked) {
-                    if (!allowFallback && number == onScreen && !keepPacked) stabilizer.forgetSent()
+                    if (!allowFallback && number == onScreen && !keepPacked) stabilizer.forgetSent(lastShownSource)
                     firstSeenOf.remove(number)
                     requestedAt.remove(number)
                     true
@@ -210,7 +211,7 @@ class SubtitlePipeline(
         if (!translated.fromPack && PackCaptionContinuity.isReread(source, shownPackSource)) return
         // Çeviri kaynağıyla neredeyse aynıysa metin zaten hedef dildedir.
         if (!stabilizer.shouldSend(source, translated.text)) return
-        val duration = if (number == onScreen) ON_SCREEN_MS else readingTime(translated)
+        val duration = if (number == onScreen) ON_SCREEN_MS else readingTime(translated.text)
         val replaces = lastShownSource?.let { TextMatch.isRevision(source, it) } ?: false
         show(source, translated, box, duration, replaces)
         val seen = firstSeenOf.remove(number)

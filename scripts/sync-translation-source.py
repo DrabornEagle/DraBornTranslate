@@ -7,6 +7,7 @@ import re
 import subprocess
 import urllib.request
 import zipfile
+from datetime import datetime
 from pathlib import Path, PurePosixPath
 
 REPOSITORY = "https://gitlab.com/sefflex/GameTranslator"
@@ -77,13 +78,18 @@ def sync() -> None:
         return
     if not SHA.fullmatch(revision):
         raise ValueError("Release commit could not be verified")
+    committed_at = released["commit"]["created_at"]
+    installed_at = installed.get("source_committed_at", installed["released_at"])
+    if revision == installed["commit"] or datetime.fromisoformat(committed_at) < datetime.fromisoformat(installed_at):
+        print(f"{tag} carries an older Android source commit ({revision[:8]}).")
+        return
     archive = f"{REPOSITORY}/-/archive/{revision}/GameTranslator-{revision}.zip"
     with zipfile.ZipFile(io.BytesIO(request(archive, 140 * 1024 * 1024))) as zipped:
         data = selected_files(zipped)
     for source, target in FILES.items():
         Path(target).write_bytes(data[source])
     Path(REVISION).write_text(json.dumps({
-        "tag": tag, "commit": revision, "released_at": released["released_at"],
+        "tag": tag, "commit": revision, "released_at": released["released_at"], "source_committed_at": committed_at,
     }, indent=2) + "\n")
     print(f"Prepared upstream revision {tag} ({revision[:8]}).")
 
