@@ -55,7 +55,7 @@ class ScreenNavigationTest {
             screenshot("01-home")
             click("Sürüm ve güncellemeler")
             waitFor { resumed() is UpdatesActivity }
-            assertTrue(hasText("Sürüm 5.5"))
+            assertTrue(hasText("Sürüm 0.5.5"))
             assertFalse(hasText("Açık kaynak lisansı"))
             screenshot("09-surum-ve-guncellemeler")
             click("Geri")

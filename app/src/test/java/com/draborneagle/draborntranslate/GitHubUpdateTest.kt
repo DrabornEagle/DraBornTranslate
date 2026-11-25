@@ -40,13 +40,14 @@ class GitHubUpdateTest {
     }
 
     @Test
-    fun acceptsTheNewTwoPartTagFromBothPreviousVersionStyles() {
-        val file = "DraBornTranslate-v5.5-Android-arm64.apk"
-        val latest = release(url = "https://github.com/DrabornEagle/DraBornTranslate/releases/download/v5.5/$file",
-            assetName = file).put("tag_name", "v5.5")
-        assertEquals("5.5", GitHubUpdate.parse(latest, "5.0.2")?.version)
-        assertEquals("5.5", GitHubUpdate.parse(latest, "0.5.4")?.version)
-        assertNull(GitHubUpdate.parse(latest, "5.5"))
+    fun acceptsTheCorrectedVersionAfterCurrentAndLegacyTags() {
+        val file = "DraBornTranslate-v0.5.5-Android-arm64.apk"
+        val latest = release(url = "https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.5.5/$file",
+            assetName = file).put("tag_name", "v0.5.5")
+        assertEquals("0.5.5", GitHubUpdate.parse(latest, "5.0.2")?.version)
+        assertEquals("0.5.5", GitHubUpdate.parse(latest, "0.5.4")?.version)
+        assertNull(GitHubUpdate.parse(latest, "0.5.5"))
+        assertNull(GitHubUpdate.parse(release().put("tag_name", "v5.0.2"), "0.5.5"))
     }
 
     @Test
