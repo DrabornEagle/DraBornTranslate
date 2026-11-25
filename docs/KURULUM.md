@@ -1,10 +1,10 @@
-# DraBornTranslate v5.0.2
+# DraBornTranslate v0.5.4
 
-**Android 10+ · ARM64 · Android sürüm kodu 3**
+**Android 10+ · ARM64 · Android sürüm kodu 5**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.2)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.5.4)
 
-v5.0.2’yi mevcut v5 serisi kurulumunun üzerine yükleyebilirsin. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.5.4 imzalı APK’yı indir ve mevcut v5 serisi kurulumunun üzerine yükle. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
