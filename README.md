@@ -33,7 +33,7 @@ Altyazılar akarken oyun telefonundaki mesajı, tabelayı veya Brief metnini se�
 
 [İmzalı DraBornTranslate v5.0.2 APK](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v5.0.2/DraBornTranslate-v5.0.2-Android-arm64.apk) · [Sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.2) · [Kurulum rehberi](docs/KURULUM.md)
 
-Android 10 ve üzeri ARM64 telefonlar desteklenir. v5.0.2, v5 serisinin paket kimliğini ve imzasını kullanır. **⋮ → Yeni sürüm kontrolü** üzerinden mevcut kurulumun üzerine yüklenebilir. Android sürüm kodu 3’dir.
+Android 10 ve üzeri ARM64 telefonlar desteklenir. v5.0.2, v5 serisinin paket kimliğini ve imzasını kullanır. **⋮ → Yeni sürüm kontrolü** üzerinden mevcut kurulumun üzerine yüklenebilir. Android sürüm kodu 3’tür.
 
 ## Güncellemeler ve kaynak kodu
 

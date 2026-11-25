@@ -4,7 +4,7 @@
 
 [İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.2)
 
-v5.0.2’i mevcut v5 serisi kurulumunun üzerine yükleyebilirsin. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v5.0.2’yi mevcut v5 serisi kurulumunun üzerine yükleyebilirsin. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -44,7 +44,7 @@ PS5’in otomatik yüklemesi yakalamaları PS App’e getirir. Telefona kaydetme
 
 ## Kaynak koddan derleme
 
-Flutter 3.50.1, Android SDK 36, Build Tools 35.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
+Flutter 3.50.1, Android SDK 36, Build Tools 35.0.0 ve 36.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
 
 ```bash
 bash scripts/build-console-ui.sh
