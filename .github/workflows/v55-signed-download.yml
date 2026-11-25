@@ -1,0 +1,74 @@
+name: Archive the verified DraBornTranslate v5.5 APK
+
+on:
+  push:
+    branches: [release/v5.5-download]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  attach:
+    if: github.repository == 'DrabornEagle/DraBornTranslate'
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45648931888
+          name: DraBornTranslate-Android-release
+          path: apk-input
+      - name: Verify and restore the already signed package
+        run: |
+          mkdir -p release-assets
+          python3 - <<'RECIPE'
+          from base64 import b64decode
+          from pathlib import Path
+
+          source = Path(".github/workflows/v55-release-assets.yml").read_text()
+          layout = source.split("<<'LAYOUT'\n", 1)[1].split("\n          LAYOUT\n", 1)[0]
+          Path("verified-apk-recipe.gz").write_bytes(b64decode("".join(layout.split()), validate=True))
+          RECIPE
+          python3 - <<'PY'
+          import gzip
+          import struct
+          from hashlib import sha256
+          from pathlib import Path
+
+          base = Path("apk-input/app-release-unsigned.apk").read_bytes()
+          if sha256(base).hexdigest() != "81c62e427199b9bacb837b1b6cd821efe6749a457f3286ed2eef445e868c8592":
+              raise SystemExit("Unexpected source APK")
+          output = Path("release-assets/DraBornTranslate-v5.5-Android-arm64.apk")
+          digest = sha256()
+          view = memoryview(base)
+          with gzip.open("verified-apk-recipe.gz", "rb") as recipe, output.open("wb") as apk:
+              while header := recipe.read(8):
+                  offset, count = struct.unpack("<iI", header)
+                  if offset == -1:
+                      data = recipe.read(count)
+                  elif 0 <= offset <= len(base) - count:
+                      data = view[offset:offset + count]
+                  else:
+                      raise SystemExit("Invalid source range")
+                  if len(data) != count:
+                      raise SystemExit("Incomplete package segment")
+                  apk.write(data)
+                  digest.update(data)
+          if digest.hexdigest() != "561e457e14fd287a6839dd71c63fe9592a69e96b81f3a89d1460f992b2a365bc":
+              raise SystemExit("Signed APK digest does not match")
+          PY
+          apk=release-assets/DraBornTranslate-v5.5-Android-arm64.apk
+          java -jar apk-input/apksigner.jar verify --print-certs "$apk" |
+            grep -F "Signer #1 certificate SHA-256 digest: 2a1caa144d305716f2b60238ddf9cd0114843adf765cf71c829daa7cad3618d5"
+          cd release-assets
+          sha256sum DraBornTranslate-v5.5-Android-arm64.apk > DraBornTranslate-v5.5-Android-arm64.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DraBornTranslate-v5.5-signed-android
+          path: release-assets/
+          if-no-files-found: error
