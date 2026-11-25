@@ -12,8 +12,8 @@ internal enum class Source(val appName: String, val packageName: String?) {
 
 internal enum class SubtitleDisplay(val label: String, val phone: Boolean, val portal: Boolean) {
     PHONE("Telefon", true, false),
-    PORTAL("Portal yan paneli (deneysel)", false, true),
-    BOTH("Telefon ve Portal paneli (deneysel)", true, true),
+    PORTAL("Portal paneli", false, true),
+    BOTH("Telefon ve Portal paneli", true, true),
     VOICE("Sesli Türkçe", false, false),
 }
 

@@ -40,6 +40,17 @@ class GitHubUpdateTest {
     }
 
     @Test
+    fun treatsThePreviousV5LabelsAsEarlierBuildsOfTheSameSeries() {
+        fun releaseFor(version: String): JSONObject {
+            val file = "DraBornTranslate-v$version-Android-arm64.apk"
+            return release(url = "https://github.com/DrabornEagle/DraBornTranslate/releases/download/v$version/$file",
+                assetName = file).put("tag_name", "v$version")
+        }
+        assertNull(GitHubUpdate.parse(releaseFor("5.0.3"), "0.5.4"))
+        assertEquals("0.5.4", GitHubUpdate.parse(releaseFor("0.5.4"), "5.0.3")?.version)
+    }
+
+    @Test
     fun skipsDraftsAndPrereleases() {
         assertNull(GitHubUpdate.parse(release().put("draft", true), "0.4.9"))
         assertNull(GitHubUpdate.parse(release().put("prerelease", true), "0.4.9"))

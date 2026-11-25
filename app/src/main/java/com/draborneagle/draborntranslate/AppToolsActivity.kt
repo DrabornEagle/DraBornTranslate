@@ -37,12 +37,6 @@ class UpdatesActivity : Activity() {
         content.addBelow(progress, 8)
         status = copy("").apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         content.addBelow(status, 5)
-        content.addBelow(press("Açık kaynak lisansı") {
-            val notice = assets.open("NOTICE").bufferedReader().use { it.readText() }
-            val license = assets.open("LICENSE").bufferedReader().use { it.readText() }
-            AlertDialog.Builder(this).setTitle("Açık kaynak lisansı")
-                .setMessage("$notice\n\n$license").setPositiveButton("Kapat", null).show()
-        }, 20)
     }
 
     override fun onResume() {

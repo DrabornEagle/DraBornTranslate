@@ -4,6 +4,7 @@ package com.draborneagle.draborntranslate
 import android.app.Activity
 import android.content.ContentValues
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
@@ -49,6 +50,13 @@ class ScreenNavigationTest {
         ActivityScenario.launch(HomeActivity::class.java).use {
             waitFor { resumed() is HomeActivity }
             screenshot("01-home")
+            click("Sürüm ve güncellemeler")
+            waitFor { resumed() is UpdatesActivity }
+            assertTrue(hasText("Sürüm 0.5.4"))
+            assertFalse(hasText("Açık kaynak lisansı"))
+            screenshot("09-surum-ve-guncellemeler")
+            click("Geri")
+            waitFor { resumed() is HomeActivity }
             click("PS5 ve TV’ye bağlan")
             waitFor { resumed() is ConsoleStudioActivity }
             waitForAccessible("Kurulum", "02-ps5-tv")
@@ -62,11 +70,55 @@ class ScreenNavigationTest {
             assertTrue(hasText("PlayStation App’i aç"))
             assertTrue(hasText("Çeviri seçenekleri"))
             screenshot("03-portal")
+            val target = app.readCaptureSettings(Source.PORTAL).display
+            val alternate = if (target == SubtitleDisplay.PHONE) SubtitleDisplay.BOTH else SubtitleDisplay.PHONE
+            click("Altyazı ve ses · ${target.label}")
+            waitForAccessible("Altyazı ve ses", "10-altyazi-ve-ses")
+            assertTrue(optionNode(target.label)?.isSelected == true)
+            assertFalse(hasAccessibleText("(deneysel)"))
+            screenshot("10-altyazi-ve-ses")
+            assertTrue(optionNode(alternate.label)?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true)
+            waitFor { hasText(alternate.label) }
+            click("Altyazı ve ses · ${alternate.label}")
+            waitForAccessible("Altyazı ve ses", "10-altyazi-ve-ses")
+            assertTrue(optionNode(alternate.label)?.isSelected == true)
+            assertTrue(optionNode(target.label)?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true)
+            waitFor { hasText(target.label) }
             click("Geri")
             waitFor { resumed() is HomeActivity }
             click("Telefonda oyna")
             waitFor { resumed() is MainActivity }
             assertTrue(hasText("PS Remote Play uygulamasını aç"))
+        }
+    }
+
+    @Test
+    fun livePortalFrameTakesPriorityOverSavedCaptureEvenWhenTheShareIsPaused() {
+        val saved = saveSample("recent-screenshotUrl.png", Color.RED)
+        try {
+            onMain {
+                LiveFocusFrames.clear()
+                SessionState.update(SessionState.State(active = true, source = Source.PORTAL))
+            }
+            ActivityScenario.launch(FocusActivity::class.java).use {
+                waitFor { resumed() is FocusActivity }
+                click("Güncel oyun karesini al")
+                waitFor { hasText("İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç.") }
+                onMain { cachePortalFrame(Color.BLUE) }
+                waitFor { hasText("PS App · Son görülen kare") && focusFrameColor() == Color.BLUE }
+                onMain { cachePortalFrame(Color.GREEN) }
+                assertEquals(Color.BLUE, onMain { focusFrameColor() })
+                click("Güncel oyun karesini al")
+                waitFor {
+                    resumed()?.intent?.data == null && hasText("PS App · Son görülen kare") && focusFrameColor() == Color.GREEN
+                }
+            }
+        } finally {
+            app.contentResolver.delete(saved, null, null)
+            onMain {
+                LiveFocusFrames.clear()
+                SessionState.update(SessionState.State())
+            }
         }
     }
 
@@ -214,6 +266,23 @@ class ScreenNavigationTest {
         return uri
     }
 
+    private fun cachePortalFrame(color: Int) {
+        val frame = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888).apply { eraseColor(color) }
+        LiveFocusFrames.replace(frame, Source.PORTAL, SystemClock.elapsedRealtime() - 15_000L)
+    }
+
+    private fun focusFrameColor(): Int? {
+        val view = resumed()?.window?.decorView?.findChild { it is FocusCanvas && it.isShown } ?: return null
+        if (view.width == 0 || view.height == 0) return null
+        val preview = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        return try {
+            view.draw(Canvas(preview))
+            preview.getPixel(preview.width / 2, preview.height / 2)
+        } finally {
+            preview.recycle()
+        }
+    }
+
     private fun touchFrame(drag: Boolean) = onMain {
         val frame = checkNotNull(resumed()?.window?.decorView?.findChild { view -> view is FocusCanvas && view.isShown })
         val start = SystemClock.uptimeMillis()
@@ -243,6 +312,11 @@ class ScreenNavigationTest {
 
     private fun hasAccessibleText(value: String): Boolean =
         instrumentation.uiAutomation.rootInActiveWindow?.containsLabel(value) == true
+
+    private fun optionNode(label: String): AccessibilityNodeInfo? =
+        instrumentation.uiAutomation.rootInActiveWindow?.let { root ->
+            root.findAccessibilityNodeInfosByText(label).firstOrNull { it.isClickable && it.text?.toString() == label }
+        }
 
     private fun AccessibilityNodeInfo.containsLabel(value: String): Boolean {
         if (isVisibleToUser && packageName == app.packageName &&

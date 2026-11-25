@@ -63,6 +63,20 @@ private const val ROSE = 0xFFFFA5BB.toInt()
 private const val PORTAL_START = "Portal Bağlantısını Başlat"
 private const val PORTAL_STOP = "Portal Bağlantısını Durdur"
 
+private enum class TranslationMode(
+    val label: String,
+    val icon: Int,
+    val accent: Int,
+    val area: ReadingArea = ReadingArea.SUBTITLES,
+    val focus: Boolean = false,
+    val captions: Boolean = true,
+) {
+    SUBTITLES(ReadingArea.SUBTITLES.label, R.drawable.ic_tv_screen, ACCENT),
+    IMAGE(VISUAL_TRANSLATION, R.drawable.ic_focus_region, MINT, focus = true, captions = false),
+    BOTH("Altyazı + $VISUAL_TRANSLATION", R.drawable.ic_capture_album, LAVENDER, focus = true),
+    GAME_TEXT(ReadingArea.GAME_TEXT.label, R.drawable.ic_controller, PEACH, area = ReadingArea.GAME_TEXT),
+}
+
 class MainActivity : Activity() {
     private val prefs by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
     private lateinit var config: CaptureSettings
@@ -79,7 +93,6 @@ class MainActivity : Activity() {
     private var aboutDialog: Dialog? = null
     private var renderAboutUpdate: ((UpdateState) -> Unit)? = null
     private var updateResultPending = false
-    private lateinit var focusArea: Button
     private lateinit var panelHelp: Button
     private var portalConnectionBadge: TextView? = null
 
@@ -188,53 +201,59 @@ class MainActivity : Activity() {
     private fun buildUi() {
         val mobile = config.source == Source.MOBILE
         val accent = if (mobile) Palette.blue else Palette.rose
-        val content = contentPage(if (mobile) "Telefonda oyna" else "PlayStation Portal", accent)
+        val content = if (mobile) contentPage("Telefonda oyna", accent) else portalPage()
+        val capture = if (mobile) card() else connectionSurface(Palette.purple)
         if (mobile) {
             content.append(featureHeader("Oyun telefonda", "PS Remote Play ile oyun görüntüsünü paylaş.",
                 R.drawable.ic_phone_screen, accent), 0)
         } else {
+            capture.addView(portalIllustration(), LinearLayout.LayoutParams(-1, dp(126)))
             val badge = copy("", 12, Palette.rose, true).apply {
                 accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+                setPadding(dp(8), dp(5), dp(8), dp(5))
+                maxWidth = dp(148)
             }
             portalConnectionBadge = badge
-            content.append(connectionHero("Portal yayını", "PlayStation App yayınına Türkçe altyazı ekle.",
-                R.drawable.ic_portal_device, accent, badge), 0)
+            capture.append(row().apply {
+                addView(copy("PlayStation App yayını", 14, Palette.white, true),
+                    LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+                addView(badge, LinearLayout.LayoutParams(-2, -2))
+            }, 10)
         }
 
-        val capture = card()
-        if (!mobile) capture.background = blend(0xFF352755.toInt(), 0xFF19243D.toInt(), 23)
-        content.append(capture, 12)
+        content.append(capture, if (mobile) 12 else 0)
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
-        styleButton(startStop, if (mobile) ACCENT to LAVENDER else MINT to ACCENT, activated = PEACH to ROSE)
+        styleButton(startStop, if (mobile) ACCENT to LAVENDER else LAVENDER to Palette.rose, activated = PEACH to ROSE)
         actionIcon(startStop, R.drawable.ic_portal_play, activeIcon = R.drawable.ic_portal_stop)
         if (!mobile) {
             startStop.textSize = 16f
-            startStop.minimumHeight = dp(56)
+            startStop.minimumHeight = dp(53)
         }
-        capture.addView(startStop, LinearLayout.LayoutParams(-1, -2))
-        openSource = button("") { openSourceApp(config.source, offerInstall = true) }
-        if (!mobile) actionIcon(openSource, R.drawable.ic_phone_screen, tint = LAVENDER)
+        capture.append(startStop, if (mobile) 0 else 12)
+        openSource = if (mobile) button("") { openSourceApp(config.source, offerInstall = true) }
+            else connectionOption("PlayStation App’i aç", R.drawable.ic_phone_screen, Palette.purple) {
+                openSourceApp(config.source, offerInstall = true)
+            }
         capture.append(openSource, 8)
-        displayChoice = button("") { selectDisplay() }
-        readingChoice = button("") { selectReadingArea() }
-        focusArea = button("$VISUAL_TRANSLATION · Alan seç") { startActivity(Intent(this, FocusActivity::class.java)) }
-        actionIcon(focusArea, R.drawable.ic_focus_region, tint = MINT)
+        displayChoice = connectionOption("", R.drawable.ic_tv_screen, Palette.blue) { selectDisplay() }
+        readingChoice = connectionOption("", R.drawable.ic_capture_album, Palette.rose) { selectReadingArea() }
+        val focusArea = connectionOption("Görüntüde alan seç", R.drawable.ic_focus_region, Palette.mint) {
+            startActivity(Intent(this, FocusActivity::class.java))
+        }
         if (mobile) {
-            capture.append(displayChoice, 8)
             capture.append(readingChoice, 7)
             capture.append(focusArea, 7)
         } else {
-            val options = card()
-            options.background = blend(0xFF293052.toInt(), 0xFF191E38.toInt(), 22)
-            options.addView(sectionTitle("Çeviri seçenekleri"))
-            options.append(actionRow(displayChoice, readingChoice), 10)
-            options.append(focusArea, 8)
-            content.append(options, 12)
+            content.append(copy("Çeviri seçenekleri", 22, Palette.white, true).apply {
+                isAccessibilityHeading = true
+            }, 19)
+            content.append(displayChoice, 9)
+            content.append(readingChoice, 7)
+            content.append(focusArea, 7)
         }
 
-        val live = card(highlight = true)
+        val live = if (mobile) card(highlight = true) else connectionSurface(Palette.mint)
         content.append(live, 14)
-        if (!mobile) live.background = blend(0xFF203D55.toInt(), 0xFF191F3C.toInt(), 22)
         live.addView(sectionTitle("Son çeviri"))
         status = label("", 14, ACCENT, bold = true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         live.append(status, 7)
@@ -253,8 +272,7 @@ class MainActivity : Activity() {
         }
         live.append(copySource, 6)
 
-        panelCard = card()
-        if (!mobile) panelCard.background = blend(0xFF3E2B50.toInt(), 0xFF211B3B.toInt(), 22)
+        panelCard = if (mobile) card() else connectionSurface(Palette.purple)
         content.append(panelCard, 14)
         panelCard.addView(sectionTitle("Portal yan paneli"))
         panelStatus = label("", 14, MUTED)
@@ -278,7 +296,7 @@ class MainActivity : Activity() {
         panelHelp = button("Portal’da paneli açma adımları") { showPortalHelp() }
         panelCard.append(panelHelp, 6)
 
-        val guide = content.addDetails("Bağlantı ve ekran paylaşımı")
+        val guide = content.addDetails("Bağlantı ve ekran paylaşımı", expandedByDefault = mobile)
         instructions = label("", 15, MUTED).apply { setLineSpacing(dp(4).toFloat(), 1f) }
         guide.append(instructions, 10)
 
@@ -321,6 +339,27 @@ class MainActivity : Activity() {
         content.append(voiceButton, 6)
     }
 
+    private fun portalPage(): LinearLayout {
+        val (scroll, content) = scrollColumn()
+        pageRoot(stack().apply {
+            addView(row().apply {
+                setPadding(dp(16), dp(4), dp(16), dp(4))
+                addView(press("‹") { finish() }.apply {
+                    background = RippleDrawable(ColorStateList.valueOf(0x29FFFFFF),
+                        filled(0xFF211A31.toInt(), 24, 0xFF47385F.toInt()), null)
+                    textSize = 27f
+                    setTextColor(Palette.purple)
+                    contentDescription = "Geri"
+                }, LinearLayout.LayoutParams(dp(48), dp(48)))
+                addView(copy("PlayStation Portal", 22, Palette.white, true).apply {
+                    isAccessibilityHeading = true
+                }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(13) })
+            })
+            addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        }, Palette.purple, connectionBackground)
+        return content
+    }
+
     private fun render() {
         val state = SessionState.current
         val mobile = config.source == Source.MOBILE
@@ -351,15 +390,12 @@ class MainActivity : Activity() {
         portalConnectionBadge?.connectionBadge(statusBadge.first, statusBadge.second)
         val controlsAvailable = !state.active && !pending && !panelTesting
         listOf(bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
-        displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
         displayChoice.isEnabled = controlsAvailable
-        displayChoice.text = "Çeviri çıkışı · ${config.display.label}"
+        displayChoice.text = config.display.label
+        displayChoice.contentDescription = "Altyazı ve ses · ${config.display.label}"
         readingChoice.isEnabled = controlsAvailable
-        readingChoice.text = when {
-            config.focus && config.captionEnabled -> "Altyazı + $VISUAL_TRANSLATION"
-            config.focus -> VISUAL_TRANSLATION
-            else -> config.readingArea.label
-        }
+        readingChoice.text = readingMode().label
+        readingChoice.contentDescription = "Çeviri modu · ${readingChoice.text}"
         packButton.isEnabled = controlsAvailable && demoTranslator == null
         packButton.text = if (ImportedGamePack.hasGta(this)) "GTA 6 Türkçe paketi hazır" else "Oyun paketleri"
         bandSettings.visibility = if (config.captionEnabled && config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE
@@ -405,16 +441,21 @@ class MainActivity : Activity() {
         if (demoMessage != null) demoSource else displayedCaption()?.source
 
     private fun selectDisplay() {
-        val choices = SubtitleDisplay.entries
-        AlertDialog.Builder(this)
-            .setTitle("Çeviri çıkışı")
-            .setSingleChoiceItems(choices.map { it.label }.toTypedArray(), choices.indexOf(config.display)) { dialog, index ->
-                setDisplay(choices[index])
-                dialog.dismiss()
-                render()
+        showPopup("Altyazı ve ses", R.drawable.ic_tv_screen, ACCENT) { dialog ->
+            for ((index, display) in SubtitleDisplay.entries.withIndex()) {
+                val (icon, accent) = when (display) {
+                    SubtitleDisplay.PHONE -> R.drawable.ic_phone_screen to ACCENT
+                    SubtitleDisplay.PORTAL -> R.drawable.ic_portal_device to LAVENDER
+                    SubtitleDisplay.BOTH -> R.drawable.ic_portal_link to MINT
+                    SubtitleDisplay.VOICE -> R.drawable.ic_notification to PEACH
+                }
+                append(connectionOption(display.label, icon, accent, selected = display == config.display) {
+                    setDisplay(display)
+                    render()
+                    dialog.dismiss()
+                }, if (index == 0) 14 else 7)
             }
-            .setNegativeButton("Kapat", null)
-            .show()
+        }
     }
 
     private fun setDisplay(display: SubtitleDisplay) {
@@ -422,25 +463,26 @@ class MainActivity : Activity() {
         prefs.edit().putString("display", display.name).putString("display.${config.source.name}", display.name).apply()
     }
 
+    private fun readingMode() = when {
+        config.focus && config.captionEnabled -> TranslationMode.BOTH
+        config.focus -> TranslationMode.IMAGE
+        config.readingArea == ReadingArea.GAME_TEXT -> TranslationMode.GAME_TEXT
+        else -> TranslationMode.SUBTITLES
+    }
+
     private fun selectReadingArea() {
-        val labels = arrayOf("Altyazı bölgesi", VISUAL_TRANSLATION, "Altyazı + $VISUAL_TRANSLATION", "Tüm oyun metinleri")
-        val selected = when {
-            config.focus && config.captionEnabled -> 2
-            config.focus -> 1
-            config.readingArea == ReadingArea.GAME_TEXT -> 3
-            else -> 0
+        val selected = readingMode()
+        showPopup("Çeviri modu", R.drawable.ic_focus_region, Palette.rose) { dialog ->
+            for ((index, mode) in TranslationMode.entries.withIndex()) {
+                append(connectionOption(mode.label, mode.icon, mode.accent, selected = mode == selected) {
+                    config = config.copy(readingArea = mode.area, focus = mode.focus, captionEnabled = mode.captions)
+                    prefs.edit().putString("readingArea", mode.area.name)
+                        .putBoolean("focus", mode.focus).putBoolean("subtitles", mode.captions).apply()
+                    render()
+                    dialog.dismiss()
+                }, if (index == 0) 14 else 7)
+            }
         }
-        AlertDialog.Builder(this).setTitle("Çeviri modu").setSingleChoiceItems(labels, selected) { dialog, index ->
-            config = config.copy(
-                readingArea = if (index == 3) ReadingArea.GAME_TEXT else ReadingArea.SUBTITLES,
-                focus = index == 1 || index == 2,
-                captionEnabled = index != 1,
-            )
-            prefs.edit().putString("readingArea", config.readingArea.name)
-                .putBoolean("focus", config.focus).putBoolean("subtitles", config.captionEnabled).apply()
-            dialog.dismiss()
-            render()
-        }.setNegativeButton("Kapat", null).show()
     }
 
     private fun previewVoice() {

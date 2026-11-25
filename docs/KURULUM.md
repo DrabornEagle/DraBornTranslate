@@ -26,7 +26,7 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 ## Altyazı ve Görsel Çeviri
 
-1. **Görsel Çeviri → Güncel oyun karesini al** düğmesi yeni bir canlı kareyi veya telefona indirilmiş en yeni PS App fotoğrafını ya da klibini açar. **Son PS App yakalaması** ile kaydı doğrudan seçebilirsin. Yeni kayıt için PS App’te **Kütüphane → Yakalamalar → İndir** yolunu kullan ve istenirse medya erişimi ver.
+1. **Görsel Çeviri → Güncel oyun karesini al** düğmesi açık oturumdan alınan son oyun karesini açar. Portal yayınını PS App’te yatay tam ekranda aç. Canlı oturum kapalıyken düğme telefona indirilen son PS App fotoğrafını veya klibini açar. **Son PS App yakalaması** ile kaydı doğrudan seçebilirsin. Yeni kayıt için PS App’te **Kütüphane → Yakalamalar → İndir** yolunu kullan ve istenirse medya erişimi ver.
 2. Görüntü üzerinde bir dikdörtgen çiz ve **Alanı çevir** düğmesine dokun. Görüntüye dokunarak tam ekrana geçebilir, yakınlaştırabilir ve Türkçe ile İngilizce arasında geçiş yapabilirsin. Klipte çevirilecek kareyi zaman çubuğuyla seç.
 3. Portal’ın canlı alan katmanı için **Altyazı + Görsel Çeviri** modunu aç. Android 14+ uygulama paylaşımında oyun ekranına dönünce seçili alan canlı taranır. Android 10–13’te çeviriyi Görsel Çeviri ekranından okuyabilirsin. PS5 eşleme oturumunda **Canlı alanı takip et** telefon ekranındaki kareyi günceller.
 

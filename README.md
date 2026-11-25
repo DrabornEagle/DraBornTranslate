@@ -23,7 +23,7 @@ Altyazılar akarken oyun telefonundaki mesajı, tabelayı veya Brief metnini se�
 
 **Oyun paketleri → Türkçe paketi indir** yolu 475.893 satırlık Türkçe oyun paketini telefona indirir. Pakette eşleşen replikler telefondaki tablodan okunur. Diğer metinleri telefondaki Töz-Çevir modeli çevirir. Çeviri için hesap, ücretli servis, kamera, mikrofon veya bilgisayar gerekmez.
 
-**Güncel oyun karesini al** açık bağlantıdan yeni bir kare veya telefona indirilen son PS App yakalamasını açar. **Son PS App yakalaması** ile fotoğrafı veya klibi doğrudan açabilirsin. **Kaynak seç** ile konsol, Portal ve PS Remote Play seçeneklerine erişebilirsin.
+**Güncel oyun karesini al** açık bağlantıdaki son oyun karesini açar. Bağlantı kapalıyken telefona indirilen son PS App yakalamasını açar. **Son PS App yakalaması** ile fotoğrafı veya klibi doğrudan açabilirsin. **Kaynak seç** ile konsol, Portal ve PS Remote Play seçeneklerine erişebilirsin.
 
 ### PS App yakalamaları
 

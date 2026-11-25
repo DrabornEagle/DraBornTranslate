@@ -222,24 +222,21 @@ class FocusActivity : Activity() {
         }
     }
 
-    private fun showLive(promptSource: Boolean = false) {
+    private fun showLive(promptSource: Boolean = false, force: Boolean = false) {
         if (capture != null || busy) return
-        if (useLiveFrame(force = promptSource)) return
         val state = SessionState.current
+        val activeSource = state.source?.takeIf { state.active }
+        if (activeSource != null && useLiveFrame(activeSource, force = force || promptSource)) return
         pendingFrame = state.active
         status.text = if (state.active) "İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç."
             else "Canlı kare için bir oyun bağlantısı seç."
-        if (promptSource && !(state.active && state.source == Source.PS5)) showSources(state)
+        if (promptSource && activeSource != Source.PS5) showSources(state)
     }
 
-    private fun useLiveFrame(force: Boolean, freshOnly: Boolean = false): Boolean {
-        val sampled = LiveFocusFrames.sample() ?: return false
+    private fun useLiveFrame(activeSource: Source, force: Boolean): Boolean {
+        val sampled = LiveFocusFrames.sample(activeSource) ?: return false
         val now = SystemClock.elapsedRealtime()
         val fresh = now - sampled.observedAt < 4_000L
-        if (freshOnly && !fresh) {
-            sampled.bitmap.recycle()
-            return false
-        }
         pendingFrame = false
         if (revisionSeen == LiveFocusFrames.revision && !force) {
             sampled.bitmap.recycle()
@@ -260,8 +257,11 @@ class FocusActivity : Activity() {
 
     private fun takeCurrentFrame() {
         if (busy) return
-        if (SessionState.current.active && useLiveFrame(force = true, freshOnly = true)) return
-        findLatestCapture { showLive(promptSource = true) }
+        if (SessionState.current.active) {
+            showLive(force = true)
+        } else {
+            findLatestCapture(preferLive = true) { showLive(promptSource = true) }
+        }
     }
 
     private fun openLatestCapture(requestAccess: Boolean = true) {
@@ -274,7 +274,7 @@ class FocusActivity : Activity() {
         }
     }
 
-    private fun findLatestCapture(onMissing: () -> Unit) {
+    private fun findLatestCapture(preferLive: Boolean = false, onMissing: () -> Unit) {
         if (busy) return
         val request = ++serial
         val priorStatus = status.text
@@ -287,7 +287,9 @@ class FocusActivity : Activity() {
                 setBusy(false)
                 status.text = priorStatus
                 if (!foreground) return@runOnUiThread
-                if (latest == null) {
+                if (preferLive && SessionState.current.active) {
+                    showLive(force = true)
+                } else if (latest == null) {
                     onMissing()
                 } else {
                     pendingFrame = false
