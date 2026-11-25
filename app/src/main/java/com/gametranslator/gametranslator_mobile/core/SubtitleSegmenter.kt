@@ -27,7 +27,7 @@ object SubtitleSegmenter {
         "listen", "look", "wait", "okay", "ok", "well", "so", "yes", "no", "now", "then", "and", "but",
     )
 
-    private val dialogueDash = Regex("^(?<dash>[-–—]+|>{1,3})\\s*")
+    private val dialogueDash = Regex("^(?<dash>[-–—]+)\\s*")
     // Cümle sonu: . ! ? … ardından isteğe bağlı kapanış tırnağı/parantez ve boşluk. Java'nın geriye bakışı sınırlı uzunluk
     // ister; sonlandırıcıdan sonraki kapanışlar için 10 karakter yeter (.NET'teki [.!?…]+[…]* ile aynı sonuç).
     private val sentenceGap = Regex("(?<=[.!?…][\"'”’)\\]]{0,10})\\s+")
@@ -49,14 +49,14 @@ object SubtitleSegmenter {
     fun labelName(piece: Piece): String? =
         if (!piece.translate && piece.text.endsWith(": ")) piece.text.dropLast(2) else null
 
-    fun split(text: String, preserveSpeakers: Boolean = true): List<Piece> {
+    fun split(text: String): List<Piece> {
         val pieces = mutableListOf<Piece>()
         val block = StringBuilder()
         var pendingSeparator = ""
         fun flushBlock() {
             if (block.isEmpty()) return
             if (pendingSeparator.isNotEmpty()) pieces.add(Piece(pendingSeparator, false))
-            addBlock(pieces, block.toString(), preserveSpeakers)
+            addBlock(pieces, block.toString())
             block.clear()
             pendingSeparator = "\n"
         }
@@ -64,7 +64,7 @@ object SubtitleSegmenter {
             val line = raw.trim()
             if (line.isEmpty()) continue
             // Etiketli ya da tireli satır yeni bir konuşmadır; diğer satırlar sarmadır, birleştirilir.
-            if ((preserveSpeakers && speakerLabel(line) != null) || dialogueDash.containsMatchIn(line)) flushBlock()
+            if (speakerLabel(line) != null || dialogueDash.containsMatchIn(line)) flushBlock()
             if (block.isNotEmpty()) block.append(' ')
             block.append(line)
         }
@@ -72,7 +72,7 @@ object SubtitleSegmenter {
         return pieces
     }
 
-    private fun addBlock(pieces: MutableList<Piece>, original: String, preserveSpeakers: Boolean) {
+    private fun addBlock(pieces: MutableList<Piece>, original: String) {
         var block = whitespace.replace(original, " ")
         dialogueDash.find(block)?.let { dash ->
             pieces.add(Piece(dash.groups["dash"]!!.value + " ", false))
@@ -83,11 +83,9 @@ object SubtitleSegmenter {
             if (!first) pieces.add(Piece(" ", false))
             first = false
             var body = sentence
-            if (preserveSpeakers) {
-                speakerLabel(body)?.let { label ->
-                    pieces.add(Piece(label.groups["label"]!!.value + " ", false))
-                    body = body.substring(label.value.length)
-                }
+            speakerLabel(body)?.let { label ->
+                pieces.add(Piece(label.groups["label"]!!.value + " ", false))
+                body = body.substring(label.value.length)
             }
             if (body.isNotEmpty()) pieces.add(Piece(body, body.any { it.isLetter() }))
         }

@@ -10,6 +10,8 @@ import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import com.gametranslator.gametranslator_mobile.Console
+import com.gametranslator.gametranslator_mobile.Store
 import java.util.concurrent.Executors
 
 class ConsoleSetupActivity : Activity() {
@@ -23,34 +25,29 @@ class ConsoleSetupActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val content = page()
-        content.addView(heading("PS5 ve TV’ye bağlan"))
-        content.addView(text("Telefonu ve konsolu aynı ağa bağla. TV’de ana hesabınla oynarken eşleme için PS5’te ikinci bir PSN kullanıcısı seç."))
+        val content = contentPage("PS5’i elle eşleştir", Palette.blue)
+        content.addBelow(featureHeader("PS5 eşleme", "Yerel IP, hesap kimliği ve PlayStation’ın verdiği kod.",
+            R.drawable.ic_controller, Palette.blue))
+        content.addView(copy("Telefonu ve konsolu aynı ağa bağla. TV’de ana hesabınla oynarken eşleme için PS5’te ikinci bir PSN kullanıcısı seç."))
         val current = ConsolePairing.load(this)
-        status = text(current?.let { "Kayıtlı PS5 · ${it.name}" } ?: "PS5 → Ayarlar → Sistem → Uzaktan Oynama → Cihazı Eşleştir")
+        status = copy(current?.let { "Kayıtlı PS5 · ${it.name}" } ?: "PS5 → Ayarlar → Sistem → Uzaktan Oynama → Cihazı Eşleştir")
         content.addView(status)
         host = field("PS5 yerel IP adresi", InputType.TYPE_CLASS_PHONE)
         host.setText(current?.host.orEmpty())
         content.addView(host)
-        scan = action("Ağda PS5 ara") { discover() }
+        scan = press("Ağda PS5 ara") { discover() }
         content.addView(scan)
         account = field("PSN hesap kimliği", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
         content.addView(account)
-        content.addView(text("Sayısal hesap kimliği veya 8 baytlık Base64. PSN kullanıcı adı ve parola girilmez."))
-        content.addView(action("Hesap kimliğini bul") {
+        content.addView(copy("Sayısal hesap kimliği veya 8 baytlık Base64. PSN kullanıcı adı ve parola girilmez."))
+        content.addView(press("Hesap kimliğini bul") {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://psn.flipscreen.games/")))
         })
         pin = field("PS5’in verdiği 8 haneli eşleme kodu", InputType.TYPE_CLASS_NUMBER)
         pin.filters = arrayOf(android.text.InputFilter.LengthFilter(8))
         content.addView(pin)
-        pair = action("PS5’i eşleştir", primary = true) { pair() }
+        pair = press("PS5’i eşleştir", Palette.blue) { pair() }
         content.addView(pair)
-        if (current != null) content.addView(action("Konsol eşlemesini kaldır") {
-            ConsolePairing.forget(this)
-            setResult(RESULT_OK)
-            finish()
-        })
-        content.addView(action("Geri dön") { finish() })
         if (!ConsolePairing.available) {
             status.text = "PS5 yerel bağlantı bileşeni açılamadı. PS Remote Play üzerinden ekran paylaşımını kullanabilirsin."
             setBusy(true)
@@ -95,7 +92,14 @@ class ConsoleSetupActivity : Activity() {
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
                 setBusy(false)
-                if (result.isSuccess) {
+                val paired = result.getOrNull()
+                if (paired != null) {
+                    Store(applicationContext).apply {
+                        accountId = paired.account
+                        console = Console(paired.host, paired.name, paired.keys.copyOfRange(0, 16), paired.keys.copyOfRange(16, 32))
+                        consoleKind = Store.KIND_PS5
+                        introSeen = true
+                    }
                     setResult(RESULT_OK)
                     finish()
                 } else status.text = result.exceptionOrNull()?.message ?: "PS5 eşlenemedi."

@@ -45,7 +45,13 @@ jobs:
       - uses: android-actions/setup-android@v4
         if: steps.sync.outputs.changed == 'true'
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0 ndk;28.2.13676358 cmake;3.22.1'
+      - uses: subosito/flutter-action@v2
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          flutter-version: '3.50.1'
+          channel: stable
+          cache: true
       - uses: actions/setup-python@v5
         if: steps.sync.outputs.changed == 'true'
         with:
@@ -60,6 +66,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/ps5-python"
           "$RUNNER_TEMP/ps5-python/bin/pip" install --only-binary=:all: protobuf==5.29.5 grpcio-tools==1.71.0
           export DRA_PS5_PYTHON="$RUNNER_TEMP/ps5-python/bin/python"
+          bash scripts/build-console-ui.sh
           ./scripts/prepare-toz.sh "$RUNNER_TEMP/toz-model"
           ./gradlew --no-daemon -PtozModelDir="$RUNNER_TEMP/toz-model" :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
           python3 scripts/check-apk-alignment.py app/build/outputs/apk/release/app-release-unsigned.apk

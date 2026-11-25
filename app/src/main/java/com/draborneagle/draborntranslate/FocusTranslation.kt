@@ -110,23 +110,31 @@ internal class FocusTranslator(context: Context) : AutoCloseable {
 
 /** Owned by the main thread. Only the latest reduced frame stays in memory. */
 internal object LiveFocusFrames {
+    data class Snapshot(val bitmap: Bitmap, val source: Source, val observedAt: Long)
+
     private var frame: Bitmap? = null
+    private var source = Source.PORTAL
+    private var observedAt = 0L
     private val observers = mutableSetOf<() -> Unit>()
     var revision: Long = 0
         private set
 
-    fun replace(bitmap: Bitmap) {
+    fun replace(bitmap: Bitmap, origin: Source, timeMs: Long = SystemClock.elapsedRealtime()) {
         frame?.recycle()
         frame = bitmap
+        source = origin
+        observedAt = timeMs
         revision++
         observers.toList().forEach { it() }
     }
 
     fun snapshot(): Bitmap? = frame?.copy(Bitmap.Config.ARGB_8888, false)
+    fun sample(): Snapshot? = snapshot()?.let { Snapshot(it, source, observedAt) }
     fun observe(observer: () -> Unit) { observers.add(observer) }
     fun remove(observer: () -> Unit) { observers.remove(observer) }
 
     fun clear() {
+        if (frame == null) return
         frame?.recycle()
         frame = null
         revision++
@@ -147,7 +155,6 @@ internal class LiveFocus(context: Context, private val displayOnAndroid: Boolean
             bitmap.recycle()
             return
         }
-        LiveFocusFrames.replace(bitmap)
         val region = FocusRegion.saved(app)
         if (region == null || !displayOnAndroid) return
         val now = SystemClock.elapsedRealtime()

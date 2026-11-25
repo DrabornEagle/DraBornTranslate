@@ -159,11 +159,15 @@ internal class ScreenFrames(
             return
         } ?: return
         image.use {
-            if (!visible) return
+            // Do not overwrite the game frame when the user opens the editor or returns to our controls.
+            if (!visible || DraBornApp.isVisible) {
+                setSignal(FrameSource.WAITING)
+                return
+            }
             val now = SystemClock.elapsedRealtime()
             lastFrameAt = now
             val wantsCaption = settings.captionEnabled && now - lastSampleAt >= settings.readingArea.sampleIntervalMs
-            val wantsFocus = settings.focus && now - lastFocusAt >= 950L
+            val wantsFocus = now - lastFocusAt >= 950L
             if (!wantsCaption && !wantsFocus) return
             if (wantsCaption) lastSampleAt = now
             if (wantsFocus) lastFocusAt = now

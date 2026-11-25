@@ -24,9 +24,6 @@ class SubtitleStabilizer(
     private val stableFrames: Int = 2,
     private val clearAfterMs: Int = CLEAR_AFTER_MS,
     private val clock: () -> Long = { android.os.SystemClock.elapsedRealtime() },
-    private val exactText: Boolean = false,
-    private val acceptCompletedSentence: Boolean = true,
-    private val minTextLength: Int = if (exactText) 2 else 3,
 ) {
     companion object {
         /** Bölge bu kadar boş kalırsa altyazı kalkmış sayılır. */
@@ -51,9 +48,6 @@ class SubtitleStabilizer(
     private var candidate = ""
     private var candidateCount = 0
     private var candidateSince = 0L
-    private var exactReading = ""
-    private var exactCount = 0
-    private val confirmationFrames = maxOf(stableFrames, 2)
     /** Ekrandaki (gönderilmiş) satır: sadeleştirilmiş satırlar alt alta, ve ilk okunduğu hali. */
     private var sent = ""
     private var sentRaw = ""
@@ -66,13 +60,10 @@ class SubtitleStabilizer(
     fun feed(rawText: String): StabilizerAction {
         val time = clock()
         val text = TextMatch.normalize(rawText)
-        val question = TextMatch.endsQuestion(rawText)
         // 3 karakterden kısa okumalar (gürültü, tek simge) boş kare sayılır.
-        if (text.length < minTextLength) {
+        if (text.length < 3) {
             candidate = ""
             candidateCount = 0
-            exactReading = ""
-            exactCount = 0
             val since = emptySince ?: time.also { emptySince = it }
             if (sent.isNotEmpty() && time - since >= clearAfterMs) {
                 leaveScreen(time)
@@ -82,10 +73,7 @@ class SubtitleStabilizer(
         }
 
         emptySince = null
-        val reading = if (question) "$text?" else text
-        exactCount = if (reading == exactReading) minOf(exactCount + 1, confirmationFrames) else 1
-        exactReading = reading
-        if (if (exactText) text == candidate else TextMatch.isSimilar(text, candidate, similarity)) {
+        if (TextMatch.isSimilar(text, candidate, similarity)) {
             candidateCount++
         } else {
             candidate = text
@@ -94,25 +82,16 @@ class SubtitleStabilizer(
         }
         // Noktalamayla biten satır tamamdır; beklemeden ilk karede gider. Çöp gibi okunan satır beklemeden gitmez.
         val garbled = OcrNoise.looksGarbled(rawText)
-        val ready = when {
-            garbled -> candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
-            exactText -> candidateCount >= stableFrames
-            else -> candidateCount >= stableFrames || (acceptCompletedSentence && endsSentence(rawText))
-        }
-        val confirmedChange = !exactText && !garbled && sent.isNotEmpty() && exactCount >= confirmationFrames &&
-            meaningChanged(text, question, sent, sentRaw)
-        if (!confirmedChange && isSame(text, sent)) return StabilizerAction.None
+        val ready = if (garbled) candidateCount >= stableFrames && time - candidateSince >= GARBLED_STABLE_MS
+        else candidateCount >= stableFrames || endsSentence(rawText)
+        // Gönderilenin gürültülü yeniden okuması yeni satır değildir.
+        if (isSame(text, sent)) return StabilizerAction.None
         if (!ready) return StabilizerAction.None
         // Aynı cümlenin daha iyi olmayan okuması da yeni satır değildir.
-        if (!exactText && !confirmedChange && sentRaw.isNotEmpty() && TextMatch.isWorseReread(rawText, sentRaw)) {
-            return StabilizerAction.None
-        }
+        if (sentRaw.isNotEmpty() && TextMatch.isWorseReread(rawText, sentRaw)) return StabilizerAction.None
 
         // Az önce kalkan satır geri geldiyse okuma birkaç kare kaçmıştır: çevirisi yeniden gösterilir.
-        val index = history.indexOfLast {
-            time - it.leftAt <= RESTORE_WITHIN_MS && isSame(text, it.rows) &&
-                (exactText || !meaningChanged(text, question, it.rows, it.raw))
-        }
+        val index = history.indexOfLast { time - it.leftAt <= RESTORE_WITHIN_MS && isSame(text, it.rows) }
         if (index >= 0) {
             val back = history.removeAt(index)
             leaveScreen(time)
@@ -130,11 +109,7 @@ class SubtitleStabilizer(
         return StabilizerAction.translate(sentRaw)
     }
 
-    private fun isSame(text: String, rows: String) = rows.isNotEmpty() &&
-        if (exactText) text == rows.replace('\n', ' ') else TextMatch.isSameSubtitle(text, rows)
-
-    private fun meaningChanged(text: String, question: Boolean, previous: String, previousRaw: String) =
-        question != TextMatch.endsQuestion(previousRaw) || TextMatch.hasMeaningfulChange(text, previous)
+    private fun isSame(text: String, rows: String) = rows.isNotEmpty() && TextMatch.isSameSubtitle(text, rows)
 
     /** Ekrandaki satırı geçmişe yazar (kalktı ya da yerine başkası geldi). */
     private fun leaveScreen(time: Long) {
@@ -162,8 +137,6 @@ class SubtitleStabilizer(
     fun reset(): StabilizerAction {
         candidate = ""
         candidateCount = 0
-        exactReading = ""
-        exactCount = 0
         emptySince = null
         history.clear()
         forgotten = ""

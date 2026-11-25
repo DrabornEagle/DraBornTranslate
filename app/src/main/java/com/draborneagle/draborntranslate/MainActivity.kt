@@ -133,6 +133,9 @@ class MainActivity : Activity() {
         if (savedInstanceState?.getBoolean("aboutOpen") == true) showAbout()
         CaptureInbox.watch(this)
         CaptureInbox.enqueue(this)
+        if (savedInstanceState == null && intent.getBooleanExtra("openFrameShare", false)) {
+            main.post { if (!isFinishing && !isDestroyed) beginOrStop() }
+        }
     }
 
     private fun removeOldTranslationCredentials() {
@@ -182,72 +185,30 @@ class MainActivity : Activity() {
     }
 
     private fun buildUi() {
-        val viewport = FrameLayout(this).apply {
-            background = gradient(GradientDrawable.Orientation.TOP_BOTTOM, 0xFF1B1438.toInt(), BACKGROUND, 0)
-        }
-        viewport.setOnApplyWindowInsetsListener { view, insets ->
-            if (Build.VERSION.SDK_INT >= 30) {
-                val safe = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
-                view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
-            }
-            insets
-        }
-        setContentView(viewport)
-        val scroll = ScrollView(this).apply { isFillViewport = true }
-        viewport.addView(scroll)
-        val content = column().apply {
-            setPadding(dp(16), dp(16), dp(16), dp(24))
-            layoutParams = FrameLayout.LayoutParams(
-                minOf(resources.displayMetrics.widthPixels, dp(610)),
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.TOP or Gravity.CENTER_HORIZONTAL,
-            )
-        }
-        scroll.addView(content)
-        val hero = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(16), dp(17), dp(16), dp(17))
-            background = gradient(GradientDrawable.Orientation.TL_BR,
-                0xFF392269.toInt(), 0xFF192643.toInt(), 24).apply { setStroke(dp(1), 0xFF56528F.toInt()) }
-        }
-        hero.addView(ImageView(this).apply {
-            setImageResource(R.drawable.brand_mark)
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-        }, LinearLayout.LayoutParams(dp(58), dp(58)).apply { marginEnd = dp(12) })
-        hero.addView(column().apply {
-            addView(label("DraBornTranslate", 23, WHITE, bold = true).apply { isAccessibilityHeading = true })
-            val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
-            append(label("Sürüm $version", 14, ACCENT), 4)
-        }, LinearLayout.LayoutParams(0, -2, 1f))
-        hero.addView(ImageButton(this).apply {
-            val background = android.util.TypedValue()
-            theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, background, true)
-            setBackgroundResource(background.resourceId)
-            setImageResource(R.drawable.ic_more_vert)
-            setColorFilter(LAVENDER)
-            contentDescription = "Hakkında"
-            tooltipText = contentDescription
-            setOnClickListener { showAbout() }
-        }, LinearLayout.LayoutParams(dp(48), dp(48)))
-        content.append(titleBar(if (config.source == Source.MOBILE) "Telefonda oyna" else "PlayStation Portal"), 0)
-        content.append(hero, 5)
+        val mobile = config.source == Source.MOBILE
+        val accent = if (mobile) Palette.blue else Palette.purple
+        val content = contentPage(if (mobile) "Telefonda oyna" else "PlayStation Portal", accent)
+        content.append(featureHeader(
+            if (mobile) "Oyun telefonda" else "Portal bağlantısı",
+            if (mobile) "PS Remote Play ile oyun görüntüsünü paylaş." else "PlayStation App yayınına Türkçe altyazı ekle.",
+            if (mobile) R.drawable.ic_phone_screen else R.drawable.ic_portal_device, accent,
+        ), 0)
 
         val capture = card()
-        content.append(capture, 14)
-        capture.addView(sectionTitle("Canlı çeviri"))
+        content.append(capture, 12)
+        startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
+        styleButton(startStop, ACCENT to LAVENDER)
+        actionIcon(startStop, R.drawable.ic_portal_play)
+        capture.addView(startStop, LinearLayout.LayoutParams(-1, -2))
         openSource = button("") { openSourceApp(config.source, offerInstall = true) }
         capture.append(openSource, 8)
         displayChoice = button("") { selectDisplay() }
-        capture.append(displayChoice, 10)
+        capture.append(displayChoice, 8)
         readingChoice = button("") { selectReadingArea() }
-        capture.append(readingChoice, 6)
+        capture.append(readingChoice, 7)
         focusArea = button("DraBorn Odak · Alan seç") { startActivity(Intent(this, FocusActivity::class.java)) }
-        capture.append(focusArea, 6)
-
-        startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
-        styleButton(startStop, ACCENT to LAVENDER)
-        capture.append(startStop, 10)
+        actionIcon(focusArea, R.drawable.ic_focus_region)
+        capture.append(focusArea, 7)
 
         val live = card(highlight = true)
         content.append(live, 14)
@@ -323,6 +284,7 @@ class MainActivity : Activity() {
         settings.addView(sizeControl)
         packButton = button("Oyun paketleri") { startActivity(Intent(this, GamePacksActivity::class.java)) }
         settings.append(packButton, 8)
+        settings.append(button("Hakkında ve güncellemeler") { showAbout() }, 8)
         settings.append(button("Açık kaynak lisansı") { showLegalNotices() }.apply {
             background = RippleDrawable(ColorStateList.valueOf(0x22B6A8FF), null, shape(WHITE, WHITE, 12))
             gravity = Gravity.START or Gravity.CENTER_VERTICAL
@@ -364,7 +326,6 @@ class MainActivity : Activity() {
             config.focus -> "DraBorn Odak"
             else -> config.readingArea.label
         }
-        focusArea.visibility = if (config.focus) View.VISIBLE else View.GONE
         packButton.isEnabled = controlsAvailable && demoTranslator == null
         packButton.text = if (ImportedGamePack.hasGta(this)) "GTA 6 Türkçe paketi hazır" else "Oyun paketleri"
         bandSettings.visibility = if (config.captionEnabled && config.readingArea == ReadingArea.SUBTITLES) View.VISIBLE else View.GONE

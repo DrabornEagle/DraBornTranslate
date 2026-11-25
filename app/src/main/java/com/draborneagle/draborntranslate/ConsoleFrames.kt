@@ -115,7 +115,7 @@ internal class ConsoleFrames(
         val now = SystemClock.elapsedRealtime()
         lastFrameAt = now
         val area = Pixels(0, 0, width, height)
-        if (settings.focus && now - lastFocus >= 950L) {
+        if (now - lastFocus >= 950L) {
             lastFocus = now
             runCatching { readRgba(buffer, stride, area) }.getOrNull()?.let(focusFrame)
         }

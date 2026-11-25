@@ -2,18 +2,15 @@
 package com.draborneagle.draborntranslate
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.View
-import android.view.WindowInsets
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
 import java.util.concurrent.Executors
@@ -29,6 +26,12 @@ class FocusActivity : Activity() {
     private lateinit var frameTime: SeekBar
     private lateinit var sample: Button
     private lateinit var reader: FocusTranslator
+    private lateinit var emptyPreview: LinearLayout
+    private lateinit var frameLabel: TextView
+    private lateinit var entire: Button
+    private lateinit var follow: Button
+    private var pendingFrame = false
+    private var revisionSeen = -1L
     private var current: CaptureFrame? = null
     private var capture: SavedCapture? = null
     private var selection = FocusRegion.full
@@ -43,7 +46,8 @@ class FocusActivity : Activity() {
         liveCaption.visibility = if (state.caption == null) View.GONE else View.VISIBLE
     }
     private val liveObserver = {
-        if (followsLive && !busy && android.os.SystemClock.elapsedRealtime() - lastLiveCheck >= 1_250L) showLive()
+        if (busy) Unit
+        else if (pendingFrame || (followsLive && SystemClock.elapsedRealtime() - lastLiveCheck >= 1_250L)) showLive()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,61 +67,88 @@ class FocusActivity : Activity() {
             selected.added > 0 -> "${if (selected.video) "Klip" else "Görüntü"} · ${captureDate(selected.added)}"
             else -> selected.name
         }
-        content.addView(copy(title, 16, Palette.peach, true))
+        frameLabel = copy(title, 13, Palette.peach, true)
+        val workspace = stack().apply {
+            background = blend(0xFF2C2044.toInt(), 0xFF161E35.toInt(), 23)
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            addView(frameLabel)
+        }
         canvas = FocusCanvas(this) { area ->
             if (!busy) {
-                followsLive = false
+                updateFollow(false)
                 selection = area
                 canvas.select(selection)
             }
         }.apply {
-            background = panelColor(0xFF070D1D.toInt())
             contentDescription = "Çevrilecek alanı görüntü üzerinde sürükleyerek seç"
+            visibility = View.GONE
         }
-        content.addView(canvas, LinearLayout.LayoutParams(-1, dp(260)).apply { topMargin = dp(12) })
-        liveCaption = heading("").apply { textSize = 19f; visibility = View.GONE }
-        content.addView(liveCaption)
-        status = text("Çevirmek istediğin alanı sürükleyerek seç.").apply {
-            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        val preview = FrameLayout(this).apply {
+            background = filled(0xFF0A1020.toInt(), 17, Palette.border)
+            clipToOutline = true
+            addView(canvas, FrameLayout.LayoutParams(-1, -1))
         }
-        content.addView(status)
-        val tools = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        translate = action("Alanı çevir", primary = true) { translateArea() }
-        original = action("İngilizceyi göster") {
+        emptyPreview = stack().apply {
+            gravity = Gravity.CENTER
+            setPadding(dp(18), dp(14), dp(18), dp(14))
+            addView(glyph(R.drawable.ic_focus_region, Palette.peach), LinearLayout.LayoutParams(dp(49), dp(49)))
+            addBelow(copy("Çevirilecek görüntüyü aç", 17, Palette.white, true).apply { gravity = Gravity.CENTER }, 10)
+            addBelow(copy("Bir canlı kare al veya telefondan dosya seç.", 13).apply { gravity = Gravity.CENTER }, 4)
+        }
+        preview.addView(emptyPreview, FrameLayout.LayoutParams(-1, -1))
+        workspace.addView(preview, LinearLayout.LayoutParams(-1, dp(218)).apply { topMargin = dp(8) })
+        status = copy("", 13).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
+        workspace.addBelow(status, 9)
+        content.addBelow(workspace)
+
+        if (selected == null) {
+            val quick = stack().apply {
+                addView(press("Güncel oyun karesini al", Palette.peach) { showLive(promptSource = true) })
+                addBelow(actionRow(
+                    press("Fotoğraf veya klip seç") {
+                        @Suppress("DEPRECATION")
+                        startActivityForResult(mediaPicker(), 51)
+                    },
+                    press("Canlı alanı takip et") {
+                        updateFollow(!followsLive)
+                        if (followsLive) showLive(promptSource = true)
+                    }.also { follow = it },
+                ), 8)
+            }
+            content.addBelow(quick, 12)
+        }
+
+        liveCaption = copy("", 17, Palette.mint, true).apply {
+            visibility = View.GONE
+            background = filled(0xFF172C37.toInt(), 15)
+            setPadding(dp(12), dp(9), dp(12), dp(9))
+        }
+        content.addBelow(liveCaption, 9)
+        frameTime = SeekBar(this).apply { max = 1000; contentDescription = "Klip konumu"; visibility = View.GONE }
+        content.addBelow(frameTime, 9)
+        sample = press("Seçilen kareyi aç") {
+            val duration = current?.durationMs ?: return@press
+            capture?.let { loadCapture(it, duration * frameTime.progress / 1000, markInitial = false) }
+        }.apply { visibility = View.GONE }
+        content.addBelow(sample)
+
+        translate = press("Alanı çevir", Palette.mint) { translateArea() }
+        original = press("İngilizceyi göster") {
             sourceOnly = !sourceOnly
             original.text = if (sourceOnly) "Türkçeyi göster" else "İngilizceyi göster"
-            paintResult()
+            if (result.isEmpty()) paintResult() else displayResult()
         }
-        tools.addView(translate, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-        tools.addView(original, LinearLayout.LayoutParams(0, -2, 1f))
-        content.addView(tools)
-        content.addView(action("Tüm görüntüyü seç") {
+        content.addBelow(actionRow(translate, original), 11)
+        entire = press("Tüm görüntüyü çevir") {
+            updateFollow(false)
             selection = FocusRegion.full
             canvas.select(selection)
             translateArea()
-        })
-        frameTime = SeekBar(this).apply { max = 1000; contentDescription = "Klip konumu"; visibility = View.GONE }
-        content.addView(frameTime)
-        sample = action("Seçilen kareyi aç") {
-            val duration = current?.durationMs ?: return@action
-            capture?.let { loadCapture(it, duration * frameTime.progress / 1000, markInitial = false) }
-        }.apply { visibility = View.GONE }
-        content.addView(sample)
-        if (capture == null) {
-            content.addView(action("Fotoğraf veya klip seç") {
-                @Suppress("DEPRECATION")
-                startActivityForResult(mediaPicker(), 51)
-            })
-            content.addView(action("Güncel oyun karesini al") { showLive() })
-            content.addView(action("Canlı alanı takip et") {
-                followsLive = !followsLive
-                status.text = if (followsLive) "Seçili alan canlı görüntüyle güncelleniyor." else "Canlı alan takibi durdu."
-                if (followsLive) showLive()
-            })
         }
-        rows = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        content.addView(rows)
-        content.addView(action("Geri dön") { finish() })
+        content.addBelow(entire, 8)
+        rows = stack()
+        content.addBelow(rows, 9)
+        updateControls()
         capture?.let { loadCapture(it) } ?: run {
             selection = FocusRegion.saved(this) ?: FocusRegion.full
             showLive()
@@ -138,16 +169,67 @@ class FocusActivity : Activity() {
         super.onStop()
     }
 
-    private fun showLive() {
-        if (busy) return
-        lastLiveCheck = android.os.SystemClock.elapsedRealtime()
-        val bitmap = LiveFocusFrames.snapshot()
-        if (bitmap == null) {
-            status.text = "Fotoğraf veya klip seç. Canlı çeviriyi açarsan oyun karesi burada görünür."
+    override fun onResume() {
+        super.onResume()
+        if (capture == null && (current == null || pendingFrame) && !busy) showLive()
+    }
+
+    private fun updateFollow(enabled: Boolean) {
+        followsLive = enabled
+        if (::follow.isInitialized) {
+            follow.text = if (enabled) "Canlı takibi durdur" else "Canlı alanı takip et"
+            follow.isSelected = enabled
+        }
+    }
+
+    private fun showLive(promptSource: Boolean = false) {
+        if (capture != null || busy) return
+        val sampled = LiveFocusFrames.sample()
+        if (sampled != null) {
+            pendingFrame = false
+            if (revisionSeen == LiveFocusFrames.revision && !promptSource) {
+                sampled.bitmap.recycle()
+                return
+            }
+            revisionSeen = LiveFocusFrames.revision
+            lastLiveCheck = SystemClock.elapsedRealtime()
+            setFrame(CaptureFrame(sampled.bitmap))
+            val age = ((lastLiveCheck - sampled.observedAt) / 1000L).coerceAtLeast(0L)
+            val source = when (sampled.source) {
+                Source.PS5 -> "Konsol"
+                Source.MOBILE -> "PS Remote Play"
+                Source.PORTAL -> "PS App"
+            }
+            frameLabel.text = if (age <= 3L) "$source · Oyun karesi" else "$source · Son görülen kare"
+            if (followsLive) translateArea()
             return
         }
-        setFrame(CaptureFrame(bitmap))
-        if (followsLive) translateArea()
+        val state = SessionState.current
+        pendingFrame = state.active
+        status.text = if (state.active) "İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç."
+            else "Canlı kare için bir oyun bağlantısı seç."
+        if (promptSource) showSources(state)
+    }
+
+    private fun showSources(state: SessionState.State) {
+        if (state.active && state.source == Source.PS5) return
+        val choices = if (state.active && state.source != null) listOf(state.source) else listOf(Source.PS5, Source.PORTAL, Source.MOBILE)
+        val labels = choices.map { route ->
+            when (route) {
+                Source.PS5 -> "PS5 ve TV’ye bağlan"
+                Source.PORTAL -> if (state.active) "PlayStation App yayınını aç" else "Portal yayınını paylaş"
+                Source.MOBILE -> if (state.active) "PS Remote Play’i öne getir" else "PS Remote Play ekranını paylaş"
+            }
+        }
+        AlertDialog.Builder(this).setTitle("Oyun görüntüsü kaynağı")
+            .setItems(labels.toTypedArray()) { _, selected ->
+                val route = choices[selected]
+                val external = if (state.active) route.packageName?.let(packageManager::getLaunchIntentForPackage) else null
+                val target = external ?: connectionIntent(this, route).apply {
+                    if (route != Source.PS5 && !state.active) putExtra("openFrameShare", true)
+                }
+                startActivity(target)
+            }.setNegativeButton("Vazgeç", null).show()
     }
 
     private fun loadCapture(item: SavedCapture, atMs: Long? = null, markInitial: Boolean = true) {
@@ -181,7 +263,10 @@ class FocusActivity : Activity() {
     private fun setFrame(frame: CaptureFrame) {
         val old = current
         current = frame
+        emptyPreview.visibility = View.GONE
+        canvas.visibility = View.VISIBLE
         result = emptyList()
+        updateControls()
         rows.removeAllViews()
         paintResult()
         canvas.select(selection)
@@ -208,21 +293,27 @@ class FocusActivity : Activity() {
     }
 
     private fun displayResult(failed: Boolean = false) {
+        val translated = result.count { !it.turkish.isNullOrBlank() && !it.turkish.equals(it.source, ignoreCase = true) }
         status.text = when {
             failed -> "Yazı tanınamadı. Alanı daha dar seçip tekrar dene."
             result.isEmpty() -> "Bu alanda okunabilir metin bulunamadı."
-            else -> "${result.count { it.turkish != null }} / ${result.size} metin Türkçe"
+            sourceOnly -> "${result.size} kaynak metin"
+            else -> "$translated Türkçe çeviri · ${result.size} okunan metin"
         }
+        updateControls()
         paintResult()
         rows.removeAllViews()
         for (entry in result) {
-            val item = text(entry.turkish ?: entry.source).apply {
-                setTextIsSelectable(true)
-                setPadding(dp(12), dp(6), dp(12), dp(8))
-                setTextColor(if (entry.turkish == null) 0xFFB2C1D8.toInt() else Color.WHITE)
-                background = panelColor(0xFF202746.toInt())
+            val output = if (sourceOnly) null else entry.turkish
+            val isTranslated = !output.isNullOrBlank() && !output.equals(entry.source, ignoreCase = true)
+            val item = stack().apply {
+                setPadding(dp(13), dp(10), dp(13), dp(10))
+                background = filled(0xFF1B243C.toInt(), 15, Palette.border)
+                addView(copy(if (isTranslated) "Türkçe" else "Kaynak metin", 11,
+                    if (isTranslated) Palette.mint else Palette.quiet, true))
+                addBelow(copy(output ?: entry.source, 16, Palette.white).apply { setTextIsSelectable(true) }, 4)
             }
-            rows.addView(item, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(6) })
+            rows.addBelow(item, 6)
         }
     }
 
@@ -234,8 +325,15 @@ class FocusActivity : Activity() {
 
     private fun setBusy(value: Boolean) {
         busy = value
-        translate.isEnabled = !value
-        sample.isEnabled = !value
+        updateControls()
+    }
+
+    private fun updateControls() {
+        val hasFrame = current != null
+        translate.isEnabled = hasFrame && !busy
+        original.isEnabled = hasFrame && result.isNotEmpty() && !busy
+        entire.isEnabled = hasFrame && !busy
+        sample.isEnabled = hasFrame && !busy
     }
 
     @Deprecated("Android activity result")
@@ -254,57 +352,4 @@ class FocusActivity : Activity() {
         disk.shutdownNow()
         super.onDestroy()
     }
-}
-
-internal fun Activity.page(): LinearLayout {
-    val content = LinearLayout(this).apply {
-        orientation = LinearLayout.VERTICAL
-        setPadding(dp(18), dp(18), dp(18), dp(22))
-    }
-    val page = ScrollView(this).apply {
-        setBackgroundColor(0xFF0D1429.toInt())
-        addView(content)
-        isFillViewport = true
-        setOnApplyWindowInsetsListener { view, insets ->
-            if (Build.VERSION.SDK_INT >= 30) {
-                val safe = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
-                view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
-            }
-            insets
-        }
-    }
-    setContentView(page)
-    return content
-}
-
-internal fun Activity.heading(value: String) = text(value).apply {
-    textSize = 26f
-    typeface = Typeface.DEFAULT_BOLD
-    isAccessibilityHeading = true
-    setTextColor(Color.WHITE)
-}
-
-internal fun Activity.text(value: String) = TextView(this).apply {
-    text = value
-    textSize = 15f
-    setTextColor(0xFFBECAE1.toInt())
-    setPadding(0, dp(6), 0, dp(8))
-}
-
-internal fun Activity.action(value: String, primary: Boolean = false, run: () -> Unit) = Button(this).apply {
-    text = value
-    textSize = 14f
-    isAllCaps = false
-    gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
-    minHeight = dp(48)
-    setTextColor(if (primary) 0xFF061926.toInt() else Color.WHITE)
-    backgroundTintList = android.content.res.ColorStateList.valueOf(
-        if (primary) 0xFF6CF5D7.toInt() else 0xFF2D3862.toInt(),
-    )
-    setOnClickListener { run() }
-}
-
-internal fun Activity.panelColor(value: Int) = GradientDrawable().apply {
-    setColor(value)
-    cornerRadius = dp(16).toFloat()
 }

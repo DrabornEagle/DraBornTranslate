@@ -355,13 +355,7 @@ List<GuideChapter> guideChapters(String? address) {
       title: 'guide.engine.1',
       subtitle: 'guide.engine.2',
       children: [
-        _Sub('guide.engine.3'),
-        _Keys([
-          ('guide.engine.4', 'guide.engine.5'),
-          ('guide.engine.6', 'guide.engine.7'),
-          ('guide.engine.8', 'guide.engine.9'),
-        ]),
-        _P('guide.engine.10'),
+        _P('guide.engine.9'),
         _Sub('guide.engine.11'),
         _P('guide.engine.12'),
         _Sub('guide.engine.13'),
@@ -411,7 +405,6 @@ List<GuideChapter> guideChapters(String? address) {
         ]),
         _Qa('guide.trouble.27', [
           'guide.trouble.28',
-          'guide.trouble.29',
           'guide.trouble.30',
         ]),
         _Qa('guide.trouble.31', [

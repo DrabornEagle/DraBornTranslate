@@ -776,7 +776,7 @@ const Map<String, String> trStrings = {
   'guide.engine.6': "DeepL",
   'guide.engine.7': "Daha doğal cümleler kurar. DeepL'den aldığın kendi API anahtarını yazman gerekir.",
   'guide.engine.8': "Cihazda",
-  'guide.engine.9': "İnternetsiz çalışır; kalitesi diğerlerinden düşüktür. İlk kullanımda dil modeli bir kez iner.",
+  'guide.engine.9': 'İngilizce oyun metni cihazdaki Töz-Çevir modeliyle Türkçeye çevrilir. Eşleşen satır paket içinden okunur.',
   'guide.engine.10': "İnternet koparsa çeviri kendiliğinden cihazdaki modele geçer ve bağlantı gelince geri döner.",
   'guide.engine.11': "Terim sözlüğü",
   'guide.engine.12': "Çevirinin bozduğu karakter adlarını ve oyun terimlerini sabitlemek içindir (yalnız İngilizce → Türkçe). Ayarlar › Çeviri › Terim sözlüğü'nden açılır. \"terms\" içindeki terimler yazdığın Türkçeyle çevrilir, \"keep\" içindeki adlar olduğu gibi kalır.",

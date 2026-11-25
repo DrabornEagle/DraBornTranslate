@@ -33,15 +33,19 @@ internal object ImportedGamePack {
     fun library(context: Context): GamePackLibrary {
         val app = context.applicationContext
         return shared ?: GamePackLibrary(
-            bundled = {
-                buildList {
-                    if (hasPack(app)) add(IMPORTED_FILE to { file(app, IMPORTED_FILE).readFully() })
-                    if (hasGta(app)) add(GTA_FILE to { file(app, GTA_FILE).readFully() })
-                }
-            },
+            bundled = { sourceFiles(app) },
             userDirectory = null,
         ).also { shared = it }
     }
+
+    fun sourceFiles(app: Context): List<Pair<String, () -> ByteArray>> = buildList {
+        if (hasPack(app)) add(IMPORTED_FILE to { file(app, IMPORTED_FILE).readFully() })
+        if (hasGta(app)) add(GTA_FILE to { file(app, GTA_FILE).readFully() })
+    }
+
+    fun downloadedChecksum(context: Context): String? =
+        context.getSharedPreferences("pack_download", Context.MODE_PRIVATE).getString("sha256", null)
+            ?.takeIf { hasGta(context) && digestPattern.matches(it) }
 
     @Synchronized
     fun install(context: Context, uri: Uri): String {

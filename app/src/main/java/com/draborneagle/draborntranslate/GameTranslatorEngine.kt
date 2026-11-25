@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicLong
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.Executors
+import java.util.concurrent.Callable
+import java.util.concurrent.FutureTask
 
 internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
     private val app = context.applicationContext
@@ -94,6 +96,15 @@ internal class GameTranslatorEngine(context: Context) : CaptionTranslator {
 
         private fun submit(priority: Int, task: () -> Unit) {
             inference.execute(TranslationJob(priority, sequence.getAndIncrement(), task))
+        }
+
+        internal fun consoleTranslation(context: Context, text: String): String? {
+            val work = FutureTask(Callable { model(context.applicationContext).translate(text) })
+            submit(0) { work.run() }
+            return runCatching { work.get(15, TimeUnit.SECONDS) }.getOrElse {
+                work.cancel(false)
+                null
+            }
         }
 
         // The ONNX session is shared by live captions, Odak and the local capture inbox.

@@ -25,9 +25,9 @@ class UpdatesActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val content = contentPage("Sürüm ve güncellemeler")
-        content.addBelow(copy("DraBornTranslate", 26, Palette.white, true))
         val version = packageManager.getPackageInfo(packageName, 0).versionName
-        content.addBelow(copy("Kurulu sürüm · $version", 15, Palette.blue), 5)
+        content.addBelow(featureHeader("Sürüm $version", "GitHub üzerinden imzalı Android güncellemeleri",
+            R.drawable.ic_package_update, Palette.blue))
         check = press("Yeni sürüm kontrolü", Palette.blue) {
             if (AppUpdater.state is UpdateState.Ready) AppUpdater.continueInstall(this, requested = true)
             else AppUpdater.check(this)
@@ -84,10 +84,13 @@ class GamePacksActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val content = contentPage("Oyun paketleri", Palette.purple)
-        content.addBelow(copy("GTA 6 Türkçe", 27, Palette.white, true))
-        content.addBelow(copy("Eşleşen altyazılar indirdiğin paketten okunur."), 5)
+        content.addBelow(featureHeader("GTA 6 Türkçe", "Paketten eşleşen altyazıları doğrudan oku.",
+            R.drawable.ic_game_package, Palette.purple))
         state = copy("", 14, Palette.mint, true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
-        content.addBelow(state, 10)
+        content.addBelow(state.apply {
+            background = filled(0xFF20263D.toInt(), 16, Palette.border)
+            setPadding(dp(13), dp(11), dp(13), dp(11))
+        }, 10)
         download = press("Türkçe paketi indir", Palette.purple) {
             install("gtaPackTitle") { app -> ImportedGamePack.downloadGta(app) ?: throw IOException("Paket indirilemedi.") }
         }

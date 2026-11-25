@@ -12,3 +12,5 @@ Android paket okuma ve Remote Play köprüsü, [GameTranslator v1.8.51](https://
 | Yerel ağ bağlantısı | [OpenSSL 3.5.9](https://github.com/openssl/openssl/tree/openssl-3.5.9) ve chiaki-ng’nin kaynak alt bağımlılıkları |
 
 Türkçe GTA 6 verisi, uygulama içinden ayrı bir paket olarak indirilebilir. Paket dosyaları APK’ya ve kaynak deposuna dahil edilmez.
+
+PS5/TV arayüzü `console-ui/` altında, Android bağlantı ve TV istemcisi bileşenleri kendi kaynak ad alanlarında bulunur. Kaynak arayüzündeki çeviri seçenekleri İngilizce → Türkçe oyun paketi ve cihazdaki Töz-Çevir modeline bağlanır. [Konsol modülü lisansı](../console-ui/LICENSE) · [Inter yazı tipi lisansı](../console-ui/assets/fonts/Inter-LICENSE)

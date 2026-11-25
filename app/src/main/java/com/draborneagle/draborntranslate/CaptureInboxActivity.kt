@@ -44,22 +44,23 @@ class CaptureInboxActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val screen = stack()
-        pageRoot(screen)
+        pageRoot(screen, Palette.mint)
         screen.addView(titleBar("PS App yakalamaları", Palette.mint))
         val tools = stack().apply { setPadding(dp(16), dp(7), dp(16), dp(10)) }
         screen.addView(tools)
+        tools.addBelow(featureHeader("Yakalama galerisi", "PS App’ten kaydettiğin fotoğraf ve klipler.",
+            R.drawable.ic_capture_album, Palette.mint))
         val statusCard = stack().apply {
             setPadding(dp(14), dp(12), dp(14), dp(12))
             background = blend(0xFF173A3C.toInt(), 0xFF162737.toInt())
         }
         mode = copy("", 15, Palette.white, true)
         statusCard.addView(mode)
-        statusCard.addBelow(copy("PS App’ten telefona inen görüntüler burada görünür.", 13), 4)
         auto = press("Otomatik çeviri", Palette.mint) { toggleAutomatic() }
         statusCard.addBelow(auto, 9)
         access = press("Medya erişimini düzenle") { requestMedia(enable = false) }.apply { visibility = View.GONE }
         statusCard.addBelow(access, 6)
-        tools.addBelow(statusCard)
+        tools.addBelow(statusCard, 8)
 
         tools.addBelow(row().apply {
             addView(press("PS App’i aç") { launchPlayStation() },
@@ -67,6 +68,12 @@ class CaptureInboxActivity : Activity() {
             addView(press("Dosya seç") { chooseCapture() }, LinearLayout.LayoutParams(0, -2, 1f))
         }, 9)
 
+        val gridHeading = row().apply {
+            setPadding(dp(16), dp(3), dp(16), dp(7))
+            addView(copy("Son yakalamalar", 17, Palette.white, true).apply { isAccessibilityHeading = true },
+                LinearLayout.LayoutParams(0, -2, 1f))
+        }
+        screen.addBelow(gridHeading)
         val gridArea = FrameLayout(this)
         screen.addView(gridArea, LinearLayout.LayoutParams(-1, 0, 1f))
         empty = copy("Yakalamalar yükleniyor…").apply {

@@ -148,11 +148,11 @@ class CaptureService : Service() {
         val discard: () -> Unit = { ocrPending.set(false) }
         val onFrame: (Bitmap) -> Unit = { bitmap -> main.post { recognize(bitmap) } }
         val onFocus: (Bitmap) -> Unit = { bitmap -> main.post {
-            val target = focus
-            if (ended || target == null) bitmap.recycle()
+            if (ended) bitmap.recycle()
             else {
                 if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
-                target.frame(bitmap)
+                LiveFocusFrames.replace(bitmap, connection)
+                focus?.frame(bitmap)
             }
         } }
         if (paired != null) {
@@ -360,6 +360,7 @@ class CaptureService : Service() {
     private fun finish(message: String) {
         if (ended) return
         ended = true
+        LiveFocusFrames.clear()
         SessionState.update(SessionState.State(source = connection, status = message, lastCaption = SessionState.current.lastCaption))
         stopSelf()
     }
@@ -381,6 +382,7 @@ class CaptureService : Service() {
     override fun onDestroy() {
         if (!ended) {
             ended = true
+            LiveFocusFrames.clear()
             SessionState.update(SessionState.State(source = connection, status = stopMessage(), lastCaption = SessionState.current.lastCaption))
         }
         modelReady = false
@@ -480,7 +482,7 @@ class CaptureService : Service() {
             .setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .addAction(Notification.Action.Builder(null, "Durdur", stop).build())
-        if (focus != null) {
+        if (SessionState.current.active) {
             val editor = PendingIntent.getActivity(this, 3, Intent(this, FocusActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
             builder.addAction(Notification.Action.Builder(null, "DraBorn Odak", editor).build())
         }

@@ -779,7 +779,7 @@ const Map<String, String> enStrings = {
   'guide.engine.6': "DeepL",
   'guide.engine.7': "Produces more natural sentences. You need to enter your own API key from DeepL. If DeepL can't translate into your language, Google is used instead.",
   'guide.engine.8': "On device",
-  'guide.engine.9': "Works without internet; quality is lower than the others. The language model is downloaded once on first use.",
+  'guide.engine.9': 'English game text is translated to Turkish on the device. A matching line is read from the installed game pack.',
   'guide.engine.10': "If the internet drops, translation switches to the on-device model by itself and switches back when the connection returns.",
   'guide.engine.11': "Glossary",
   'guide.engine.12': "Pins down character names and game terms that the translation gets wrong. It works only for English → Turkish (Settings › Translation › Glossary). Terms under \"terms\" are translated with the Turkish you give; names under \"keep\" are left as they are.",

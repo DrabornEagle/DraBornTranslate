@@ -10,21 +10,9 @@ import java.util.Locale
 object OcrNoise {
     private const val SYMBOLS = "$@#%^*_=|\\~<>{}¢£¥§©®°±µ¶¤"
     private val whitespace = Regex("\\s+")
-    private val splitNegative = Regex(
-        """\b(do|does|did|ca|wo|would|could|should|is|are|was|were|have|has|had)\s*n\s*['’‘]?\s*t\b""",
-        RegexOption.IGNORE_CASE,
-    )
-    private val splitContraction = Regex(
-        """\b(i|you|he|she|it|we|they|that|there|who|what)\s*['’‘]\s*(m|s|re|ve|ll|d)\b""",
-        RegexOption.IGNORE_CASE,
-    )
-    private val missingApostrophe = setOf(
-        "dont", "doesnt", "didnt", "isnt", "arent", "wasnt", "werent",
-        "havent", "hasnt", "hadnt", "couldnt", "wouldnt", "shouldnt",
-    )
     private val leadingNumber = Regex("^\\d+(?:m|km|ft|yd)?[.?!:;]?$")
     private val usual = Regex(
-        "^(?:[A-Za-z]{1,4}\\d{1,4}|\\d{1,4}[A-Z]|\\d+(?:st|nd|rd|th|s|k|K|m|km|kg|cm|mm|p|x|fps|hp|HP|XP|xp|v|V|D|d)|[xX]\\d{1,3}" +
+        "^(?:[A-Za-z]{1,4}\\d{1,4}|\\d+(?:st|nd|rd|th|s|k|K|m|km|kg|cm|mm|p|x|fps|hp|HP|XP|xp|v|V|D|d)|[xX]\\d{1,3}" +
             "|\\d+[.,]\\d+[A-Za-z]{0,3}|\\d{1,2}[:.]\\d{2}(?:am|pm|AM|PM)?)$")
 
     internal fun tokens(text: String): List<String> = text.split(whitespace).filter { it.isNotEmpty() }
@@ -45,14 +33,7 @@ object OcrNoise {
 
     fun clean(line: String): String {
         val kept = mutableListOf<String>()
-        val joined = splitContraction.replace(splitNegative.replace(line) { match ->
-            val verb = match.groupValues[1]
-            val ending = if (verb.all(Char::isUpperCase)) "N'T" else "n't"
-            if (match.value.any(Char::isWhitespace)) verb + ending else match.value
-        }) { match ->
-            if (match.value.any(Char::isWhitespace)) "${match.groupValues[1]}'${match.groupValues[2]}" else match.value
-        }
-        val tokens = tokens(joined)
+        val tokens = tokens(line)
         for (index in tokens.indices) {
             val token = tokens[index]
             val (lead, core, trail) = split(token)
@@ -74,9 +55,7 @@ object OcrNoise {
             else if (trail.isNotEmpty() && kept.isNotEmpty()) kept[kept.size - 1] = kept.last() + trail
         }
         // Altyazının yanındaki göstergenin sayısı satırın başına yapışıyor ("9? We'll lose"): sayı atılır.
-        if (kept.size >= 3 && kept[0].last() in "?!:;" && leadingNumber.matches(kept[0]) && kept[1][0].isUpperCase()) {
-            kept.removeAt(0)
-        }
+        if (kept.size >= 3 && leadingNumber.matches(kept[0]) && kept[1][0].isUpperCase()) kept.removeAt(0)
         return kept.joinToString(" ")
     }
 
@@ -134,15 +113,6 @@ object OcrNoise {
 
     /** Sözcüğün kendisi; null ise tamamen çöptür. */
     private fun cleanCore(core: String): String? {
-        when (core) {
-            "D0n't", "D0n’t" -> return "Don't"
-            "d0n't", "d0n’t" -> return "don't"
-            "Ieft" -> return "left"
-            "n0" -> return "no"
-            "r0ad" -> return "road"
-            "sec0nd" -> return "second"
-        }
-        if (core.lowercase(Locale.ROOT) in missingApostrophe) return core.dropLast(1) + "'" + core.last()
         val letters = core.count { it.isLetter() }
         val digits = core.count { isNumber(it) }
         val hasSymbol = core.any { it in SYMBOLS }
@@ -156,7 +126,7 @@ object OcrNoise {
 
     /** "PS5", "R2", "2nd", "100m", "4K", "60fps", "x2", "R2-D2": olağan harf-rakam karışımları. */
     private fun isUsualMix(core: String): Boolean =
-        core.split('-').all { part -> part.none(::isNumber) || part.all(::isNumber) || usual.matches(part) }
+        core.split('-').all { part -> part.none { isNumber(it) } || usual.matches(part) }
 
     private fun isEdge(c: Char): Boolean =
         c !in SYMBOLS && (isPunctuationOrSymbol(c) || c in "\"'“”‘’«»()[]")

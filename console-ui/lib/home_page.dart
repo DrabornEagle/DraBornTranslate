@@ -386,6 +386,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               chevron: true,
               onTap: () => Navigator.of(context).push(appleRoute<void>((_) => const ScreenPage())),
             ),
+            Cell(
+              icon: CupertinoIcons.globe,
+              iconColor: Tokens.accentText,
+              title: 'TV tarayıcısında göster',
+              chevron: true,
+              onTap: () => Bridge.openTool('tvBrowser'),
+            ),
             // Çeviriyi bilgisayar yapıyorsa telefon yalnız ekran olur (bilgisayardaki ikinci ekran kartı burayı gösterir)
             Cell(
               icon: CupertinoIcons.desktopcomputer,

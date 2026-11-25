@@ -1,17 +1,17 @@
-# DraBornTranslate v5.0.1
+# DraBornTranslate v5.0.2
 
-**Android 10+ · ARM64 · Android sürüm kodu 2**
+**Android 10+ · ARM64 · Android sürüm kodu 3**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.1)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v5.0.2)
 
-v5.0.1’i mevcut v5.0 kurulumunun üzerine yükleyebilirsin. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v5.0.2’i mevcut v5 serisi kurulumunun üzerine yükleyebilirsin. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
 1. PS5’i ve telefonu aynı ev ağına bağla. PS5’te **Ayarlar → Sistem → Uzaktan Oynama** ayarını aç.
-2. TV’de ana hesabınla oynarken görüntüyü telefona almak için PS5’e ikinci hesap ekle. **Cihazı Eşleştir** ekranındaki kodu kullan. Eşlenen hesabın sayısal PSN kimliğini, PS5’in IP adresini ve konsoldaki kodu **PS5 ve TV’ye bağlan → PS5’i eşleştir** bölümüne gir.
-3. Oyunun İngilizce altyazısını aç. **Çeviri → Çeviriyi başlat** seçeneğine dokun.
-4. **Ayarlar → Çeviri çıkışı** ekranından telefon veya TV çıkışını seç. TV için **TV ekranını hazırla** sayfasındaki adresi aynı ağdaki TV tarayıcısında aç. Oyun ile tarayıcıyı yan yana göstermek, TV’nin çoklu görüntü desteğine bağlıdır.
+2. TV’de ana hesabınla oynarken görüntüyü telefona almak için PS5’e ikinci hesap ekle. **Cihazı Eşleştir** ekranındaki kodu kullan. Eşlenen hesabın sayısal PSN kimliğini, PS5’in IP adresini ve konsoldaki kodu **PS5 ve TV’ye bağlan → PS5’i elle eşleştir** bölümüne gir.
+3. Oyunun İngilizce altyazısını aç. **Çeviri** sekmesinde başlat düğmesine dokun. Canlı önizlemeden okunan altyazı bölgesini kontrol et.
+4. **TV uygulamasını kur** sihirbazı TV modelini seçtirir ve geliştirici modu adımlarını gösterir. **Bu telefonda göster** ile tam ekran altyazıyı açabilirsin. **TV tarayıcısında göster** seçeneği aynı ağdaki bir tarayıcı için panel adresi verir. Oyun ve tarayıcının birlikte görünmesi, TV’nin çoklu görüntü desteğine bağlıdır.
 
 PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oyna** yolunu kullan. PS Remote Play’i aç ve Android ekran paylaşımında onu seç.
 
@@ -26,7 +26,7 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 ## Altyazı ve DraBorn Odak
 
-1. Çeviri modundan **Altyazı + DraBorn Odak** seç. İngilizce altyazı açıkken oyundaki telefon mesajını, Brief bölümünü veya tabelayı aç.
+1. Ana ekrandan **DraBorn Odak → Güncel oyun karesini al** yolunu kullan. Kaynak açık değilse bir bağlantı seçip oyun görüntüsünü aç. Portal’daki canlı alan katmanı için **Altyazı + DraBorn Odak** modunu aç. İngilizce altyazı açıkken oyundaki telefon mesajını, Brief bölümünü veya tabelayı aç.
 2. **DraBorn Odak · Alan seç** ekranında görüntü üzerinden bir dikdörtgen çiz. **Alanı çevir** seçeneği Türkçeyi görüntünün üstünde gösterir ve bu alanı canlı oturum için saklar.
 3. Android 14+ uygulama paylaşımında oyun ekranına dönünce seçili alan canlı taranır. Android 10–13’te Odak sonucu görüntü inceleme ekranından okunur. PS5 eşleme oturumunda **Canlı alanı takip et** seçeneği telefon ekranındaki kareyi günceller.
 
@@ -44,9 +44,10 @@ PS5’in otomatik yüklemesi yakalamaları PS App’e getirir. Telefona kaydetme
 
 ## Kaynak koddan derleme
 
-Android SDK 35, Build Tools 35.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
+Flutter 3.50.1, Android SDK 36, Build Tools 35.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
 
 ```bash
+bash scripts/build-console-ui.sh
 ./scripts/prepare-ps5.sh
 ./scripts/prepare-openssl.sh
 python3 -m venv .venv

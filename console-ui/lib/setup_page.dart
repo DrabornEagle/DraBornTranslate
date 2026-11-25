@@ -290,6 +290,14 @@ class _SetupPageState extends State<SetupPage> {
             // Telefon yalnızca ekran olacaksa (çeviriyi bilgisayar yapıyor) konsol kurulumu gerekmez.
             Group(children: [
               Cell(
+                icon: CupertinoIcons.game_controller,
+                iconColor: Tokens.accentText,
+                title: 'PS5’i elle eşleştir',
+                subtitle: 'PSN hesap kimliği ve 8 haneli kodla bağlan.',
+                chevron: true,
+                onTap: () => Bridge.openTool('manual'),
+              ),
+              Cell(
                 icon: CupertinoIcons.tv_fill,
                 iconColor: Tokens.purple,
                 title: t('home.install_tv.title'),
