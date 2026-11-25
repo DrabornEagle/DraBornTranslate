@@ -37,13 +37,12 @@ private fun Context.coverImage() = ImageView(this).apply {
 internal fun Context.homeCover(status: TextView) = FrameLayout(this).apply {
     background = filled(connectionBackground, 24)
     clipToOutline = true
-    addView(coverImage(), FrameLayout.LayoutParams(-1, dp(224)))
-    addView(View(context).apply {
-        background = GradientDrawable(
+    addView(coverImage().apply {
+        foreground = GradientDrawable(
             GradientDrawable.Orientation.TR_BL,
             intArrayOf(0x00140E28, 0x4D13132B, 0xFA0C0C19.toInt()),
         )
-    }, FrameLayout.LayoutParams(-1, -1))
+    }, FrameLayout.LayoutParams(-1, dp(224)))
     addView(stack().apply {
         minimumHeight = dp(224)
         gravity = Gravity.BOTTOM

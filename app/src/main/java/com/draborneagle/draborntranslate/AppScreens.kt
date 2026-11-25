@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -270,6 +271,9 @@ class HomeActivity : Activity() {
         screen.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
         screen.addView(bottomBar())
         pageRoot(screen, Palette.purple, connectionBackground)
+        if (Build.VERSION.SDK_INT >= 30) {
+            window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+        }
 
         connectionStatus = copy("", 12, Palette.blue, true).apply {
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE

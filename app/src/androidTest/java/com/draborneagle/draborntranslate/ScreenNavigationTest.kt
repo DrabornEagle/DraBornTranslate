@@ -49,6 +49,9 @@ class ScreenNavigationTest {
         }
         ActivityScenario.launch(HomeActivity::class.java).use {
             waitFor { resumed() is HomeActivity }
+            waitForAccessible("PS5 ve TV’ye bağlan", "01-home")
+            waitForAccessible("Portal’a bağlan", "01-home")
+            waitForAccessible("Telefonda oyna", "01-home")
             screenshot("01-home")
             click("Sürüm ve güncellemeler")
             waitFor { resumed() is UpdatesActivity }
