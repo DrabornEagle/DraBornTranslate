@@ -12,9 +12,12 @@ import android.graphics.Typeface
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.WindowManager
 import kotlin.math.abs
 import kotlin.math.floor
@@ -54,10 +57,16 @@ internal class FocusOverlay(private val context: Context) : AutoCloseable {
     }
 }
 
-/** Maps bounding boxes to the same fit-center transform used to show the source bitmap. */
-internal class FocusCanvas(context: Context, private val onSelect: ((FocusRegion) -> Unit)? = null) : View(context) {
+/** Applies the same image transform to the frame and its text replacements. */
+internal class FocusCanvas(
+    context: Context,
+    zoomable: Boolean = false,
+    private val onSelect: ((FocusRegion) -> Unit)? = null,
+) : View(context) {
     private val image = RectF()
     private val start = FloatArray(2)
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    private var dragged = false
     private var selection: RectF? = null
     private var frame: Bitmap? = null
     private var frameWidth = 1
@@ -70,6 +79,33 @@ internal class FocusCanvas(context: Context, private val onSelect: ((FocusRegion
         strokeWidth = context.dp(2).toFloat()
     }
     private val letters = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = Typeface.DEFAULT_BOLD }
+    private var zoom = 1f
+    private var panX = 0f
+    private var panY = 0f
+    private val pinch = if (zoomable) ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            zoomTo(zoom * detector.scaleFactor, detector.focusX, detector.focusY)
+            return true
+        }
+    }) else null
+    private val gestures = if (zoomable) GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(event: MotionEvent) = true
+
+        override fun onDoubleTap(event: MotionEvent): Boolean {
+            zoomTo(if (zoom > 1f) 1f else 2f, event.x, event.y)
+            return true
+        }
+
+        override fun onScroll(start: MotionEvent?, event: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+            if (zoom > 1f && event.pointerCount == 1 && pinch?.isInProgress != true) {
+                panX -= distanceX
+                panY -= distanceY
+                constrainPan()
+                invalidate()
+            }
+            return true
+        }
+    }) else null
 
     fun show(width: Int, height: Int, bitmap: Bitmap?, lines: List<FocusText>) {
         frameWidth = width
@@ -90,9 +126,11 @@ internal class FocusCanvas(context: Context, private val onSelect: ((FocusRegion
         val x = (width - frameWidth * scale) / 2
         val y = (height - frameHeight * scale) / 2
         image.set(x, y, width - x, height - y)
-        frame?.let { canvas.drawBitmap(it, null, image, fill) }
         canvas.save()
+        canvas.translate(panX, panY)
+        canvas.scale(zoom, zoom, width / 2f, height / 2f)
         canvas.clipRect(image)
+        frame?.let { canvas.drawBitmap(it, null, image, fill) }
         for (entry in result) {
             val text = entry.turkish ?: continue
             val source = entry.box
@@ -104,6 +142,23 @@ internal class FocusCanvas(context: Context, private val onSelect: ((FocusRegion
             x + it.right * image.width(), y + it.bottom * image.height(), outline,
         ) }
         canvas.restore()
+    }
+
+    private fun zoomTo(value: Float, focusX: Float, focusY: Float) {
+        val next = value.coerceIn(1f, 4f)
+        val factor = next / zoom
+        panX = (focusX - width / 2f) * (1 - factor) + panX * factor
+        panY = (focusY - height / 2f) * (1 - factor) + panY * factor
+        zoom = next
+        constrainPan()
+        invalidate()
+    }
+
+    private fun constrainPan() {
+        val x = ((image.width() * zoom - width) / 2f).coerceAtLeast(0f)
+        val y = ((image.height() * zoom - height) / 2f).coerceAtLeast(0f)
+        panX = panX.coerceIn(-x, x)
+        panY = panY.coerceIn(-y, y)
     }
 
     private fun drawReplacement(canvas: Canvas, text: String, box: RectF, background: Int, scale: Float) {
@@ -141,6 +196,11 @@ internal class FocusCanvas(context: Context, private val onSelect: ((FocusRegion
             .setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(false).build()
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        pinch?.let {
+            it.onTouchEvent(event)
+            gestures?.onTouchEvent(event)
+            return true
+        }
         val select = onSelect ?: return false
         if (image.width() <= 1 || image.height() <= 1) return false
         val x = ((event.x - image.left) / image.width()).coerceIn(0f, 1f)
@@ -148,29 +208,36 @@ internal class FocusCanvas(context: Context, private val onSelect: ((FocusRegion
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 if (!image.contains(event.x, event.y)) return false
-                parent.requestDisallowInterceptTouchEvent(true)
+                parent?.requestDisallowInterceptTouchEvent(true)
                 start[0] = x
                 start[1] = y
+                dragged = false
+                return true
+            }
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                dragged = true
                 return true
             }
             MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
-                val region = FocusRegion(minOf(start[0], x), minOf(start[1], y), maxOf(start[0], x), maxOf(start[1], y))
-                if (abs(x - start[0]) >= 0.03f && abs(y - start[1]) >= 0.03f) {
-                    select(region)
-                    if (event.actionMasked == MotionEvent.ACTION_UP) {
-                        performClick()
-                        return true
-                    }
+                val dx = abs(x - start[0])
+                val dy = abs(y - start[1])
+                dragged = dragged || dx * image.width() > touchSlop || dy * image.height() > touchSlop
+                if (dragged && dx >= 0.03f && dy >= 0.03f) {
+                    select(FocusRegion(minOf(start[0], x), minOf(start[1], y), maxOf(start[0], x), maxOf(start[1], y)))
+                }
+                if (event.actionMasked == MotionEvent.ACTION_UP) {
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                    if (!dragged) performClick()
                 }
                 return true
             }
-            MotionEvent.ACTION_CANCEL -> return true
+            MotionEvent.ACTION_CANCEL -> {
+                parent?.requestDisallowInterceptTouchEvent(false)
+                return true
+            }
         }
         return false
     }
 
-    override fun performClick(): Boolean {
-        super.performClick()
-        return true
-    }
+    override fun performClick(): Boolean = super.performClick()
 }

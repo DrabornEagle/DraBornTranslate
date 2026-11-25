@@ -187,9 +187,7 @@ class CaptureInboxActivity : Activity() {
     }
 
     private fun launchPlayStation() {
-        val app = packageManager.getLaunchIntentForPackage("com.scee.psxandroid")
-            ?: Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.scee.psxandroid"))
-        runCatching { startActivity(app) }
+        openPlayStationApp()
     }
 
     @Suppress("DEPRECATION")
@@ -329,6 +327,12 @@ internal fun Activity.captureIntent(capture: SavedCapture) = Intent(this, FocusA
     putExtra("captureModified", capture.modified)
     putExtra("captureSize", capture.size)
     putExtra("captureAdded", capture.added)
+}
+
+internal fun Activity.openPlayStationApp(): Boolean {
+    val app = packageManager.getLaunchIntentForPackage("com.scee.psxandroid")
+        ?: Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.scee.psxandroid"))
+    return runCatching { startActivity(app) }.isSuccess
 }
 
 internal fun mediaPicker() = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {

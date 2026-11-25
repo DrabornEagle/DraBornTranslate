@@ -334,7 +334,7 @@ class CaptureService : Service() {
     }
 
     private fun waitingForText() = when {
-        !captionEnabled -> "Görüntü alınıyor. DraBorn Odak’ta alanını seç."
+        !captionEnabled -> "Görüntü alınıyor. Görsel Çeviri’de alanı seç."
         readingArea == ReadingArea.GAME_TEXT -> "Görüntü alınıyor. Oyun metni bekleniyor."
         else -> "Görüntü alınıyor. Altyazı bekleniyor."
     }
@@ -484,7 +484,7 @@ class CaptureService : Service() {
             .addAction(Notification.Action.Builder(null, "Durdur", stop).build())
         if (SessionState.current.active) {
             val editor = PendingIntent.getActivity(this, 3, Intent(this, FocusActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
-            builder.addAction(Notification.Action.Builder(null, "DraBorn Odak", editor).build())
+            builder.addAction(Notification.Action.Builder(null, VISUAL_TRANSLATION, editor).build())
         }
         return builder.build()
     }

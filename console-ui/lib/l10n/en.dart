@@ -271,6 +271,8 @@ const Map<String, String> enStrings = {
   'home.node.waiting': 'Waiting',
   'home.node.not_connected': 'Not connected',
   'home.screen.title': 'Show on this phone',
+  'home.image_translation.title': 'Image Translation',
+  'home.image_translation.detail': 'Select and translate an area of a game frame.',
   'home.screen.subtitle': "If your TV isn't supported, read the translation here in large text",
   'home.pc_screen.title': "Show the PC's subtitles",
   'home.pc_screen.subtitle': 'If your computer does the translating, this phone becomes the display',

@@ -4,6 +4,7 @@ package com.gametranslator.gametranslator_mobile
 import com.draborneagle.draborntranslate.ConsoleSession
 import com.draborneagle.draborntranslate.FocusActivity
 import com.draborneagle.draborntranslate.R
+import com.draborneagle.draborntranslate.VISUAL_TRANSLATION
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -123,7 +124,7 @@ class TranslatorService : Service() {
             .setContentText(UiText.t("notification.text"))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(open)
-            .addAction(Notification.Action.Builder(null, "DraBorn Odak", focus).build())
+            .addAction(Notification.Action.Builder(null, VISUAL_TRANSLATION, focus).build())
             .setOngoing(true)
             .addAction(Notification.Action.Builder(null, UiText.t("notification.stop"), stop).build())
             .build()

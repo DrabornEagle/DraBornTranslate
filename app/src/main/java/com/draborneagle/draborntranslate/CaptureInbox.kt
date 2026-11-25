@@ -169,14 +169,18 @@ internal object CaptureInbox {
         notifyChanged()
     }
 
-    fun items(context: Context): List<SavedCapture> = buildList {
-        addAll(query(context, collections[0], video = false))
-        addAll(query(context, collections[1], video = true))
+    fun latest(context: Context): SavedCapture? = recent(context, limit = 1).firstOrNull()
+
+    fun items(context: Context): List<SavedCapture> = recent(context, limit = MAX_RECENT)
+
+    private fun recent(context: Context, limit: Int): List<SavedCapture> = buildList {
+        addAll(query(context, collections[0], video = false, limit = limit))
+        addAll(query(context, collections[1], video = true, limit = limit))
     }.sortedWith(compareByDescending<SavedCapture> { it.added }
         .thenByDescending { it.uri.lastPathSegment?.toLongOrNull() ?: 0 })
-        .take(MAX_RECENT)
+        .take(limit)
 
-    private fun query(context: Context, collection: Uri, video: Boolean): List<SavedCapture> {
+    private fun query(context: Context, collection: Uri, video: Boolean, limit: Int): List<SavedCapture> {
         val id = BaseColumns._ID
         val name = MediaStore.MediaColumns.DISPLAY_NAME
         val path = MediaStore.MediaColumns.RELATIVE_PATH
@@ -192,12 +196,12 @@ internal object CaptureInbox {
             putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
                 arrayOf("%/PS App/%", "%/PlayStation App/%", "Download/%", matchName))
             putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, "$added DESC, $id DESC")
-            putInt(ContentResolver.QUERY_ARG_LIMIT, MAX_RECENT)
+            putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
         }
         return runCatching {
             context.contentResolver.query(collection, fields, args, null)?.use { cursor ->
                 buildList {
-                    while (size < MAX_RECENT && cursor.moveToNext()) {
+                    while (size < limit && cursor.moveToNext()) {
                         add(SavedCapture(
                             ContentUris.withAppendedId(collection, cursor.getLong(0)),
                             cursor.getString(1) ?: "PlayStation yakalaması", video, cursor.getLong(2), cursor.getLong(3),
@@ -368,7 +372,7 @@ class CaptureInboxJob : JobService() {
         manager.createNotificationChannel(NotificationChannel("ps-captures", "PS App yakalamaları", NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 82, Intent(this, CaptureInboxActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
         manager.notify(82, Notification.Builder(this, "ps-captures").setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("DraBorn Odak").setContentText("$count PlayStation yakalaması çevrildi.")
+            .setContentTitle(VISUAL_TRANSLATION).setContentText("$count PlayStation yakalaması çevrildi.")
             .setContentIntent(open).setAutoCancel(true).build())
     }
 

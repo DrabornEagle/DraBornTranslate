@@ -5,11 +5,13 @@ import android.app.Activity
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.SystemClock
 import android.provider.MediaStore
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
@@ -25,6 +27,7 @@ import com.gametranslator.gametranslator_mobile.ConsoleStudioActivity
 import com.gametranslator.gametranslator_mobile.Store
 import java.io.File
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -56,6 +59,8 @@ class ScreenNavigationTest {
             waitFor { resumed() is MainActivity }
             assertTrue(hasText("PlayStation Portal"))
             assertTrue(hasText("Canlı çeviriyi başlat"))
+            assertTrue(hasText("PlayStation App’i aç"))
+            assertTrue(hasText("Çeviri seçenekleri"))
             screenshot("03-portal")
             click("Geri")
             waitFor { resumed() is HomeActivity }
@@ -74,15 +79,18 @@ class ScreenNavigationTest {
         try {
             ActivityScenario.launch(FocusActivity::class.java).use {
                 waitFor { resumed() is FocusActivity }
-                screenshot("05-odak")
+                assertTrue(hasText("Görsel Çeviri"))
+                screenshot("05-gorsel-ceviri")
                 click("Güncel oyun karesini al")
-                waitForAccessible("Oyun görüntüsü kaynağı", "05-odak-source")
+                waitForAccessible("Oyun görüntüsü kaynağı", "06-kaynak-secimi")
+                assertTrue(hasAccessibleText("Son PS App yakalaması"))
+                screenshot("06-kaynak-secimi")
                 instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
                 onMain {
                     assertTrue(ConsoleSession.begin())
                 }
                 click("Güncel oyun karesini al")
-                assertTrue(hasText("İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç."))
+                waitFor { hasText("İlk oyun karesi bekleniyor. Oyun yayınını ekranda aç.") }
                 onMain {
                     val sample = Bitmap.createBitmap(640, 360, Bitmap.Config.ARGB_8888).apply { eraseColor(Color.rgb(29, 88, 140)) }
                     ConsoleSession.frame(sample, SystemClock.elapsedRealtime())
@@ -95,6 +103,56 @@ class ScreenNavigationTest {
                 LiveFocusFrames.clear()
                 SessionState.update(SessionState.State())
             }
+        }
+    }
+
+    @Test
+    fun newestPlayStationClipOpensFromTheCurrentFrameButton() {
+        val files = mutableListOf<Uri>()
+        try {
+            saveSample("older-screenshotUrl.png", Color.BLUE).also(files::add)
+            val clip = saveClip().also(files::add)
+            saveSample("unrelated.png", Color.RED, "Pictures/Screenshots/").also(files::add)
+            ActivityScenario.launch(FocusActivity::class.java).use {
+                waitFor { resumed() is FocusActivity }
+                click("Güncel oyun karesini al")
+                waitFor { resumed()?.intent?.data?.lastPathSegment == clip.lastPathSegment }
+                waitFor {
+                    resumed()?.window?.decorView?.findChild { view ->
+                        view.isShown && view.contentDescription == "Klip konumu"
+                    } != null
+                }
+                screenshot("07-son-ps-app-klibi")
+                onMain { resumed()?.finish() }
+            }
+        } finally {
+            files.forEach { app.contentResolver.delete(it, null, null) }
+        }
+    }
+
+    @Test
+    fun newestPlayStationImageCanBeDraggedAndOpenedFullScreen() {
+        val photo = saveSample("newest-screenshotUrl.png", Color.rgb(45, 86, 146))
+        val capture = checkNotNull(CaptureInbox.latest(app))
+        try {
+            CaptureInbox.save(app, capture, listOf(FocusText(Rect(152, 136, 448, 211), "Look around.", "Etrafına bak.", Color.BLUE)))
+            ActivityScenario.launch(FocusActivity::class.java).use {
+                waitFor { resumed() is FocusActivity }
+                click("Güncel oyun karesini al")
+                waitFor { resumed()?.intent?.data?.lastPathSegment == photo.lastPathSegment }
+                waitFor { hasText("1 Türkçe çeviri · 1 okunan metin") }
+                touchFrame(drag = true)
+                assertFalse(hasAccessibleText("Tam ekranı kapat"))
+                touchFrame(drag = false)
+                waitForAccessible("Tam ekranı kapat", "08-tam-ekran")
+                assertTrue(hasAccessibleText("İngilizceyi göster"))
+                screenshot("08-tam-ekran")
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                onMain { resumed()?.finish() }
+            }
+        } finally {
+            app.contentResolver.delete(photo, null, null)
+            File(app.filesDir, "capture-inbox/${capture.key}.json").delete()
         }
     }
 
@@ -122,12 +180,12 @@ class ScreenNavigationTest {
         }
     }
 
-    private fun saveSample(name: String, color: Int): Uri {
+    private fun saveSample(name: String, color: Int, path: String = "Pictures/PS App/"): Uri {
         val resolver = app.contentResolver
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/PS App/")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, path)
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
         val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -138,6 +196,38 @@ class ScreenNavigationTest {
         bitmap.recycle()
         resolver.update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
         return uri
+    }
+
+    private fun saveClip(): Uri {
+        val resolver = app.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "new-master_playlist.mp4")
+            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "Movies/PS App/")
+            put(MediaStore.MediaColumns.IS_PENDING, 1)
+        }
+        val uri = checkNotNull(resolver.insert(MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values))
+        instrumentation.context.assets.open("ps-app-capture.mp4").use { input ->
+            checkNotNull(resolver.openOutputStream(uri)).use { output -> input.copyTo(output) }
+        }
+        resolver.update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
+        return uri
+    }
+
+    private fun touchFrame(drag: Boolean) = onMain {
+        val frame = checkNotNull(resumed()?.window?.decorView?.findChild { view -> view is FocusCanvas && view.isShown })
+        val start = SystemClock.uptimeMillis()
+        fun send(action: Int, x: Float, y: Float) {
+            val motion = MotionEvent.obtain(start, SystemClock.uptimeMillis(), action, frame.width * x, frame.height * y, 0)
+            try {
+                frame.dispatchTouchEvent(motion)
+            } finally {
+                motion.recycle()
+            }
+        }
+        send(MotionEvent.ACTION_DOWN, 0.37f, 0.39f)
+        if (drag) send(MotionEvent.ACTION_MOVE, 0.63f, 0.6f)
+        send(MotionEvent.ACTION_UP, if (drag) 0.63f else 0.37f, if (drag) 0.6f else 0.39f)
     }
 
     private fun firstCapture(): String? = onMain { currentGrid()?.getChildAt(0)?.tag?.toString() }

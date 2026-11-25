@@ -351,8 +351,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             Cell(
               icon: CupertinoIcons.viewfinder,
               iconColor: Tokens.teal,
-              title: 'DraBorn Odak',
-              subtitle: 'Oyun karesinden bir alan seç ve çevir.',
+              title: t('home.image_translation.title'),
+              subtitle: t('home.image_translation.detail'),
               chevron: true,
               onTap: () => Bridge.openTool('focus'),
             ),

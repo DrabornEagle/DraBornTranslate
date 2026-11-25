@@ -17,13 +17,13 @@
 
 **PS5 ve TV’ye bağlan** ekranında konsol kurulumu, canlı önizleme, altyazı geçmişi, TV uygulaması kurulum sihirbazı ve ikinci ekran seçenekleri bulunur. **Portal’a bağlan** ekranında PS App üzerinden paylaşımlı ekran, altyazı bandı ve Portal paneli bulunur.
 
-### Altyazı + DraBorn Odak
+### Altyazı ve Görsel Çeviri
 
-Altyazılar akarken oyun telefonundaki mesajı, tabelayı veya Brief metnini seç. **DraBorn Odak** Türkçeyi okuduğu görüntünün üstüne yerleştirir ve çevirinin tamamını metin olarak da gösterir. Android 14 ve üzerindeki uygulama paylaşımında seçili alan canlı olarak yenilenebilir.
+Altyazılar akarken oyun telefonundaki mesajı, tabelayı veya Brief metnini seç. **Görsel Çeviri** Türkçeyi görüntünün üzerine yerleştirir ve çevirinin tamamını metin olarak gösterir. Görüntüye dokunarak tam ekranda açabilir, iki parmakla yakınlaştırabilirsin. Android 14 ve üzerindeki uygulama paylaşımında seçili alan canlı olarak yenilenebilir.
 
 **Oyun paketleri → Türkçe paketi indir** yolu 475.893 satırlık Türkçe oyun paketini telefona indirir. Pakette eşleşen replikler telefondaki tablodan okunur. Diğer metinleri telefondaki Töz-Çevir modeli çevirir. Çeviri için hesap, ücretli servis, kamera, mikrofon veya bilgisayar gerekmez.
 
-**Güncel oyun karesini al** ile açık bağlantıdan son oyun karesini seç. Bağlantı kapalıysa Odak, konsol veya telefon ekranı kaynağını açar.
+**Güncel oyun karesini al** açık bağlantıdan yeni bir kare veya telefona indirilen son PS App yakalamasını açar. **Son PS App yakalaması** ile fotoğrafı veya klibi doğrudan açabilirsin. **Kaynak seç** ile konsol, Portal ve PS Remote Play seçeneklerine erişebilirsin.
 
 ### PS App yakalamaları
 

@@ -24,11 +24,11 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 [PlayStation App Paylaşımlı Ekran](https://www.playstation.com/tr-tr/support/games/playstation-app-features/) · [PS Portal Uzaktan Oynama](https://www.playstation.com/tr-tr/support/hardware/playstation-remote-play-on-psportal/)
 
-## Altyazı ve DraBorn Odak
+## Altyazı ve Görsel Çeviri
 
-1. Ana ekrandan **DraBorn Odak → Güncel oyun karesini al** yolunu kullan. Kaynak açık değilse bir bağlantı seçip oyun görüntüsünü aç. Portal’daki canlı alan katmanı için **Altyazı + DraBorn Odak** modunu aç. İngilizce altyazı açıkken oyundaki telefon mesajını, Brief bölümünü veya tabelayı aç.
-2. **DraBorn Odak · Alan seç** ekranında görüntü üzerinden bir dikdörtgen çiz. **Alanı çevir** seçeneği Türkçeyi görüntünün üstünde gösterir ve bu alanı canlı oturum için saklar.
-3. Android 14+ uygulama paylaşımında oyun ekranına dönünce seçili alan canlı taranır. Android 10–13’te Odak sonucu görüntü inceleme ekranından okunur. PS5 eşleme oturumunda **Canlı alanı takip et** seçeneği telefon ekranındaki kareyi günceller.
+1. **Görsel Çeviri → Güncel oyun karesini al** düğmesi yeni bir canlı kareyi veya telefona indirilmiş en yeni PS App fotoğrafını ya da klibini açar. **Son PS App yakalaması** ile kaydı doğrudan seçebilirsin. Yeni kayıt için PS App’te **Kütüphane → Yakalamalar → İndir** yolunu kullan ve istenirse medya erişimi ver.
+2. Görüntü üzerinde bir dikdörtgen çiz ve **Alanı çevir** düğmesine dokun. Görüntüye dokunarak tam ekrana geçebilir, yakınlaştırabilir ve Türkçe ile İngilizce arasında geçiş yapabilirsin. Klipte çevirilecek kareyi zaman çubuğuyla seç.
+3. Portal’ın canlı alan katmanı için **Altyazı + Görsel Çeviri** modunu aç. Android 14+ uygulama paylaşımında oyun ekranına dönünce seçili alan canlı taranır. Android 10–13’te çeviriyi Görsel Çeviri ekranından okuyabilirsin. PS5 eşleme oturumunda **Canlı alanı takip et** telefon ekranındaki kareyi günceller.
 
 Canlı altyazı ve alanın OCR işlemi bağımsızdır. Ekranda küçük veya bulanık bir satır varsa oyunda HUD yazı boyutunu büyütmek ve tam ekran görüntü kullanmak okumayı iyileştirir.
 

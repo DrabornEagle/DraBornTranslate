@@ -270,6 +270,8 @@ const Map<String, String> trStrings = {
   'home.node.waiting': 'Bekleniyor',
   'home.node.not_connected': 'Bağlı değil',
   'home.screen.title': 'Bu telefonda göster',
+  'home.image_translation.title': 'Görsel Çeviri',
+  'home.image_translation.detail': 'Oyun karesinden bir alan seç ve çevir.',
   'home.screen.subtitle': "TV'n desteklenmiyorsa çeviriyi burada büyük yazıyla oku",
   'home.pc_screen.title': 'Bilgisayarın altyazısını göster',
   'home.pc_screen.subtitle': 'Çeviriyi bilgisayar yapıyorsa telefon ekran olur',

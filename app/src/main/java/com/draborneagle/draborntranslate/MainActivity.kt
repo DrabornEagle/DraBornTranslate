@@ -81,6 +81,7 @@ class MainActivity : Activity() {
     private var updateResultPending = false
     private lateinit var focusArea: Button
     private lateinit var panelHelp: Button
+    private var portalConnectionBadge: TextView? = null
 
     private lateinit var instructions: TextView
     private lateinit var openSource: Button
@@ -186,32 +187,54 @@ class MainActivity : Activity() {
 
     private fun buildUi() {
         val mobile = config.source == Source.MOBILE
-        val accent = if (mobile) Palette.blue else Palette.purple
+        val accent = if (mobile) Palette.blue else Palette.rose
         val content = contentPage(if (mobile) "Telefonda oyna" else "PlayStation Portal", accent)
-        content.append(featureHeader(
-            if (mobile) "Oyun telefonda" else "Portal bağlantısı",
-            if (mobile) "PS Remote Play ile oyun görüntüsünü paylaş." else "PlayStation App yayınına Türkçe altyazı ekle.",
-            if (mobile) R.drawable.ic_phone_screen else R.drawable.ic_portal_device, accent,
-        ), 0)
+        if (mobile) {
+            content.append(featureHeader("Oyun telefonda", "PS Remote Play ile oyun görüntüsünü paylaş.",
+                R.drawable.ic_phone_screen, accent), 0)
+        } else {
+            val badge = copy("", 12, Palette.rose, true).apply {
+                accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+            }
+            portalConnectionBadge = badge
+            content.append(connectionHero("Portal yayını", "PlayStation App yayınına Türkçe altyazı ekle.",
+                R.drawable.ic_portal_device, accent, badge), 0)
+        }
 
         val capture = card()
+        if (!mobile) capture.background = blend(0xFF352755.toInt(), 0xFF19243D.toInt(), 23)
         content.append(capture, 12)
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
-        styleButton(startStop, ACCENT to LAVENDER)
-        actionIcon(startStop, R.drawable.ic_portal_play)
+        styleButton(startStop, if (mobile) ACCENT to LAVENDER else MINT to ACCENT, activated = PEACH to ROSE)
+        actionIcon(startStop, R.drawable.ic_portal_play, activeIcon = R.drawable.ic_portal_stop)
+        if (!mobile) {
+            startStop.textSize = 16f
+            startStop.minimumHeight = dp(56)
+        }
         capture.addView(startStop, LinearLayout.LayoutParams(-1, -2))
         openSource = button("") { openSourceApp(config.source, offerInstall = true) }
+        if (!mobile) actionIcon(openSource, R.drawable.ic_phone_screen, tint = LAVENDER)
         capture.append(openSource, 8)
         displayChoice = button("") { selectDisplay() }
-        capture.append(displayChoice, 8)
         readingChoice = button("") { selectReadingArea() }
-        capture.append(readingChoice, 7)
-        focusArea = button("DraBorn Odak · Alan seç") { startActivity(Intent(this, FocusActivity::class.java)) }
-        actionIcon(focusArea, R.drawable.ic_focus_region)
-        capture.append(focusArea, 7)
+        focusArea = button("$VISUAL_TRANSLATION · Alan seç") { startActivity(Intent(this, FocusActivity::class.java)) }
+        actionIcon(focusArea, R.drawable.ic_focus_region, tint = MINT)
+        if (mobile) {
+            capture.append(displayChoice, 8)
+            capture.append(readingChoice, 7)
+            capture.append(focusArea, 7)
+        } else {
+            val options = card()
+            options.background = blend(0xFF293052.toInt(), 0xFF191E38.toInt(), 22)
+            options.addView(sectionTitle("Çeviri seçenekleri"))
+            options.append(actionRow(displayChoice, readingChoice), 10)
+            options.append(focusArea, 8)
+            content.append(options, 12)
+        }
 
         val live = card(highlight = true)
         content.append(live, 14)
+        if (!mobile) live.background = blend(0xFF203D55.toInt(), 0xFF191F3C.toInt(), 22)
         live.addView(sectionTitle("Son çeviri"))
         status = label("", 14, ACCENT, bold = true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         live.append(status, 7)
@@ -231,6 +254,7 @@ class MainActivity : Activity() {
         live.append(copySource, 6)
 
         panelCard = card()
+        if (!mobile) panelCard.background = blend(0xFF3E2B50.toInt(), 0xFF211B3B.toInt(), 22)
         content.append(panelCard, 14)
         panelCard.addView(sectionTitle("Portal yan paneli"))
         panelStatus = label("", 14, MUTED)
@@ -258,7 +282,7 @@ class MainActivity : Activity() {
         instructions = label("", 15, MUTED).apply { setLineSpacing(dp(4).toFloat(), 1f) }
         guide.append(instructions, 10)
 
-        val settings = content.addDetails("Görünüm ve oyun paketi")
+        val settings = content.addDetails("Görünüm ve oyun paketi", expandedByDefault = mobile)
         bandSettings = column()
         settings.append(bandSettings, 12)
         bandSettings.addView(label("Altyazı hizası", 16, WHITE, bold = true))
@@ -313,8 +337,18 @@ class MainActivity : Activity() {
                 "3. DraBornTranslate’te başlat ve Android paylaşımında Tek uygulama → PlayStation App’i seç. Yayını önde tut.\n" +
                 "4. $textInstructions"
         }
-        openSource.text = "${config.source.appName} uygulamasını aç"
+        openSource.text = if (mobile) "${config.source.appName} uygulamasını aç" else "PlayStation App’i aç"
         val panelTesting = state.portalPanel?.testing == true
+        val currentSource = state.source == config.source
+        val statusBadge = when {
+            pending -> "Ekran paylaşımı bekleniyor" to Palette.blue
+            state.active && currentSource && state.videoVisible -> "Canlı çeviri açık" to Palette.mint
+            state.active && currentSource -> "Yayın bekleniyor" to Palette.blue
+            state.active -> "Başka bağlantı açık" to Palette.peach
+            panelTesting && currentSource -> "Panel denemesi açık" to Palette.mint
+            else -> "Çeviri kapalı" to Palette.rose
+        }
+        portalConnectionBadge?.connectionBadge(statusBadge.first, statusBadge.second)
         val controlsAvailable = !state.active && !pending && !panelTesting
         listOf(bandControl, sizeControl).forEach { it.isEnabled = controlsAvailable }
         displayChoice.visibility = if (mobile) View.GONE else View.VISIBLE
@@ -322,8 +356,8 @@ class MainActivity : Activity() {
         displayChoice.text = "Çeviri çıkışı · ${config.display.label}"
         readingChoice.isEnabled = controlsAvailable
         readingChoice.text = when {
-            config.focus && config.captionEnabled -> "Altyazı + DraBorn Odak"
-            config.focus -> "DraBorn Odak"
+            config.focus && config.captionEnabled -> "Altyazı + $VISUAL_TRANSLATION"
+            config.focus -> VISUAL_TRANSLATION
             else -> config.readingArea.label
         }
         packButton.isEnabled = controlsAvailable && demoTranslator == null
@@ -332,6 +366,7 @@ class MainActivity : Activity() {
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
         voiceButton.isEnabled = controlsAvailable
         startStop.isEnabled = !pending && demoTranslator == null
+        startStop.isActivated = state.active && currentSource
         startStop.text = when {
             !state.active -> "Canlı çeviriyi başlat"
             state.source == config.source -> "Canlı çeviriyi durdur"
@@ -388,7 +423,7 @@ class MainActivity : Activity() {
     }
 
     private fun selectReadingArea() {
-        val labels = arrayOf("Altyazı bölgesi", "DraBorn Odak", "Altyazı + DraBorn Odak", "Tüm oyun metinleri")
+        val labels = arrayOf("Altyazı bölgesi", VISUAL_TRANSLATION, "Altyazı + $VISUAL_TRANSLATION", "Tüm oyun metinleri")
         val selected = when {
             config.focus && config.captionEnabled -> 2
             config.focus -> 1
@@ -1003,12 +1038,12 @@ class MainActivity : Activity() {
         ))
     }
 
-    private fun actionIcon(button: Button, icon: Int, activeIcon: Int? = null) {
+    private fun actionIcon(button: Button, icon: Int, activeIcon: Int? = null, tint: Int = BACKGROUND) {
         val icons = StateListDrawable().apply {
             if (activeIcon != null) addState(intArrayOf(android.R.attr.state_activated), getDrawable(activeIcon)?.mutate())
             addState(intArrayOf(), getDrawable(icon)?.mutate())
             setTintList(ColorStateList(arrayOf(intArrayOf(-android.R.attr.state_enabled), intArrayOf()),
-                intArrayOf(0xFF909AB8.toInt(), BACKGROUND)))
+                intArrayOf(0xFF909AB8.toInt(), tint)))
         }
         button.compoundDrawablePadding = dp(8)
         button.setCompoundDrawablesRelativeWithIntrinsicBounds(icons, null, null, null)
@@ -1047,14 +1082,15 @@ class MainActivity : Activity() {
     private fun gradient(orientation: GradientDrawable.Orientation, start: Int, end: Int, radius: Int) =
         GradientDrawable(orientation, intArrayOf(start, end)).apply { cornerRadius = dp(radius).toFloat() }
 
-    private fun LinearLayout.addDetails(title: String): LinearLayout {
+    private fun LinearLayout.addDetails(title: String, expandedByDefault: Boolean = true): LinearLayout {
         val container = card()
         val body = column()
         val heading = button(title)
         heading.gravity = Gravity.CENTER_VERTICAL or Gravity.START
         heading.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_disclosure, 0)
-        heading.isSelected = true
-        if (Build.VERSION.SDK_INT >= 30) heading.stateDescription = "Açık"
+        body.visibility = if (expandedByDefault) View.VISIBLE else View.GONE
+        heading.isSelected = expandedByDefault
+        if (Build.VERSION.SDK_INT >= 30) heading.stateDescription = if (expandedByDefault) "Açık" else "Kapalı"
         heading.setOnClickListener {
             val expanded = body.visibility != View.VISIBLE
             body.visibility = if (expanded) View.VISIBLE else View.GONE
