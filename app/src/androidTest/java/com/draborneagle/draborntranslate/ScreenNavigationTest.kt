@@ -91,7 +91,7 @@ class ScreenNavigationTest {
                 val positions = onMain {
                     val screen = checkNotNull(resumed()?.window?.decorView)
                     readingOrder.map { label ->
-                        val item = checkNotNull(screen.findChild { it is TextView && it.text == label })
+                        val item = checkNotNull(screen.findChild { it is TextView && it.text.toString() == label })
                         IntArray(2).also(item::getLocationInWindow)[1]
                     }
                 }
