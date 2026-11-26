@@ -4,9 +4,9 @@
   <img src="app/src/main/res/drawable-nodpi/brand_mark.webp" width="68" height="68" alt="">
   <h1>DraBornTranslate</h1>
   <p><strong>PlayStation oyunlarını Türkçe oku.</strong><br>Canlı altyazı, oyun içi metin çevirisi ve PS App yakalamaları.</p>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.5/DraBornTranslate-v0.6.5-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.6.5%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.6.5 imzalı APK’yı indir"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.6/DraBornTranslate-v0.6.6-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.6.6%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.6.6 imzalı APK’yı indir"></a>
   <a href="docs/KURULUM.md"><img src="https://img.shields.io/badge/KURULUM-REHBER%C4%B0-BDA5FF?style=for-the-badge&amp;labelColor=161529" alt="Kurulum rehberi"></a>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.5"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.6.5 sürüm notları"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.6"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.6.6 sürüm notları"></a>
   <p><sub>İmzalı APK · Android 10+ · ARM64</sub></p>
 </div>
 
@@ -18,9 +18,9 @@ GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repli
 
 ## GTA 6 görev araması
 
-Görev Ara, 204 görev ve oyun kaydını Türkçe, İngilizce ve harita başlıklarıyla eşleştirir. **Meet Raul’s Crew** araması **Credit Check** görevini, **BIL_HOUSE** araması **Home Sweet Home** görevini açar. Cal Hampton ve Kenton Rees gibi doğrulanmış karakter portreleri kendiliğinden görünür. **Görev Bilgileri** sahneleri, mevcut görev karelerini ve önce tamamlanacak görevleri gösterir.
+Görev Ara, 204 görev ve oyun kaydını Türkçe, İngilizce ve harita başlıklarıyla eşleştirir. **Meet Raul’s Crew** araması **Credit Check** görevini, **BIL_HOUSE** araması **Home Sweet Home** görevini açar. Cal Hampton ve Kenton Rees gibi doğrulanmış karakter portreleri kendiliğinden görünür. **Görev Bilgileri** Türkçe sahne özetlerini, mevcut görev karelerini ve önce tamamlanacak görevleri gösterir.
 
-**Görev Metinleri → Konuşmalar** Türkçe sahne özetlerini, konuşanları ve konumları uygulama içinde gösterir. Etkin pakette diyalog satırları varsa bunları sahneye göre görüntüler. **Hedefler/Kaynaklar** görev hedefleri ve rehber bağlantılarını içerir. **Oyun Paketleri → GTA 6 paketini indir** güncel kataloğu GitHub’dan getirir.
+**Görev Metinleri → Konuşmalar**, etkin görev paketindeki replikleri konuşmacı ve sahne bilgisiyle satır satır gösterir. **Hedefler/Kaynaklar** görev hedefleri ve rehber bağlantılarını içerir. **Oyun Paketleri → GTA 6 paketini indir** güncel kataloğu GitHub’dan getirir.
 
 **Attend the Launch Party** veya **Attent the Launch Party** araması Papa Audacity’nin **The Audacity** yan görevini bulur. [Paket içeriği ve kaynaklar](packs/gta-6/README.md)
 
@@ -52,7 +52,7 @@ Görev Ara, 204 görev ve oyun kaydını Türkçe, İngilizce ve harita başlık
 
 ## İndir ve kur
 
-1. [DraBornTranslate v0.6.5 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.5/DraBornTranslate-v0.6.5-Android-arm64.apk).
+1. [DraBornTranslate v0.6.6 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.6/DraBornTranslate-v0.6.6-Android-arm64.apk).
 2. APK’yı Android telefonunda aç. Önceki v5 serisi kurulumunun üzerine yükleyebilirsin.
 3. Ana ekrandan bağlantını seç. [PS5, Portal ve Remote Play kurulum adımları](docs/KURULUM.md).
 

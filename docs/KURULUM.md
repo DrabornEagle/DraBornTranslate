@@ -1,10 +1,10 @@
-# DraBornTranslate v0.6.5
+# DraBornTranslate v0.6.6
 
-**Android 10+ · ARM64 · Android sürüm kodu 13**
+**Android 10+ · ARM64 · Android sürüm kodu 14**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.5)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.6)
 
-v0.6.5 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.6.6 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -34,8 +34,8 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 **Görev Ara** Türkçe veya İngilizce görev adı, harita başlığı ve teknik kodla çalışır. **Meet Raul’s Crew** aramasıyla **Credit Check** görevine ulaşabilirsin. Dâhilî katalog çevrimdışı açılır. **Oyun Paketleri → GTA 6 paketini indir** üzerinden GitHub’daki kataloğu cihazına alabilirsin.
 
-- **Görev Bilgileri** doğrulanmış karakter portresini ve görev karelerini kaynaklarından otomatik yükler. Sahne sırasını ve **Önce tamamlanacak görev** kartını burada görebilirsin.
-- **Görev Metinleri → Konuşmalar** hazır paketteki Türkçe sahne özetlerini, konuşanları ve konumları gösterir. Etkin pakette diyalog satırları varsa sahne, konuşan ve mevcut zaman bilgisiyle okunabilir.
+- **Görev Bilgileri** Türkçe sahne özetlerini, sahne sırasını ve **Önce tamamlanacak görev** kartını gösterir. Karakter portreleri ve görev kareleri otomatik yüklenir.
+- **Görev Metinleri → Konuşmalar** etkin paketteki replikleri sahne, konuşmacı ve varsa zaman bilgisiyle satır satır gösterir.
 - **Hedefler/Kaynaklar** hedefleri, görev rehberlerini, karakter ve görsel kaynaklarını açar. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
 
 ## Altyazı ve Görsel Çeviri

@@ -54,14 +54,19 @@ class ScreenNavigationTest {
                 entry("catalog.json", """
                     {"format":1,"version":"test","gameBuild":"Test",
                     "missions":[{"id":"launch","titleTr":"Lansman Partisine Katıl","titleEn":"The Audacity",
-                    "type":"side","chapter":3,"summaryTr":"Lansmandan önce daveti bekle.","textCount":2,
+                    "type":"side","chapter":3,"summaryTr":"Lansmandan önce daveti bekle.","textCount":5,
                     "aliases":["Attent the Launch Party"],"locationTr":"Neo Paloma Apartments",
                     "sourceUrl":"https://example.org/mission","textSourceUrl":"https://example.org/lines",
-                    "scenes":[{"id":"lobby","titleTr":"Buluşma","environmentTr":"Giriş holü"}]}]}
+                    "scenes":[{"id":"lobby","titleTr":"Buluşma","environmentTr":"Giriş holü"},
+                    {"id":"hall","titleTr":"Koridora geçiş","environmentTr":"Arka koridor"}],
+                    "conversationSummaries":[{"titleTr":"İlk karşılaşma","summaryTr":"İkili girişte buluşur."}]}]}
                 """.trimIndent())
                 entry("texts/launch.json", """
                     [{"type":"objective","tr":"Lansman partisine katıl.","sceneId":"lobby"},
-                     {"type":"dialogue","tr":"Seni girişte bekleyeceğim.","sceneId":"lobby","speaker":"Deniz","startMs":2500}]
+                     {"type":"guide","tr":"Giriş kapısından geçilir.","sceneId":"lobby"},
+                     {"type":"dialogue","tr":"Seni girişte bekleyeceğim.","sceneId":"lobby","speaker":"Deniz","startMs":2500},
+                     {"type":"dialogue","tr":"Birazdan oradayım.","sceneId":"lobby","speaker":"Ece","startMs":4100},
+                     {"type":"dialogue","tr":"Kapıyı açık bıraktım.","sceneId":"hall","speaker":"Mert","startMs":800}]
                 """.trimIndent())
             }
             ActivityScenario.launch(HomeActivity::class.java).use {
@@ -74,12 +79,32 @@ class ScreenNavigationTest {
                 click("İngilizce")
                 waitFor { hasText("The Audacity") }
                 click("The Audacity")
-                waitFor { resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") }
+                waitFor {
+                    resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") &&
+                        hasText("Sahne özetleri") && hasText("İlk karşılaşma")
+                }
+                assertFalse(hasText("Seni girişte bekleyeceğim."))
                 click("Görev metinleri")
-                waitFor { hasText("Seni girişte bekleyeceğim.") && hasText("Deniz") && hasText("Buluşma") && hasText("Giriş holü") }
+                val readingOrder = listOf("Buluşma", "Deniz", "Seni girişte bekleyeceğim.", "Ece", "Birazdan oradayım.",
+                    "Koridora geçiş", "Mert", "Kapıyı açık bıraktım.")
+                waitFor { readingOrder.all(::hasText) && hasText("Giriş holü") && hasText("Arka koridor") }
+                val positions = onMain {
+                    val screen = checkNotNull(resumed()?.window?.decorView)
+                    readingOrder.map { label ->
+                        val item = checkNotNull(screen.findChild { it is TextView && it.text == label })
+                        IntArray(2).also(item::getLocationInWindow)[1]
+                    }
+                }
+                assertTrue("Scene headings and dialogue should follow the package order",
+                    positions.zipWithNext().all { (first, next) -> first < next })
                 assertFalse(hasText("Canlı kayıt başlat"))
                 assertFalse(hasText("SRT / VTT ekle"))
                 assertFalse(hasText("Lansman partisine katıl."))
+                assertFalse(hasText("Sahne özetleri"))
+                assertFalse(hasText("İlk karşılaşma"))
+                assertFalse(hasText("Giriş kapısından geçilir."))
+                assertFalse(hasText("Bu görev için kayıtlı replik bulunmuyor."))
+                screenshot("08-gorev-konusmalari")
                 click("Hedefler/Kaynaklar")
                 waitFor { hasText("Lansman partisine katıl.") && hasText("Giriş holü") }
                 assertTrue(hasText("Görev kaynağını aç"))
@@ -99,7 +124,7 @@ class ScreenNavigationTest {
     }
 
     @Test
-    fun bundledCatalogShowsMissionMediaAndTurkishScenesWithNoArchiveButton() {
+    fun bundledCatalogShowsMissionMediaAndSummariesOnlyInMissionInfo() {
         ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
             waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
             click("İngilizce")
@@ -111,17 +136,21 @@ class ScreenNavigationTest {
             }
             screenshot("06-gorev-ara")
             click("Gone Fishing")
-            waitFor { resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") && hasText("Buluşma noktası") }
+            waitFor {
+                resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") && hasText("Buluşma noktası") &&
+                    hasText("Sahne özetleri") && hasText("Teknedeki iş") && hasText("Kampı terk ederken")
+            }
             assertFalse(hasText("Profil fotoğrafı ekle"))
             assertFalse(hasText("Oyundan görüntü ekle"))
             assertFalse(hasText("Görsel kaynağı · GTABase"))
             screenshot("07-gorev-detayi")
             click("Görev metinleri")
-            waitFor { hasText("Sahne özetleri") && hasText("Teknedeki iş") && hasText("Kampı terk ederken") }
+            waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
+            assertFalse(hasText("Sahne özetleri"))
+            assertFalse(hasText("Teknedeki iş"))
             assertFalse(hasText("Görevin diyalog arşivini aç"))
             assertFalse(hasText("Konuşma kayıtlarım"))
             assertFalse(hasText("Altyazı geçmişinden seç"))
-            screenshot("08-gorev-konusmalari")
             click("Hedefler/Kaynaklar")
             waitFor { hasText("Kaynaklar") && hasText("Görev kaynağını aç") }
             assertFalse(hasText("Görevin diyalog arşivini aç"))
@@ -145,10 +174,23 @@ class ScreenNavigationTest {
             waitFor { hasText("Meet the Heders") }
             assertFalse(hasText("Görev adı doğrulanmadı"))
             click("Meet the Heders")
-            waitFor { hasText("Brian’la balkon görüşmesi") }
+            waitFor { hasText("Brian’la balkon görüşmesi") && hasText("Balkondaki konuşma") }
             click("Görev metinleri")
-            waitFor { hasText("Balkondaki konuşma") }
+            waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
+            assertFalse(hasText("Balkondaki konuşma"))
             assertFalse(hasText("Görevin diyalog arşivini aç"))
+            click("Geri")
+            waitFor { resumed() is GtaMissionSearchActivity }
+            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("first impressions") }
+            waitFor { hasText("First Impressions") }
+            click("First Impressions")
+            waitFor {
+                hasText("Garaja yönlendirme") && hasText("Arabadaki açıklama") &&
+                    hasText("Asıl işin ortaya çıkması")
+            }
+            click("Görev metinleri")
+            waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
+            assertFalse(hasText("Garaja yönlendirme"))
         }
     }
 

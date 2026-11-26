@@ -358,8 +358,9 @@ class GtaMissionDetailsActivity : Activity() {
         if (mission.characters.isNotEmpty()) {
             body.addBelow(miamiSection("Görevde görülenler", mission.characters.joinToString(", "), Miami.lavender), 10)
         }
+        showSceneSummaries()
         val notes = rows.orEmpty().filter { it.type == GtaTextType.GUIDE && it.sceneId != null }.groupBy { it.sceneId }
-        if (mission.scenes.isNotEmpty()) body.addBelow(copy("Sahneler", 18, Palette.white, true).apply {
+        if (mission.scenes.isNotEmpty()) body.addBelow(copy("Görev aşamaları", 18, Palette.white, true).apply {
             isAccessibilityHeading = true
         }, 15)
         mission.scenes.forEachIndexed { index, scene ->
@@ -491,7 +492,7 @@ class GtaMissionDetailsActivity : Activity() {
             else it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE
         }
         if (entries.isEmpty()) {
-            if (conversations) showConversationSummaries()
+            if (conversations) body.addBelow(copy("Bu görev için kayıtlı replik bulunmuyor."), 12)
             else body.addBelow(miamiSection("Hedefler", "Bu görev için kayıtlı hedef bulunmuyor.", Miami.lavender), 10)
             return
         }
@@ -529,12 +530,9 @@ class GtaMissionDetailsActivity : Activity() {
         translateRows(version, pending.iterator())
     }
 
-    private fun showConversationSummaries() {
+    private fun showSceneSummaries() {
         val summaries = mission.conversationSummaries
-        if (summaries.isEmpty()) {
-            body.addBelow(miamiSection("Konuşmalar", "Bu görev için sahne konuşması henüz bulunmuyor.", Miami.aqua), 10)
-            return
-        }
+        if (summaries.isEmpty()) return
         body.addBelow(copy("Sahne özetleri", 19, Palette.white, true).apply { isAccessibilityHeading = true }, 13)
         val colors = listOf(Miami.aqua, Miami.coral, Miami.lavender)
         summaries.forEachIndexed { index, summary ->
