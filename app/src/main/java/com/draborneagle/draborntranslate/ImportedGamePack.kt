@@ -135,6 +135,12 @@ internal object ImportedGamePack {
         json.endObject()
     }
 
+    fun ensureGta(context: Context) {
+        synchronized(downloadLock) {
+            if (!hasGta(context)) downloadGta(context)
+        }
+    }
+
     fun downloadGta(context: Context, force: Boolean = true): String? {
         synchronized(downloadLock) {
             val generation = synchronized(this) { gtaGeneration }

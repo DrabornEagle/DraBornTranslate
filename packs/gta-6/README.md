@@ -4,7 +4,7 @@
 
 2026.11.26.6 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** bölümünde aşamalar, sahne özetlerinin üstünde yer alır. Aramada açılan 197 görev kartının 195’inde toplam 311 Türkçe sahne özeti bulunur. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
 
-**Konuşmalar** etkin görev paketindeki, yerel replik ZIP’indeki veya bağlı GitHub replik paketindeki `dialogue` kayıtlarını sahne ve konuşmacı bilgisiyle satır satır gösterir. Hazır görev paketinde replik dizini yer almıyor. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir.
+**Konuşmalar** seçilen görevin yayımlanmış `dialogue` kayıtlarını sahne ve konuşmacı bilgisiyle satır satır gösterir. Sekme açıldığında GitHub görev paketi en fazla saatte bir otomatik denetlenir. Doğrulanmış arşiv çevrimdışı kalır. Bu katalog 343 rehber ve bir hedef kaydı içerir. Yayımlanmış konuşma sayısı sıfırdır. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir.
 
 | Kaynak | Kapsam |
 | --- | --- |
@@ -17,13 +17,13 @@
 
 Sahne zamanı için videonun veya sahnenin başlangıcına göre ölçüm gerekir. Metin dökümündeki satır numarası ve hash, videodaki saniyeyi vermez.
 
-## Kendi görev paketini hazırlama
+## Görev paketi yayını
 
 1. [catalog.json](catalog.json) dosyasında görev bilgilerini düzenle. Her görevin `id` değeri benzersiz olmalı. İsteğe bağlı `scenes`, `requires`, `mapLabels`, `giver`, `sourceUrl`, `textSourceUrl`, `gameDataSourceUrl`, `profileSourceUrl` ve `gallerySourceUrl` alanları sahne bilgilerini, farklı adları ve kaynakları bağlar.
 2. Eklemeye yetkili olduğun metinleri `texts/<görev-id>.json` dosyasına sıralı JSON dizisi olarak kaydet. Her satırda aşağıdaki alanları kullan.
 3. İsteğe bağlı `media.json` içinde yayıncıya ait görsel URL’lerini `portraits` ve `previews` alanlarında tanımla. `portraitAliases` kısa karakter adlarını portre anahtarlarına bağlar.
 4. İsteğe bağlı `conversations.json` içinde görev kimliklerini Türkçe sahne özetlerine bağla. Her özet `titleTr` ve `summaryTr` değerlerini, varsa `locationTr` metnini ve `speakers` dizisini içerir.
-5. `python3 scripts/gta-mission-pack.py --build --directory <paket-klasörü>` komutuyla ZIP’i oluştur. Android’de **Oyun paketleri → Görev paketi seç (.zip)** düğmesiyle yükle. Özel ZIP aramada önceliklidir. **Yüklü paketleri yönet** menüsünden özel ZIP’i kaldırarak GitHub paketine dönebilirsin.
+5. Katalogdaki `version` değerini artır ve `python3 scripts/gta-mission-pack.py --build --directory packs/gta-6` komutuyla arşivi oluştur. Yeni manifesti ve ZIP’i aynı commit’te yayımla. Uygulama güncellemeyi bu dizinden otomatik alır.
 
 | Alan | İçerik |
 | --- | --- |
@@ -34,20 +34,10 @@ Sahne zamanı için videonun veya sahnenin başlangıcına göre ölçüm gereki
 | `speaker`, `contextTr` | Konuşan kişi ve varsa satırın Türkçe bağlamı |
 | `startMs`, `endMs` | Varsa sahnenin başlangıcından itibaren doğrulanmış milisaniye değerleri |
 
-GitHub paketini güncellerken katalogdaki `version` değerini değiştir, komutu yeniden çalıştır ve manifesti yeni ZIP’le aynı commit’te gönder. Dosya adı ZIP’in SHA-256 özetinden üretilir.
+ZIP’in adı SHA-256 özetinden üretilir. Uygulama arşivin boyutunu, özetini, sürümünü ve her repliğin sahne ile konuşmacı alanlarını doğrular.
 
-## Türkçe altyazı paketini kullanma
+## Altyazı anahtarları
 
-1. **Oyun Paketleri → Altyazı paketi seç (.gz veya .json)** ile `gta-6.gz` dosyasını seç. Uygulamadaki GTA 6 altyazı indirmesi de kullanılabilir. Seçilen yerel GTA 6 paketi önceliklidir.
-2. Elindeki yetkili görev dizininde her göreve mevcut katalogdaki `id` ile yer ver. `scenes` dizisi sahnelerin okuma sırasını, `texts/<görev-id>.json` her sahnedeki repliklerin sırasını belirler. Sahne başlığı için `titleTr`, bilinen ortam için `environmentTr` kullan. Replik satırına ilgili sahne kimliğini, konuşmacıyı ve altyazı paketindeki anahtarı yaz.
-3. Ürettiğin ZIP’i **Oyun Paketleri → Replik paketi seç (.zip)** ile yükle. Aranan görevin **Konuşmalar** ekranı eşleşen Türkçe satırları cihazda çözer.
+`scenes` dizisi sahnelerin okuma sırasını, `texts/<görev-id>.json` her sahnedeki repliklerin sırasını belirler. Sahne başlığı için `titleTr`, bilinen ortam için `environmentTr` kullan.
 
-Yalnızca altyazı dosyası kurulduğunda görev eşlemesi için ayrıca dizin gerekir. `gta-6.gz` bir çeviri sözlüğüdür. Anahtarlar görev, sahne, konuşmacı veya konuşma sırası taşımaz. `subtitleKey` alanı İngilizce metnin [PackKey](../../app/src/main/java/com/gametranslator/gametranslator_mobile/core/GamePacks.kt) ile hesaplanan anahtarını kullanır. Eşleme tam anahtarla önce `entries`, sonra `segments` tablosundan yapılır.
-
-## GitHub’dan replikleri eşitleme
-
-1. Yayımlama izni olan replikler için yukarıdaki biçimde bir paket oluştur. Katalogdaki görev `id` değerlerini kullan, sahne dizisini okuma sırasına göre yaz ve her replikte `sceneId` ile `speaker` belirt. Görev başına satırlar sahne içindeki yazılış sırasıyla görünür.
-2. `manifest.json` dosyasını ve üretilen ZIP’i herkese açık GitHub deponda aynı dizine koy. Uygulama GitHub’daki dosya bağlantısını veya `raw.githubusercontent.com` bağlantısını kabul eder.
-3. Android’de **Oyun Paketleri → Replik paketi bağla** seç ve manifest bağlantısını gir. Uygulama eşleşen görev ve replik sayısını gösterir. **Konuşmalar** açıldığında en fazla saatte bir güncelleme aranır. **Replik paketini güncelle** üzerinden hemen kontrol edebilirsin.
-
-Son doğrulanan dosya cihazda saklanır. Öncelik, etkin görev ZIP’indeki repliklerin ardından yerel replik ZIP’ine ve son olarak GitHub replik paketine verilir.
+`gta-6.gz` bir Türkçe çeviri sözlüğüdür. Görev, sahne, konuşmacı ve sıra bilgilerini görev paketi sağlar. `subtitleKey` alanı İngilizce metnin [PackKey](../../app/src/main/java/com/gametranslator/gametranslator_mobile/core/GamePacks.kt) ile hesaplanan anahtarını kullanır. Uygulama önce `entries`, sonra `segments` tablosunda tam eşleşme arar. Yayımlanmış replikte anahtar varsa ve gerekli altyazı paketi cihazda yoksa onu da otomatik indirir.

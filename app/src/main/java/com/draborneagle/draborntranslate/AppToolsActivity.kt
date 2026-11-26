@@ -6,10 +6,8 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import java.io.IOException
@@ -74,9 +72,6 @@ class GamePacksActivity : Activity() {
     private val preferences by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
     private lateinit var download: Button
     private lateinit var liveDownload: Button
-    private lateinit var missionImport: Button
-    private lateinit var dialogueImport: Button
-    private lateinit var dialogueConnect: Button
     private lateinit var imported: Button
     private lateinit var manage: Button
     private lateinit var state: TextView
@@ -102,12 +97,6 @@ class GamePacksActivity : Activity() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             })
         }, 8)
-        missionImport = press("Görev paketi seç (.zip)") { chooseFile(MISSION_IMPORT, "application/zip") }
-        missions.addBelow(missionImport, 8)
-        dialogueImport = press("Replik paketi seç (.zip)") { chooseFile(DIALOGUE_IMPORT, "application/zip") }
-        missions.addBelow(dialogueImport, 8)
-        dialogueConnect = press("Replik paketi bağla") { showDialogueSource() }
-        missions.addBelow(dialogueConnect, 8)
         content.addBelow(missions, 14)
         val subtitles = miamiPanel(Miami.aqua)
         subtitles.addView(copy("Türkçe altyazı", 19, Palette.white, true).apply { isAccessibilityHeading = true })
@@ -119,7 +108,7 @@ class GamePacksActivity : Activity() {
             }
         }
         subtitles.addBelow(liveDownload, 10)
-        imported = press("Altyazı paketi seç (.gz veya .json)") { chooseFile(SUBTITLE_IMPORT, "*/*") }
+        imported = press("Altyazı paketi seç (.gz veya .json)") { chooseSubtitleFile() }
         subtitles.addBelow(imported, 8)
         content.addBelow(subtitles, 12)
         manage = press("Yüklü paketleri yönet") { managePacks() }
@@ -128,11 +117,11 @@ class GamePacksActivity : Activity() {
     }
 
     @Suppress("DEPRECATION")
-    private fun chooseFile(code: Int, mime: String) {
+    private fun chooseSubtitleFile() {
         startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            type = mime
+            type = "*/*"
             addCategory(Intent.CATEGORY_OPENABLE)
-        }, code)
+        }, SUBTITLE_IMPORT)
     }
 
     override fun onResume() {
@@ -140,45 +129,9 @@ class GamePacksActivity : Activity() {
         render()
     }
 
-    private fun showDialogueSource() {
-        val current = GtaMissionStore.dialogueSource(this)
-        val input = EditText(this).apply {
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
-            setSingleLine(true)
-            hint = "GitHub manifest.json bağlantısı"
-            setText(current.orEmpty())
-        }
-        val form = stack().apply {
-            setPadding(dp(24), dp(4), dp(24), 0)
-            addView(input)
-        }
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Görev replik paketi")
-            .setMessage("Yayımlama izni olan paketin GitHub manifest bağlantısını gir.")
-            .setView(form)
-            .setNegativeButton("Vazgeç", null)
-            .setPositiveButton(if (current == null) "Bağla ve indir" else "Kontrol et", null)
-            .show()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val source = githubDialogueManifest(input.text.toString())
-            if (source == null) {
-                input.error = "GitHub’daki manifest.json dosyasının HTTPS bağlantısını gir."
-                return@setOnClickListener
-            }
-            dialog.dismiss()
-            perform { app ->
-                val coverage = GtaMissionStore.connectDialogue(app, source.toString())
-                dialogueStatus(coverage)
-            }
-        }
-    }
-
     private fun missionStatus(catalog: GtaMissionCatalog): String {
         return "GitHub paketi hazır · ${catalog.missions.size} görev"
     }
-
-    private fun dialogueStatus(coverage: GtaDialoguePackCoverage) =
-        "Replik paketi hazır · ${coverage.missions} görev · ${coverage.lines} replik kaydı"
 
     private fun render(message: String? = null) {
         val downloaded = GtaMissionStore.hasDownload(this)
@@ -188,10 +141,8 @@ class GamePacksActivity : Activity() {
             downloaded -> "GitHub görev paketi çevrimdışı kullanıma hazır."
             else -> "Uygulamaya dâhil görev rehberi çevrimdışı hazır."
         }
-        listOf(download, liveDownload, missionImport, dialogueImport, dialogueConnect, imported, manage)
-            .forEach { it.isEnabled = !busy }
+        listOf(download, liveDownload, imported, manage).forEach { it.isEnabled = !busy }
         download.text = if (downloaded) "GitHub’daki görev paketini güncelle" else "GTA 6 paketini indir"
-        dialogueConnect.text = if (GtaMissionStore.dialogueSource(this) == null) "Replik paketi bağla" else "Replik paketini güncelle"
         liveDownload.text = if (ImportedGamePack.hasGtaDownload(this)) {
             "Altyazı paketi güncellemesini denetle"
         } else "GTA 6 altyazı paketini indir"
@@ -221,7 +172,7 @@ class GamePacksActivity : Activity() {
             if (GtaMissionStore.hasLocal(this@GamePacksActivity)) {
                 add("Özel görev paketi" to { app -> GtaMissionStore.remove(app, local = true) })
             }
-            if (GtaMissionStore.dialogueSource(this@GamePacksActivity) != null) {
+            if (GtaMissionStore.hasLinkedDialogue(this@GamePacksActivity)) {
                 add("GitHub replik paketi" to GtaMissionStore::removeDialogue)
             }
             if (GtaMissionStore.hasLocalDialogue(this@GamePacksActivity)) {
@@ -261,16 +212,12 @@ class GamePacksActivity : Activity() {
     @Deprecated("Android activity result")
     override fun onActivityResult(code: Int, result: Int, data: Intent?) {
         super.onActivityResult(code, result, data)
-        if (result != RESULT_OK) return
+        if (result != RESULT_OK || code != SUBTITLE_IMPORT) return
         val uri = data?.data ?: return
-        when (code) {
-            MISSION_IMPORT -> perform { app -> missionStatus(GtaMissionStore.installLocal(app, uri)) }
-            DIALOGUE_IMPORT -> perform { app -> dialogueStatus(GtaMissionStore.installLocalDialogue(app, uri)) }
-            SUBTITLE_IMPORT -> perform { app ->
-                val installed = ImportedGamePack.install(app, uri)
-                if (!installed.gta) preferences.edit().putString("packTitle", installed.title).apply()
-                "${installed.title} · Paket hazır"
-            }
+        perform { app ->
+            val installed = ImportedGamePack.install(app, uri)
+            if (!installed.gta) preferences.edit().putString("packTitle", installed.title).apply()
+            "${installed.title} · Paket hazır"
         }
     }
 
@@ -281,7 +228,5 @@ class GamePacksActivity : Activity() {
 
     private companion object {
         const val SUBTITLE_IMPORT = 28
-        const val MISSION_IMPORT = 29
-        const val DIALOGUE_IMPORT = 30
     }
 }

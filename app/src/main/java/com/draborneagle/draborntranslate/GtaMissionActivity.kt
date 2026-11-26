@@ -215,7 +215,6 @@ class GtaMissionDetailsActivity : Activity() {
     private var dialogue: GtaMissionDialogue? = null
     private var dialogueSync = DialogueSync.IDLE
     private var packError: String? = null
-    private var dialogueError: String? = null
     private var translation: GameTranslatorEngine? = null
     private val translatedLines = mutableMapOf<GtaMissionText, String>()
     private val attemptedTranslations = mutableSetOf<GtaMissionText>()
@@ -253,7 +252,7 @@ class GtaMissionDetailsActivity : Activity() {
                 content.addBelow(body, 12)
                 render()
                 loadTexts()
-                if (pane == Pane.CONVERSATIONS) refreshDialogue()
+                if (pane == Pane.CONVERSATIONS) loadConversations()
             }
         }
     }
@@ -262,7 +261,7 @@ class GtaMissionDetailsActivity : Activity() {
         if (pane == target) return
         pane = target
         visibleRows = PAGE_SIZE
-        if (pane == Pane.CONVERSATIONS) refreshDialogue()
+        if (pane == Pane.CONVERSATIONS) loadConversations()
         render()
     }
 
@@ -482,44 +481,60 @@ class GtaMissionDetailsActivity : Activity() {
         val app = applicationContext
         worker.execute {
             val result = runCatching { GtaMissionStore.texts(app, catalog, mission) }
-            val cached = runCatching {
-                val transcript = GtaMissionDialogue.fromTexts(mission.scenes, result.getOrNull().orEmpty())
-                    ?: GtaMissionStore.dialogue(app, mission.id)
-                transcript?.resolveSubtitles { keys ->
-                    runCatching { ImportedGamePack.gtaTranslations(app, keys) }.getOrDefault(emptyMap())
-                }
-            }
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
                 rows = result.getOrNull()
-                dialogue = cached.getOrNull()
                 packError = result.exceptionOrNull()?.message
-                dialogueError = cached.exceptionOrNull()?.message
-                render()
+                if (pane != Pane.CONVERSATIONS) render()
             }
         }
     }
 
-    private fun refreshDialogue() {
-        if (dialogueSync != DialogueSync.IDLE || GtaMissionStore.dialogueSource(this) == null) return
+    private fun loadConversations() {
+        if (dialogueSync != DialogueSync.IDLE) return
         dialogueSync = DialogueSync.CHECKING
         val app = applicationContext
+        val missionId = mission.id
         worker.execute {
-            val result = runCatching { GtaMissionStore.refreshDialogue(app) }
+            fun resolve(transcript: GtaMissionDialogue?) = transcript?.resolveSubtitles { keys ->
+                ImportedGamePack.gtaTranslations(app, keys)
+            }
+            val cached = runCatching { GtaMissionStore.dialogue(app, missionId) }
+            val preview = runCatching { resolve(cached.getOrNull()) }.getOrElse { cached.getOrNull() }
+            if (!preview?.inSceneOrder().isNullOrEmpty()) {
+                runOnUiThread {
+                    if (isDestroyed || isFinishing) return@runOnUiThread
+                    dialogue = preview
+                    if (pane == Pane.CONVERSATIONS) render()
+                }
+            }
+
+            val refresh = runCatching { GtaMissionStore.refreshPublished(app) }
+            val result = runCatching {
+                val stored = GtaMissionStore.dialogue(app, missionId)
+                val reload = stored != cached.getOrNull()
+                val selected = if (reload) stored else preview
+                val needsSubtitles = !ImportedGamePack.hasGta(app) &&
+                    selected?.lines?.any { it.subtitleKey != null && it.turkish == null } == true
+                if (needsSubtitles) ImportedGamePack.ensureGta(app)
+                if (reload || needsSubtitles) resolve(selected) else selected
+            }
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
-                dialogueSync = if (result.isSuccess) DialogueSync.READY else DialogueSync.FAILED
-                if (result.getOrDefault(false)) loadTexts()
-                else if (pane == Pane.CONVERSATIONS && dialogue?.inSceneOrder().isNullOrEmpty()) render()
+                val updated = result.getOrElse { preview }
+                val redraw = dialogue != updated || updated?.inSceneOrder().isNullOrEmpty()
+                dialogue = updated
+                dialogueSync = if (refresh.isSuccess && result.isSuccess) DialogueSync.READY else DialogueSync.FAILED
+                if (pane == Pane.CONVERSATIONS && redraw) render()
             }
         }
     }
 
     private fun showPackText(version: Int, conversations: Boolean) {
-        if (rows == null && (!conversations || dialogue == null)) {
+        if (rows == null && !conversations) {
             val issue = packError
             body.addBelow(copy(issue ?: "Görev metinleri yükleniyor…"), 12)
-            if (issue != null && !conversations) body.addBelow(press("Yeniden dene") { loadTexts() }, 8)
+            if (issue != null) body.addBelow(press("Yeniden dene") { loadTexts() }, 8)
             return
         }
         val available = rows.orEmpty()
@@ -529,14 +544,10 @@ class GtaMissionDetailsActivity : Activity() {
         }
         if (entries.isEmpty()) {
             if (conversations) {
-                val status = dialogueError ?: when {
-                    transcript?.lines?.any { it.subtitleKey != null } == true ->
-                        "Bu görevin replik anahtarlarına yüklü Türkçe altyazı paketinde karşılık bulunamadı."
-                    dialogueSync == DialogueSync.CHECKING -> "Görev replikleri güncelleniyor…"
-                    dialogueSync == DialogueSync.FAILED -> "Replik kaynağına şu anda ulaşılamadı."
-                    ImportedGamePack.hasGta(this) -> "Bu görevin sahne ve konuşmacı dizini bulunmuyor."
-                    dialogueSync == DialogueSync.READY -> "Bağlı pakette bu görevin repliği yok."
-                    else -> "Bu görev için kayıtlı replik bulunmuyor."
+                val status = when (dialogueSync) {
+                    DialogueSync.IDLE, DialogueSync.CHECKING -> "Görev konuşmaları yükleniyor…"
+                    DialogueSync.FAILED -> "Görev konuşmaları şu anda yüklenemedi."
+                    DialogueSync.READY -> "Bu görev için konuşma kaydı bulunmuyor."
                 }
                 body.addBelow(copy(status).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }, 12)
             } else body.addBelow(miamiSection("Hedefler", "Bu görev için kayıtlı hedef bulunmuyor.", Miami.lavender), 10)

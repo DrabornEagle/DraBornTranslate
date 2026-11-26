@@ -30,15 +30,19 @@ import androidx.test.runner.lifecycle.Stage
 import com.gametranslator.gametranslator_mobile.ConsoleStudioActivity
 import com.gametranslator.gametranslator_mobile.Store
 import com.gametranslator.gametranslator_mobile.core.PackKey
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.net.HttpURLConnection
 import java.security.MessageDigest
 import java.util.zip.GZIPOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -46,6 +50,19 @@ import org.junit.runner.RunWith
 class ScreenNavigationTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val app = instrumentation.targetContext
+    private val missionSync = app.getSharedPreferences("gta_mission_catalog", Context.MODE_PRIVATE)
+    private var priorMissionCheck = 0L
+
+    @Before
+    fun useCachedMissionPack() {
+        priorMissionCheck = missionSync.getLong("nextCheck", 0L)
+        missionSync.edit().putLong("nextCheck", System.currentTimeMillis() + 5 * 60_000L).commit()
+    }
+
+    @After
+    fun restoreMissionSyncCheck() {
+        missionSync.edit().putLong("nextCheck", priorMissionCheck).commit()
+    }
 
     @Test
     fun missionSearchOpensDetailsAndContextForAUserPack() {
@@ -102,7 +119,7 @@ class ScreenNavigationTest {
                 assertFalse(hasText("Sahne özetleri"))
                 assertFalse(hasText("İlk karşılaşma"))
                 assertFalse(hasText("Giriş kapısından geçilir."))
-                assertFalse(hasText("Bu görev için kayıtlı replik bulunmuyor."))
+                assertFalse(hasText("Bu görev için konuşma kaydı bulunmuyor."))
                 screenshot("08-gorev-konusmalari")
                 click("Hedefler/Kaynaklar")
                 waitFor { hasText("Lansman partisine katıl.") && hasText("Giriş holü") }
@@ -123,23 +140,50 @@ class ScreenNavigationTest {
     }
 
     @Test
-    fun downloadedDialogueShowsItsOwnScenesAlongsideTheExistingMission() {
+    fun publishedDialogueLoadsAutomaticallyWithItsOwnScenesAndNoSetupButtons() {
         val base = File(app.filesDir, "gta-6-missions-local.zip")
-        val backup = base.takeIf(File::isFile)?.readBytes()
-        val source = "https://raw.githubusercontent.com/example/mission-pack/main/manifest.json"
-        val sourceHash = MessageDigest.getInstance("SHA-256").digest(source.toByteArray()).joinToString("") { "%02x".format(it) }
-        val cache = File(app.filesDir, "gta-6-dialogue-$sourceHash.zip")
-        val preferences = app.getSharedPreferences("gta_mission_dialogue", Context.MODE_PRIVATE)
-        val previousSource = preferences.getString("manifest", null)
-        val previousCheck = preferences.getLong("lastCheck", 0L)
+        val cache = File(app.filesDir, "gta-6-missions.zip")
+        val backups = listOf(base, cache).associateWith { file -> file.takeIf(File::isFile)?.readBytes() }
+        val archive = File.createTempFile("published-dialogue-", ".zip", app.cacheDir)
         try {
             writeDialogueFixture(base, "base", "entrance", "Giriş", """
                 [{"type":"objective","sceneId":"entrance","tr":"Girişe git."}]
             """.trimIndent())
-            writeDialogueFixture(cache, "synced", "garden", "Bahçedeki buluşma", """
+            val version = "2099.01.01.1"
+            writeDialogueFixture(archive, version, "garden", "Bahçedeki buluşma", """
                 [{"type":"dialogue","sceneId":"garden","speaker":"Deniz","tr":"Yardımın için teşekkürler."}]
             """.trimIndent())
-            preferences.edit().putString("manifest", source).putLong("lastCheck", System.currentTimeMillis()).apply()
+            val data = archive.readBytes()
+            val checksum = MessageDigest.getInstance("SHA-256").digest(data).joinToString("") { "%02x".format(it) }
+            val zipName = "gta-6-tr-${checksum.take(12)}.zip"
+            val manifest = """{"version":"$version","bytes":${data.size},"sha256":"$checksum"}"""
+            val requests = mutableListOf<String>()
+            missionSync.edit().remove("nextCheck").commit()
+            assertTrue(GtaMissionStore.refreshPublished(app) { request ->
+                assertEquals("raw.githubusercontent.com", request.host)
+                val path = request.path.substringAfterLast('/')
+                requests.add(path)
+                val reply = when (path) {
+                    "manifest.json" -> manifest.toByteArray(Charsets.UTF_8)
+                    zipName -> data
+                    else -> error("Unexpected pack request")
+                }
+                object : HttpURLConnection(request.toURL()) {
+                    override fun connect() = Unit
+                    override fun disconnect() = Unit
+                    override fun usingProxy() = false
+                    override fun getResponseCode() = HTTP_OK
+                    override fun getInputStream() = ByteArrayInputStream(reply)
+                }
+            })
+            assertEquals(listOf("manifest.json", zipName), requests)
+            assertFalse(GtaMissionStore.refreshPublished(app) { error("Recent checks should use the downloaded copy") })
+
+            ActivityScenario.launch(GamePacksActivity::class.java).use {
+                waitFor { hasText("Oyun Paketleri") && hasText("Görev ara") }
+                listOf("Görev paketi seç (.zip)", "Replik paketi seç (.zip)", "Replik paketi bağla",
+                    "Replik paketini güncelle").forEach { assertFalse(it, hasText(it)) }
+            }
             ActivityScenario.launch<GtaMissionDetailsActivity>(Intent(app, GtaMissionDetailsActivity::class.java)
                 .putExtra("mission", "dialogue-test")).use {
                 waitFor { hasText("Deneme görevi") && hasText("Görev metinleri") }
@@ -154,9 +198,8 @@ class ScreenNavigationTest {
                 assertFalse(hasText("Yardımın için teşekkürler."))
             }
         } finally {
-            preferences.edit().putString("manifest", previousSource).putLong("lastCheck", previousCheck).apply()
-            cache.delete()
-            if (backup == null) base.delete() else base.writeBytes(backup)
+            archive.delete()
+            backups.forEach { (file, data) -> if (data == null) file.delete() else file.writeBytes(data) }
         }
     }
 
@@ -167,7 +210,6 @@ class ScreenNavigationTest {
         val dialogue = File(app.filesDir, "gta-6-dialogue-local.zip")
         val backups = listOf(guide, subtitles, dialogue).associateWith { file -> file.takeIf(File::isFile)?.readBytes() }
         val gzip = File(app.cacheDir, "indexed-subtitles.gz")
-        val zip = File(app.cacheDir, "indexed-dialogue.zip")
         val reply = checkNotNull(PackKey.key("Meet me by the lift."))
         val answer = checkNotNull(PackKey.key("I am on my way."))
         val unrelated = checkNotNull(PackKey.key("Save your game."))
@@ -193,13 +235,12 @@ class ScreenNavigationTest {
                   "textCount":3,"scenes":[{"id":"lobby","titleTr":"Holde buluşma","environmentTr":"Apartman girişi"},
                   {"id":"lift","titleTr":"Asansöre geçiş"}]}]}
             """.trimIndent()
-            writeMissionFixture(zip, indexCatalog, """
+            writeMissionFixture(dialogue, indexCatalog, """
                 [{"type":"dialogue","sceneId":"lift","speaker":"Ece","subtitleKey":"$answer"},
                  {"type":"dialogue","sceneId":"lobby","speaker":"Deniz","subtitleKey":"$reply",
                   "contextTr":"Replik açıklaması"},
                  {"type":"dialogue","sceneId":"lobby","speaker":"Eşleşmeyen","subtitleKey":"0000000000000000"}]
             """.trimIndent())
-            assertEquals(GtaDialoguePackCoverage("indexed", 1, 3), GtaMissionStore.installLocalDialogue(app, Uri.fromFile(zip)))
             ActivityScenario.launch<GtaMissionDetailsActivity>(Intent(app, GtaMissionDetailsActivity::class.java)
                 .putExtra("mission", "dialogue-test")).use {
                 waitFor { hasText("Deneme görevi") && hasText("Görev metinleri") }
@@ -218,7 +259,6 @@ class ScreenNavigationTest {
             }
         } finally {
             gzip.delete()
-            zip.delete()
             ImportedGamePack.removeLocalGta(app)
             backups.forEach { (file, data) -> if (data == null) file.delete() else file.writeBytes(data) }
         }
@@ -265,7 +305,7 @@ class ScreenNavigationTest {
             assertFalse(hasText("Görsel kaynağı · GTABase"))
             screenshot("07-gorev-detayi")
             click("Görev metinleri")
-            waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
+            waitFor { hasText("Bu görev için konuşma kaydı bulunmuyor.") }
             assertFalse(hasText("Sahne özetleri"))
             assertFalse(hasText("Teknedeki iş"))
             assertFalse(hasText("Görevin diyalog arşivini aç"))
@@ -296,7 +336,7 @@ class ScreenNavigationTest {
             click("Meet the Heders")
             waitFor { hasText("Brian’la balkon görüşmesi") && hasText("Balkondaki konuşma") }
             click("Görev metinleri")
-            waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
+            waitFor { hasText("Bu görev için konuşma kaydı bulunmuyor.") }
             assertFalse(hasText("Balkondaki konuşma"))
             assertFalse(hasText("Görevin diyalog arşivini aç"))
             click("Geri")
@@ -310,7 +350,7 @@ class ScreenNavigationTest {
             }
             assertReadingOrder(listOf("Görev aşamaları", "Sahne özetleri", "Garaja yönlendirme"))
             click("Görev metinleri")
-            waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
+            waitFor { hasText("Bu görev için konuşma kaydı bulunmuyor.") }
             assertFalse(hasText("Garaja yönlendirme"))
         }
     }

@@ -60,12 +60,11 @@ class GtaMissionPackTest {
     }
 
     @Test
-    fun syncedDialogueRequiresMatchingMissionIdAndRealSceneAndSpeakerFields() {
+    fun publishedDialogueRequiresRealSceneAndSpeakerFields() {
         val file = archive()
-        assertEquals(GtaDialoguePackCoverage("test", 1, 1), GtaMissionPack.validateDialogue(file, setOf("launch")))
+        assertEquals("test", GtaMissionPack.validate(file).version)
         assertEquals(null, GtaMissionPack.dialogue(file, "unrelated"))
         assertEquals("Deniz", GtaMissionPack.dialogue(file, "launch")?.lines?.single()?.speaker)
-        assertThrows(IOException::class.java) { GtaMissionPack.validateDialogue(file, setOf("unrelated")) }
 
         val withoutSpeaker = texts().also { it.getJSONObject(1).remove("speaker") }
         val withoutScene = texts().also {
@@ -76,12 +75,10 @@ class GtaMissionPackTest {
             }
         }
         listOf(withoutSpeaker, withoutScene).forEach { rows ->
-            assertThrows(IOException::class.java) { GtaMissionPack.validateDialogue(archive(rows = rows), setOf("launch")) }
+            assertThrows(IOException::class.java) { GtaMissionPack.validate(archive(rows = rows)) }
         }
         val objectivesOnly = texts().also { it.getJSONObject(1).put("type", "objective") }
-        assertThrows(IOException::class.java) {
-            GtaMissionPack.validateDialogue(archive(rows = objectivesOnly), setOf("launch"))
-        }
+        assertEquals(null, GtaMissionPack.dialogue(archive(rows = objectivesOnly), "launch"))
     }
 
     @Test
@@ -111,7 +108,7 @@ class GtaMissionPackTest {
              {"type":"dialogue","subtitleKey":"0000000000000003","sceneId":"exit","speaker":"Ece","tr":"Görüşürüz."}]
         """.trimIndent())
         val file = archive(entry = entry, rows = rows)
-        assertEquals(GtaDialoguePackCoverage("test", 1, 4), GtaMissionPack.validateDialogue(file, setOf("launch")))
+        GtaMissionPack.validate(file)
         val transcript = checkNotNull(GtaMissionPack.dialogue(file, "launch"))
         val resolved = transcript.resolveSubtitles { keys ->
             assertEquals(setOf(-1L, 2L), keys)
@@ -133,23 +130,6 @@ class GtaMissionPackTest {
             val rows = texts().also { change(it.getJSONObject(1).put("subtitleKey", "0123456789abcdef")) }
             assertThrows(IOException::class.java) { GtaMissionPack.validate(archive(rows = rows)) }
         }
-    }
-
-    @Test
-    fun onlyGitHubManifestFileUrlsResolveToPublishedPackRequests() {
-        val raw = "https://raw.githubusercontent.com/example/mission-pack/main/tr/manifest.json"
-        assertEquals(raw, githubDialogueManifest(raw)?.toString())
-        assertEquals(raw, githubDialogueManifest("https://github.com/example/mission-pack/blob/main/tr/manifest.json")?.toString())
-        listOf(
-            "http://github.com/example/mission-pack/blob/main/tr/manifest.json",
-            "https://github.com@example.org/example/mission-pack/blob/main/tr/manifest.json",
-            "https://github.com:444/example/mission-pack/blob/main/tr/manifest.json",
-            "https://github.com/example/mission-pack/tree/main/tr/manifest.json",
-            "https://github.com/example/mission-pack/blob/main/../manifest.json",
-            "https://raw.githubusercontent.com/example/mission-pack/main/tr/manifest.json?token=example",
-            "https://raw.githubusercontent.com/example/mission-pack/main/%2e/manifest.json",
-            "https://example.org/example/mission-pack/main/tr/manifest.json",
-        ).forEach { assertEquals(null, githubDialogueManifest(it)) }
     }
 
     @Test
