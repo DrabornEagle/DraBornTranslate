@@ -43,12 +43,10 @@ internal fun Context.miamiHero(title: String, detail: String, accent: Int) = Fra
     addView(ImageView(context).apply {
         setImageResource(R.drawable.miami_waterfront)
         scaleType = ImageView.ScaleType.CENTER_CROP
+        foreground = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+            intArrayOf(0xF4090C19.toInt(), 0xBA101329.toInt(), 0x20101329))
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }, FrameLayout.LayoutParams(-1, dp(152), Gravity.TOP))
-    addView(View(context).apply {
-        background = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
-            intArrayOf(0xF4090C19.toInt(), 0xDD101329.toInt(), 0x20101329))
-    }, FrameLayout.LayoutParams(-1, -1))
     addView(stack().apply {
         gravity = Gravity.CENTER_VERTICAL
         minimumHeight = dp(152)

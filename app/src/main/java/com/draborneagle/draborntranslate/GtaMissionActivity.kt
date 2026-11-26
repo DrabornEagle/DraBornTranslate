@@ -175,8 +175,8 @@ class GtaMissionSearchActivity : Activity() {
         val alias = mission.mapLabels.firstOrNull { missionNameKey(it) == missionNameKey(query) }
             ?: mission.mapLabels.firstOrNull()
         val secondary = mission.alternateNameIn(language)
-        val info = listOfNotNull(alias?.takeUnless { it == title || it == secondary }, secondary)
-            .ifEmpty { listOfNotNull(mission.code.takeIf { mission.englishTitle == null }) }.joinToString(" · ")
+        val mapLabel = alias?.takeUnless { it == title || it == secondary }
+        val alternate = secondary ?: mission.code.takeIf { mission.englishTitle == null && mapLabel == null }
         background = RippleDrawable(ColorStateList.valueOf(0x28FFFFFF),
             filled(Miami.surface, 20, Miami.edge), null)
         setPadding(dp(12), dp(11), dp(10), dp(11))
@@ -187,7 +187,8 @@ class GtaMissionSearchActivity : Activity() {
         addView(missionAvatar(mission.giver, mission.giver?.let(portraits::get), 49), LinearLayout.LayoutParams(dp(49), dp(49)))
         addView(stack().apply {
             addView(copy(title, 18, Palette.white, true))
-            if (info.isNotBlank()) addBelow(copy(info, 13, Miami.lavender), 2)
+            if (mapLabel != null) addBelow(copy(mapLabel, 13, Miami.lavender, true), 2)
+            if (alternate != null) addBelow(copy(alternate, 13), 2)
             addBelow(copy(listOfNotNull(mission.giver, mission.category).joinToString(" · "), 12), 3)
         }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(11) })
         addView(glyph(R.drawable.ic_disclosure, Miami.pink).apply { rotation = -90f },
