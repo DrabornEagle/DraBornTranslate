@@ -60,23 +60,21 @@ class GtaMissionPackTest {
     }
 
     @Test
-    fun publishedDialogueRequiresRealSceneAndSpeakerFields() {
-        val file = archive()
+    fun publishedDialogueWithoutSceneOrSpeakerBelongsOnlyToItsMission() {
+        val entry = mission().apply { remove("scenes") }
+        val rows = JSONArray("""
+            [{"type":"dialogue","tr":"Seni bekliyorum."},
+             {"type":"objective","tr":"Kapıya git."}]
+        """.trimIndent())
+        val file = archive(entry = entry, rows = rows)
         assertEquals("test", GtaMissionPack.validate(file).version)
         assertEquals(null, GtaMissionPack.dialogue(file, "unrelated"))
-        assertEquals("Deniz", GtaMissionPack.dialogue(file, "launch")?.lines?.single()?.speaker)
-
-        val withoutSpeaker = texts().also { it.getJSONObject(1).remove("speaker") }
-        val withoutScene = texts().also {
-            it.getJSONObject(1).apply {
-                remove("sceneId")
-                remove("startMs")
-                remove("endMs")
-            }
-        }
-        listOf(withoutSpeaker, withoutScene).forEach { rows ->
-            assertThrows(IOException::class.java) { GtaMissionPack.validate(archive(rows = rows)) }
-        }
+        val dialogue = checkNotNull(GtaMissionPack.dialogue(file, "launch"))
+        assertTrue(dialogue.inSceneOrder().isEmpty())
+        val line = dialogue.inReadingOrder().single()
+        assertEquals("Seni bekliyorum.", line.turkish)
+        assertEquals(null, line.sceneId)
+        assertEquals(null, line.speaker)
         val objectivesOnly = texts().also { it.getJSONObject(1).put("type", "objective") }
         assertEquals(null, GtaMissionPack.dialogue(archive(rows = objectivesOnly), "launch"))
     }
@@ -95,6 +93,7 @@ class GtaMissionPackTest {
         val transcript = checkNotNull(GtaMissionPack.dialogue(file, "launch"))
         assertEquals(listOf("Varış", "Çıkış"), transcript.scenes.map { it.title })
         assertEquals(listOf("Merhaba.", "Dışarıda bekliyorum.", "Geliyorum."), transcript.inSceneOrder().map { it.turkish })
+        assertEquals(transcript.inSceneOrder(), transcript.inReadingOrder())
     }
 
     @Test
@@ -120,10 +119,9 @@ class GtaMissionPackTest {
     }
 
     @Test
-    fun subtitleKeysRequireAValidDialogueSceneAndSpeaker() {
+    fun subtitleKeysRequireADialogueRowAndValidReferences() {
         listOf<(JSONObject) -> Unit>(
             { it.put("subtitleKey", "short") },
-            { it.remove("speaker") },
             { it.put("sceneId", "unknown") },
             { it.put("type", "objective") },
         ).forEach { change ->

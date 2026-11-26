@@ -204,7 +204,7 @@ class ScreenNavigationTest {
     }
 
     @Test
-    fun localSubtitleGzipSuppliesOnlyTheSelectedMissionsIndexedLines() {
+    fun readAllIncludesMissionIndexedLinesWithoutASceneOrSpeaker() {
         val guide = File(app.filesDir, "gta-6-missions-local.zip")
         val subtitles = File(app.filesDir, "gta-6-local.json.gz")
         val dialogue = File(app.filesDir, "gta-6-dialogue-local.zip")
@@ -212,6 +212,7 @@ class ScreenNavigationTest {
         val gzip = File(app.cacheDir, "indexed-subtitles.gz")
         val reply = checkNotNull(PackKey.key("Meet me by the lift."))
         val answer = checkNotNull(PackKey.key("I am on my way."))
+        val ungrouped = checkNotNull(PackKey.key("The door is open."))
         val unrelated = checkNotNull(PackKey.key("Save your game."))
         try {
             writeDialogueFixture(guide, "base", "entrance", "Giriş", """
@@ -221,7 +222,7 @@ class ScreenNavigationTest {
                 it.write("""
                     {"format":2,"id":"gta-6","lang":"tr","title":"Deneme altyazıları",
                     "entries":{"$reply":"<b>Asansörün yanında buluşalım.</>","$unrelated":"Oyunu kaydet."},
-                    "segments":{"$reply":"Önceliği düşük karşılık.","$answer":"Yoldayım."}}
+                    "segments":{"$reply":"Önceliği düşük karşılık.","$answer":"Yoldayım.","$ungrouped":"Kapı açık."}}
                 """.trimIndent())
             }
             val installed = ImportedGamePack.install(app, Uri.fromFile(gzip))
@@ -232,15 +233,17 @@ class ScreenNavigationTest {
             val indexCatalog = """
                 {"format":1,"version":"indexed","gameBuild":"Test","missions":[
                  {"id":"dialogue-test","titleTr":"Deneme görevi","type":"story","summaryTr":"Buluşma.",
-                  "textCount":3,"scenes":[{"id":"lobby","titleTr":"Holde buluşma","environmentTr":"Apartman girişi"},
+                  "textCount":4,"scenes":[{"id":"lobby","titleTr":"Holde buluşma","environmentTr":"Apartman girişi"},
                   {"id":"lift","titleTr":"Asansöre geçiş"}]}]}
             """.trimIndent()
             writeMissionFixture(dialogue, indexCatalog, """
-                [{"type":"dialogue","sceneId":"lift","speaker":"Ece","subtitleKey":"$answer"},
-                 {"type":"dialogue","sceneId":"lobby","speaker":"Deniz","subtitleKey":"$reply",
+                [{"type":"dialogue","sceneId":"lobby","speaker":"Deniz","subtitleKey":"$reply",
                   "contextTr":"Replik açıklaması"},
+                 {"type":"dialogue","subtitleKey":"$ungrouped"},
+                 {"type":"dialogue","sceneId":"lift","speaker":"Ece","subtitleKey":"$answer"},
                  {"type":"dialogue","sceneId":"lobby","speaker":"Eşleşmeyen","subtitleKey":"0000000000000000"}]
             """.trimIndent())
+            GtaMissionPack.validate(dialogue)
             ActivityScenario.launch<GtaMissionDetailsActivity>(Intent(app, GtaMissionDetailsActivity::class.java)
                 .putExtra("mission", "dialogue-test")).use {
                 waitFor { hasText("Deneme görevi") && hasText("Görev metinleri") }
@@ -250,9 +253,22 @@ class ScreenNavigationTest {
                 waitFor { readingOrder.all(::hasText) && hasText("Apartman girişi") }
                 assertReadingOrder(readingOrder)
                 listOf("Girişe git.", "Replik açıklaması", "Eşleşmeyen", "Oyunu kaydet.",
-                    "Önceliği düşük karşılık.", "Görevin diyalog arşivini aç").forEach { item ->
+                    "Önceliği düşük karşılık.", "Görevin diyalog arşivini aç", "Kapı açık.").forEach { item ->
                     assertFalse(item, hasText(item))
                 }
+                click("Bütün konuşmayı oku")
+                val allLines = listOf("Deniz", "Asansörün yanında buluşalım.", "Kapı açık.", "Ece", "Yoldayım.")
+                waitFor { allLines.all(::hasText) }
+                assertReadingOrder(allLines)
+                listOf("Holde buluşma", "Asansöre geçiş", "Apartman girişi", "Girişe git.", "Oyunu kaydet.",
+                    "Eşleşmeyen", "Görev metinlerini kaynakta aç").forEach { assertFalse(it, hasText(it)) }
+                it.recreate()
+                waitFor { allLines.all(::hasText) }
+                assertReadingOrder(allLines)
+                assertFalse(hasText("Holde buluşma"))
+                click("Sahnelere göre")
+                waitFor { readingOrder.all(::hasText) }
+                assertFalse(hasText("Kapı açık."))
                 click("Hedefler/Kaynaklar")
                 waitFor { hasText("Girişe git.") }
                 assertFalse(hasText("Yoldayım."))
@@ -316,6 +332,13 @@ class ScreenNavigationTest {
                 assertReadingOrder(order)
                 listOf("Bu ilk oturum mu?", "Başka görevin repliği.", "Kayıt kapandıktan sonra.", "Görev hedefi.",
                     "Bu görevde canlı altyazı").forEach { assertFalse(it, hasText(it)) }
+                click("Bütün konuşmayı oku")
+                val allLines = listOf("Deniz", "Beni bekle.", "Ece", "Buradayım.", "Her yer temiz.")
+                waitFor { allLines.all(::hasText) }
+                assertReadingOrder(allLines)
+                listOf("Girişe git", "Avluya çık", "Başka görevin repliği.", "Bu ilk oturum mu?").forEach {
+                    assertFalse(it, hasText(it))
+                }
                 click("Hedefler/Kaynaklar")
                 waitFor { hasText("Görev hedefi.") }
                 assertFalse(hasText("Beni bekle."))

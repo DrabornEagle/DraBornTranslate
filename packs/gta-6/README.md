@@ -4,7 +4,7 @@
 
 2026.11.26.6 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** bölümünde aşamalar, sahne özetlerinin üstünde yer alır. Aramada açılan 197 görev kartının 195’inde toplam 311 Türkçe sahne özeti bulunur. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
 
-**Konuşmalar** seçilen görevin yayımlanmış `dialogue` kayıtlarını sahne ve konuşmacı bilgisiyle satır satır gösterir. Sekme açıldığında GitHub görev paketi en fazla saatte bir otomatik denetlenir. Doğrulanmış arşiv çevrimdışı kalır. Bu katalog 343 rehber ve bir hedef kaydı içerir. Yayımlanmış konuşma sayısı sıfırdır. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir. **Bu görevde canlı altyazı** üzerinden başlatılan bir oturumun replikleri cihazda saklanır. Görevin yayımlanmış konuşmaları varsa paket kullanılır. Diğer görevlerde **Konuşmalar**, son kayıtlı oynanışın ekranda okunabilen repliklerini gösterir.
+**Konuşmalar → Bütün konuşmayı oku** seçili görevin tüm okunabilir `dialogue` kayıtlarını tek akışta gösterir. **Sahnelere göre** bilinen sahneleri ve ortamları gösterir. Sekme açıldığında GitHub görev paketi en fazla saatte bir otomatik denetlenir. Doğrulanmış arşiv çevrimdışı kalır. Bu katalog 343 rehber ve bir hedef kaydı içerir. Yayımlanmış konuşma sayısı sıfırdır. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir. **Bu görevde canlı altyazı** üzerinden başlatılan bir oturumun replikleri cihazda saklanır. Görevin yayımlanmış konuşmaları varsa paket kullanılır. Diğer görevlerde **Konuşmalar**, son kayıtlı oynanışın ekranda okunabilen repliklerini gösterir.
 
 | Kaynak | Kapsam |
 | --- | --- |
@@ -29,15 +29,15 @@ Sahne zamanı için videonun veya sahnenin başlangıcına göre ölçüm gereki
 | --- | --- |
 | `type` | `dialogue`, `objective`, `message`, `hint`, `ui`, `guide` veya `other` |
 | `tr`, `en` | Türkçe metin ve varsa İngilizce metin. Yalnız İngilizce sağlandığında cihazda otomatik olarak Türkçeye çevrilir. |
-| `subtitleKey` | Yüklü Türkçe GTA 6 altyazı paketindeki 16 haneli hex anahtar. `dialogue`, `sceneId` ve `speaker` alanlarıyla kullanılır. Doğrudan metin yerine yalnızca anahtar da verilebilir. |
-| `sceneId` | Görev kaydındaki sahne kimliği |
-| `speaker`, `contextTr` | Konuşan kişi ve varsa satırın Türkçe bağlamı |
+| `subtitleKey` | `dialogue` kaydı için Türkçe GTA 6 altyazı paketindeki 16 haneli hex anahtar. Doğrudan metin yerine yalnızca anahtar da verilebilir. |
+| `sceneId` | Varsa görev kaydındaki sahne kimliği |
+| `speaker`, `contextTr` | Varsa konuşan kişi ve satırın Türkçe bağlamı |
 | `startMs`, `endMs` | Varsa sahnenin başlangıcından itibaren doğrulanmış milisaniye değerleri |
 
-ZIP’in adı SHA-256 özetinden üretilir. Uygulama arşivin boyutunu, özetini, sürümünü ve her repliğin sahne ile konuşmacı alanlarını doğrular.
+ZIP’in adı SHA-256 özetinden üretilir. Uygulama arşivin boyutunu, özetini, sürümünü, replik anahtarlarını ve varsa sahne referanslarını doğrular.
 
 ## Altyazı anahtarları
 
-`scenes` dizisi sahnelerin okuma sırasını, `texts/<görev-id>.json` her sahnedeki repliklerin sırasını belirler. Sahne başlığı için `titleTr`, bilinen ortam için `environmentTr` kullan.
+`scenes` dizisi sahnelerin okuma sırasını, `texts/<görev-id>.json` her sahnedeki repliklerin sırasını belirler. Sahne ilişkisinin eksik olduğu görevlerde **Bütün konuşmayı oku** dosyadaki sırayı kullanır. Böyle bir dosyada replikleri konuşma sırasına göre yaz. Sahne başlığı için `titleTr`, bilinen ortam için `environmentTr` kullan.
 
 `gta-6.gz` bir Türkçe çeviri sözlüğüdür. Görev, sahne, konuşmacı ve sıra bilgilerini görev paketi sağlar. `subtitleKey` alanı İngilizce metnin [PackKey](../../app/src/main/java/com/gametranslator/gametranslator_mobile/core/GamePacks.kt) ile hesaplanan anahtarını kullanır. Uygulama önce `entries`, sonra `segments` tablosunda tam eşleşme arar. Yayımlanmış replikte anahtar varsa ve gerekli altyazı paketi cihazda yoksa onu da otomatik indirir.

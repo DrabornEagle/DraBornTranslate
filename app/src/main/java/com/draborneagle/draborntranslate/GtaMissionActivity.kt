@@ -200,6 +200,7 @@ class GtaMissionSearchActivity : Activity() {
 
 class GtaMissionDetailsActivity : Activity() {
     private enum class Pane { INFO, CONVERSATIONS, TARGETS }
+    private enum class ConversationView { SCENES, ALL }
     private enum class DialogueSync { IDLE, CHECKING, READY, FAILED }
 
     private val worker = Executors.newSingleThreadExecutor()
@@ -210,6 +211,7 @@ class GtaMissionDetailsActivity : Activity() {
     private lateinit var mission: GtaMission
     private val language by lazy { GtaMissionSearchLanguage.fromName(intent.getStringExtra(SEARCH_LANGUAGE)) }
     private var pane = Pane.INFO
+    private var conversationView = ConversationView.SCENES
     private var visibleRows = PAGE_SIZE
     private var rows: List<GtaMissionText>? = null
     private var dialogue: GtaMissionDialogue? = null
@@ -223,6 +225,9 @@ class GtaMissionDetailsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pane = Pane.entries.firstOrNull { it.name == savedInstanceState?.getString("missionPane") } ?: Pane.INFO
+        conversationView = ConversationView.entries.firstOrNull {
+            it.name == savedInstanceState?.getString("missionConversationView")
+        } ?: ConversationView.SCENES
         visibleRows = savedInstanceState?.getInt("missionRows", PAGE_SIZE) ?: PAGE_SIZE
         val content = miamiPage("Görev Detayı", Miami.pink)
         val loading = copy("Görev yükleniyor…")
@@ -323,8 +328,25 @@ class GtaMissionDetailsActivity : Activity() {
             setPadding(dp(7), dp(7), dp(7), dp(7))
         }
         body.addBelow(options)
+        if (pane == Pane.CONVERSATIONS) {
+            body.addBelow(actionRow(
+                press("Sahnelere göre") { selectConversationView(ConversationView.SCENES) }.apply {
+                    missionTab(conversationView == ConversationView.SCENES, Miami.aqua, 0xFF9AE1FA.toInt())
+                },
+                press("Bütün konuşmayı oku") { selectConversationView(ConversationView.ALL) }.apply {
+                    missionTab(conversationView == ConversationView.ALL, Miami.pink, Miami.lavender)
+                },
+            ), 8)
+        }
         showPackText(version, conversations = pane == Pane.CONVERSATIONS)
         if (pane == Pane.TARGETS) showSources()
+    }
+
+    private fun selectConversationView(target: ConversationView) {
+        if (conversationView == target) return
+        conversationView = target
+        visibleRows = PAGE_SIZE
+        render()
     }
 
     private fun Button.missionTab(selected: Boolean, accent: Int, end: Int, icon: Int? = null) {
@@ -527,7 +549,7 @@ class GtaMissionDetailsActivity : Activity() {
             val cached = runCatching { GtaMissionStore.dialogue(app, missionId) }
             val preview = runCatching { resolve(cached.getOrNull()) }.getOrElse { cached.getOrNull() }
             val local = runCatching { GtaMissionRecording.dialogue(app, missionId) }.getOrNull()
-            val visible = preview?.takeUnless { it.inSceneOrder().isEmpty() } ?: local
+            val visible = preview?.takeIf { it.readableLines.isNotEmpty() } ?: local
             if (visible != null) {
                 runOnUiThread {
                     if (isDestroyed || isFinishing) return@runOnUiThread
@@ -548,8 +570,8 @@ class GtaMissionDetailsActivity : Activity() {
             }
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
-                val updated = result.getOrElse { preview }?.takeUnless { it.inSceneOrder().isEmpty() } ?: local
-                val redraw = dialogue != updated || updated?.inSceneOrder().isNullOrEmpty()
+                val updated = result.getOrElse { preview }?.takeIf { it.readableLines.isNotEmpty() } ?: local
+                val redraw = dialogue != updated || updated == null
                 dialogue = updated
                 dialogueSync = if (refresh.isSuccess && result.isSuccess) DialogueSync.READY else DialogueSync.FAILED
                 if (pane == Pane.CONVERSATIONS && redraw) render()
@@ -566,8 +588,11 @@ class GtaMissionDetailsActivity : Activity() {
         }
         val available = rows.orEmpty()
         val transcript = dialogue.takeIf { conversations }
-        val entries = if (conversations) transcript?.inSceneOrder().orEmpty() else available.filter {
-            it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE
+        val fullConversation = conversations && conversationView == ConversationView.ALL
+        val entries = when {
+            fullConversation -> transcript?.inReadingOrder().orEmpty()
+            conversations -> transcript?.let { it.inSceneOrder().ifEmpty { it.readableLines } }.orEmpty()
+            else -> available.filter { it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE }
         }
         if (entries.isEmpty()) {
             if (conversations) {
@@ -581,21 +606,23 @@ class GtaMissionDetailsActivity : Activity() {
             return
         }
         val scenes = (transcript?.scenes ?: mission.scenes).associateBy { it.id }
+        val list = if (fullConversation) textCard(Miami.aqua).also { body.addBelow(it, 12) } else body
         val pending = mutableListOf<Triple<GtaMissionText, String?, TextView>>()
         entries.take(visibleRows).forEachIndexed { index, line ->
             val scene = scenes[line.sceneId]
             val previousLine = entries.getOrNull(index - 1)
-            if (conversations && scene != null && (index == 0 || line.sceneId != previousLine?.sceneId)) {
+            if (conversations && !fullConversation && scene != null && line.sceneId != previousLine?.sceneId) {
                 body.addBelow(sceneHeading(scene.title, scene.environment, Miami.aqua), 12)
             }
             val translated = line.turkish ?: translatedLines[line]
             val accent = if (conversations) Miami.aqua else if (index % 2 == 0) Miami.coral else Miami.lavender
-            body.addBelow(textCard(accent).apply {
+            val lineView = if (fullConversation) stack() else textCard(accent)
+            list.addBelow(lineView.apply {
                 val title = if (conversations) line.speaker else line.type.label
                 title?.let { addView(copy(it, 14, accent, true)) }
                 val lineText = copy(translated ?: line.english.orEmpty(), 16, Palette.white).apply { setTextIsSelectable(true) }
                 addBelow(lineText, if (title == null) 0 else 5)
-                val timing = line.startMs?.let { start ->
+                val timing = line.startMs?.takeUnless { fullConversation }?.let { start ->
                     val first = formatMissionTime(start)
                     line.endMs?.let { end -> "$first–${formatMissionTime(end)}" } ?: first
                 }
@@ -606,7 +633,7 @@ class GtaMissionDetailsActivity : Activity() {
                 val environment = scene?.environment?.takeUnless { conversations }
                 val context = line.context?.takeUnless { conversations }
                 listOfNotNull(environment, context, timing).forEach { addBelow(copy(it, 13), 4) }
-            }, 8)
+            }, if (fullConversation && index == 0) 0 else 8)
         }
         if (entries.size > visibleRows) body.addBelow(press("Daha fazla metin göster", Miami.lavender) {
             visibleRows += PAGE_SIZE
@@ -689,6 +716,7 @@ class GtaMissionDetailsActivity : Activity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString("missionPane", pane.name)
+        outState.putString("missionConversationView", conversationView.name)
         outState.putInt("missionRows", visibleRows)
         super.onSaveInstanceState(outState)
     }

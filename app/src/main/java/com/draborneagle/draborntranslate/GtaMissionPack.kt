@@ -151,10 +151,15 @@ internal data class GtaMissionText(
 )
 
 internal data class GtaMissionDialogue(val scenes: List<GtaMissionScene>, val lines: List<GtaMissionText>) {
+    val readableLines = lines.filter { it.turkish != null || it.english != null }
+
     fun inSceneOrder(): List<GtaMissionText> {
-        val byScene = lines.groupBy { it.sceneId }
-        return scenes.flatMap { byScene[it.id].orEmpty() }.filter { it.turkish != null || it.english != null }
+        val byScene = readableLines.groupBy { it.sceneId }
+        return scenes.flatMap { byScene[it.id].orEmpty() }
     }
+
+    fun inReadingOrder(): List<GtaMissionText> =
+        if (readableLines.any { it.sceneId == null }) readableLines else inSceneOrder()
 
     fun resolveSubtitles(find: (Set<Long>) -> Map<Long, String>): GtaMissionDialogue {
         val keys = lines.filter { it.turkish == null }.mapNotNullTo(mutableSetOf()) { it.subtitleKey }
@@ -168,7 +173,7 @@ internal data class GtaMissionDialogue(val scenes: List<GtaMissionScene>, val li
 
     companion object {
         fun fromTexts(scenes: List<GtaMissionScene>, texts: List<GtaMissionText>): GtaMissionDialogue? {
-            val spoken = texts.filter { it.type == GtaTextType.DIALOGUE && it.sceneId != null && it.speaker != null }
+            val spoken = texts.filter { it.type == GtaTextType.DIALOGUE }
             return if (spoken.isEmpty()) null else GtaMissionDialogue(scenes, spoken)
         }
     }
@@ -199,11 +204,7 @@ internal object GtaMissionPack {
             checkPack(expanded <= MAX_EXPANDED_BYTES)
         }
         checkPack(expected.isEmpty())
-        catalog.missions.filter { it.textCount > 0 }.forEach { mission ->
-            checkPack(texts(zip, mission).none { line ->
-                line.type == GtaTextType.DIALOGUE && (line.sceneId == null || line.speaker == null)
-            })
-        }
+        catalog.missions.filter { it.textCount > 0 }.forEach { texts(zip, it) }
         catalog
     }
 
@@ -306,7 +307,7 @@ internal object GtaMissionPack {
             val english = data.text("en")
             val speaker = data.text("speaker")
             val subtitleKey = if (data.has("subtitleKey")) {
-                checkPack(type == GtaTextType.DIALOGUE && sceneId != null && speaker != null)
+                checkPack(type == GtaTextType.DIALOGUE)
                 PackKey.number(data.requiredText("subtitleKey")) ?: invalid()
             } else null
             checkPack(turkish != null || english != null || subtitleKey != null)
