@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' blob:; connect-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+  <title>DraBornTranslate – Oyun penceresi</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #090c19; color: #eee; font: 16px system-ui; }
+    img { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+    img[hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <p id="status" role="status">Konsol görüntüsü bekleniyor…</p>
+  <img id="game" alt="Canlı konsol görüntüsü" hidden>
+  <script>
+    const game = document.getElementById('game');
+    const status = document.getElementById('status');
+    let frame;
+    function clearFrame(message) {
+      if (frame) URL.revokeObjectURL(frame);
+      frame = undefined;
+      game.removeAttribute('src');
+      game.hidden = true;
+      status.hidden = false;
+      status.textContent = message;
+    }
+    async function refresh() {
+      let interval = 700;
+      const request = new AbortController();
+      const timeout = setTimeout(() => request.abort(), 3000);
+      try {
+        const result = await fetch('frame.jpg', { cache: 'no-store', signal: request.signal });
+        if (result.status === 204) {
+          clearFrame('Konsol görüntüsü bekleniyor…');
+        } else if (result.ok) {
+          const next = URL.createObjectURL(await result.blob());
+          game.src = next;
+          if (frame) URL.revokeObjectURL(frame);
+          frame = next;
+          status.hidden = true;
+          game.hidden = false;
+          interval = 160;
+        } else {
+          clearFrame('Oyun penceresi telefonda kapatıldı.');
+        }
+      } catch {
+        clearFrame('Telefonda oyun penceresini açık tut ve aynı ağa bağlan.');
+      } finally {
+        clearTimeout(timeout);
+        setTimeout(refresh, interval);
+      }
+    }
+    refresh();
+  </script>
+</body>
+</html>

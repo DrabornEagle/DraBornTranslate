@@ -1,10 +1,10 @@
-# DraBornTranslate v0.6.8
+# DraBornTranslate v0.7
 
-**Android 10+ · ARM64 · Android sürüm kodu 16**
+**Android 10+ · ARM64 · Android sürüm kodu 17**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.8)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7)
 
-v0.6.8 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.7 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -37,6 +37,15 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 - **Görev Bilgileri** görev aşamalarını Türkçe sahne özetlerinden önce gösterir. **Önce tamamlanacak görev** kartı aynı ekrandadır. Karakter portreleri ve görev kareleri otomatik yüklenir.
 - **Oyun Paketleri → Replik paketi bağla** ekranına, yayımlama izni olan bir replik paketinin GitHub `manifest.json` bağlantısını gir. **Görev Metinleri → Konuşmalar** replikleri sahne, konuşmacı ve varsa zaman bilgisiyle gösterir. Uygulama son doğrulanan paketi çevrimdışı açar.
 - **Hedefler/Kaynaklar** hedefleri, görev rehberlerini, karakter ve görsel kaynaklarını açar. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
+
+## Capiche ile Türkçe dublaj
+
+1. Oyunda İngilizce altyazıyı ve konuşmacı adlarını aç. DraBornTranslate’te **PS5 ve TV’ye bağlan** üzerinden konsol yayınını başlat.
+2. Konsol ayarlarında **Ek alanlar → Capiche · Türkçe dublaj → Oyun penceresini paylaş** seç. Portal ve telefon ekranlarında Capiche’ye **Oyun profili → GTA 6** üzerinden erişebilirsin.
+3. Oyun penceresinin bağlantısını aynı Wi-Fi’daki bir bilgisayarda ayrı bir Chrome veya Edge penceresinde aç.
+4. Bilgisayarda Capiche’yi aç ve DraBornTranslate oyun penceresini paylaş. Altyazı alanını işaretleyip dublajı başlat. Oyun penceresini simge durumuna küçültme. [Capiche](https://capiche.gg/tr)
+
+Telefon yalnızca konsol görüntüsünü yerel ağa verir. **Oyun penceresini durdur** düğmesi veya konsol bağlantısının kapanması paylaşılan adresi kapatır. **Capiche’ye bağış yap** düğmesi geliştiricinin destek bağlantısını açar.
 
 ## Altyazı ve Görsel Çeviri
 

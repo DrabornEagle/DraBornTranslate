@@ -316,6 +316,19 @@ class ScreenNavigationTest {
     }
 
     @Test
+    fun capicheShowsBrowserActionsAndWaitsForTheConsoleBeforeSharing() {
+        ActivityScenario.launch(CapicheActivity::class.java).use {
+            waitFor { resumed() is CapicheActivity && hasText("Capiche’yi aç") && hasText("Capiche’ye bağış yap") }
+            val window = onMain {
+                resumed()?.window?.decorView?.findChild { it is TextView && it.text == "Oyun penceresini paylaş" }
+            }
+            assertNotNull(window)
+            assertFalse(window!!.isEnabled)
+            assertFalse(hasText("Oyun bağlantısını kopyala"))
+        }
+    }
+
+    @Test
     fun currentFramePromptsForASourceAndDisplaysPortraitPortalFrames() {
         val saved = saveSample("recent-screenshotUrl.png", Color.RED)
         try {

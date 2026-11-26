@@ -89,6 +89,7 @@ const Map<String, String> enStrings = {
   'settings.extra.gta6': 'Set up for GTA 6',
   'settings.extra.gta6.sub': 'Subtitles are found automatically; the bottom objective, help box and phone message are translated too',
   'settings.extra.gta6.done': 'Set up for GTA 6',
+  'settings.extra.capiche': 'Capiche · Turkish dubbing',
   'settings.extra.preset.bottom_objective': 'Objective at the bottom',
   'settings.extra.preset.bottom_objective.sub': 'Below the subtitles, centered (GTA 6)',
   'settings.extra.preset.help_box': 'Help box',

@@ -11,6 +11,7 @@ import java.net.SocketTimeoutException
 import java.net.URL
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
@@ -81,6 +82,27 @@ class PortalPanelServerTest {
             val wrongToken = if (url.path[1] == 'A') "B" else "A"
             val wrongPath = "/" + wrongToken + url.path.substring(2)
             assertEquals(404, get(origin + wrongPath + "caption.txt").code)
+        }
+    }
+
+    @Test
+    fun gameFramesRequireAnExplicitWindowAndItsOwnLink() {
+        PortalPanelServer(loopback, "captions", 22) {}.use { captions ->
+            val frame = AtomicReference<ByteArray?>()
+            PortalPanelServer(loopback, "game", 22, gameJpeg = frame::get) {}.use { game ->
+                val url = URL(game.url)
+                assertEquals(204, get(game.url + "frame.jpg").code)
+                frame.set("test frame".toByteArray())
+                val image = get(game.url + "frame.jpg")
+                assertEquals(200, image.code)
+                assertEquals("image/jpeg", image.contentType)
+                assertEquals("no-store", image.cacheControl)
+                assertEquals("test frame", image.body)
+                assertEquals(404, get("http://${url.host}:${url.port}${URL(captions.url).path}frame.jpg").code)
+                assertEquals(404, get(captions.url + "frame.jpg").code)
+                frame.set(null)
+                assertEquals(204, get(game.url + "frame.jpg").code)
+            }
         }
     }
 

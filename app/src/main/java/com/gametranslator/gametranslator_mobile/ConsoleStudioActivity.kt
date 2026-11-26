@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import com.draborneagle.draborntranslate.CapicheActivity
 import com.draborneagle.draborntranslate.ConsolePairing
 import com.draborneagle.draborntranslate.ConsoleSession
 import com.draborneagle.draborntranslate.ConsoleSetupActivity
@@ -137,6 +138,7 @@ class ConsoleStudioActivity : FlutterActivity() {
                     "focus" -> startActivity(Intent(this, FocusActivity::class.java))
                     "packs" -> startActivity(Intent(this, GamePacksActivity::class.java))
                     "missions" -> startActivity(Intent(this, GtaMissionSearchActivity::class.java))
+                    "capiche" -> startActivity(Intent(this, CapicheActivity::class.java))
                     "tvBrowser" -> startActivity(Intent(this, TvPanelActivity::class.java))
                     "manual" -> startActivity(Intent(this, ConsoleSetupActivity::class.java))
                     "home" -> finish()

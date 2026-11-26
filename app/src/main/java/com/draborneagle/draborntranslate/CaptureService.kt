@@ -263,8 +263,10 @@ class CaptureService : Service() {
                 main.post {
                     ocrPending.set(false)
                     if (!ended && frameEpoch == epoch) {
-                        if (result == null) updateStatus("Yazı tanıma yanıtı alınamadı.")
-                        else {
+                        if (result == null) {
+                            hudSession?.clearPauseMenu()
+                            updateStatus("Yazı tanıma yanıtı alınamadı.")
+                        } else {
                             val lines = result.subtitles.map { it.text }
                             updateStatus(if (lines.isEmpty() && result.hud.isEmpty()) waitingForText() else "GTA 6 oyun metni okunuyor.")
                             captions?.read(lines, result.captionPosition(), result.allowFallback)

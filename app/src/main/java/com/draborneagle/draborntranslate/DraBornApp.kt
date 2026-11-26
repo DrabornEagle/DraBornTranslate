@@ -71,6 +71,7 @@ internal object ConsoleSession {
     fun end() {
         if (!active) return
         active = false
+        CapicheGameWindow.stop()
         LiveFocusFrames.clear()
         SessionState.update(SessionState.State(source = Source.PS5))
     }

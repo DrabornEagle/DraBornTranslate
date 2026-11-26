@@ -104,11 +104,13 @@ internal class GtaHudOverlay(
             val width = video.width() * when (block.kind) {
                 HudKind.OBJECTIVE -> 0.47f
                 HudKind.CONTROLS -> 0.42f
+                HudKind.PAUSE_MENU -> 0.22f
                 else -> 0.30f
             }
             val left = when (block.kind) {
                 HudKind.HELP -> box.right + radius
                 HudKind.OBJECTIVE -> box.centerX() - width / 2
+                HudKind.PAUSE_MENU -> box.left
                 else -> box.right - width
             }
             val area = RectF(left, box.top, left + width, box.bottom)

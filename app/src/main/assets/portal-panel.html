@@ -70,7 +70,7 @@
   var revision = null;
   var lastState = null;
   var hudKey = null;
-  var kinds = {OBJECTIVE:"objective",HELP:"help",MESSAGE:"message",PHONE:"phone",CONTROLS:"controls"};
+  var kinds = {OBJECTIVE:"objective",HELP:"help",MESSAGE:"message",PHONE:"phone",CONTROLS:"controls",PAUSE_MENU:"pause-menu"};
   var styles = {TEXT:"text",INCOMING:"incoming",OUTGOING:"outgoing",REPLY:"reply",NAME:"name"};
 
   function display(state, connected) {
@@ -165,9 +165,10 @@
         inner.appendChild(div);
       });
       card.appendChild(inner);
-      var width = kind === "phone" ? .33 : kind === "objective" || kind === "controls" ? .43 : .28;
+      var width = kind === "phone" ? .33 : kind === "objective" || kind === "controls" ? .43 : kind === "pause-menu" ? .22 : .28;
       var left = kind === "help" ? box[2] + .012 : kind === "objective" ? (box[0] + box[2] - width) / 2 :
-        kind === "phone" ? (box[0] >= width + .015 ? box[0] - width - .015 : box[2] + .015) : box[2] - width;
+        kind === "phone" ? (box[0] >= width + .015 ? box[0] - width - .015 : box[2] + .015) :
+        kind === "pause-menu" ? box[0] : box[2] - width;
       hud.appendChild(card);
       if (wide()) {
         position(card, Math.min(.99 - width, Math.max(.01, left)), Math.max(.01, box[1]), width);

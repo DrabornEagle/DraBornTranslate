@@ -82,7 +82,7 @@ internal fun Button.miamiChoice(selected: Boolean, accent: Int) {
     setTextColor(if (selected) Miami.night else Palette.white)
 }
 
-internal fun Context.openMissionSource(url: String) {
+internal fun Context.openBrowserLink(url: String) {
     try {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     } catch (_: ActivityNotFoundException) {

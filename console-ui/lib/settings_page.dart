@@ -480,6 +480,13 @@ class _SettingsTabState extends State<SettingsTab> {
                 toast(context, t('settings.extra.gta6.done'));
               },
             ),
+            Cell(
+              key: const ValueKey('extra-capiche'),
+              icon: CupertinoIcons.play_circle_fill,
+              iconColor: Tokens.teal,
+              title: t('settings.extra.capiche'),
+              onTap: () => Bridge.openTool('capiche'),
+            ),
             for (final preset in AppSettings.extraPresets)
               Cell(
                 key: ValueKey('extra-$preset'),

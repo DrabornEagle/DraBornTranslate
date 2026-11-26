@@ -25,6 +25,7 @@ internal class PortalPanelServer(
     address: Inet4Address,
     template: String,
     fontSize: Int,
+    private val gameJpeg: (() -> ByteArray?)? = null,
     private val onViewed: () -> Unit,
 ) : AutoCloseable {
     private val prefix = "/${newToken()}/"
@@ -141,6 +142,15 @@ internal class PortalPanelServer(
                 send(client, "200 OK", "text/html; charset=utf-8", page, headOnly,
                     "X-DraBorn-Panel: ready\r\n")
             }
+            "${prefix}frame.jpg" -> {
+                if (gameJpeg == null) {
+                    send(client, "404 Not Found", "text/plain", ByteArray(0), headOnly)
+                } else {
+                    val image = gameJpeg()
+                    send(client, if (image == null) "204 No Content" else "200 OK",
+                        "image/jpeg", image ?: ByteArray(0), headOnly)
+                }
+            }
             "${prefix}caption.txt", "${prefix}state.json" -> {
                 val json = request[1].substringBefore('?').endsWith("/state.json")
                 val after = request[1].substringAfter("?after=", "").toLongOrNull()
@@ -194,6 +204,8 @@ internal class PortalPanelServer(
             "Connection: close\r\n" +
             "X-Content-Type-Options: nosniff\r\n" +
             "Referrer-Policy: no-referrer\r\n" +
+            (if (gameJpeg == null) "" else
+                "X-Frame-Options: DENY\r\nCross-Origin-Resource-Policy: same-origin\r\n") +
             extraHeaders + "\r\n"
         BufferedOutputStream(client.getOutputStream()).apply {
             write(headers.toByteArray(Charsets.US_ASCII))

@@ -508,6 +508,10 @@ class MainActivity : Activity() {
                     dialog.dismiss()
                     startActivity(Intent(this@MainActivity, GamePacksActivity::class.java))
                 }, 8)
+                append(button("Capiche · Türkçe dublaj") {
+                    dialog.dismiss()
+                    startActivity(Intent(this@MainActivity, CapicheActivity::class.java))
+                }, 8)
             }
         }
     }

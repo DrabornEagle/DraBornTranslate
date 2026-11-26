@@ -28,6 +28,10 @@ internal class HudTranslationSession(
     fun read(blocks: List<HudBlock>) {
         for ((kind, region) in regions) {
             val candidate = blocks.firstOrNull { it.kind == kind }
+            if (kind == HudKind.PAUSE_MENU) {
+                region.rendered = candidate
+                continue
+            }
             val unchanged = candidate?.contentKey() == region.candidate?.contentKey()
             region.sameFrames = if (unchanged) minOf(region.sameFrames + 1, 2) else 1
             region.candidate = candidate
@@ -40,6 +44,11 @@ internal class HudTranslationSession(
         }
         publish()
         next()
+    }
+
+    fun clearPauseMenu() {
+        regions.getValue(HudKind.PAUSE_MENU).rendered = null
+        publish()
     }
 
     fun reset() {

@@ -52,6 +52,36 @@ class Gta6ProfileTest {
     }
 
     @Test
+    fun pauseListClearsOnTheFirstGameplayReading() {
+        val menu = listOf(
+            line("Game", 0.075, 0.22, 0.14),
+            line("Store", 0.072, 0.305, 0.14),
+            line("Help", 0.078, 0.39, 0.135),
+        )
+        val paused = Gta6Profile.read(menu, menu)
+        assertEquals(listOf("Oyun", "Mağaza", "Yardım"), paused.hud.single().lines.map { it.text })
+        assertEquals(HudKind.PAUSE_MENU, paused.hud.single().kind)
+        assertFalse(paused.allowFallback)
+        var displayed = emptyList<HudBlock>()
+        val session = HudTranslationSession(translate = { _, _ -> error("Pause labels are available immediately") },
+            show = { displayed = it })
+        session.read(paused.hud)
+        assertEquals(paused.hud, displayed)
+
+        val caption = line("Are you ready to go?", 0.35, 0.83, 0.65)
+        val playing = Gta6Profile.read(listOf(caption), emptyList())
+        session.read(playing.hud)
+        assertEquals(listOf(caption), playing.subtitles)
+        assertTrue(displayed.isEmpty())
+
+        session.read(paused.hud)
+        session.clearPauseMenu()
+        assertTrue(displayed.isEmpty())
+        assertTrue(Gta6Profile.read(menu.map { it.copy(box = it.box.copy(top = 0.5, bottom = 0.522)) },
+            emptyList()).hud.none { it.kind == HudKind.PAUSE_MENU })
+    }
+
+    @Test
     fun waitsOnDisagreeingReadingsBeforeModelTranslation() {
         val one = line("Take the left exit.", 0.38, 0.82, 0.62)
         val two = one.copy(text = "Take the right exit.")

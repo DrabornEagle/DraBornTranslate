@@ -638,7 +638,7 @@ class GtaMissionDetailsActivity : Activity() {
         add(mission.profileSource, "Karakteri kaynakta gör")
         add(mission.gameDataSource, "Oyun verisindeki kaydı aç")
         add("https://github.com/psviethoa/gta6-text-en", "GitHub İngilizce metin kaynağı")
-        links.forEach { (url, label) -> body.addBelow(press(label) { openMissionSource(url) }, 7) }
+        links.forEach { (url, label) -> body.addBelow(press(label) { openBrowserLink(url) }, 7) }
     }
 
     private fun formatMissionTime(ms: Long) =

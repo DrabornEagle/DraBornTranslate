@@ -88,6 +88,7 @@ const Map<String, String> trStrings = {
   'settings.extra.gta6': 'GTA 6 için ayarla',
   'settings.extra.gta6.sub': 'Altyazı otomatik bulunur; alttaki görev, ipucu kutusu ve telefon mesajı da çevrilir',
   'settings.extra.gta6.done': 'GTA 6 için ayarlandı',
+  'settings.extra.capiche': 'Capiche · Türkçe dublaj',
   'settings.extra.preset.bottom_objective': 'Alttaki görev yazısı',
   'settings.extra.preset.bottom_objective.sub': 'Altyazının altında, ortada (GTA 6)',
   'settings.extra.preset.help_box': 'İpucu kutusu',

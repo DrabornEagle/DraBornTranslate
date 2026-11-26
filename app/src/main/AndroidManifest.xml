@@ -54,6 +54,7 @@
         <activity android:name=".TvPanelActivity" android:exported="false" />
         <activity android:name=".UpdatesActivity" android:exported="false" />
         <activity android:name=".GamePacksActivity" android:exported="false" />
+        <activity android:name=".CapicheActivity" android:exported="false" />
         <activity android:name=".GtaMissionSearchActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".GtaMissionDetailsActivity" android:exported="false" />
         <activity android:name=".ConsoleSetupActivity" android:exported="false" />

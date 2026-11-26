@@ -19,7 +19,8 @@ internal enum class GameReadingProfile(val label: String) {
 }
 
 internal enum class HudKind(val label: String) {
-    OBJECTIVE("Görev"), HELP("İpucu"), MESSAGE("Mesaj"), PHONE("Telefon"), CONTROLS("Tuşlar")
+    OBJECTIVE("Görev"), HELP("İpucu"), MESSAGE("Mesaj"), PHONE("Telefon"), CONTROLS("Tuşlar"),
+    PAUSE_MENU("Duraklatma menüsü"),
 }
 
 internal enum class HudLineStyle { TEXT, INCOMING, OUTGOING, REPLY, NAME }
@@ -68,6 +69,12 @@ internal object Gta6Profile {
     private val subtitles = TextBox(0.17, 0.73, 0.83, objective.top)
     private val controls = TextBox(0.53, 0.91, 1.0, 1.0)
     private val phoneRegion = TextBox(0.40, 0.12, 0.995, 0.93)
+    private val pauseRegion = TextBox(0.0, 0.085, 0.31, 0.92)
+    private val pauseItems = mapOf(
+        "game" to "Oyun", "map" to "Harita", "brief" to "Özet", "progress" to "İlerleme",
+        "stats" to "İstatistikler", "settings" to "Ayarlar", "store" to "Mağaza",
+        "help" to "Yardım", "online" to "Çevrimiçi",
+    )
     private val phoneTitles = setOf("messages", "new messages", "new message", "text messages", "group chat")
     private val phoneCommands = setOf("scroll", "send", "exit", "back", "reply", "select", "reminders")
     private val commandPattern = Regex("""\b(?:PHOTO STUDIO|SET DESTINATION|SCROLL|SEND|EXIT|BACK|REPLY|SELECT|REMINDERS|OPEN|CLOSE)\b""", RegexOption.IGNORE_CASE)
@@ -92,9 +99,10 @@ internal object Gta6Profile {
         // Prefer the view with more readable English while keeping the original view's colors and coordinates.
         val base = normal.sortedWith(screenOrder)
         val contrast = contrasted.sortedWith(screenOrder)
+        val merged = merge(base, contrast)
+        pauseMenu(merged)?.let { return ProfileReading(emptyList(), listOf(it), allowFallback = false) }
         val basePhone = phone(base)
         val contrastPhone = phone(contrast)
-        val merged = merge(base, contrast)
         val phone = phone(merged) ?: basePhone ?: contrastPhone
         val first = subtitleLines(base, phone?.box)
         val second = subtitleLines(contrast, phone?.box)
@@ -115,6 +123,23 @@ internal object Gta6Profile {
             controller(merged.filter { controls.contains(it.box) })?.let(::add)
         }
         return ProfileReading(result, blocks, !disagreement && !OcrNoise.looksGarbled(result.joinToString(" ") { it.text }))
+    }
+
+    private fun pauseMenu(lines: List<ProfileLine>): HudBlock? {
+        val recognised = lines.filter { pauseRegion.contains(it.box) }.mapNotNull { line ->
+            val label = pauseItems[TextMatch.normalize(line.text)] ?: return@mapNotNull null
+            line to label
+        }
+        val anchor = recognised.maxByOrNull { (line, _) ->
+            recognised.count { abs(it.first.box.left - line.box.left) < 0.055 }
+        }?.first ?: return null
+        val menu = recognised.filter { abs(it.first.box.left - anchor.box.left) < 0.055 }.distinctBy { it.second }
+        val steps = menu.zipWithNext().count { (first, second) ->
+            second.first.box.top - first.first.box.top in 0.028..0.23
+        }
+        if (steps < 2) return null
+        val box = union(menu.map { it.first }, pauseRegion)
+        return HudBlock(HudKind.PAUSE_MENU, box, menu.map { HudLine(it.second, prompt = true) })
     }
 
     private fun merge(normal: List<ProfileLine>, contrasted: List<ProfileLine>): List<ProfileLine> {

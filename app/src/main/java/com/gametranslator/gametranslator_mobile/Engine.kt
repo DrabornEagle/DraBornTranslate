@@ -1054,7 +1054,11 @@ object Engine : Native.SessionListener {
         }
         ocr.read(bitmap) { result ->
             try {
-                if (!running || pipeline !== current || gtaReader !== ocr || result == null) return@read
+                if (!running || pipeline !== current || gtaReader !== ocr) return@read
+                if (result == null) {
+                    hud.clearPauseMenu()
+                    return@read
+                }
                 current.onRead(result.subtitles.map { it.text }, result.captionPosition()?.box, result.allowFallback)
                 hud.read(result.hud)
             } finally {
