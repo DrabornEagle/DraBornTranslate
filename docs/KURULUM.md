@@ -1,6 +1,6 @@
 # DraBornTranslate v0.7.1
 
-**Android 10+ · ARM64 · Android sürüm kodu 17**
+**Android 10+ · ARM64 · Android sürüm kodu 18**
 
 [İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.1)
 

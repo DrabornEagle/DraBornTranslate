@@ -72,7 +72,7 @@ internal object ImportedGamePack {
         val data = context.contentResolver.openInputStream(uri)?.use { readLimited(it, MAX_JSON_BYTES) }
             ?: throw IOException("Oyun paketi açılamadı.")
         val pack = validate(data, "Oyun paketi")
-        val gta = pack.id == GTA_ID
+        val gta = pack.id == GTA_ID && readGtaTranslations(data.inputStream(), emptySet()) != null
         write(file(context, if (gta) GTA_LOCAL_FILE else IMPORTED_FILE), data)
         if (gta) gtaLibrary = null
         shared = null
@@ -90,10 +90,10 @@ internal object ImportedGamePack {
             val name = gtaSource(context) ?: IMPORTED_FILE.takeIf { hasPack(context) }
             name?.let { file(context, it).openRead() }
         } ?: return emptyMap()
-        return input.use { readGtaTranslations(it, keys) }
+        return input.use { readGtaTranslations(it, keys).orEmpty() }
     }
 
-    private fun readGtaTranslations(input: InputStream, keys: Set<Long>): Map<Long, String> {
+    private fun readGtaTranslations(input: InputStream, keys: Set<Long>): Map<Long, String>? {
         val buffered = input.buffered()
         buffered.mark(2)
         val gzip = buffered.read() == 0x1f && buffered.read() == 0x8b
@@ -107,8 +107,9 @@ internal object ImportedGamePack {
             json.beginObject()
             while (json.hasNext()) {
                 when (json.nextName()) {
-                    "id" -> gameId = json.nextString()
-                    "lang" -> language = json.nextString().ifBlank { "tr" }
+                    "id" -> if (json.peek() == JsonToken.STRING) gameId = json.nextString() else json.skipValue()
+                    "lang" -> if (json.peek() == JsonToken.STRING) language = json.nextString().ifBlank { "tr" }
+                              else json.skipValue()
                     "entries" -> readSubtitleTable(json, keys, entries)
                     "segments" -> readSubtitleTable(json, keys, segments)
                     else -> json.skipValue()
@@ -116,10 +117,14 @@ internal object ImportedGamePack {
             }
             json.endObject()
         }
-        return if (gameId == GTA_ID && language == "tr") segments + entries else emptyMap()
+        return if (gameId == GTA_ID && language == "tr") segments + entries else null
     }
 
     private fun readSubtitleTable(json: JsonReader, keys: Set<Long>, matches: MutableMap<Long, String>) {
+        if (keys.isEmpty() || json.peek() != JsonToken.BEGIN_OBJECT) {
+            json.skipValue()
+            return
+        }
         json.beginObject()
         while (json.hasNext()) {
             val key = PackKey.number(json.nextName())
