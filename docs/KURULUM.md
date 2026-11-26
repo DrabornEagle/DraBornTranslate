@@ -1,10 +1,10 @@
-# DraBornTranslate v0.6
+# DraBornTranslate v0.6.1
 
-**Android 10+ · ARM64 · Android sürüm kodu 8**
+**Android 10+ · ARM64 · Android sürüm kodu 9**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.1)
 
-v0.6 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.6.1 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -32,7 +32,7 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 ## GTA 6 görev araması
 
-v0.6.1 kaynak sürümünde **Oyun paketleri → GTA 6 paketini indir** ile görev kataloğu GitHub’dan gelir. İndirme bitince **Görev ara** seçeneğinden görevin Türkçe veya İngilizce adını yaz. Ana ekrandan ve GTA 6 oyun profili penceresinden de aynı aramaya ulaşabilirsin. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
+**Oyun paketleri → GTA 6 paketini indir** ile görev kataloğu GitHub’dan gelir. İndirme bitince **Görev ara** seçeneğinden görevin Türkçe veya İngilizce adını yaz. Ana ekrandan ve GTA 6 oyun profili penceresinden de aynı aramaya ulaşabilirsin. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
 
 ## Altyazı ve Görsel Çeviri
 
