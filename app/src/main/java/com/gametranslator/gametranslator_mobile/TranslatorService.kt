@@ -3,6 +3,7 @@ package com.gametranslator.gametranslator_mobile
 
 import com.draborneagle.draborntranslate.ConsoleSession
 import com.draborneagle.draborntranslate.FocusActivity
+import com.draborneagle.draborntranslate.GtaMissionRecording
 import com.draborneagle.draborntranslate.R
 import com.draborneagle.draborntranslate.VISUAL_TRANSLATION
 
@@ -30,8 +31,9 @@ class TranslatorService : Service() {
         private const val CHANNEL = "translation"
         private const val NOTIFICATION_ID = 1
 
-        fun start(context: Context) {
+        fun start(context: Context, missionId: String? = null) {
             val intent = Intent(context, TranslatorService::class.java)
+                .putExtra(GtaMissionRecording.EXTRA_MISSION_ID, missionId)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent) else context.startService(intent)
         }
 
@@ -78,7 +80,7 @@ class TranslatorService : Service() {
         }
         live = this
         acquireLocks()
-        Engine.start(this)
+        Engine.start(this, intent?.getStringExtra(GtaMissionRecording.EXTRA_MISSION_ID))
         // START_NOT_STICKY: süreç ölürse (çökme, bellek) sistem hizmeti kendiliğinden yeniden başlatmaz. Eskiden
         // yeniden başlatıyordu ve çeviri kullanıcı "başlat" demeden açılıyordu: çökme döngüsü, ve Xbox'ta kullanıcı
         // istemeden açılıp kapanan uzaktan oynatma oturumu. Çeviriyi kullanıcı yeniden başlatır.

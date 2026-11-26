@@ -273,9 +273,61 @@ class ScreenNavigationTest {
         writeMissionFixture(file, catalog, lines)
     }
 
-    private fun writeMissionFixture(file: File, catalog: String, lines: String) {
+    @Test
+    fun selectedMissionShowsLocallyRecordedSubtitlesInOrder() {
+        val guide = File(app.filesDir, "gta-6-missions-local.zip")
+        val backup = guide.takeIf(File::isFile)?.readBytes()
+        val missionId = "local-caption-${java.util.UUID.randomUUID()}"
+        val catalog = """{"format":1,"version":"local-capture","gameBuild":"Test","missions":[
+            {"id":"$missionId","titleTr":"Kayıt deneme görevi","type":"story","summaryTr":"Deneme rehberi.",
+             "textCount":1}]}"""
+        try {
+            writeMissionFixture(guide, catalog, """[{"type":"objective","tr":"Görev hedefi."}]""", missionId)
+            checkNotNull(GtaMissionRecording.start(app, missionId)).apply {
+                add("Deniz: Is this the first run?", "Deniz: Bu ilk oturum mu?")
+                close()
+            }
+            val recording = checkNotNull(GtaMissionRecording.start(app, missionId))
+            val tick = SystemClock.elapsedRealtime()
+            fun objective(text: String) = listOf(HudBlock(HudKind.OBJECTIVE,
+                com.gametranslator.gametranslator_mobile.core.TextBox(0.1, 0.8, 0.9, 0.9),
+                listOf(HudLine(text))))
+            recording.observeObjectives(objective("Girişe git"))
+            recording.add("Deniz: Wait for me.", "Deniz: Beni bekle.", tick)
+            recording.add("Deniz: Wait for me.", "Deniz: Beni bekle.", tick + 200)
+            recording.observeObjectives(objective("Avluya çık"))
+            recording.add("Ece: I am here.", "Ece: Buradayım.", tick + 1200)
+            recording.add("All clear.", "Her yer temiz.", tick + 3400)
+            recording.close()
+            recording.add("Deniz: This is after capture.", "Kayıt kapandıktan sonra.")
+            checkNotNull(GtaMissionRecording.start(app, "$missionId-other")).apply {
+                add("Elsewhere: hello.", "Başka görevin repliği.")
+                close()
+            }
+            assertEquals(listOf("Deniz", "Ece", null),
+                GtaMissionRecording.dialogue(app, missionId)?.inSceneOrder()?.map { it.speaker })
+
+            ActivityScenario.launch<GtaMissionDetailsActivity>(Intent(app, GtaMissionDetailsActivity::class.java)
+                .putExtra("mission", missionId)).use {
+                waitFor { hasText("Bu görevde canlı altyazı") }
+                click("Görev metinleri")
+                val order = listOf("Girişe git", "Deniz", "Beni bekle.", "Avluya çık", "Ece", "Buradayım.", "Her yer temiz.")
+                waitFor { order.all(::hasText) }
+                assertReadingOrder(order)
+                listOf("Bu ilk oturum mu?", "Başka görevin repliği.", "Kayıt kapandıktan sonra.", "Görev hedefi.",
+                    "Bu görevde canlı altyazı").forEach { assertFalse(it, hasText(it)) }
+                click("Hedefler/Kaynaklar")
+                waitFor { hasText("Görev hedefi.") }
+                assertFalse(hasText("Beni bekle."))
+            }
+        } finally {
+            if (backup == null) guide.delete() else guide.writeBytes(backup)
+        }
+    }
+
+    private fun writeMissionFixture(file: File, catalog: String, lines: String, missionId: String = "dialogue-test") {
         ZipOutputStream(file.outputStream()).use { zip ->
-            for ((name, text) in mapOf("catalog.json" to catalog, "texts/dialogue-test.json" to lines)) {
+            for ((name, text) in mapOf("catalog.json" to catalog, "texts/$missionId.json" to lines)) {
                 zip.putNextEntry(ZipEntry(name))
                 zip.write(text.toByteArray(Charsets.UTF_8))
                 zip.closeEntry()

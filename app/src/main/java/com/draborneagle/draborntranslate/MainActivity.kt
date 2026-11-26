@@ -80,6 +80,7 @@ private enum class TranslationMode(
 class MainActivity : Activity() {
     private val prefs by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
     private lateinit var config: CaptureSettings
+    private val recordingMissionId by lazy { intent.getStringExtra(GtaMissionRecording.EXTRA_MISSION_ID) }
     private var pending = false
     private var demoMessage: String? = null
     private var demoCaption: Caption? = null
@@ -140,6 +141,9 @@ class MainActivity : Activity() {
         removeOldTranslationCredentials()
         val route = if (intent.getStringExtra("connection") == Source.MOBILE.name) Source.MOBILE else Source.PORTAL
         config = readCaptureSettings(route)
+        if (recordingMissionId != null) {
+            config = config.copy(gameProfile = GameReadingProfile.GTA_6, readingArea = ReadingArea.SUBTITLES, captionEnabled = true)
+        }
         pending = savedInstanceState?.getBoolean("pending") ?: false
         tunnelAddress = savedInstanceState?.getString("tunnelAddress").orEmpty()
         tunnelSession = savedInstanceState?.getString("tunnelSession")
@@ -224,6 +228,9 @@ class MainActivity : Activity() {
         }
 
         content.append(capture, if (mobile) 12 else 0)
+        intent.getStringExtra(GtaMissionRecording.EXTRA_MISSION_TITLE)?.takeIf { recordingMissionId != null }?.let {
+            capture.append(copy("$it · Görev altyazısı kaydı", 14, Palette.mint, true), 8)
+        }
         startStop = button("Canlı çeviriyi başlat") { beginOrStop() }
         styleButton(startStop, if (mobile) ACCENT to LAVENDER else LAVENDER to Palette.rose, activated = PEACH to ROSE)
         actionIcon(startStop, R.drawable.ic_portal_play, activeIcon = R.drawable.ic_portal_stop)
@@ -388,10 +395,10 @@ class MainActivity : Activity() {
         displayChoice.isEnabled = controlsAvailable
         displayChoice.text = config.display.label
         displayChoice.contentDescription = "Altyazı ve ses · ${config.display.label}"
-        readingChoice.isEnabled = controlsAvailable
+        readingChoice.isEnabled = controlsAvailable && recordingMissionId == null
         readingChoice.text = readingMode().label
         readingChoice.contentDescription = "Çeviri modu · ${readingChoice.text}"
-        profileChoice.isEnabled = controlsAvailable
+        profileChoice.isEnabled = controlsAvailable && recordingMissionId == null
         profileChoice.text = when {
             state.suggestGtaProfile && config.gameProfile == GameReadingProfile.GENERAL -> "Oyun profili · GTA 6 öneriliyor"
             else -> "Oyun profili · ${config.gameProfile.label}"
@@ -779,7 +786,7 @@ class MainActivity : Activity() {
                 pending = false
                 try {
                     SessionState.update(SessionState.current.copy(active = true, source = config.source, status = "Ekran paylaşımı başlatılıyor…"))
-                    CaptureService.start(this, resultCode, data, config)
+                    CaptureService.start(this, resultCode, data, config, recordingMissionId)
                     if (Build.VERSION.SDK_INT < 34) openSourceApp(config.source, offerInstall = false)
                 } catch (error: RuntimeException) {
                     showIdle("Canlı altyazı servisinin açılması için tekrar izin ver.")

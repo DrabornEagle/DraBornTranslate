@@ -4,7 +4,7 @@
 
 2026.11.26.6 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** bölümünde aşamalar, sahne özetlerinin üstünde yer alır. Aramada açılan 197 görev kartının 195’inde toplam 311 Türkçe sahne özeti bulunur. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
 
-**Konuşmalar** seçilen görevin yayımlanmış `dialogue` kayıtlarını sahne ve konuşmacı bilgisiyle satır satır gösterir. Sekme açıldığında GitHub görev paketi en fazla saatte bir otomatik denetlenir. Doğrulanmış arşiv çevrimdışı kalır. Bu katalog 343 rehber ve bir hedef kaydı içerir. Yayımlanmış konuşma sayısı sıfırdır. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir.
+**Konuşmalar** seçilen görevin yayımlanmış `dialogue` kayıtlarını sahne ve konuşmacı bilgisiyle satır satır gösterir. Sekme açıldığında GitHub görev paketi en fazla saatte bir otomatik denetlenir. Doğrulanmış arşiv çevrimdışı kalır. Bu katalog 343 rehber ve bir hedef kaydı içerir. Yayımlanmış konuşma sayısı sıfırdır. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir. **Bu görevde canlı altyazı** üzerinden başlatılan bir oturumun replikleri cihazda saklanır. Görevin yayımlanmış konuşmaları varsa paket kullanılır. Diğer görevlerde **Konuşmalar**, son kayıtlı oynanışın ekranda okunabilen repliklerini gösterir.
 
 | Kaynak | Kapsam |
 | --- | --- |

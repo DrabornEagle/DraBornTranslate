@@ -11,6 +11,7 @@ import com.draborneagle.draborntranslate.ConsoleSession
 import com.draborneagle.draborntranslate.GameReadingProfile
 import com.draborneagle.draborntranslate.GameTranslatorEngine
 import com.draborneagle.draborntranslate.Gta6Profile
+import com.draborneagle.draborntranslate.GtaMissionRecording
 import com.draborneagle.draborntranslate.GtaProfileReader
 import com.draborneagle.draborntranslate.HudBlock
 import com.draborneagle.draborntranslate.HudKind
@@ -141,6 +142,7 @@ object Engine : Native.SessionListener {
     private var appContext: Context? = null
     private var store: Store? = null
     @Volatile private var settings = Settings()
+    @Volatile private var missionRecording: GtaMissionRecording.Recording? = null
     private var session = 0L
     private var retry: ScheduledFuture<*>? = null
     /** Durdurma istendi ama denetim iş parçacığı henüz işlemedi (uyandırma beklemesini keser). */
@@ -349,7 +351,7 @@ object Engine : Native.SessionListener {
         }, "gt-start-watch").apply { isDaemon = true }.start()
     }
 
-    fun start(context: Context) {
+    fun start(context: Context, missionId: String? = null) {
         val app = context.applicationContext
         noteLastExit(app)
         log(2, "başlat istendi (durum $phase, çalışıyor=$running)")
@@ -375,6 +377,9 @@ object Engine : Native.SessionListener {
                 if (!Native.available) return@onControl setPhase("failed", UiText.code("native_missing"))
                 if (s.accountId == null || s.console == null) return@onControl setPhase("failed", UiText.code("need_ps_setup"))
             }
+            missionRecording?.close()
+            missionRecording = GtaMissionRecording.start(app, missionId)
+            settings = settings.forMissionRecording()
             running = true
             lastDeliveredFrame = 0L
             lastSource = ""
@@ -406,6 +411,8 @@ object Engine : Native.SessionListener {
         // Oturumun kapanması birkaç saniye sürer (iş parçacıkları beklenir); arayüz bu sırada "durduruluyor" gösterir.
         if (running || session != 0L || xbox != null) setPhase("stopping")
         onControl {
+            missionRecording?.close()
+            missionRecording = null
             if (!running && session == 0L && xbox == null) return@onControl setPhase("idle")
             running = false
             retry?.cancel(false)
@@ -434,7 +441,7 @@ object Engine : Native.SessionListener {
         val app = context.applicationContext
         onControl {
             val before = settings
-            val now = Store(app).settings
+            val now = Store(app).settings.forMissionRecording()
             settings = now
             if (!running) return@onControl
             if (now.style != before.style) server.sendStyle(now.style)
@@ -462,6 +469,10 @@ object Engine : Native.SessionListener {
             if (now.buttonLayout != before.buttonLayout) updateRegionWatcher()
         }
     }
+
+    private fun Settings.forMissionRecording(): Settings =
+        if (missionRecording == null) this
+        else withGta6Reading().copy(sourceLanguage = "en", targetLanguage = "tr", sharePool = false)
 
     private fun buildPipeline() {
         pipeline?.reset()
@@ -500,12 +511,17 @@ object Engine : Native.SessionListener {
         // bitmez; üç kez çevrildikten sonra bir süre okunmaz.
         built.repeats = RepeatedText()
         built.onRepeatBlocked = { line -> log(2, "arayüz yazısı: \"$line\" yineleniyor, artık çevrilmeyecek") }
+        val recording = missionRecording
         built.onPair = { source, translation ->
             lastSource = source
             lastTranslation = translation
             translatedCount++
             // Yalnız altyazı satırları geçmişe girer; ek alanların çevirileri girmez (bilgisayarda da öyle).
             addToHistory(source, translation, fromPack = lastPackSource == source)
+            if (recording != null && running && !stopRequested &&
+                (runningGame.isBlank() || ExtraAreas.isGta6(runningGame, null))) {
+                recording.add(source, translation)
+            }
             log(2, "çeviri: \"${source.replace('\n', ' ')}\" → \"$translation\"")
             notifyChanged()
         }
@@ -1046,11 +1062,15 @@ object Engine : Native.SessionListener {
         val ocr = gtaReader ?: GtaProfileReader(reader).also { gtaReader = it }
         val hud = gtaHud ?: run {
             val translator = GameTranslatorEngine(app, GameReadingProfile.GTA_6)
+            val recording = missionRecording
             gtaTranslator = translator
             HudTranslationSession({ input, done ->
                 val requested = if (settings.packsEnabled) translator::translate else translator::translateFallback
                 requested(input) { reply -> reader.execute { done(reply) } }
-            }, ::publishGtaHud).also { gtaHud = it }
+            }, { blocks ->
+                recording?.observeObjectives(blocks)
+                publishGtaHud(blocks)
+            }).also { gtaHud = it }
         }
         ocr.read(bitmap) { result ->
             try {

@@ -1,10 +1,10 @@
-# DraBornTranslate v0.7.2
+# DraBornTranslate v0.7.3
 
-**Android 10+ · ARM64 · Android sürüm kodu 19**
+**Android 10+ · ARM64 · Android sürüm kodu 20**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.2)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.3)
 
-v0.7.2 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.7.3 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -35,7 +35,7 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 **Görev Ara** Türkçe veya İngilizce görev adı, harita başlığı ve teknik kodla çalışır. **Meet Raul’s Crew** aramasıyla **Credit Check** görevine ulaşabilirsin. Dâhilî katalog çevrimdışı açılır. **Oyun Paketleri → GTA 6 paketini indir** üzerinden GitHub’daki kataloğu cihazına alabilirsin.
 
 - **Görev Bilgileri** görev aşamalarını Türkçe sahne özetlerinden önce gösterir. **Önce tamamlanacak görev** kartı aynı ekrandadır. Karakter portreleri ve görev kareleri otomatik yüklenir.
-- **Görev Metinleri → Konuşmalar** bölümünü aç. Yayımlanmış konuşmalar sahne sırası, konuşmacı ve varsa zaman bilgisiyle otomatik görünür. Uygulama son doğrulanan kayıtları çevrimdışı açar.
+- **Görev Bilgileri → Bu görevde canlı altyazı** üzerinden Portal, PS Remote Play veya konsol bağlantısını seç. Oyunda İngilizce altyazıyı ve konuşmacı adlarını aç. Görevi bitirince canlı çeviriyi durdur. **Görev Metinleri → Konuşmalar** son oyun oturumunda okunan replikleri otomatik açar. Yayımlanmış sahne dökümleri görev paketinden gelir.
 - **Hedefler/Kaynaklar** hedefleri, görev rehberlerini, karakter ve görsel kaynaklarını açar. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
 
 ## Capiche ile Türkçe dublaj

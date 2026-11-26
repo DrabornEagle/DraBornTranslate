@@ -14,6 +14,7 @@ import com.draborneagle.draborntranslate.TvPanelActivity
 import com.draborneagle.draborntranslate.FocusActivity
 import com.draborneagle.draborntranslate.GamePacksActivity
 import com.draborneagle.draborntranslate.GtaMissionSearchActivity
+import com.draborneagle.draborntranslate.GtaMissionRecording
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -207,7 +208,7 @@ class ConsoleStudioActivity : FlutterActivity() {
                 )
                 requestNotificationPermission()
                 try {
-                    TranslatorService.start(this)
+                    TranslatorService.start(this, intent.getStringExtra(GtaMissionRecording.EXTRA_MISSION_ID))
                     result.success(null)
                 } catch (error: Exception) {
                     // Sistem hizmeti başlatmayı reddetti (ör. arka plan kısıtlaması): sessiz kalmasın.

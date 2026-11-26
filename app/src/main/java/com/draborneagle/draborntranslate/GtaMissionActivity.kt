@@ -362,6 +362,7 @@ class GtaMissionDetailsActivity : Activity() {
                 location?.let { addBelow(copy(it, 14, Miami.aqua, true), 10) }
             })
         }
+        body.addBelow(press("Bu görevde canlı altyazı", Miami.aqua) { chooseRecordingConnection() }, 8)
         if (mission.mapLabels.isNotEmpty()) {
             body.addBelow(miamiSection("Oyunda görünen adlar", mission.mapLabels.joinToString("\n"), Miami.coral), 8)
         }
@@ -394,6 +395,30 @@ class GtaMissionDetailsActivity : Activity() {
         mission.prerequisites.mapNotNull(catalog::mission).distinctBy { it.id }.forEach { previous ->
             body.addBelow(prerequisite(previous), 10)
         }
+    }
+
+    private fun chooseRecordingConnection() {
+        if (SessionState.current.active || SessionState.current.portalPanel?.testing == true) {
+            AlertDialog.Builder(this).setTitle("Açık bağlantı")
+                .setMessage("Bu görevde canlı altyazıyı açmak için önce mevcut bağlantıyı durdur.")
+                .setPositiveButton("Tamam", null).show()
+            return
+        }
+        val options = stack().apply { setPadding(dp(22), dp(4), dp(22), dp(5)) }
+        val title = mission.nameIn(language)
+        val dialog = AlertDialog.Builder(this).setTitle(title)
+            .setView(options).setNegativeButton("Vazgeç", null).create()
+        options.addView(copy("Oyunda İngilizce altyazıyı ve konuşmacı adlarını aç. Bu görev boyunca okunan altyazılar telefonda saklanır. Görev bitince canlı çeviriyi durdur.", 14))
+        listOf("PlayStation Portal" to Source.PORTAL, "PS Remote Play" to Source.MOBILE, "PS5 ve TV" to Source.PS5)
+            .forEach { (label, source) ->
+                options.addBelow(press(label, Miami.aqua) {
+                    dialog.dismiss()
+                    startActivity(connectionIntent(this, source)
+                        .putExtra(GtaMissionRecording.EXTRA_MISSION_ID, mission.id)
+                        .putExtra(GtaMissionRecording.EXTRA_MISSION_TITLE, title))
+                }, 7)
+            }
+        dialog.show()
     }
 
     private fun detailSurface(accent: Int): GradientDrawable =
@@ -491,7 +516,7 @@ class GtaMissionDetailsActivity : Activity() {
     }
 
     private fun loadConversations() {
-        if (dialogueSync != DialogueSync.IDLE) return
+        if (dialogueSync == DialogueSync.CHECKING) return
         dialogueSync = DialogueSync.CHECKING
         val app = applicationContext
         val missionId = mission.id
@@ -501,10 +526,12 @@ class GtaMissionDetailsActivity : Activity() {
             }
             val cached = runCatching { GtaMissionStore.dialogue(app, missionId) }
             val preview = runCatching { resolve(cached.getOrNull()) }.getOrElse { cached.getOrNull() }
-            if (!preview?.inSceneOrder().isNullOrEmpty()) {
+            val local = runCatching { GtaMissionRecording.dialogue(app, missionId) }.getOrNull()
+            val visible = preview?.takeUnless { it.inSceneOrder().isEmpty() } ?: local
+            if (visible != null) {
                 runOnUiThread {
                     if (isDestroyed || isFinishing) return@runOnUiThread
-                    dialogue = preview
+                    dialogue = visible
                     if (pane == Pane.CONVERSATIONS) render()
                 }
             }
@@ -521,7 +548,7 @@ class GtaMissionDetailsActivity : Activity() {
             }
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
-                val updated = result.getOrElse { preview }
+                val updated = result.getOrElse { preview }?.takeUnless { it.inSceneOrder().isEmpty() } ?: local
                 val redraw = dialogue != updated || updated?.inSceneOrder().isNullOrEmpty()
                 dialogue = updated
                 dialogueSync = if (refresh.isSuccess && result.isSuccess) DialogueSync.READY else DialogueSync.FAILED

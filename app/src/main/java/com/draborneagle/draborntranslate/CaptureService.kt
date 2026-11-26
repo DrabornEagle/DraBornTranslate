@@ -33,6 +33,7 @@ class CaptureService : Service() {
     private var profileReader: GtaProfileReader? = null
     private var hudSession: HudTranslationSession? = null
     private var gtaOverlay: GtaHudOverlay? = null
+    private var missionRecording: GtaMissionRecording.Recording? = null
     private var profile = GameReadingProfile.GENERAL
     private var plainPhonePanel = false
     private var translator: CaptionTranslator? = null
@@ -141,6 +142,7 @@ class CaptureService : Service() {
             portalIssue = panelIssue,
         ))
         if (config.captionEnabled && config.gtaProfileActive) {
+            missionRecording = GtaMissionRecording.start(this, intent.getStringExtra(GtaMissionRecording.EXTRA_MISSION_ID))
             profileReader = GtaProfileReader(profileOcr)
             hudSession = HudTranslationSession(language::translate, ::showHud)
             if (!direct && config.showOnPhone) gtaOverlay = GtaHudOverlay(this, config)
@@ -156,7 +158,10 @@ class CaptureService : Service() {
         }
         captions = CaptionSession(
             translate = language::translateFallback,
-            show = ::showCaption,
+            show = { caption ->
+                if (!ended && caption != null) missionRecording?.add(caption.source, caption.turkish)
+                showCaption(caption)
+            },
             lookup = language::lookupPack,
             onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
@@ -309,6 +314,7 @@ class CaptureService : Service() {
 
     private fun showHud(blocks: List<HudBlock>) {
         if (ended) return
+        missionRecording?.observeObjectives(blocks)
         val state = SessionState.current.copy(gameHud = blocks)
         SessionState.update(state)
         renderTranslation(state)
@@ -436,6 +442,7 @@ class CaptureService : Service() {
     }
 
     override fun onDestroy() {
+        missionRecording?.close()
         if (!ended) {
             ended = true
             LiveFocusFrames.clear()
@@ -572,10 +579,11 @@ class CaptureService : Service() {
         private const val EXTRA_PLAIN_PHONE = "plainPhonePanel"
         private val profileOcr = Executors.newSingleThreadExecutor { r -> Thread(r, "dra-gta-ocr").apply { isDaemon = true } }
 
-        internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings) {
+        internal fun start(context: Context, resultCode: Int, grant: Intent, config: CaptureSettings, missionId: String? = null) {
             context.startForegroundService(captureIntent(context, config).apply {
                 putExtra(EXTRA_GRANT, grant)
                 putExtra(EXTRA_RESULT, resultCode)
+                putExtra(GtaMissionRecording.EXTRA_MISSION_ID, missionId)
             })
         }
 
