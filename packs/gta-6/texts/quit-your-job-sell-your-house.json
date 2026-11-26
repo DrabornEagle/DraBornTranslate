@@ -8,5 +8,10 @@
     "type": "guide",
     "tr": "Gösteri ekibinin havadaki varış noktası Catalan Key üzerindedir.",
     "sceneId": "jump"
+  },
+  {
+    "type": "guide",
+    "tr": "Papa Audacity son gösterinin hazırlığını binanın helikopter pistinde yapar. Jason ile Lucia’nın ikisi de bu işe katılır.",
+    "sceneId": "guide-1"
   }
 ]

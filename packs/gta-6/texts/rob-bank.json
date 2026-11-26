@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Görev, bankaya gitmeden önce maskeler ve ekipmana ilişkin hedefler içerir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Oyun, birden fazla Fleeca noktasına uğramayı ister. Şubeden çıkış ve bir sonraki şubeye geçişi ekrandaki hedefler ayırır.",
+    "sceneId": "guide-2"
+  }
+]

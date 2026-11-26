@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Banka işi için gereken donanımı Brian, eski bağlantısı Pilot Pete aracılığıyla sağlayacaktır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia yükü alırken kolluk kuvvetleri ortaya çıkar. Bu aşamadaki sonraki işaretler malzeme ile bölgeden çıkışa odaklanır.",
+    "sceneId": "guide-2"
+  }
+]

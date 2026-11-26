@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "2026.11.26.1",
+  "version": "2026.11.26.2",
   "gameBuild": "Xbox Series 1.0.2.1",
   "missions": [
     {
@@ -26,6 +26,11 @@
           "titleTr": "Danışmanla görüşme",
           "environmentTr": "Cezaevi görüşme odası",
           "contextTr": "Lucia’nın cezaevindeki durumunu tanıtan açılış sahnesi."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Görüşmenin amacı",
+          "environmentTr": "Cezaevi"
         }
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_PROLO"
@@ -54,6 +59,11 @@
           "titleTr": "Kingfishers bölgesi",
           "environmentTr": "Pelican Valley",
           "contextTr": "Aksayan işin ardından Jason’ın yöneldiği bölge."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Aksayan iş",
+          "environmentTr": "Keys çevresi"
         }
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_CHASE"
@@ -70,7 +80,19 @@
       "aliases": [
         "FT_AMUCO"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:FT_AMUCO"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:FT_AMUCO",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Hazırlık",
+          "environmentTr": "Ammu-Nation"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Alışveriş sonrası",
+          "environmentTr": "Dükkân ve çevresi"
+        }
+      ]
     },
     {
       "id": "ft-kmodshp",
@@ -86,6 +108,19 @@
       ],
       "characters": [
         "Joey"
+      ],
+      "titleEn": "Just a Scratch",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Aracı götür",
+          "environmentTr": "Coastal Auto Care"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "İşi tamamla",
+          "environmentTr": "Tamir atölyesi"
+        }
       ]
     },
     {
@@ -95,13 +130,48 @@
       "chapter": 1,
       "summaryTr": "Jason, Brian adına bir hediyelik eşya dükkânının kirasını almaya gider ve dükkânın farklı bir işe de ev sahipliği yaptığını görür.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/lab-fees",
-      "locationTr": "Hediyelik eşya dükkânı",
+      "locationTr": "Key Lento · hediyelik eşya dükkânı ve Brian’ın deposu",
       "aliases": [
         "Lab Fees",
-        "COM_KBOS_SHOP"
+        "COM_KBOS_SHOP",
+        "Collect Brian’s Rent"
       ],
       "characters": [
-        "Jason"
+        "Jason Duval",
+        "Brian Heder",
+        "Dükkân görevlisi"
+      ],
+      "titleEn": "Lab Fees",
+      "requires": [
+        "gone-fishing"
+      ],
+      "textSourceUrl": "https://www.powerpyx.com/gta-6-lab-fees-collect-brians-rent-walkthrough/",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Brian’ın kira işi",
+          "environmentTr": "Key Lento’daki hediyelik eşya dükkânı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kasadaki görüşme",
+          "environmentTr": "Hediyelik eşya dükkânının satış alanı"
+        },
+        {
+          "id": "guide-3",
+          "titleTr": "Arka odaya geç",
+          "environmentTr": "Dükkândaki şifreli kapı ve laboratuvar"
+        },
+        {
+          "id": "guide-4",
+          "titleTr": "Teslimat",
+          "environmentTr": "Brian’ın güneydeki deposu"
+        },
+        {
+          "id": "guide-5",
+          "titleTr": "Ödeme",
+          "environmentTr": "Jason’ın evinin önündeki posta kutusu"
+        }
       ]
     },
     {
@@ -118,6 +188,19 @@
       ],
       "characters": [
         "Cal"
+      ],
+      "titleEn": "Unwanted Attention",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Cal’le yola çık",
+          "environmentTr": "Hamlet"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Phoenix’in teslimi",
+          "environmentTr": "Polis otoparkı, Pay ’n’ Spray ve Brian’ın deposu"
+        }
       ]
     },
     {
@@ -136,6 +219,18 @@
         "Jason",
         "Arnold",
         "Brian"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Aramanın nedeni",
+          "environmentTr": "Brian’ın görev bağlantısı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görevi bul",
+          "environmentTr": "Bölüm 1 haritası"
+        }
       ]
     },
     {
@@ -149,6 +244,18 @@
       "locationTr": "Mandy’nin evi",
       "aliases": [
         "COM_KBOS_NEIGHB"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kira ziyareti",
+          "environmentTr": "Mandy’nin evi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Evdeki iş",
+          "environmentTr": "Bakım gereken bölüm"
+        }
       ]
     },
     {
@@ -171,6 +278,11 @@
           "titleTr": "Evi hazırlama",
           "environmentTr": "Evin içi",
           "contextTr": "Mobilyaların yerini değiştirme ve dönüş için yapılan hazırlık."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Lucia’nın dönüşüne hazırlık",
+          "environmentTr": "Jason’ın evi"
         }
       ],
       "aliases": [
@@ -205,6 +317,11 @@
           "titleTr": "Kutlama",
           "environmentTr": "Rusty Anchor barı",
           "contextTr": "Kat ve Mattia’nın katıldığı akşam, çıkan kavganın ardından sona erer."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Kutlamanın bağlamı",
+          "environmentTr": "Rusty Anchor"
         }
       ],
       "aliases": [
@@ -226,6 +343,19 @@
       ],
       "characters": [
         "Jason"
+      ],
+      "titleEn": "Buck Me",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Lucia’nın hesabı",
+          "environmentTr": "Fleeca şubesi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görüşme sırası",
+          "environmentTr": "Bankanın müşteri alanı"
+        }
       ]
     },
     {
@@ -238,6 +368,18 @@
       "locationTr": "Grassrivers",
       "aliases": [
         "CTI_PIL_RD_BC_PARENT"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kayıp sevkiyat",
+          "environmentTr": "Grassrivers"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Arama bağlamı",
+          "environmentTr": "Bataklık çevresi"
+        }
       ]
     },
     {
@@ -256,6 +398,18 @@
         "Jason",
         "Lucia",
         "Brian"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Yeni iş için görüşme",
+          "environmentTr": "Marina"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görüşmenin yeri",
+          "environmentTr": "Rıhtım ve tekne çevresi"
+        }
       ]
     },
     {
@@ -267,11 +421,25 @@
       "sourceUrl": "https://six.mics.dev/missions/int-plnsh",
       "locationTr": "Leonida · uçuş ve motosikletçi grubun buluşması",
       "aliases": [
-        "INT_PLNSH"
+        "INT_PLNSH",
+        "Clear Skies"
       ],
       "characters": [
         "Donnie",
         "Brian"
+      ],
+      "titleEn": "Clear Skies",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Planlı uçuş",
+          "environmentTr": "Leonida hava sahası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Donnie’nin ek hamlesi",
+          "environmentTr": "Yerel motosikletçi grubun buluşması"
+        }
       ]
     },
     {
@@ -331,7 +499,19 @@
         "Lori",
         "Brian"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_AIR"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_AIR",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Gergin buluşma",
+          "environmentTr": "Grassrivers"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sulak alandaki takip",
+          "environmentTr": "Grassrivers kanalları"
+        }
+      ]
     },
     {
       "id": "com-kbos-clean",
@@ -343,10 +523,24 @@
       "locationTr": "Donnie’nin karavanı",
       "aliases": [
         "Clean Up After Donnie",
-        "COM_KBOS_CLEAN"
+        "COM_KBOS_CLEAN",
+        "Don Gone"
       ],
       "characters": [
         "Jason"
+      ],
+      "titleEn": "Don Gone",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Karavana dön",
+          "environmentTr": "Donnie’nin karavanı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "İşi tanı",
+          "environmentTr": "Görev işareti"
+        }
       ]
     },
     {
@@ -363,6 +557,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Cal’e destek",
+          "environmentTr": "Balık tutulan kıyı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sahnenin amacı",
+          "environmentTr": "Kıyı ve su çevresi"
+        }
       ]
     },
     {
@@ -379,6 +585,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Mattia’nın teklifi",
+          "environmentTr": "Grassrivers ziyaretçi merkezi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Çantayı takip et",
+          "environmentTr": "Ziyaretçi merkezinden çıkış"
+        }
       ]
     },
     {
@@ -386,13 +604,25 @@
       "titleTr": "BIL_HOUSE",
       "type": "story",
       "chapter": 1,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Lucia, Jason’ın evine dönüp orada saklanan eşyayı alır. Ardından Andy’nin aracına ulaşması gerekir.",
       "sourceUrl": "https://six.mics.dev/missions/bil-house",
       "aliases": [
         "BIL_HOUSE"
       ],
       "characters": [
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Eve dönüş ve Andy",
+          "environmentTr": "Jason’ın Key Lento’daki evi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Bölgeden çıkış",
+          "environmentTr": "Key Lento yolları"
+        }
       ]
     },
     {
@@ -411,7 +641,19 @@
         "Lucia",
         "Jason"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_WHEEL"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_WHEEL",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Hastaneye git",
+          "environmentTr": "Vice City Hospital"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Ayrılma",
+          "environmentTr": "Hastane ve çevresi"
+        }
+      ]
     },
     {
       "id": "island-dreams",
@@ -432,6 +674,11 @@
           "titleTr": "Batığa dalış",
           "environmentTr": "Gemi enkazı",
           "contextTr": "Rehberlik edilen dalış grubu ile hazine arayışı aynı bölgede buluşur."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Batık işi",
+          "environmentTr": "Su altındaki gemi enkazı"
         }
       ],
       "aliases": [
@@ -449,6 +696,18 @@
       "locationTr": "Evin içi",
       "aliases": [
         "COM_SFH_FLTPK"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Mobilya kurulumu",
+          "environmentTr": "Jason ve Lucia’nın evi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Ev sahnesi",
+          "environmentTr": "Evin içi"
+        }
       ]
     },
     {
@@ -462,6 +721,18 @@
       "locationTr": "Port Gellhorn · motel odası",
       "aliases": [
         "MTL_WAKE"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Yeni başlangıç",
+          "environmentTr": "Port Gellhorn’daki motel odası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Çantanın bağlantısı",
+          "environmentTr": "Motel odası"
+        }
       ]
     },
     {
@@ -469,7 +740,7 @@
       "titleTr": "FT_MOTEL_SHOP",
       "type": "story",
       "chapter": 2,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Bölüm 2 dizinindeki FT_MOTEL_SHOP kaydı bu kodla aranabilir. Söz konusu kayıt için Explorer altı diyalog sonucu gösteriyor.",
       "sourceUrl": "https://six.mics.dev/missions/ft-motel-shop",
       "aliases": [
         "FT_MOTEL_SHOP"
@@ -484,7 +755,8 @@
       "sourceUrl": "https://six.mics.dev/missions/mtl-drive",
       "locationTr": "Motel ve Port Gellhorn",
       "aliases": [
-        "MTL_DRIVE"
+        "MTL_DRIVE",
+        "Girl’s Trip"
       ],
       "characters": [
         "Jason",
@@ -492,6 +764,19 @@
         "Frankie",
         "Vicki",
         "Dunk"
+      ],
+      "titleEn": "Girl’s Trip",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "İhtiyaç",
+          "environmentTr": "Port Gellhorn moteli"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Bölgeyi tanı",
+          "environmentTr": "Port Gellhorn"
+        }
       ]
     },
     {
@@ -514,6 +799,11 @@
           "titleTr": "Tamirciyle tanışma",
           "environmentTr": "Oto tamir atölyesi",
           "contextTr": "Görüşmede Moses’ın hangi araçlarla ilgilendiği anlaşılır."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Araç bağlantısı",
+          "environmentTr": "Moses Watkins’in garajı"
         }
       ],
       "aliases": [
@@ -530,11 +820,25 @@
       "sourceUrl": "https://six.mics.dev/missions/cti-mech-stfc",
       "locationTr": "Moses’ın atölyesi ve araç teslimatı",
       "aliases": [
-        "CTI_MECH_STFC"
+        "CTI_MECH_STFC",
+        "Daily Driver"
       ],
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "titleEn": "Daily Driver",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Aranan araç",
+          "environmentTr": "Port Gellhorn ve çevresi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Atölye teslimi",
+          "environmentTr": "Moses’ın atölyesi"
+        }
       ]
     },
     {
@@ -542,13 +846,27 @@
       "titleTr": "MTL_PAIN",
       "type": "story",
       "chapter": 2,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Ağrı kesici arayışı tekrar Dunk’a ulaşır. Görev boyunca Dunk’la buluşma ve grupla yeniden bir araya gelme istemleri görünür.",
       "sourceUrl": "https://six.mics.dev/missions/mtl-pain",
       "aliases": [
-        "MTL_PAIN"
+        "MTL_PAIN",
+        "Slam Dunk"
       ],
       "characters": [
         "Dunk"
+      ],
+      "titleEn": "Slam Dunk",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Dunk’la buluşma",
+          "environmentTr": "Dunk’ın karavanı ve rıhtım çevresi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Dr. Bill bağlantısı",
+          "environmentTr": "İş yeri ve teslimat rotası"
+        }
       ]
     },
     {
@@ -566,7 +884,19 @@
       "characters": [
         "Jason"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MTL_MONT"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MTL_MONT",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Jason’ı kontrol et",
+          "environmentTr": "Port Gellhorn moteli"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Motel sahnesi",
+          "environmentTr": "Jason’ın kaldığı oda"
+        }
+      ]
     },
     {
       "id": "coffee-break",
@@ -584,7 +914,19 @@
         "Lucia",
         "Wyman"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:HO_PAR_FRINT"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:HO_PAR_FRINT",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Oturup plan yap",
+          "environmentTr": "Kahve buluşması"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görevin bağlamı",
+          "environmentTr": "Port Gellhorn"
+        }
+      ]
     },
     {
       "id": "afternoon-delight",
@@ -607,6 +949,11 @@
           "titleTr": "Kulüpteki özel gece",
           "environmentTr": "Delights Cabaret’nin gösteri alanı",
           "contextTr": "Vicki’nin önerisi, mekânın kadınlara ayrılan gecesinde hayata geçer."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Vicki’nin önerisi",
+          "environmentTr": "Delights Cabaret"
         }
       ],
       "aliases": [
@@ -623,13 +970,27 @@
       "sourceUrl": "https://six.mics.dev/missions/mtl-mud",
       "locationTr": "Thrillbilly Mud Club · çamur pisti",
       "aliases": [
-        "MTL_MUD"
+        "MTL_MUD",
+        "Thrillbillies"
       ],
       "characters": [
         "Jason",
         "Lucia",
         "Billy",
         "Wyman"
+      ],
+      "titleEn": "Thrillbillies",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Billy’yle tanış",
+          "environmentTr": "Thrillbilly Mud Club"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Pist denemesi",
+          "environmentTr": "Çamur parkuru"
+        }
       ]
     },
     {
@@ -641,7 +1002,8 @@
       "sourceUrl": "https://six.mics.dev/missions/csc-drt-cnvy",
       "locationTr": "Kelly County",
       "aliases": [
-        "CSC_DRT_CNVY"
+        "CSC_DRT_CNVY",
+        "Twist Wrist, Smash, Grab"
       ],
       "characters": [
         "Jason",
@@ -651,6 +1013,19 @@
         "Brittney",
         "Billy",
         "EJ"
+      ],
+      "titleEn": "Twist Wrist, Smash, Grab",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "İşe katıl",
+          "environmentTr": "Kelly County"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Konvoy sonrası",
+          "environmentTr": "Kelly County yolları"
+        }
       ]
     },
     {
@@ -662,11 +1037,25 @@
       "sourceUrl": "https://six.mics.dev/missions/bil-motel",
       "locationTr": "Motel ve Vice City güzergâhı",
       "aliases": [
-        "BIL_MOTEL"
+        "BIL_MOTEL",
+        "Checking Out"
       ],
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "titleEn": "Checking Out",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Motelden çık",
+          "environmentTr": "Port Gellhorn moteli"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Şehir değişimi",
+          "environmentTr": "Vice City yolu"
+        }
       ]
     },
     {
@@ -674,14 +1063,28 @@
       "titleTr": "CLB_MEET",
       "type": "story",
       "chapter": 2,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Jason ile Lucia kulüpte Dre’Quan’la görüşür. İşaretler binanın arka tarafı ile iç mekân arasında geçiş gösterir.",
       "sourceUrl": "https://six.mics.dev/missions/clb-meet",
       "aliases": [
-        "CLB_MEET"
+        "CLB_MEET",
+        "Welcome to Vice City"
       ],
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "titleEn": "Welcome to Vice City",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Dre’Quan’ı bul",
+          "environmentTr": "Jack of Hearts"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Daire bağlantısı",
+          "environmentTr": "Vice City’deki daire"
+        }
       ]
     },
     {
@@ -694,6 +1097,18 @@
       "titleEn": "Play Nurse",
       "aliases": [
         "MTL_CHECK"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Jason’ın bakımı",
+          "environmentTr": "Port Gellhorn moteli"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sonraki adım",
+          "environmentTr": "Motel ve çevresi"
+        }
       ]
     },
     {
@@ -705,7 +1120,21 @@
       "sourceUrl": "https://six.mics.dev/missions/up-mlspm",
       "locationTr": "Starlet Motel resepsiyonu",
       "aliases": [
-        "UP_MLSPM"
+        "UP_MLSPM",
+        "Overnight Charges"
+      ],
+      "titleEn": "Overnight Charges",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Linda’yla görüş",
+          "environmentTr": "Starlet Motel resepsiyonu"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Ödeme bağlantısı",
+          "environmentTr": "Motelin ön bürosu"
+        }
       ]
     },
     {
@@ -720,7 +1149,19 @@
       "aliases": [
         "FT_UP_MMRENT"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:FT_UP_MMRENT"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:FT_UP_MMRENT",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Gecikmiş hesap",
+          "environmentTr": "Starlet Motel"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kolyeyi geri al",
+          "environmentTr": "Motel yönetimi"
+        }
+      ]
     },
     {
       "id": "car-service",
@@ -763,10 +1204,24 @@
       "sourceUrl": "https://six.mics.dev/missions/clb-deal",
       "locationTr": "Vice City · Crosstown",
       "aliases": [
-        "CLB_DEAL"
+        "CLB_DEAL",
+        "Dealer’s Choice"
       ],
       "characters": [
         "Dre'Quan"
+      ],
+      "titleEn": "Dealer’s Choice",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Boobie’nin ricası",
+          "environmentTr": "Vice City’deki daire"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Crosstown bağlantısı",
+          "environmentTr": "Vice City · Crosstown"
+        }
       ]
     },
     {
@@ -774,7 +1229,7 @@
       "titleTr": "ROB_VEH",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Bu kaydın hedefleri Lucia’yla restoranda, Brian’la da mekânın bar ve balkon bölümlerinde buluşmayı içerir.",
       "sourceUrl": "https://six.mics.dev/missions/rob-veh",
       "aliases": [
         "ROB_VEH"
@@ -782,6 +1237,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Buluşmalar",
+          "environmentTr": "Restoran ve Brian’ın bulunduğu mekân"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Konteynerdeki araba",
+          "environmentTr": "Tersane ve depo"
+        }
       ]
     },
     {
@@ -789,7 +1256,7 @@
       "titleTr": "ANT_SRCH",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Arama Halifax’ın kaldığı yerle bağlantılıdır. Ekip motel ve antikacı arasında hareket eder.",
       "sourceUrl": "https://six.mics.dev/missions/ant-srch",
       "aliases": [
         "ANT_SRCH"
@@ -797,6 +1264,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Halifax’ı ara",
+          "environmentTr": "Motel"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Heykelin izi",
+          "environmentTr": "Evelyn Andrews Antiques"
+        }
       ]
     },
     {
@@ -804,7 +1283,7 @@
       "titleTr": "Şüpheli Köken",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Dubious Provenance adı katalogda birden fazla kez geçer. Bu kaydın oyun dosyasındaki ayırt edici kodu ANT_CHASE.",
       "sourceUrl": "https://six.mics.dev/missions/dubious-provenance",
       "titleEn": "Dubious Provenance",
       "aliases": [
@@ -814,7 +1293,14 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_CHASE"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_CHASE",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kayıt ayrımı",
+          "environmentTr": "Capri antika hikâyesi"
+        }
+      ]
     },
     {
       "id": "mami-knows-best",
@@ -842,6 +1328,11 @@
           "titleTr": "Komşularla karşılaşma",
           "environmentTr": "M7 üyelerinin bulunduğu yan ev",
           "contextTr": "Komşularla yaşanan anlaşmazlık ziyaretin merkezine oturur."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Ziyaretin sonucu",
+          "environmentTr": "Mia’nın portföyündeki ev"
         }
       ],
       "aliases": [
@@ -865,7 +1356,14 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DEAL_INTR"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DEAL_INTR",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "İş arayışı",
+          "environmentTr": "Vice City"
+        }
+      ]
     },
     {
       "id": "here-kitty-kitty",
@@ -878,7 +1376,19 @@
       "aliases": [
         "COM_DLR_MISS"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DLR_MISS"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DLR_MISS",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Charles’ı bul",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Araştırma sonucu",
+          "environmentTr": "Charles’ın bulunduğu alan"
+        }
+      ]
     },
     {
       "id": "ao-deal-t-synth",
@@ -890,6 +1400,18 @@
       "locationTr": "Vice City’deki laboratuvarlar",
       "aliases": [
         "AO_DEAL_T_SYNTH"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Tyrone’un hedefi",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Üretim yerleri",
+          "environmentTr": "Vice City’deki laboratuvarlar"
+        }
       ]
     },
     {
@@ -921,6 +1443,11 @@
           "titleTr": "Roxy’yi bulma",
           "environmentTr": "Ev partisi",
           "contextTr": "Roxy ile ekibin yeniden konuştuğu yer."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Gösteriden ev partisine",
+          "environmentTr": "Jack of Hearts ve sonraki buluşma"
         }
       ],
       "aliases": [
@@ -937,12 +1464,26 @@
       "sourceUrl": "https://six.mics.dev/missions/com-cbo-cbint",
       "locationTr": "Vice City · Little Cuba",
       "aliases": [
-        "COM_CBO_CBINT"
+        "COM_CBO_CBINT",
+        "Boobie Time"
       ],
       "characters": [
         "Yasmani",
         "Big Mike",
         "Boobie"
+      ],
+      "titleEn": "Boobie Time",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Şoförlük",
+          "environmentTr": "Vice City güzergâhı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Yasmani’yle tanış",
+          "environmentTr": "Little Cuba"
+        }
       ]
     },
     {
@@ -950,7 +1491,7 @@
       "titleTr": "ROB_DRIVE",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Jason ile Lucia, Raul’un belirlediği noktaya gider. Araç ve otopark istemleri buluşma bölümüne aittir.",
       "sourceUrl": "https://six.mics.dev/missions/rob-drive",
       "aliases": [
         "ROB_DRIVE"
@@ -959,6 +1500,18 @@
         "Jason",
         "Lucia",
         "Raul"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Raul’la buluş",
+          "environmentTr": "Rialto Islands ve otopark"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Teslimata dön",
+          "environmentTr": "Buluşma yeri ve teslim güzergâhı"
+        }
       ]
     },
     {
@@ -977,7 +1530,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_RED"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_RED",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Eve dön",
+          "environmentTr": "Jason ve Lucia’nın dairesi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sabit diskin durumu",
+          "environmentTr": "Daire ve depo bağlantısı"
+        }
+      ]
     },
     {
       "id": "rob-boat-j",
@@ -993,6 +1558,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Konvoyu bul",
+          "environmentTr": "Vice River"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Nehirden ayrıl",
+          "environmentTr": "Vice River ve çıkış rotası"
+        }
       ]
     },
     {
@@ -1000,7 +1577,7 @@
       "titleTr": "ROB_BANK",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Görev, bankaya gitmeden önce maskeler ve ekipmana ilişkin hedefler içerir.",
       "sourceUrl": "https://six.mics.dev/missions/rob-bank",
       "aliases": [
         "ROB_BANK"
@@ -1008,6 +1585,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Hazırlık odası",
+          "environmentTr": "Daire ve planlama alanı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Fleeca şubeleri",
+          "environmentTr": "Banka içi ve önündeki park alanı"
+        }
       ]
     },
     {
@@ -1026,7 +1615,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CTI_SHOW_HATH"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CTI_SHOW_HATH",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Randy’nin hedefi",
+          "environmentTr": "Araç buluşma alanı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Teslimat",
+          "environmentTr": "Randy’nin garajı"
+        }
+      ]
     },
     {
       "id": "randys-wish-list",
@@ -1039,6 +1640,18 @@
       "locationTr": "Randy Kozlov’un showroom’u",
       "aliases": [
         "AO_SHOW_L_EXP"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Listeyi al",
+          "environmentTr": "Randy Kozlov’un showroom’u"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Araçları takip et",
+          "environmentTr": "Vice City’deki teslimat ağı"
+        }
       ]
     },
     {
@@ -1050,11 +1663,25 @@
       "sourceUrl": "https://six.mics.dev/missions/ban-setup",
       "locationTr": "Sinfrontera National Bank",
       "aliases": [
-        "BAN_SETUP"
+        "BAN_SETUP",
+        "Sinfrontera National Bank"
       ],
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "titleEn": "Sinfrontera National Bank",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "İşin hedefi",
+          "environmentTr": "Sinfrontera National Bank"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Uzman bağlantısı",
+          "environmentTr": "Planlama görüşmesi"
+        }
       ]
     },
     {
@@ -1073,7 +1700,19 @@
         "Lucia",
         "Nicole"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_RESCU"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_RESCU",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Nicole Park’ı bul",
+          "environmentTr": "Banka hazırlığı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Raul’a götür",
+          "environmentTr": "Teslimata giden yol"
+        }
+      ]
     },
     {
       "id": "clb-steal",
@@ -1084,10 +1723,24 @@
       "sourceUrl": "https://six.mics.dev/missions/clb-steal",
       "locationTr": "Eris Flagship mağazası",
       "aliases": [
-        "CLB_STEAL"
+        "CLB_STEAL",
+        "Ride Or Die"
       ],
       "characters": [
         "Jason"
+      ],
+      "titleEn": "Ride Or Die",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Eris’te buluş",
+          "environmentTr": "Eris Flagship mağazası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Arabayı götür",
+          "environmentTr": "Vice City sokakları"
+        }
       ]
     },
     {
@@ -1107,7 +1760,19 @@
         "Pete",
         "Brian"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_EXPLO"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_EXPLO",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Pilot Pete’le buluş",
+          "environmentTr": "Sevkiyat buluşması"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Teslimat aksar",
+          "environmentTr": "Yükün indirildiği alan"
+        }
+      ]
     },
     {
       "id": "ban-carte",
@@ -1126,6 +1791,18 @@
         "Monty",
         "Karim",
         "Raul"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Monty’yle görüş",
+          "environmentTr": "Watson Bay"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Başka yere geç",
+          "environmentTr": "Vice City"
+        }
       ]
     },
     {
@@ -1133,7 +1810,7 @@
       "titleTr": "BAN_SAFE",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Banka hazırlığının bu bölümü Gil’in evindeki kasayla ilgilidir. Ekrandaki hedefler eve giriş ve kasanın bulunması arasında değişir.",
       "sourceUrl": "https://six.mics.dev/missions/ban-safe",
       "aliases": [
         "BAN_SAFE"
@@ -1142,6 +1819,18 @@
         "Jason",
         "Lucia",
         "Felipe"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Gil’in malikanesi",
+          "environmentTr": "Malikane ve çalışma odası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kasayı taşı",
+          "environmentTr": "Malikaneden Felipe’nin teslim noktasına"
+        }
       ]
     },
     {
@@ -1157,6 +1846,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Çekimi kur",
+          "environmentTr": "Müzik klibi seti"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Setin amacı",
+          "environmentTr": "Klip çekimi"
+        }
       ]
     },
     {
@@ -1175,7 +1876,19 @@
         "Lucia",
         "Boobie"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_TOWER"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_TOWER",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Boobie’nin işi",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kayıt ve kaynak",
+          "environmentTr": "Bölüm 3"
+        }
+      ]
     },
     {
       "id": "ft-ban-distr",
@@ -1191,6 +1904,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Karim’in hazırlığı",
+          "environmentTr": "Vice City haberleşme kuleleri"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Hikâye bağlantısı",
+          "environmentTr": "Raul’la görüşme"
+        }
       ]
     },
     {
@@ -1213,14 +1938,26 @@
         "Karim",
         "Raul"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_FINAL"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_FINAL",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Hazırlık sonrası",
+          "environmentTr": "Sinfrontera National Bank"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "İşin ardından",
+          "environmentTr": "Y Hotel bağlantısı"
+        }
+      ]
     },
     {
       "id": "ant-recov",
       "titleTr": "ANT_RECOV",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "ANT_RECOV, aynı bölümdeki heykel arayışından ve Halifax’la buluşmadan ayrı bir oyun dosyası kaydıdır.",
       "sourceUrl": "https://six.mics.dev/missions/ant-recov",
       "aliases": [
         "ANT_RECOV"
@@ -1228,6 +1965,13 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kayıt bağlamı",
+          "environmentTr": "Bölüm 3 antika kayıtları"
+        }
       ]
     },
     {
@@ -1246,7 +1990,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_INTRO"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_INTRO",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Heykeli göster",
+          "environmentTr": "Capri’deki antikacı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kayıt ayrımı",
+          "environmentTr": "Antika dükkânı"
+        }
+      ]
     },
     {
       "id": "ant-give",
@@ -1258,6 +2014,18 @@
       "locationTr": "Capri · antikacı dükkânı",
       "aliases": [
         "ANT_GIVE"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Halifax’la buluş",
+          "environmentTr": "Capri antika dükkânı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Heykeli bırak",
+          "environmentTr": "Antikacının görüşme alanı"
+        }
       ]
     },
     {
@@ -1274,6 +2042,18 @@
         "Jason",
         "Lucia",
         "Karim"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Karim’in rehberliği",
+          "environmentTr": "Görevin işaretli alanları"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sinfrontera bağlantısı",
+          "environmentTr": "Bölüm 3"
+        }
       ]
     },
     {
@@ -1317,6 +2097,18 @@
         "Jason",
         "Lucia",
         "Rob"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Araçları al",
+          "environmentTr": "Araç teslim noktaları"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Otele dön",
+          "environmentTr": "Y Hotel"
+        }
       ]
     },
     {
@@ -1337,7 +2129,19 @@
         "Abe Gonzalez",
         "CSC_DIG_DATA"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_DIG_DATA"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_DIG_DATA",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Avukatı bul",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görüşmenin bağlamı",
+          "environmentTr": "Avukat görüşmesi"
+        }
+      ]
     },
     {
       "id": "mny-party",
@@ -1357,6 +2161,18 @@
         "Valentina",
         "Petra",
         "Elonzo"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Açılışı izle",
+          "environmentTr": "Megamundo Network merkezi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Etkinliğin seyri",
+          "environmentTr": "Megamundo’nun açılış alanı"
+        }
       ]
     },
     {
@@ -1374,6 +2190,18 @@
         "Lucia",
         "Nate",
         "J-Wang"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kordell’in ekibi",
+          "environmentTr": "Ajax Gym ve Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Havaalanı bağlantısı",
+          "environmentTr": "Araç takibi"
+        }
       ]
     },
     {
@@ -1391,7 +2219,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_HELI"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_HELI",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Dre’Quan’ın çekimi",
+          "environmentTr": "Vice City tanıtım seti"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Çekimin türü",
+          "environmentTr": "Tanıtım sahnesi"
+        }
+      ]
     },
     {
       "id": "air-train",
@@ -1408,6 +2248,18 @@
         "Lucia",
         "Nate",
         "Jason"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Nate’le çalış",
+          "environmentTr": "Ajax Gym"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Özel salon",
+          "environmentTr": "Ajax Gym’in Trauma Floor bölümü"
+        }
       ]
     },
     {
@@ -1423,6 +2275,18 @@
       ],
       "aliases": [
         "CLB_PROMO"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Organizatöre ulaş",
+          "environmentTr": "Vice City kulüp çevresi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Müzik işleri bağlantısı",
+          "environmentTr": "Kulüp tanıtımı"
+        }
       ]
     },
     {
@@ -1440,7 +2304,19 @@
       "characters": [
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_BEACH"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_BEACH",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Nate’le buluş",
+          "environmentTr": "Ocean Beach"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kordell bağlantısı",
+          "environmentTr": "Ocean Beach teslim noktası"
+        }
+      ]
     },
     {
       "id": "amateur-hour",
@@ -1457,7 +2333,19 @@
         "Francisco",
         "Omar"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_BUS"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_BUS",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Cisco’nun ricası",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Ekibe yaklaşma",
+          "environmentTr": "Cisco’nun buluşması"
+        }
+      ]
     },
     {
       "id": "dirty-work",
@@ -1474,7 +2362,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_GANG"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_GANG",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Raina’yla bağlantı",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sahne için kaynak",
+          "environmentTr": "Bölüm 4"
+        }
+      ]
     },
     {
       "id": "too-much-baggage",
@@ -1491,7 +2391,19 @@
       "characters": [
         "Jason"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_SCOPE"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_SCOPE",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Bagaj vardiyası",
+          "environmentTr": "Vice City International Airport"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Karim’in hazırlığı",
+          "environmentTr": "Havaalanı bagaj alanı"
+        }
+      ]
     },
     {
       "id": "adventures-in-babysitting",
@@ -1508,7 +2420,19 @@
       "characters": [
         "Jason"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MNY_ESCRT"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MNY_ESCRT",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Güvenlik vardiyası",
+          "environmentTr": "The Vault gece kulübü"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Eve dönüş",
+          "environmentTr": "Andrés’in evi"
+        }
+      ]
     },
     {
       "id": "fresh-evidence",
@@ -1526,14 +2450,26 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_EVI"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_EVI",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kanıtı ara",
+          "environmentTr": "Dante Fresh’in malikanesi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Briana’yla bağlantı",
+          "environmentTr": "VYB açılış hazırlığı"
+        }
+      ]
     },
     {
       "id": "air-truck",
       "titleTr": "AIR_TRUCK",
       "type": "story",
       "chapter": 4,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "Görev kaydında Lucia, Nate ve Kordell’le bağlantılı bir görüşme başlatır. Ekip, hazırlanan işin planlarını arar.",
       "sourceUrl": "https://six.mics.dev/missions/air-truck",
       "aliases": [
         "AIR_TRUCK"
@@ -1541,6 +2477,18 @@
       "characters": [
         "Lucia",
         "Nate"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kordell’e ulaş",
+          "environmentTr": "Bina resepsiyonu ve planlama odası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Ekipte kal",
+          "environmentTr": "Yol ve planlama alanı"
+        }
       ]
     },
     {
@@ -1557,6 +2505,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Rafa’nın yeri",
+          "environmentTr": "Çimento fabrikası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görüşmenin sonu",
+          "environmentTr": "Fabrikadan ayrılış"
+        }
       ]
     },
     {
@@ -1575,7 +2535,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_PARTY"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_PARTY",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Gösteriye hazırlan",
+          "environmentTr": "VYB"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sanatçı odasına git",
+          "environmentTr": "VYB sahne arkası"
+        }
+      ]
     },
     {
       "id": "close-surveillance",
@@ -1589,7 +2561,19 @@
       "aliases": [
         "AIR_DRONE"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_DRONE"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_DRONE",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Nate ve Cisco’yu izle",
+          "environmentTr": "Ocean Beach"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Omar’ın dairesi",
+          "environmentTr": "Vice City"
+        }
+      ]
     },
     {
       "id": "delivery-method",
@@ -1607,7 +2591,19 @@
         "Jason",
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_HACK"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_HACK",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "TSS’ye git",
+          "environmentTr": "TSS ofisleri"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sistem hazırlığı",
+          "environmentTr": "Ofis içi"
+        }
+      ]
     },
     {
       "id": "team-building",
@@ -1624,7 +2620,19 @@
         "Lucia",
         "Kordell"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_RECRU"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_RECRU",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Ekiple tanış",
+          "environmentTr": "Kordell’in buluşması"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Hazırlık bağlamı",
+          "environmentTr": "Vice City"
+        }
+      ]
     },
     {
       "id": "fully-catered",
@@ -1643,7 +2651,19 @@
         "Lucia",
         "Raul"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_CATER"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_CATER",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "İkram aracını bul",
+          "environmentTr": "Havaalanı ikram aracı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Çantalar ve konuşma",
+          "environmentTr": "Planlama alanı"
+        }
+      ]
     },
     {
       "id": "vcia-takedown",
@@ -1665,7 +2685,19 @@
         "Andrea",
         "Francisco"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_FINAL"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_FINAL",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kargo bölümüne giriş",
+          "environmentTr": "Vice City International Airport"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Havaalanından çıkış",
+          "environmentTr": "Terminal, pist ve ulaşım yolları"
+        }
+      ]
     },
     {
       "id": "blood-sweat-and-gear",
@@ -1679,7 +2711,19 @@
       "aliases": [
         "COM_UP_BBWOR"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_UP_BBWOR"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_UP_BBWOR",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Ekibin antrenmanı",
+          "environmentTr": "Ajax Gym özel alanı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Çalışmanın sonucu",
+          "environmentTr": "Ajax Gym"
+        }
+      ]
     },
     {
       "id": "sfh-taxi",
@@ -1690,6 +2734,18 @@
       "sourceUrl": "https://six.mics.dev/missions/sfh-taxi",
       "aliases": [
         "SFH_TAXI"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Geçmişe dönüş",
+          "environmentTr": "Lucia’nın hatırladığı sabah"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Olayın zamanı",
+          "environmentTr": "Geçmiş sahnesi"
+        }
       ]
     },
     {
@@ -1706,6 +2762,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Raul’la görüş",
+          "environmentTr": "Ocean Beach Marina"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Hikâye bağlantısı",
+          "environmentTr": "Raul’un teknesi"
+        }
       ]
     },
     {
@@ -1725,7 +2793,19 @@
         "Sıfırdan Başla",
         "BIL_CONFR"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_CONFR"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_CONFR",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Dikkat çekmeden ilerle",
+          "environmentTr": "Vice City"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kayıt bağlamı",
+          "environmentTr": "Şehirdeki takip"
+        }
+      ]
     },
     {
       "id": "coa-helis",
@@ -1743,6 +2823,18 @@
         "Lucia",
         "Giorgio",
         "Vinny"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Giorgio’nun açıklaması",
+          "environmentTr": "Giorgio’nun çatı katı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Tesis keşfi",
+          "environmentTr": "Sahil güvenlik merkezi ve Mile Zero Air Station"
+        }
       ]
     },
     {
@@ -1759,6 +2851,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Spa görüşmesi",
+          "environmentTr": "Giorgio’nun spası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Yeni koşul",
+          "environmentTr": "Spa ve çıkış alanı"
+        }
       ]
     },
     {
@@ -1778,6 +2882,18 @@
         "Kat",
         "Mattia",
         "Dardan"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kat’ın durumu",
+          "environmentTr": "Giorgio’nun çatı katı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Yol hazırlığı",
+          "environmentTr": "Çatı katı ve binadan çıkış"
+        }
       ]
     },
     {
@@ -1807,6 +2923,11 @@
           "titleTr": "Gemiden ayrılma",
           "environmentTr": "Gemi ve helikopter",
           "contextTr": "Lucia ile Vinny köpekle birlikte gemiden uzaklaşır."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Rocco’nun önemi",
+          "environmentTr": "Liman"
         }
       ],
       "aliases": [
@@ -1829,6 +2950,18 @@
         "Jason",
         "Lucia",
         "Rocco"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Rakip sevkiyat",
+          "environmentTr": "Yük gemisi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "El konulan yük",
+          "environmentTr": "Sahil güvenlik merkezi"
+        }
       ]
     },
     {
@@ -1846,6 +2979,18 @@
         "Dardan",
         "Lucia",
         "Jason"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Ayrı görüşmeler",
+          "environmentTr": "Gözaltı ve savcılık"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Çıkış",
+          "environmentTr": "Polisle karşılaşma"
+        }
       ]
     },
     {
@@ -1862,6 +3007,18 @@
       "characters": [
         "Jason",
         "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Finale ilerle",
+          "environmentTr": "Bölüm 5 finali"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Bitiriş kaydı ayrımı",
+          "environmentTr": "Final sonrası oyun ekranı"
+        }
       ]
     },
     {
@@ -1873,6 +3030,18 @@
       "sourceUrl": "https://six.mics.dev/missions/bil-law",
       "aliases": [
         "BIL_LAW"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Anlaşmayı görüş",
+          "environmentTr": "Abe Gonzalez’le görüşme"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Önceki avukat görüşmesi",
+          "environmentTr": "Bölüm 5"
+        }
       ]
     },
     {
@@ -1885,6 +3054,18 @@
       "titleEn": "The End of the Road",
       "aliases": [
         "FIN_CONT"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Finalden sonra",
+          "environmentTr": "Oyun bitiş ekranı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kayıt bağlamı",
+          "environmentTr": "Menü"
+        }
       ]
     },
     {
@@ -1902,7 +3083,19 @@
       "characters": [
         "Lucia"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_MOM_MSEVN"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_MOM_MSEVN",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Mia’yı bul",
+          "environmentTr": "Güney Leonida"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Mülk görüşmesi",
+          "environmentTr": "Güney Leonida’daki yeni bina"
+        }
+      ]
     },
     {
       "id": "spin-on-this",
@@ -1919,7 +3112,19 @@
         "Tyrone",
         "Dook"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DLR_COOK"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DLR_COOK",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Son üretim noktası",
+          "environmentTr": "Kitty Litter tesisi"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Görevin yeri",
+          "environmentTr": "Bölüm 5"
+        }
+      ]
     },
     {
       "id": "delivery-day",
@@ -1937,6 +3142,18 @@
         "Jason",
         "Lucia",
         "Randy"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Son iki araç",
+          "environmentTr": "Randy’nin araç teslimat rotası"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Rıhtıma ulaş",
+          "environmentTr": "Millport rıhtımları"
+        }
       ]
     },
     {
@@ -1951,18 +3168,37 @@
       "aliases": [
         "CTI_PIL_RD_SH"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CTI_PIL_RD_SH"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CTI_PIL_RD_SH",
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Kaybolan paket",
+          "environmentTr": "Bataklık"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Kayıt ayrımı",
+          "environmentTr": "Bölüm 5 oyun dizini"
+        }
+      ]
     },
     {
       "id": "prologue-int-cred",
       "titleTr": "Prolog · Jenerik Kaydı",
       "type": "story",
       "chapter": 5,
-      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "summaryTr": "INT_CRED, Explorer dizininde Prologue başlığı altında görünen ayrı bir koddur. Cezaevi görüşmesiyle başlayan oynanabilir Prolog kaydı ayrıca listelenir.",
       "sourceUrl": "https://six.mics.dev/missions/prologue-int-cred",
       "titleEn": "Prologue",
       "aliases": [
         "INT_CRED"
+      ],
+      "scenes": [
+        {
+          "id": "guide-1",
+          "titleTr": "Jenerik kaydı",
+          "environmentTr": "Açılış geçişi"
+        }
       ]
     },
     {
@@ -1985,6 +3221,11 @@
           "titleTr": "Sahil gösterisi",
           "environmentTr": "Ocean Beach gösteri alanı",
           "contextTr": "Papa Audacity’nin motosiklet gösterisi projeyi tanıtır."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "İlk davet",
+          "environmentTr": "Ocean Beach"
         }
       ]
     },
@@ -2011,6 +3252,16 @@
           "titleTr": "Sürüş parkuru",
           "environmentTr": "Çok katlı otoparkın alt katı",
           "contextTr": "İlk motosiklet parkuru için yönlendirme burada verilir."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Sınava git",
+          "environmentTr": "La Perle otoparkı"
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Sınavın sonu",
+          "environmentTr": "Otopark katları"
         }
       ],
       "requires": [
@@ -2047,6 +3298,11 @@
           "titleTr": "Havadaki gösteri",
           "environmentTr": "Catalan Key üzeri",
           "contextTr": "Ekip, atlayış için helikopterle bölgenin üzerine çıkar."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Hazırlık sahnesi",
+          "environmentTr": "Peacock Bay Condominiums"
         }
       ],
       "requires": [
@@ -2073,6 +3329,11 @@
           "titleTr": "Şehirde tanıtım atlayışları",
           "environmentTr": "Vice City’deki işaretli alanlar",
           "contextTr": "Ayrı noktalardaki atlayışlar aynı tanıtım çalışmasına bağlıdır."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Şehirdeki duraklar",
+          "environmentTr": "Ocean Beach, Dalton Island ve Stockyard"
         }
       ],
       "requires": [
@@ -2107,6 +3368,11 @@
           "titleTr": "Tanıtım uçuşu",
           "environmentTr": "Liman, Tequesta Retreat ve adliye çevresi",
           "contextTr": "Şehir üstündeki farklı geçiş noktaları tanıtımın parçalarıdır."
+        },
+        {
+          "id": "guide-2",
+          "titleTr": "Lansmanın bağlantısı",
+          "environmentTr": "Vice City hava rotası"
         }
       ],
       "requires": [
@@ -2158,6 +3424,11 @@
           "titleTr": "Partiden ayrılma",
           "environmentTr": "Havuzun karşısındaki bina ve sokak",
           "contextTr": "Gösterinin ardından kalabalıktan çıkış, binadaki asansör üzerinden gerçekleşir."
+        },
+        {
+          "id": "guide-1",
+          "titleTr": "Lansmandaki zamanlama",
+          "environmentTr": "Tequesta’daki çatı ve havuz"
         }
       ],
       "requires": [

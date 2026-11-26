@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Brian’ın işi öncesinde Jason silah dükkânına uğrar. Alınması gereken ekipman dükkânın uzun namlulu silahlar bölümündedir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Alımı tamamlayınca dükkândan çık. Bir sonraki Brian işi için haritadaki yeni görev etiketini kontrol et.",
+    "sceneId": "guide-2"
+  }
+]

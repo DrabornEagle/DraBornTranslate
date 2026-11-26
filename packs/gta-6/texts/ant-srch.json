@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Arama Halifax’ın kaldığı yerle bağlantılıdır. Ekip motel ve antikacı arasında hareket eder.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Antikacıda aranan eşya heykeldir. Arama sırasında içerideki kişilerin dikkatini çekmek görevi kesintiye uğratabilir.",
+    "sceneId": "guide-2"
+  }
+]

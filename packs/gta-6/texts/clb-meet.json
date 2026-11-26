@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ile Lucia kulüpte Dre’Quan’la görüşür. İşaretler binanın arka tarafı ile iç mekân arasında geçiş gösterir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Kulüp buluşması ve ikilinin kullanacağı daireye gidilmesi aynı görev dizisinde görünür.",
+    "sceneId": "guide-2"
+  }
+]

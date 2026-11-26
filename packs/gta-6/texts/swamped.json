@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Brian ve Lori, Donnie yüzünden açılan anlaşmazlığı Kingfishers’la çözmek ister. Buluşma planlandığı gibi gitmez.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Görüşme bittikten sonra olay sulak alanı geçen bir takibe dönüşür. Bu kısım Lori’yi kurtarmaya odaklanır.",
+    "sceneId": "guide-2"
+  }
+]

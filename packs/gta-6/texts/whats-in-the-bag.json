@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia önceki bölümde taşıdıkları çantayı motel odasında açar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Çantaya ilişkin konuşma, Mattia’nın Grassrivers’ta verdiği işin devamıdır. Bu kayıtla Jason’ın bakım ihtiyaçlarına ilişkin motel görevleri açılır.",
+    "sceneId": "guide-2"
+  }
+]

@@ -397,10 +397,8 @@ class FocusActivity : Activity() {
             }
             addView(row().apply {
                 setPadding(dp(12), dp(8), dp(12), dp(8))
-                addView(press("‹") { dialog.dismiss() }.apply {
-                    contentDescription = "Tam ekranı kapat"
-                    textSize = 24f
-                }, LinearLayout.LayoutParams(dp(48), dp(48)))
+                addView(backButton(Palette.blue, "Tam ekranı kapat") { dialog.dismiss() },
+                    LinearLayout.LayoutParams(dp(48), dp(48)))
                 addView(copy("Tam ekran", 17, Palette.white, true).apply { isAccessibilityHeading = true },
                     LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(10); marginEnd = dp(8) })
                 addView(toggle, LinearLayout.LayoutParams(-2, -2))

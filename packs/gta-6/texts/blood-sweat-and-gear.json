@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia, Kordell’in ekibinin kullandığı özel salonda onlarla antrenman yapar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Burada amaç ekibin Lucia’yı kendi çevresine kabul etmesini sağlamaktır. Sonraki görevlerde salon bağlantıları havaalanı hazırlığına açılır.",
+    "sceneId": "guide-2"
+  }
+]

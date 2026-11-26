@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Linda, 900 dolarlık oda borcuna karşılık kolyeyi elinde tutar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Borcun kapatılması, teminatın geri alınmasıyla bağlantılıdır. Gösterilen ödeme hedefi motelin ön bürosuna aittir.",
+    "sceneId": "guide-2"
+  }
+]

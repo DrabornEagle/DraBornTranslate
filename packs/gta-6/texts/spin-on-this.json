@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Önceki üretim tesisleriyle bağlantılı bu iş, kalan son üretim noktasına odaklanır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bölüm 3’te Tyrone’la başlayan üretim araştırmasının son kayıtlarından biridir. Ayrıntılı dış referansa görev kaynağından geçilebilir.",
+    "sceneId": "guide-2"
+  }
+]

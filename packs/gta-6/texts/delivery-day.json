@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Randy’nin listesinde kalan iki lüks araç sevkiyat için rıhtıma götürülür.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Yolda rakip bir araç hırsızlığı ekibi belirir. Jason, Lucia ve Randy otomobilleri limana ulaştırmaya çalışır.",
+    "sceneId": "guide-2"
+  }
+]

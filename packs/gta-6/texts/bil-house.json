@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia, Jason’ın evine dönüp orada saklanan eşyayı alır. Ardından Andy’nin aracına ulaşması gerekir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Andy’yle birlikte mahalleden çıkılırken polis takibi başlar. Alanı terk etmeye ilişkin hedefler bu kaçış aşamasına aittir.",
+    "sceneId": "guide-2"
+  }
+]

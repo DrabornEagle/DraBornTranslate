@@ -1,0 +1,27 @@
+[
+  {
+    "type": "guide",
+    "tr": "Kapalı dükkânın önündeyken oyun içi telefonla Brian’a ulaş. Görev, dükkâna girdiğinde Lab Fees adıyla görünür.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Görevli parayı ödeyemediğini söyler. Borcu kapatmak için Jason’a dükkânın arkasındaki laboratuvardan ürün almasını teklif eder.",
+    "sceneId": "guide-2"
+  },
+  {
+    "type": "guide",
+    "tr": "Tuş takımında oyun içi kapı kodu 0420 kullanılır. Kod, satış alanındaki not defterinde de bulunur. Çantayı arka odadan al.",
+    "sceneId": "guide-3"
+  },
+  {
+    "type": "guide",
+    "tr": "Dükkândan çıktıktan sonra Brian’ı telefonla ara. Yeşil harita işaretinin gösterdiği deponun oyun içi kodu 7700. Çantayı içeride bırak.",
+    "sceneId": "guide-4"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu aşamada Jason’ın banka hesabı olmadığı için 600 dolarlık görev ödülü daha sonra eve gönderilir.",
+    "sceneId": "guide-5"
+  }
+]

@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Cal ve Jason, Lucia gelmeden önce mobilyaların yerini değiştirip evi hazırlar.",
     "sceneId": "home"
+  },
+  {
+    "type": "guide",
+    "tr": "Cal’le taşınan mobilyalar, Lucia tahliye olmadan önce eve yer açmak içindir. Evi hazırlama görevinin bağlamı, sonrasında açılabilen alışveriş işlerinden ayrıdır.",
+    "sceneId": "guide-1"
   }
 ]

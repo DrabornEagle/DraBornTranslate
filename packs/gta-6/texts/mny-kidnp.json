@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Andrés, Jason ve Lucia’yla birlikte Rafa’yı bulmak için fabrikaya gider.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Çatışmanın ardından Rafa ailesine döner. Abe daha sonra Jason ve Lucia’nın yeni kimlikleri hakkında haber verir.",
+    "sceneId": "guide-2"
+  }
+]

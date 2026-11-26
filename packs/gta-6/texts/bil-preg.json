@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Kat doğuma yaklaşırken Mattia yardım istemek için Jason ile Lucia’ya ulaşır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu kaydın önceliği Kat’a yardım etmektir. Çatı katındaki diğer Giorgio görüşmeleri farklı hedeflere bağlanır.",
+    "sceneId": "guide-2"
+  }
+]

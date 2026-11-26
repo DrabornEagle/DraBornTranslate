@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason, Andrés de León’a kulüpte eşlik eder. FAP’ın girişimiyle güvenlik işi aniden kaçışa döner.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Jason ve Andrés eve ulaştığında Rafa’nın götürüldüğü anlaşılır. Bu gelişme çimento fabrikasındaki sonraki görevi başlatır.",
+    "sceneId": "guide-2"
+  }
+]

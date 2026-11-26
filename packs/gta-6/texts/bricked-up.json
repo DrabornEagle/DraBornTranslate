@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Boobie, Jason ile Lucia’yı birlikte yürütülecek bir iş için çağırır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Görev adını ararken Bricked Up başlığını kullan. Kamusal görev dizininde Jason, Lucia ve Boobie bu kayda bağlanır.",
+    "sceneId": "guide-2"
+  }
+]

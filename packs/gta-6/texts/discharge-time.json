@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Görev, Lucia’nın hastane ziyaretiyle açılır. Girişteki görev işaretinin gösterdiği görüşmeyi takip et.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Hastanedeki gelişmeler planı değiştirir. İçerideki görüşme ve tesis dışındaki hareketi aynı görev zincirinin parçaları olarak izle.",
+    "sceneId": "guide-2"
+  }
+]

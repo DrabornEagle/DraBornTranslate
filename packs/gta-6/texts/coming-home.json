@@ -8,5 +8,10 @@
     "type": "guide",
     "tr": "Kutlama sırasında Kat ve Mattia’yla tanışılır. Akşam çıkan tartışmayla kısa kesilir.",
     "sceneId": "rusty-anchor"
+  },
+  {
+    "type": "guide",
+    "tr": "Kat, Lucia’yı cezaevinden tanır. Mattia’nın da katıldığı akşam, tahliye kutlamasından ilerideki iş bağlantılarına uzanır.",
+    "sceneId": "guide-1"
   }
 ]

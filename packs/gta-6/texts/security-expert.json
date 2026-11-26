@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Nicole, Sinfrontera’nın güvenlik sistemine ilişkin uzmanlığı nedeniyle ekibin planına dahil olur.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Nicole’la buluştuktan sonra hedef, onu Raul’un bulunduğu noktaya ulaştırmaktır. İşin tamamlanması bankadan önceki hazırlığı ilerletir.",
+    "sceneId": "guide-2"
+  }
+]

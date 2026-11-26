@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Bu kaydın hedefleri Lucia’yla restoranda, Brian’la da mekânın bar ve balkon bölümlerinde buluşmayı içerir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Açılan başka bir bölümde konteynerden bir araba çıkarılır. Aracı sağlam tutarak oyundaki depo işaretine ilerle.",
+    "sceneId": "guide-2"
+  }
+]

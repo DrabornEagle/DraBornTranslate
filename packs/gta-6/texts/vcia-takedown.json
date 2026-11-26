@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia, Nate’in ekibiyle kargo alanına girerken Jason’ın görevi tesisin diğer yanına yayılır. Ekrandaki karakter değişimleri hazırlıkları eşzamanlı gösterir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "İç bölümdeki para hazırlığı bittikten sonra takip uçak ve kamyon çevresine kayar. Görev sonundaki hedefler tekrar ekiple buluşmaya yönlendirir.",
+    "sceneId": "guide-2"
+  }
+]

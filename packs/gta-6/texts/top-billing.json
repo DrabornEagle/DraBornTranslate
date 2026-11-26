@@ -8,5 +8,10 @@
     "type": "guide",
     "tr": "Ekip, Roxy’yle konuşmak için gittiği ev partisinde yeniden bir araya gelir.",
     "sceneId": "house-party"
+  },
+  {
+    "type": "guide",
+    "tr": "Roxy’nin ayrılmasıyla Dre’Quan ve Bae-Luxe, Jason ve Lucia’yla birlikte onu aramaya yönelir. Kulüp mekânı ile ev partisi aynı geceye ait iki farklı sahnedir.",
+    "sceneId": "guide-1"
   }
 ]

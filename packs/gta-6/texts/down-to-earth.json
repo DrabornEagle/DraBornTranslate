@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Brian Jason’ı yeni bir iş konuşmak üzere marinaya çağırır. Lucia da buluşmaya katılır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Brian’ın harita işaretine git. Bu kayıttaki buluşma başlangıcını, Donnie’yle daha sonra yapılan uçak işinden ayır.",
+    "sceneId": "guide-2"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "İşaretlenen araç Granforma Zorrusso’dur. Randy’nin genel listesinden bağımsız olarak bu kayıt tek bir araca odaklanır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Araçla Randy’nin gösterdiği teslim noktasına git. Teslimat tamamlandığında lüks araç işinin bu bölümü kapanır.",
+    "sceneId": "guide-2"
+  }
+]

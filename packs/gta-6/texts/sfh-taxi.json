@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia’nın tutuklanmasından önce Tomás’la geçirdiği son sabaha dönülür.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu kayıt, Jason ve Lucia’nın Bölüm 5’teki şimdiki zamanından önce geçer. Hangi sözün hangi zamana ait olduğunu ayırt etmek için açılış geçişine dikkat et.",
+    "sceneId": "guide-2"
+  }
+]

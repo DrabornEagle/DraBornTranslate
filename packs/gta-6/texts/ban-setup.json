@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Raul’un planı, La Polilla Negra’nın kullandığı bankaya odaklanır. Hazırlık ekibi bankanın düzeni ve giriş çıkışları hakkında bilgi toplar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Raul ve Andrea, güvenlik düzenini anlamak için Nicole Park’ın gerekli olduğunu açıklar. Onu bulma kısmı Güvenlik Uzmanı görevine bağlı.",
+    "sceneId": "guide-2"
+  }
+]

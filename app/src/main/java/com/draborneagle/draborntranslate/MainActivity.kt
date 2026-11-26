@@ -345,13 +345,7 @@ class MainActivity : Activity() {
         pageRoot(stack().apply {
             addView(row().apply {
                 setPadding(dp(16), dp(4), dp(16), dp(4))
-                addView(press("‹") { finish() }.apply {
-                    background = RippleDrawable(ColorStateList.valueOf(0x29FFFFFF),
-                        filled(0xFF211A31.toInt(), 24, 0xFF47385F.toInt()), null)
-                    textSize = 27f
-                    setTextColor(Palette.purple)
-                    contentDescription = "Geri"
-                }, LinearLayout.LayoutParams(dp(48), dp(48)))
+                addView(backButton(Palette.purple) { finish() }, LinearLayout.LayoutParams(dp(48), dp(48)))
                 addView(copy("PlayStation Portal", 22, Palette.white, true).apply {
                     isAccessibilityHeading = true
                 }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(13) })

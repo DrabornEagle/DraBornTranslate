@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia, Raina’nın dahil olduğu bir işi ele alır. Bu görev ekibin şehirdeki yeni iş bağlantılarını genişletir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Rehberlerde Dirty Work adıyla geçen bu kayıtta izlenebilen kesin konum için görev kaynağını aç.",
+    "sceneId": "guide-2"
+  }
+]

@@ -1,8 +1,8 @@
 # GTA 6 görev paketi
 
-**DraBornTranslate v0.6.1** içindeki **Oyun paketleri → GTA 6 paketini indir** düğmesi GitHub’daki manifesti ve ona karşılık gelen ZIP’i indirir. **Görev ara** Türkçe başlığı, İngilizce başlığı, görev kodunu ve bilinen diğer adları arar. İndirilen görev bilgileri ve metinler çevrimdışı açılır.
+**Oyun paketleri → GTA 6 paketini indir** düğmesi GitHub’daki manifesti ve ona karşılık gelen ZIP’i indirir. **Görev ara** bölümündeki **Türkçe** ve **İngilizce** seçenekleri başlıkların hangi dilde gösterileceğini ve eşit arama sonuçlarının sırasını belirler. Oyun dosyası kodu ve bilinen diğer adlar iki seçimde de aranabilir. İndirilen görev bilgileri ve metinler çevrimdışı açılır.
 
-Paket, GTA VI Explorer’ın beş bölümde dizinlediği 110 oyun dosyası kaydını ve Papa Audacity’nin altı yan görevini kapsar. Bazı kayıtlar yalnızca oyun dosyasındaki kodla görünür. Ayrıntı bulunan görevlerde Türkçe özet, konum ve sahne bilgileri yer alır. İlk pakette 32 özgün rehber notu ve bir kısa görev hedefi çevirisi var. Görev detayı, mevcut olduğunda diyalog arşivindeki ilgili sayfayı da açar.
+Paket, GTA VI Explorer’ın beş bölümde dizinlediği 110 oyun dosyası kaydını ve Papa Audacity’nin altı yan görevini kapsar. Bazı kayıtlar yalnızca oyun dosyasındaki kodla görünür. 116 kaydın tümünde özgün Türkçe rehber metni bulunur. Paket 250 rehber notu ve bir kısa görev hedefi çevirisi içerir. Kaynakta doğrulanabilen konum ve sahne bilgileri ilgili metnin yanında görünür. Ayrıntısı sınırlı kayıtlarda bilinen görev kodu ve kaynak bağlantısı gösterilir. Görev bilgileri ve görev metinleri ekranlarında kaynak bağlantıları bulunur.
 
 | Kaynak | Kapsam |
 | --- | --- |

@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.drawable.RippleDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -22,22 +24,44 @@ import android.widget.Toast
 import java.util.Locale
 import java.util.concurrent.Executors
 
+private const val MISSION_EXTRA = "mission"
+private const val SEARCH_LANGUAGE = "mission_search_language"
+
+private fun Context.openMission(mission: GtaMission, language: GtaMissionSearchLanguage) {
+    startActivity(Intent(this, GtaMissionDetailsActivity::class.java)
+        .putExtra(MISSION_EXTRA, mission.id)
+        .putExtra(SEARCH_LANGUAGE, language.name))
+}
+
+private fun Button.renderChoice(selected: Boolean, accent: Int) {
+    isSelected = selected
+    val face = if (selected) context.filled(accent, 16) else context.filled(Palette.surface, 16, Palette.border)
+    background = RippleDrawable(ColorStateList.valueOf(0x24FFFFFF), face, null)
+    setTextColor(if (selected) Palette.background else Palette.white)
+}
+
 class GtaMissionSearchActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
     private lateinit var search: EditText
     private lateinit var feedback: TextView
     private lateinit var results: LinearLayout
     private lateinit var install: Button
+    private lateinit var turkish: Button
+    private lateinit var english: Button
+    private var language = GtaMissionSearchLanguage.TURKISH
     private var catalog: GtaMissionCatalog? = null
     private var visibleCount = PAGE_SIZE
+    private var checkedLegacyCatalog = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val content = contentPage("Görev ara", Palette.purple)
-        content.addBelow(featureHeader("GTA 6 görevleri", "Türkçe veya İngilizce görev adıyla ara.",
+        content.addBelow(featureHeader("GTA 6 görevleri", "Görevleri ve sahne rehberlerini bul.",
             R.drawable.ic_game_package, Palette.purple))
+        turkish = press(GtaMissionSearchLanguage.TURKISH.label) { selectLanguage(GtaMissionSearchLanguage.TURKISH) }
+        english = press(GtaMissionSearchLanguage.ENGLISH.label) { selectLanguage(GtaMissionSearchLanguage.ENGLISH) }
+        content.addBelow(actionRow(turkish, english), 12)
         search = EditText(this).apply {
-            hint = "Görev adı"
             setHintTextColor(Palette.quiet)
             setTextColor(Palette.white)
             setTextSize(16f)
@@ -75,6 +99,7 @@ class GtaMissionSearchActivity : Activity() {
         content.addBelow(install, 10)
         results = stack()
         content.addBelow(results)
+        selectLanguage(GtaMissionSearchLanguage.fromName(getPreferences(MODE_PRIVATE).getString(SEARCH_LANGUAGE, null)))
         content.isFocusableInTouchMode = true
         content.requestFocus()
     }
@@ -85,31 +110,58 @@ class GtaMissionSearchActivity : Activity() {
         if (catalog == null) feedback.text = "Görevler yükleniyor…"
         worker.execute {
             val loaded = runCatching { GtaMissionStore.catalog(app) }
-            runOnUiThread {
-                if (isDestroyed || isFinishing) return@runOnUiThread
-                catalog = loaded.getOrNull()
-                install.visibility = if (catalog == null) View.VISIBLE else View.GONE
-                search.isEnabled = catalog != null
-                if (catalog == null) {
-                    results.removeAllViews()
-                    feedback.text = if (loaded.isFailure) "Görev paketi açılamadı. Oyun paketlerinden yeniden indir."
-                        else "Çevrimdışı arama için GTA 6 paketini indir."
-                } else renderResults()
+            showCatalog(loaded)
+            val available = loaded.getOrNull()
+            if (!checkedLegacyCatalog && available?.missions?.any { it.textCount == 0 } == true &&
+                !GtaMissionStore.hasLocal(app)) {
+                checkedLegacyCatalog = true
+                runCatching {
+                    GtaMissionStore.download(app)
+                    GtaMissionStore.catalog(app)
+                }.onSuccess { showCatalog(Result.success(it)) }
             }
         }
     }
 
+    private fun showCatalog(loaded: Result<GtaMissionCatalog?>) {
+        runOnUiThread {
+            if (isDestroyed || isFinishing) return@runOnUiThread
+            catalog = loaded.getOrNull()
+            install.visibility = if (catalog == null) View.VISIBLE else View.GONE
+            search.isEnabled = catalog != null
+            if (catalog != null) {
+                renderResults()
+            } else {
+                results.removeAllViews()
+                feedback.text = if (loaded.isFailure) "Görev paketi açılamadı. Oyun paketlerinden yeniden indir."
+                    else "Çevrimdışı arama için GTA 6 paketini indir."
+            }
+        }
+    }
+
+    private fun selectLanguage(selected: GtaMissionSearchLanguage) {
+        if (language != selected) {
+            getPreferences(MODE_PRIVATE).edit().putString(SEARCH_LANGUAGE, selected.name).apply()
+        }
+        language = selected
+        visibleCount = PAGE_SIZE
+        search.hint = language.searchHint
+        turkish.renderChoice(language == GtaMissionSearchLanguage.TURKISH, Palette.purple)
+        english.renderChoice(language == GtaMissionSearchLanguage.ENGLISH, Palette.blue)
+        renderResults()
+    }
+
     private fun renderResults() {
         val available = catalog ?: return
-        val matches = available.search(search.text.toString())
+        val matches = available.search(search.text.toString(), language)
         feedback.text = if (matches.isEmpty()) "Bu adla eşleşen görev bulunamadı."
             else "${matches.size} görev · ${available.gameBuild}"
         results.removeAllViews()
         matches.take(visibleCount).forEach { mission ->
-            val description = listOfNotNull(mission.englishTitle?.takeUnless { it == mission.title }, mission.category)
+            val description = listOfNotNull(mission.alternateNameIn(language), mission.category)
                 .joinToString(" · ")
-            results.addBelow(navTile(mission.title, description, R.drawable.ic_game_package, Palette.purple) {
-                startActivity(Intent(this, GtaMissionDetailsActivity::class.java).putExtra("mission", mission.id))
+            results.addBelow(navTile(mission.nameIn(language), description, R.drawable.ic_game_package, Palette.purple) {
+                openMission(mission, language)
             }, 8)
         }
         if (matches.size > visibleCount) results.addBelow(press("Daha fazla görev göster") {
@@ -143,13 +195,14 @@ class GtaMissionDetailsActivity : Activity() {
     private var translation: GameTranslatorEngine? = null
     private val translations = mutableMapOf<Int, String>()
     private val pendingTranslations = mutableSetOf<Int>()
+    private val language by lazy { GtaMissionSearchLanguage.fromName(intent.getStringExtra(SEARCH_LANGUAGE)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val content = contentPage("Görev detayı", Palette.purple)
         val loading = copy("Görev bilgileri yükleniyor…")
         content.addBelow(loading, 8)
-        val id = intent.getStringExtra("mission")
+        val id = intent.getStringExtra(MISSION_EXTRA)
         val app = applicationContext
         worker.execute {
             val selected = runCatching {
@@ -165,8 +218,8 @@ class GtaMissionDetailsActivity : Activity() {
                 }
                 content.removeView(loading)
                 val (catalog, mission) = selected
-                content.addBelow(featureHeader(mission.title, mission.category, R.drawable.ic_game_package, Palette.purple))
-                mission.englishTitle?.takeUnless { it == mission.title }?.let { content.addBelow(copy(it), 10) }
+                content.addBelow(featureHeader(mission.nameIn(language), mission.category, R.drawable.ic_game_package, Palette.purple))
+                mission.alternateNameIn(language)?.let { content.addBelow(copy(it), 10) }
                 infoButton = press("Görev bilgileri") { showInfo(catalog, mission) }
                 textButton = press("Görev metinleri") { showTexts(catalog, mission) }
                 content.addBelow(actionRow(infoButton, textButton), 12)
@@ -188,8 +241,8 @@ class GtaMissionDetailsActivity : Activity() {
         }
         if (mission.prerequisites.isNotEmpty()) body.addBelow(copy("Önce tamamlanacak görev", 15, Palette.purple, true), 10)
         catalog.missions.filter { it.id in mission.prerequisites }.forEach { prerequisite ->
-            body.addBelow(press(prerequisite.title) {
-                startActivity(Intent(this, GtaMissionDetailsActivity::class.java).putExtra("mission", prerequisite.id))
+            body.addBelow(press(prerequisite.nameIn(language)) {
+                openMission(prerequisite, language)
             }, 8)
         }
         mission.source?.let { body.addBelow(press("Görev kaynağını aç") { openSource(it) }, 12) }
@@ -198,9 +251,11 @@ class GtaMissionDetailsActivity : Activity() {
     private fun showTexts(catalog: GtaMissionCatalog, mission: GtaMission) {
         selectSection(texts = true)
         if (mission.textCount == 0) {
-            body.addBelow(copy("Bu görev için Türkçe metin kaydı henüz eklenmedi."))
-            val label = if (mission.textSource == null) "GTA VI Explorer’da diyalog ara" else "Görev metinlerini kaynakta aç"
-            body.addBelow(press(label) { openSource(mission.textSource ?: "https://six.mics.dev/dialogue") }, 10)
+            body.addBelow(section("Görev özeti", mission.summary))
+            if (!GtaMissionStore.hasLocal(this)) body.addBelow(press("Görev paketini güncelle", Palette.mint) {
+                startActivity(Intent(this, GamePacksActivity::class.java))
+            }, 10)
+            addTextSources(mission)
             return
         }
         lines?.let {
@@ -223,6 +278,7 @@ class GtaMissionDetailsActivity : Activity() {
                     body.removeAllViews()
                     body.addBelow(copy(loaded.exceptionOrNull()?.message ?: "Görev metinleri açılamadı."))
                     body.addBelow(press("Yeniden dene") { showTexts(catalog, mission) }, 10)
+                    addTextSources(mission)
                 }
             }
         }
@@ -239,9 +295,6 @@ class GtaMissionDetailsActivity : Activity() {
             press("Sonraki metinler") { textPage++; renderTexts(entries, mission) }.apply { isEnabled = end < entries.size },
         )
         body.addBelow(copy("${start + 1}–$end / ${entries.size} metin", 14, Palette.mint, true))
-        mission.textSource?.let { url ->
-            body.addBelow(press("Görev metinlerini kaynakta aç") { openSource(url) }, 8)
-        }
         if (entries.size > pageSize) body.addBelow(pageControls, 8)
         entries.subList(start, end).forEachIndexed { offset, line ->
             val index = start + offset
@@ -262,6 +315,18 @@ class GtaMissionDetailsActivity : Activity() {
                 listOfNotNull(line.english?.takeIf { translated != null }, scene?.environment, line.context, time)
                     .forEach { addBelow(copy(it, 13), 5) }
             }, 8)
+        }
+        addTextSources(mission)
+    }
+
+    private fun addTextSources(mission: GtaMission) {
+        mission.source?.let { source ->
+            body.addBelow(press("Görev kaynağını aç") { openSource(source) }, 8)
+        }
+        val target = mission.textSource ?: "https://six.mics.dev/dialogue"
+        if (target != mission.source) {
+            val label = if (mission.textSource == null) "GTA VI Explorer’da diyalog ara" else "Görev metinlerini kaynakta aç"
+            body.addBelow(press(label) { openSource(target) }, 8)
         }
     }
 
@@ -285,13 +350,8 @@ class GtaMissionDetailsActivity : Activity() {
 
     private fun selectSection(texts: Boolean) {
         showingTexts = texts
-        listOf(infoButton, textButton).forEach { button ->
-            val selected = if (button === textButton) texts else !texts
-            button.isSelected = selected
-            button.isClickable = !selected
-            button.background = if (selected) filled(Palette.purple, 16) else filled(Palette.surface, 16, Palette.border)
-            button.setTextColor(if (selected) Palette.background else Palette.white)
-        }
+        infoButton.renderChoice(!texts, Palette.purple)
+        textButton.renderChoice(texts, Palette.purple)
         body.removeAllViews()
     }
 

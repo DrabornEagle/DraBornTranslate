@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Nate’in satış görüşmesine Lucia da eşlik eder. Bu iş, Lucia’nın ekibin güvenini kazanma çabasının parçası.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Görüşmenin ardından Nate, Lucia’yı Kordell’e önerebileceğini belirtir.",
+    "sceneId": "guide-2"
+  }
+]

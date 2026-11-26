@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Görev kaydında Lucia, Nate ve Kordell’le bağlantılı bir görüşme başlatır. Ekip, hazırlanan işin planlarını arar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Yol üzerindeki hedefler ekibi koruyup planları almayı içerir. Nate, Kordell veya Francisco’nun kaybı görev akışını kesebilir.",
+    "sceneId": "guide-2"
+  }
+]

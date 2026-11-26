@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Bölüm 2 dizinindeki FT_MOTEL_SHOP kaydı bu kodla aranabilir. Söz konusu kayıt için Explorer altı diyalog sonucu gösteriyor.",
+    "contextTr": "Motel alışveriş kaydı"
+  },
+  {
+    "type": "guide",
+    "tr": "Görev adını ya da tedarik noktalarını ayrıca doğrulamak için bu kaydın bağlantısını aç. Dizinde konum alanı bulunmuyor.",
+    "contextTr": "Kaynağa bak"
+  }
+]

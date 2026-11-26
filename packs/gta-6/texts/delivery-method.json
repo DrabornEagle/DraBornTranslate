@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Havaalanı işine hazırlık için Lucia’nın kaydını TSS sistemine yerleştirmek gerekir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Oyun içindeki hedef, işi ofiste tamamlamaya yönlendirir. Bu kayıt havaalanındaki ana operasyon başlamadan önce geçer.",
+    "sceneId": "guide-2"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia, Andrés de León’un katıldığı açılışta güvenliğe destek verir. Bu işi avukatla kurdukları bağlantı üzerinden alırlar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "FAP’ın müdahalesiyle organizasyon rehine durumuna dönüşür. César ve Petra’nın da bulunduğu konuklar olayın merkezindedir.",
+    "sceneId": "guide-2"
+  }
+]

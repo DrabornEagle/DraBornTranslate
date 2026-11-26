@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Sinfrontera işi yaklaşırken Karim, bankanın acil iletişimini etkileyecek bir hazırlık planlar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Çalışmanın sonunda Tomás ve sabit disk konusu Raul’a açılır. Raul bu meseleyi banka işi bitince ele alacağını söyler.",
+    "sceneId": "guide-2"
+  }
+]

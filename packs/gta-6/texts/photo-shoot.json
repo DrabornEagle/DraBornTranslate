@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Dre’Quan, Jason ve Lucia’yı bir tanıtım çekimine dahil eder.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Görev adı Photo/Shoot olarak görünür. Real Dimez’in DWNPLY’nin aracıyla çektiği klip, katalogda ayrı bir kayıttır.",
+    "sceneId": "guide-2"
+  }
+]

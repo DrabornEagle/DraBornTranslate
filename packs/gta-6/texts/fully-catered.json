@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Raul, havaalanındaki plan için doğru araçla hazırlık yapılmasını ister. Jason ve Lucia ikram kamyonetini almakla görevlendirilir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Ekip çantaları hazırlarken Raul oğlundan bahseder. Konuşma, Jason ile Lucia’nın Tomás’a ilişkin kararlarına bağlanır.",
+    "sceneId": "guide-2"
+  }
+]

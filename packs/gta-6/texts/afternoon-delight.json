@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Vicki’nin iş teklifinin buluşma noktası, özel bir gösterinin düzenlendiği Delights Cabaret’dir.",
     "sceneId": "night"
+  },
+  {
+    "type": "guide",
+    "tr": "Vicki, kulübün kadınlara yönelik gecesindeki yoğunluğu bir fırsat olarak görür. Jason ve Lucia’nın yaklaşımı gösteri ve mekândaki hareketlilik etrafında şekillenir.",
+    "sceneId": "guide-1"
   }
 ]

@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Açılış, cezaevi danışmanının Lucia’nın dosyası ve tahliye ihtimali hakkında konuştuğu görüşmedir.",
     "sceneId": "interview"
+  },
+  {
+    "type": "guide",
+    "tr": "Danışmanın Lucia’ya yönelttiği sorular açılışın çerçevesini kurar. Tahliye konusu ilerleyen görevlerde Jason’ın Lucia’yı karşılamasına bağlanır.",
+    "sceneId": "guide-1"
   }
 ]

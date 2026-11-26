@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Valentina iki otomobili önceden ayarlamıştır. Ekrandaki hedef, yeni araçları teslim yerinden almaya yönlendirir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Araçları Y Hotel’e getirmek bu kaydın tamamlanma kısmıdır. Otel süitine taşınma farklı bir kayıt olarak bulunur.",
+    "sceneId": "guide-2"
+  }
+]

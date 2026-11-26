@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Şehirdeki AudaCity araçlarının bulunduğu farklı noktalarda gösteri atlayışları yapılır.",
     "sceneId": "city"
+  },
+  {
+    "type": "guide",
+    "tr": "AudaCity araçlarında yapılan tanıtım atlayışları birden fazla noktaya dağılır. Noktalar tamamlanınca sonraki hava gösterisinin daveti gelebilir.",
+    "sceneId": "guide-1"
   }
 ]

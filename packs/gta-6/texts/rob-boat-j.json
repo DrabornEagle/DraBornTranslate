@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Raul, Guardia kardeşlerin su yoluyla taşıdığı yükü hedef gösterir. Lucia, teknelerin nerede olduğunu öğrenmek için kara tarafındaki bağlantıyı takip eder.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Teknelerle yaşanan karmaşadan sonra ekip hedef yükü alıp Raul’a dönmeye çalışır. Hem Guardia ekibi hem sahil güvenlik nehirdeki hareketliliğe katılır.",
+    "sceneId": "guide-2"
+  }
+]

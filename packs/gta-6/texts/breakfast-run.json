@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Dışarıdaki işlerin ardından Lucia Jason’ı görmek için motel odasına döner.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu dönüş Jason’ın yaralanmasına bağlıdır. Vicki ve Dunk’la bağlantılı tedarik görevleri ayrı kayıtlarda izlenir.",
+    "sceneId": "guide-2"
+  }
+]

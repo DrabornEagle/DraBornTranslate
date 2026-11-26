@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia, M7’nin elindeki Mia’ya ulaşmak isterken yakalanır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Mia, Terro’ya başka bir merkez bulmayı teklif eder. Yeni yer bulununca Viper’ın anlaşmazlığı Lucia’nın işini yeniden değiştirir.",
+    "sceneId": "guide-2"
+  }
+]

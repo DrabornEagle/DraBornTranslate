@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ile Donnie, Brian’ın beklediği uçağın bölgeye fark edilmeden ulaşmasına yardım eder.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Donnie hat dışına çıkarak ayrı bir satış görüşmesi ayarlar. Görüşme kötüleştiğinde Jason, Donnie’yle birlikte bölgeden ayrılır.",
+    "sceneId": "guide-2"
+  }
+]

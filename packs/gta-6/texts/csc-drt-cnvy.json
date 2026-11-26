@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Mud Club’daki yarıştan sonra Billy yeni iş için ekibi toplar. Hedef, yoldaki zırhlı araçtır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Grup araçtan alınan parayla ayrılır. Billy’nin sürücülerinden birinin kaybolması bu işin akışını etkiler.",
+    "sceneId": "guide-2"
+  }
+]

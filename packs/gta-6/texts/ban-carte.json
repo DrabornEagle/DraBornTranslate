@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Andrea ve Lucia, La Polilla Negra’dan Monty’yle Watson Bay’de buluşur. Monty, görüşmede cartel sosyal medyası için görüntü almak ister.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "İlk buluşma bozulunca ekip Monty’yi başka bir noktaya götürür. Raul’un ekibi, banka planı için Monty’den bilgi almaya çalışır.",
+    "sceneId": "guide-2"
+  }
+]

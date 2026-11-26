@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Kitty Litter hakkında bilgi arayan Jason, Charles’a ulaşır. Charles’ın o sıradaki hâli görüşmenin beklenenden farklı ilerlemesine yol açar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Dikkat edilmesi gereken bağlantı maddenin kaynağıdır. Tyrone’un üretim yerlerini hedef alan işi ayrıca kayıtlıdır.",
+    "sceneId": "guide-2"
+  }
+]

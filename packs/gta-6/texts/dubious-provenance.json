@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Dubious Provenance adı katalogda birden fazla kez geçer. Bu kaydın oyun dosyasındaki ayırt edici kodu ANT_CHASE.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "İlgili metin bağlantısı Jason ve Lucia’yla eşleştirilen bu görev kaydına gider. Antika dükkânındaki fiyat görüşmesi ANT_INTRO kaydında yer alır.",
+    "contextTr": "Kaynağı aç"
+  }
+]

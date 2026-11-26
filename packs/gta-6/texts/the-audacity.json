@@ -30,5 +30,10 @@
     "type": "guide",
     "tr": "Partiden ayrılmak için havuzun karşısındaki binaya geç ve asansörle sokağa in.",
     "sceneId": "exit"
+  },
+  {
+    "type": "guide",
+    "tr": "DacityCoin satış düğmesi parti aşamasında açılır. Sahne arkasından son gösteriye geçmeden önce oyun içi uygulamadaki durumu kontrol et.",
+    "sceneId": "guide-1"
   }
 ]

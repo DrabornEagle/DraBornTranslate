@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Dre’Quan, Royce Jones’un ilgisini çekmek için destek ister.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Royce, VYB’deki sonraki Real Dimez planına bağlanır. Bu kayıt gösteriden önceki tanıtım görüşmesine aittir.",
+    "sceneId": "guide-2"
+  }
+]

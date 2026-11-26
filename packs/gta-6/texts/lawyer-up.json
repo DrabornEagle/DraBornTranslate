@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Valentina’nın ayarladığı avukat Abraham Gonzalez, Jason ile Lucia’nın yasal durumuyla ilgili bir yol açabilir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu ilk bağlantı Valentina’nın otel görüşmesinde bahsettiği tavsiyeye dayanır. Abe’yle final öncesindeki anlaşma görüşmesi farklı görev kaydıdır.",
+    "sceneId": "guide-2"
+  }
+]

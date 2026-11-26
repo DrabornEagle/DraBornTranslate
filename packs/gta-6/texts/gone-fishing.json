@@ -3,5 +3,15 @@
     "type": "guide",
     "tr": "Cal, Donnie ve Jason’la başlayan iş bozulduğunda rota Pelican Valley’ye kayar.",
     "sceneId": "pelican-valley"
+  },
+  {
+    "type": "guide",
+    "tr": "Cal ve Donnie’yle başlayan yolculukta işler ters gider. Jason’ın rotasının Pelican Valley’ye dönmesi, Kingfishers’la kurulacak gerilimin başlangıcıdır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Karışıklık sonrası Cal ve Donnie’nin durumuna dikkat et. Görev işareti bölgeye girdikten sonra bir sonraki buluşma noktasını gösterir.",
+    "sceneId": "pelican-valley"
   }
 ]

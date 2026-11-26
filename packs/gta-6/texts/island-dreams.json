@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Kenton’ın müşterileri batığı gezmektedir. Jason dalışı yönetirken Kenton’ın hazine arayışına yardım eder.",
     "sceneId": "dive"
+  },
+  {
+    "type": "guide",
+    "tr": "Kenton’ın işi, Jason’ın grubu güvenli biçimde dalışa götürmesini gerektirir. Hazine arayışı aynı turun altında ilerler.",
+    "sceneId": "guide-1"
   }
 ]

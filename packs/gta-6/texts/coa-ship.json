@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Giorgio’nun ekibi denizdeki sevkiyata müdahale eder. Daha önce Rocco için yapılan görev, gemi bölümünün hazırlığıdır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Deniz bölümünün ardından Giorgio kendi el konulan yükünün geri alınmasını ister. Sonraki görüşme Jason ve Lucia’nın arandığı durumla bağlantılıdır.",
+    "sceneId": "guide-2"
+  }
+]

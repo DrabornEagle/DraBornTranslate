@@ -15,6 +15,15 @@ internal enum class GtaMissionType(val key: String, val label: String) {
     STORY("story", "Ana hikâye"), SIDE("side", "Yan hikâye"), OBJECTIVE("objective", "Görev hedefi"),
 }
 
+internal enum class GtaMissionSearchLanguage(val label: String, val searchHint: String) {
+    TURKISH("Türkçe", "Türkçe görev adı"),
+    ENGLISH("İngilizce", "İngilizce görev adı veya kod");
+
+    companion object {
+        fun fromName(name: String?) = entries.firstOrNull { it.name == name } ?: TURKISH
+    }
+}
+
 internal enum class GtaTextType(val key: String, val label: String) {
     DIALOGUE("dialogue", "Diyalog"), OBJECTIVE("objective", "Hedef"), MESSAGE("message", "Mesaj"),
     HINT("hint", "İpucu"), INTERFACE("ui", "Arayüz"), GUIDE("guide", "Görev rehberi"), OTHER("other", "Diğer"),
@@ -46,12 +55,22 @@ internal data class GtaMission(
 ) {
     val category: String get() = listOfNotNull(type.label, chapter?.let { "Bölüm $it" }, series).joinToString(" · ")
     val searchNames = (listOfNotNull(title, englishTitle, series, location, id) + aliases).map(::foldMissionName)
+    private val englishName = englishTitle ?: aliases.firstOrNull { missionCode.matches(it) }
+
+    fun nameIn(language: GtaMissionSearchLanguage) =
+        if (language == GtaMissionSearchLanguage.ENGLISH) englishName ?: title else title
+
+    fun alternateNameIn(language: GtaMissionSearchLanguage): String? {
+        val preferred = nameIn(language)
+        return (if (language == GtaMissionSearchLanguage.ENGLISH) title else englishName)?.takeUnless { it == preferred }
+    }
 }
 
+private val missionCode = Regex("[A-Z0-9]+(?:_[A-Z0-9]+)+")
 private fun foldMissionName(text: String) = PackKey.canon(text).replace('ı', 'i')
 
 internal data class GtaMissionCatalog(val version: String, val gameBuild: String, val missions: List<GtaMission>) {
-    fun search(query: String): List<GtaMission> {
+    fun search(query: String, language: GtaMissionSearchLanguage = GtaMissionSearchLanguage.TURKISH): List<GtaMission> {
         val name = foldMissionName(query)
         if (name.isEmpty()) return missions
         val words = name.split(' ')
@@ -63,7 +82,13 @@ internal data class GtaMissionCatalog(val version: String, val gameBuild: String
                 names.any { value -> words.all { value.contains(it) } } -> 2
                 else -> return@mapNotNull null
             }
-            mission to rank
+            val preferred = foldMissionName(mission.nameIn(language))
+            val matchesPreferred = when (rank) {
+                0 -> name == preferred
+                1 -> preferred.startsWith(name)
+                else -> words.all { preferred.contains(it) }
+            }
+            mission to (rank * 2 + if (matchesPreferred) 0 else 1)
         }.sortedBy { it.second }.map { it.first }
     }
 }

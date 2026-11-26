@@ -56,6 +56,7 @@ class ScreenNavigationTest {
                     "missions":[{"id":"launch","titleTr":"Lansman Partisine Katıl","titleEn":"The Audacity",
                     "type":"side","chapter":3,"summaryTr":"Lansmandan önce daveti bekle.","textCount":1,
                     "aliases":["Attent the Launch Party"],"locationTr":"Neo Paloma Apartments",
+                    "sourceUrl":"https://example.org/mission","textSourceUrl":"https://example.org/lines",
                     "scenes":[{"id":"lobby","titleTr":"Buluşma","environmentTr":"Giriş holü"}]}]}
                 """.trimIndent())
                 entry("texts/launch.json", """
@@ -65,15 +66,25 @@ class ScreenNavigationTest {
             ActivityScenario.launch(HomeActivity::class.java).use {
                 waitFor { resumed() is HomeActivity }
                 click("Görev ara")
+                waitFor { resumed() is GtaMissionSearchActivity && hasText("Türkçe") }
+                click("Türkçe")
                 waitFor { resumed() is GtaMissionSearchActivity && hasText("Lansman Partisine Katıl") }
                 onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Attent the Launch Party") }
-                click("Lansman Partisine Katıl")
+                click("İngilizce")
+                waitFor { hasText("The Audacity") }
+                click("The Audacity")
                 waitFor { resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") }
                 click("Görev metinleri")
                 waitFor { hasText("Lansman partisine katıl.") && hasText("Giriş holü") }
+                assertTrue(hasText("Görev kaynağını aç"))
+                assertTrue(hasText("Görev metinlerini kaynakta aç"))
                 assertFalse(hasText("Neo Paloma Apartments"))
                 click("Görev bilgileri")
                 waitFor { hasText("Neo Paloma Apartments") }
+                click("Geri")
+                waitFor { resumed() is GtaMissionSearchActivity && hasText("The Audacity") }
+                click("Türkçe")
+                waitFor { hasText("Lansman Partisine Katıl") }
             }
         } finally {
             if (backup == null) file.delete() else file.writeBytes(backup)

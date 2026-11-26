@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Jason ve Lucia burada otel görevlisi Santino ve Valentina’nın sonraki planıyla tanışır.",
     "sceneId": "suite"
+  },
+  {
+    "type": "guide",
+    "tr": "Santino’yla tanışmanın ardından Valentina, Abraham Gonzalez’le görüşme ayarlar. Avukatla yapılan görüşme ayrı bir görevdir.",
+    "sceneId": "suite"
   }
 ]

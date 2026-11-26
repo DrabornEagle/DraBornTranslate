@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Oda ücretinin ne kadar olduğunu öğrenmek için Linda’ya uğra. Ücret peşin talep edilir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Para hazır olduğunda Linda’yla tekrar konuşmak ödeme işlemini sürdürür. Kolyenin teminat olarak tutulduğu takip kaydı Geciken Ödeme olarak görünür.",
+    "sceneId": "guide-2"
+  }
+]

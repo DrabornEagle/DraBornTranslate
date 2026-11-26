@@ -13,5 +13,10 @@
     "type": "guide",
     "tr": "Mattia ertesi sabah Grassrivers’taki ziyaretçi merkezinden bir çanta alınmasını önerir.",
     "sceneId": "offer"
+  },
+  {
+    "type": "guide",
+    "tr": "Kutlamadan sonraki konuşmada Mattia, Grassrivers Visitor Centre’dan teslim alınacak çantadan bahseder. Çantanın alınması ve içinde ne olduğunun öğrenilmesi farklı görevlerde ele alınır.",
+    "sceneId": "offer"
   }
 ]

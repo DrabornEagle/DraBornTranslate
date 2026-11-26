@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ile Lucia, Raul’un belirlediği noktaya gider. Araç ve otopark istemleri buluşma bölümüne aittir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Takip başladıktan sonra karakterler yeniden bir araya gelerek Raul’un teslimat noktasına gider. Raul’un ayrılması veya kullanılan aracın kaybı ilerlemeyi durdurabilir.",
+    "sceneId": "guide-2"
+  }
+]

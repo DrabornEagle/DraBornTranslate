@@ -186,13 +186,28 @@ internal fun Activity.pageRoot(view: View, accent: Int = Palette.blue, base: Int
     outer.requestApplyInsets()
 }
 
+internal fun Context.backButton(accent: Int, label: String = "Geri", action: () -> Unit) = ImageButton(this).apply {
+    contentDescription = label
+    tooltipText = label
+    setImageResource(R.drawable.ic_arrow_back)
+    setColorFilter(Palette.background)
+    scaleType = ImageView.ScaleType.CENTER_INSIDE
+    setPadding(dp(10), dp(10), dp(10), dp(10))
+    minimumWidth = dp(48)
+    minimumHeight = dp(48)
+    stateListAnimator = null
+    val highlight = mix(Palette.blue, Palette.purple, 0.35f)
+    val face = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(accent, highlight)).apply {
+        cornerRadius = dp(16).toFloat()
+        setStroke(dp(1), mix(accent, Palette.white, 0.45f))
+    }
+    background = RippleDrawable(ColorStateList.valueOf(0x28090C16), face, null)
+    setOnClickListener { action() }
+}
+
 internal fun Activity.titleBar(title: String, accent: Int = Palette.blue) = row().apply {
     setPadding(dp(16), dp(8), dp(16), dp(8))
-    addView(press("‹") { finish() }.apply {
-        textSize = 27f
-        setTextColor(accent)
-        contentDescription = "Geri"
-    }, LinearLayout.LayoutParams(dp(48), dp(48)))
+    addView(backButton(accent) { finish() }, LinearLayout.LayoutParams(dp(48), dp(48)))
     addView(copy(title, 20, Palette.white, true).apply { isAccessibilityHeading = true },
         LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
 }

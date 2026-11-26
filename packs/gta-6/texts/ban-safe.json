@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Banka hazırlığının bu bölümü Gil’in evindeki kasayla ilgilidir. Ekrandaki hedefler eve giriş ve kasanın bulunması arasında değişir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Kasa bulunduğunda Felipe’nin aracıyla taşınır. Kasayı ya da aracı kaybetmek, teslimatı tamamlamadan işi durdurur.",
+    "sceneId": "guide-2"
+  }
+]

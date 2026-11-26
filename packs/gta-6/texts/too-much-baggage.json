@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason, Omar’ın yönettiği bagaj ekibine katılır. Vardiyadaki görevler yolcu bagajlarının işlendiği alanı tanıtır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Jason’ın bu işe başlaması havaalanının güvenlik düzeni hakkında bilgi edinmek içindir. Karim’in hazırlığıyla ilgili hedefler vardiyaya bağlanır.",
+    "sceneId": "guide-2"
+  }
+]

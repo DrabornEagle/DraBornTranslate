@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Donnie’nin ardından Brian’ı işlere bağlayan eşyaları ortadan kaldırmak gerekir. Aranan kanıtlar karavanın bulunduğu alandadır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Aynı bölümde Donnie’nin kayıp paketine ilişkin ayrı kayıtlar bulunur. Bu görevde ekranda karavanı temizlemeye yönelik hedefleri izle.",
+    "sceneId": "guide-2"
+  }
+]

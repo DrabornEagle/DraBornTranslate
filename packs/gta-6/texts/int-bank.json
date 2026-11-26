@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia’nın toplum hizmetinden kazanacağı parayı alabilmesi için finans işlemi başlatılır. Jason’la banka şubesindeki buluşma Buck Me adıyla bulunur.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Şubedeki görüşmeyi bitir. Para yatırma ve birikimle ilgili sonraki adımlar haritada ayrı hedefler olarak görünebilir.",
+    "sceneId": "guide-2"
+  }
+]

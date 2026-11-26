@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia, Kordell’in çevresine ulaşmak için Nate’le düzenli antrenman yapar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Nate’le yakınlık kurulunca Lucia ekibin diğer üyeleriyle tanışır. Özel antrenman alanına girmesi yeni işlere zemin hazırlar.",
+    "sceneId": "guide-2"
+  }
+]

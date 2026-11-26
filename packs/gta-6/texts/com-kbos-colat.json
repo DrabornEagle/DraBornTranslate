@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Brian’ın beklediği ödeme, çekilmiş bir Imponte Phoenix’in bagajındadır. Cal ile birlikte polis otoparkına git.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Hedef aracın kendisi teslimatın parçası. Otopark bölümünden sonra boyahaneye, ardından Brian’ın işaretlenen deposuna ilerle.",
+    "sceneId": "guide-2"
+  }
+]

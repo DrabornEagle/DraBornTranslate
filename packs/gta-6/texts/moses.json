@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Atölyede Moses, Lucia’ya ileride hangi araçları kendisine getirebileceğini anlatır.",
     "sceneId": "shop"
+  },
+  {
+    "type": "guide",
+    "tr": "Moses, Lucia’nın göze çarpmayan bir araçla gelmesini ister. Atölyedeki tanışma, teslim edilecek Crawler görevinden önce gerçekleşir.",
+    "sceneId": "guide-1"
   }
 ]

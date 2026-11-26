@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia önceki küçük soygunların ardından bir araya gelir. Sohbetin amacı, bir sonraki işi hangi yöne götüreceklerine karar vermektir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bölüm 2’nin motel döneminde yer alan bu kayıt, Delights Cabaret’ye gidilen görevden ayrı tutulur.",
+    "sceneId": "guide-2"
+  }
+]

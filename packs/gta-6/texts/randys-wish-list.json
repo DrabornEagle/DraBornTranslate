@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Randy, istediği üst sınıf otomobilleri bir liste hâlinde verir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Her araç hedefinin kendi işareti olabilir. Listeyi tamamlamayı izlerken Zorrusso işini ve limana giden son teslimatı ayrı kayıtlar olarak kullan.",
+    "sceneId": "guide-2"
+  }
+]

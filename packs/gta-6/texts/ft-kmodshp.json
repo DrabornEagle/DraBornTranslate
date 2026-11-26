@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "İşaretli servise hasarlı Ganado ile git. Joey, aracın durumunu atölyede değerlendirir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Garajdaki araç işlemini bitirip Jason’ın kullandığı Ganado ile ayrıl. Bu kayıt rehberlerde Just a Scratch adıyla geçer.",
+    "sceneId": "guide-2"
+  }
+]

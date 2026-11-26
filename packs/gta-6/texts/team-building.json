@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Kordell, Lucia’yı çevresindeki diğer kişilerle tanıştırır. Bu görüşme Nate’le kurulan ilişkinin ilerlediği aşamadır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Lucia’nın spor salonuna erişim süreci gelecekteki havaalanı işi için bilgi sağlar.",
+    "sceneId": "guide-2"
+  }
+]

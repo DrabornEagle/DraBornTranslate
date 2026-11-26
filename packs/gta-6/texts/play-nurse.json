@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Lucia, Jason toparlanırken ulaşım, erzak ve gelir ihtiyacını düşünür.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu kayıt bakım sürecinin başlangıcına aittir. Ağrı kesici araması ve Linda’yla ödeme görüşmesi haritada ayrı işler olarak izlenir.",
+    "sceneId": "guide-2"
+  }
+]

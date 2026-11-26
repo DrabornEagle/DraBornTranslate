@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Brian uzun süredir iş yaptığı Arnold’dan haber alamaz. Jason ve Cal, Arnold’un nerede olduğunu öğrenmek için birlikte hareket eder.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Haritada Brian’la görüşme biçiminde başlayan kayıt, görevin adı ekrana çıktığında Hey Arnold! olarak tanınır.",
+    "sceneId": "guide-2"
+  }
+]

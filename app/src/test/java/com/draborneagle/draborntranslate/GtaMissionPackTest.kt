@@ -30,6 +30,19 @@ class GtaMissionPackTest {
     }
 
     @Test
+    fun preferredLanguageBreaksSearchTiesAndKeepsMissionCodes() {
+        val catalog = GtaMissionPack.validate(archive())
+        val turkish = catalog.missions.single().copy(title = "Sahil", englishTitle = "The Beach")
+        val english = turkish.copy(id = "english", title = "Kıyı", englishTitle = "Sahil")
+        val coded = turkish.copy(id = "coded", title = "Liman", englishTitle = null, aliases = listOf("DOCK_ROUTE"))
+        val combined = catalog.copy(missions = listOf(turkish, english, coded))
+        assertEquals(turkish.id, combined.search("Sahil", GtaMissionSearchLanguage.TURKISH).first().id)
+        assertEquals(english.id, combined.search("Sahil", GtaMissionSearchLanguage.ENGLISH).first().id)
+        assertEquals("DOCK_ROUTE", coded.nameIn(GtaMissionSearchLanguage.ENGLISH))
+        assertEquals(coded.id, combined.search("dock route", GtaMissionSearchLanguage.ENGLISH).single().id)
+    }
+
+    @Test
     fun keepsTextOrderAndOnlyUsesSuppliedSceneTimes() {
         val file = archive()
         val catalog = GtaMissionPack.validate(file)
@@ -87,6 +100,12 @@ class GtaMissionPackTest {
         assertEquals(checksum, actual)
         val catalog = GtaMissionPack.validate(file)
         assertEquals(manifest.getString("version"), catalog.version)
+        assertTrue(catalog.missions.all { it.textCount > 0 && it.source != null })
+        val lab = catalog.search("Lab Fees", GtaMissionSearchLanguage.ENGLISH).first()
+        assertEquals("com-kbos-shop", lab.id)
+        assertEquals("Dükkân Kirası", lab.nameIn(GtaMissionSearchLanguage.TURKISH))
+        val details = GtaMissionPack.texts(file, catalog.version, lab)
+        assertTrue(details.size >= 4 && details.all { it.sceneId != null && !it.turkish.isNullOrBlank() })
         val mission = catalog.search("attent the launch party").first()
         assertEquals("the-audacity", mission.id)
         assertEquals(GtaMissionType.SIDE, mission.type)

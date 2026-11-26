@@ -8,5 +8,10 @@
     "type": "guide",
     "tr": "Aracı Balsero’da Randy’ye teslim etmek yeni iş bağlantısını açar.",
     "sceneId": "balsero"
+  },
+  {
+    "type": "guide",
+    "tr": "Raul’un deneme işi Randy’nin mağazasında son bulur. Randy’nin lüks araç listesini açabilecek bağlantı burada kurulur.",
+    "sceneId": "balsero"
   }
 ]

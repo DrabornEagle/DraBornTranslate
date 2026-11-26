@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Keşif ve uzman işi tamamlandığında Raul’un ekibi bankaya girer. Jason ile Lucia, planın farklı parçalarında yer alır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Raul daha sonra avans ve yeni bir konaklama ayarladığını bildirir. Bölüm 4’teki Y Hotel kaydı bu görüşmenin sonrasına bağlanır.",
+    "sceneId": "guide-2"
+  }
+]

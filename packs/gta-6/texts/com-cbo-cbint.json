@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason, alacaklarını toplarken Boobie’yi şehir içinde taşır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Boobie, bu yolculukta Jason’ı Yasmani’yle tanıştırır. Yasmani, sonradan gündeme gelecek mücevher işlerinin bağlantısıdır.",
+    "sceneId": "guide-2"
+  }
+]

@@ -8,5 +8,10 @@
     "type": "guide",
     "tr": "Yan evdeki M7 üyeleriyle karşılaşma, anne kızın planını değiştirir.",
     "sceneId": "next-door"
+  },
+  {
+    "type": "guide",
+    "tr": "Boş evin durumu ve komşuların yaklaşımı Mia’nın satış planını bozar. Lucia’nın mahalleyle ilgili karşılaştığı risk burada görünür.",
+    "sceneId": "guide-1"
   }
 ]

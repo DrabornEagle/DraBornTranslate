@@ -8,5 +8,15 @@
     "type": "guide",
     "tr": "Tanıtım uçuşu ilgi çekmek için liman ve Tequesta Retreat üzerinden şehrin diğer noktalarına uzanır.",
     "sceneId": "flight"
+  },
+  {
+    "type": "guide",
+    "tr": "AudaCity’nin şehir içindeki gösterileri bitince Papa Audacity’yle havaalanında buluşulur. Uçuş liman ve Tequesta Retreat üzerinden adliye tarafına yönelir.",
+    "sceneId": "airfield"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu uçuş sonrasında lansman daveti beklenir. Davet, daha sonra Neo Paloma Apartments’ta başlayan The Audacity görevine yönlendirir.",
+    "sceneId": "guide-2"
   }
 ]

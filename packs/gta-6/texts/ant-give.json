@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Heykelin gerçek olup olmadığını öğrenmek için Halifax’a başvurulur.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu aşama eserin incelenebilmesi için teslim edilmesine odaklanır. Düşük bilgi içeren ANT_RECOV kaydıyla ayrı tutulur.",
+    "sceneId": "guide-2"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason yaralıyken Lucia ağrı kesici aramaya başlar. Yardım arayışı motelde Vicki’yle tanışmasına yol açar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Vicki çevreyi gösterirken Lucia’yı yerel bağlantı Dunk’la tanıştırır. Bu ilk tanışma, Dunk’la yapılan sonraki işten önce gelir.",
+    "sceneId": "guide-2"
+  }
+]

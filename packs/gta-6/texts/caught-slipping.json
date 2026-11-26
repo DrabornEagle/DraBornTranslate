@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Eve dönen ikili hareketlilik görünce dairenin soyulduğunu anlar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Kısa takibin ardından sabit diskin hâlâ ellerinde olduğu anlaşılır. Önceden aldıkları çantayı başka bir yerde muhafaza etmeyi konuşurlar.",
+    "sceneId": "guide-2"
+  }
+]

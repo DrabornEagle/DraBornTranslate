@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason, Donnie’nin düşürdüğü yükün yerini aramak için sulak alana gider.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Benzer açıklaması olan CTI_PIL_RD_BC_PARENT kodu da katalogda bulunur. Bu kaydı Find Donnie’s Package adıyla açabilirsin.",
+    "sceneId": "guide-2"
+  }
+]

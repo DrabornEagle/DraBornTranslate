@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia’nın ana hikâyesinin sonucunu belirleyen görev. Bu kayıt finalin kendisine aittir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Aramada aynı adla ikinci bir kayıt çıkabilir. Devam Seçimi, ana final bittikten sonra gösterilen oyun seçeneğidir.",
+    "sceneId": "guide-2"
+  }
+]

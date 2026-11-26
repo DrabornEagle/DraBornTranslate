@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Ağrı kesici arayışı tekrar Dunk’a ulaşır. Görev boyunca Dunk’la buluşma ve grupla yeniden bir araya gelme istemleri görünür.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Hedeflerde Dr. Bill ile bir ofis görünür. Oyundaki araç ve teslimat işaretlerini izlemek bu aşamayı ilerletir.",
+    "sceneId": "guide-2"
+  }
+]

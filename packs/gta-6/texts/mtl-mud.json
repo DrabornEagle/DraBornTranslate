@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Wyman’ın bahsettiği ödülleri araştıran ikili pistte Billy’yle karşılaşır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Billy’nin ek işlerine girebilmek için önce pistte yetenek gösterilir. Zırhlı araç işi bu tanışmayla bağlantılı ayrı bir kayıt.",
+    "sceneId": "guide-2"
+  }
+]

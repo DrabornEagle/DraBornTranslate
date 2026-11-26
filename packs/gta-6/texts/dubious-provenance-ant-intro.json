@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ve Lucia heykelin değerini anlamak için Capri’deki antikacıya gider.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu ad, kovalamaca verisi içeren ANT_CHASE ile de eşleşir. Antikacıya yapılan ilk ziyaret ANT_INTRO koduyla aranabilir.",
+    "sceneId": "guide-2"
+  }
+]

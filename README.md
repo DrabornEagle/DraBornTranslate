@@ -16,9 +16,9 @@
 
 GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repliğin bozuk okunan bir karesi pakette bulunamadığında ekrandaki doğru çeviri korunur.
 
-## GTA 6 görev araması · v0.6.1
+## GTA 6 görev araması
 
-**Oyun paketleri → GTA 6 paketini indir** ile görev kataloğunu GitHub’dan yükle. **Görev ara** bölümünde Türkçe veya İngilizce görev adını yaz. **Görev bilgileri** özet, karakterler ve bilinen sahne ortamlarını gösterir. **Görev metinleri** paketteki Türkçe kayıtları ve mevcut kaynak bağlantılarını açar.
+**Oyun paketleri → GTA 6 paketini indir** ile görev kataloğunu GitHub’dan yükle. **Görev ara** bölümünde **Türkçe** veya **İngilizce** başlık görünümünü seçip görev adını yaz. **Görev bilgileri** özet, karakterler ve bilinen sahne ortamlarını gösterir. **Görev metinleri** 116 görev kaydının Türkçe rehberlerini ve ilgili kaynak bağlantılarını açar.
 
 **Attend the Launch Party** veya **Attent the Launch Party** araması Papa Audacity’nin **The Audacity** yan görevini bulur. [Paket içeriği ve kaynaklar](packs/gta-6/README.md)
 

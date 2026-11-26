@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason, Brian adına kiracı Mandy’yle görüşür. Evdeki onarım ihtiyacı, ziyaretin ikinci kısmını başlatır.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Sohbetten sonra Mandy’nin gösterdiği ev işini tamamla. Görevdeki ev içi talimatlar, bu bakım aşamasına aittir.",
+    "sceneId": "guide-2"
+  }
+]

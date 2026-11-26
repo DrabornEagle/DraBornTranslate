@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Oyun, final öncesine dönüp ilerlemeyi sürdürmeyi veya yeni bir oyun açmayı sunar.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu kayıtta görülen ifadeler, final sahnesindeki konuşmalardan farklı olarak devam seçenekleriyle ilgilidir.",
+    "sceneId": "guide-2"
+  }
+]

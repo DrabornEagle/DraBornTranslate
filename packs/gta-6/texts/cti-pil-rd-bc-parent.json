@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Donnie’nin taşıdığı paket sulak alanda kalır. Jason’ın görevi, Donnie’nin bıraktığı yükü geri getirmektir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu kayıt Donnie’nin yükünü bulma kısmına aittir. Karavanındaki izleri temizleme işi katalogda ayrı bir göreve bağlıdır.",
+    "sceneId": "guide-2"
+  }
+]

@@ -3,5 +3,10 @@
     "type": "guide",
     "tr": "Papa Audacity’ye yardım ettikten sonra yakındaki mühendisle konuşulur. Bu görüşme bir sonraki daveti açar.",
     "sceneId": "show"
+  },
+  {
+    "type": "guide",
+    "tr": "Sahildeki gösteride Papa Audacity ve girişimi tanıtılır. Gösteri bitince mühendisle konuşmak, ekibin sonraki sürüş sınavına davet almayı sağlar.",
+    "sceneId": "guide-1"
   }
 ]

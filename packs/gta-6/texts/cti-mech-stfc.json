@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Moses, 1982 model Canis Crawler aramaktadır. Haritada farklı bir araç hedefiyle karşılaşırsan model adını kontrol et.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Ödeme için Crawler’ı Moses’a getir. Bu, tamirciyle tanıştıktan sonra açılan araç işi.",
+    "sceneId": "guide-2"
+  }
+]

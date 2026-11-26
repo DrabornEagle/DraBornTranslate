@@ -3,5 +3,15 @@
     "type": "guide",
     "tr": "La Perle’de mühendisi bulunca ilk deneme için bekleyen motosiklete binilir. Parkur otoparkın alt katındadır.",
     "sceneId": "garage"
+  },
+  {
+    "type": "guide",
+    "tr": "AudaCity’nin sürüş denemesi, park alanının alt bölümünde başlar. Mühendis, sırasıyla geçilecek parkur girişlerini gösterir.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Parkur tamamlanınca mühendisle tekrar buluş. Bu görev, sonraki Peacock Bay tanıtım işinden önce gelir.",
+    "sceneId": "guide-2"
   }
 ]

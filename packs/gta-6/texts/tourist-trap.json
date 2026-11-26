@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Mattia’nın teklifini kabul edince ziyaretçi merkezindeki dolaplardan bir çanta alınır. İş, sonraki olayları başlatan teslimata dönüşür.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Alınan çantanın içeriği daha sonra motel bölümünün açılışında yeniden gündeme gelir.",
+    "sceneId": "guide-2"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Jason ile Lucia, bekleyen davalar konusunda Abe’yle bir çıkış yolu konuşur.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Avukata ilk tanışma Bölüm 4’te gerçekleşir. Buradaki konuşma, Giorgio’yla yaşanan gelişmelerden sonraki anlaşma ihtimali hakkındadır.",
+    "sceneId": "guide-2"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Giorgio, Jason ile Lucia’ya bir af ayarlayabileceğini söyler. Karşılığında onlardan işlerine yardım etmelerini ister.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Görüşmedeki saldırı, ekibin önüne rakip sevkiyatı durdurma işi koyar.",
+    "sceneId": "guide-2"
+  }
+]

@@ -8,5 +8,10 @@
     "type": "guide",
     "tr": "Rocco’yu aldıktan sonra ekip helikopterle gemiyi terk eder.",
     "sceneId": "evacuation"
+  },
+  {
+    "type": "guide",
+    "tr": "Vinny’nin planında Rocco, sonraki sevkiyat işinde yükün bulunmasına yardım edecektir. Yolcu gemisindeki hareketlilik ona ulaşmak için kullanılır.",
+    "sceneId": "guide-1"
   }
 ]

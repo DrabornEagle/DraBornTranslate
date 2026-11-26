@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Tekneye gitmek için Raul’un Ocean Beach Marina’daki işaretini takip et.",
+    "sceneId": "guide-1"
+  },
+  {
+    "type": "guide",
+    "tr": "Bu görüşmenin sonrasındaki gelişmeler Sıfırdan Başlamak kaydının gerekçesini oluşturur.",
+    "sceneId": "guide-2"
+  }
+]
