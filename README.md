@@ -4,9 +4,9 @@
   <img src="app/src/main/res/drawable-nodpi/brand_mark.webp" width="68" height="68" alt="">
   <h1>DraBornTranslate</h1>
   <p><strong>PlayStation oyunlarını Türkçe oku.</strong><br>Canlı altyazı, oyun içi metin çevirisi ve PS App yakalamaları.</p>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.2/DraBornTranslate-v0.6.2-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.6.2%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.6.2 imzalı APK’yı indir"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.3/DraBornTranslate-v0.6.3-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.6.3%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.6.3 imzalı APK’yı indir"></a>
   <a href="docs/KURULUM.md"><img src="https://img.shields.io/badge/KURULUM-REHBER%C4%B0-BDA5FF?style=for-the-badge&amp;labelColor=161529" alt="Kurulum rehberi"></a>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.2"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.6.2 sürüm notları"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.3"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.6.3 sürüm notları"></a>
   <p><sub>İmzalı APK · Android 10+ · ARM64</sub></p>
 </div>
 
@@ -52,7 +52,7 @@ Görev Ara, Türkçe ve İngilizce görev adlarının yanı sıra harita başlı
 
 ## İndir ve kur
 
-1. [DraBornTranslate v0.6.2 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.2/DraBornTranslate-v0.6.2-Android-arm64.apk).
+1. [DraBornTranslate v0.6.3 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.6.3/DraBornTranslate-v0.6.3-Android-arm64.apk).
 2. APK’yı Android telefonunda aç. Önceki v5 serisi kurulumunun üzerine yükleyebilirsin.
 3. Ana ekrandan bağlantını seç. [PS5, Portal ve Remote Play kurulum adımları](docs/KURULUM.md).
 

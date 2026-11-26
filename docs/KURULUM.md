@@ -1,10 +1,10 @@
-# DraBornTranslate v0.6.2
+# DraBornTranslate v0.6.3
 
 **Android 10+ · ARM64 · Android sürüm kodu 10**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.2)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6.3)
 
-v0.6.2 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.6.3 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
