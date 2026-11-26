@@ -50,6 +50,9 @@ def archive_inputs(directory):
             entries[f"texts/{mission_id}.json"] = entry
             line_count += len(rows)
 
+    media_file = directory / "media.json"
+    if media_file.is_file():
+        catalog["media"] = json.loads(media_file.read_text(encoding="utf-8"))
     entries["catalog.json"] = json_bytes(catalog)
     if len(entries["catalog.json"]) > MAX_CATALOG_BYTES or sum(map(len, entries.values())) > MAX_EXPANDED_BYTES:
         raise ValueError("Expanded archive exceeds the Android pack size limit")

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "2026.11.26.3",
+  "version": "2026.11.26.4",
   "gameBuild": "Xbox Series 1.0.2.1",
   "missions": [
     {
@@ -1182,7 +1182,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/mtl-mud",
       "mapLabels": [
         "Check Out the Mud Club"
-      ]
+      ],
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
     },
     {
       "id": "csc-drt-cnvy",
@@ -1223,7 +1224,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/csc-drt-cnvy",
       "mapLabels": [
         "Join Billy on a Job"
-      ]
+      ],
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
     },
     {
       "id": "bil-motel",
@@ -2018,7 +2020,8 @@
       ],
       "gallerySourceUrl": "https://www.powerpyx.com/gta-6-randys-wish-list-car-locations-walkthrough/",
       "giver": "Randy",
-      "textSourceUrl": "https://six.mics.dev/missions/randys-wish-list"
+      "textSourceUrl": "https://six.mics.dev/missions/randys-wish-list",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
     },
     {
       "id": "ban-setup",
@@ -2654,7 +2657,8 @@
       "mapLabels": [
         "Meet Abe Gonzalez"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/lawyer-up"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/lawyer-up",
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina"
     },
     {
       "id": "mny-party",
@@ -2694,7 +2698,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/mny-party",
       "mapLabels": [
         "Work Personal Security"
-      ]
+      ],
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina"
     },
     {
       "id": "air-tail",
@@ -3021,7 +3026,8 @@
       "mapLabels": [
         "Work Security for Andrés"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/adventures-in-babysitting"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/adventures-in-babysitting",
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon"
     },
     {
       "id": "fresh-evidence",
@@ -3129,7 +3135,8 @@
       "titleEn": "Rafa’s Kidnapping",
       "gallerySourceUrl": "https://www.powerpyx.com/gta-6-rafas-kidnapping-walkthrough/",
       "giver": "Andrés de León / Abe Gonzalez",
-      "textSourceUrl": "https://six.mics.dev/missions/mny-kidnp"
+      "textSourceUrl": "https://six.mics.dev/missions/mny-kidnp",
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon"
     },
     {
       "id": "headliners",
@@ -3391,7 +3398,8 @@
       "mapLabels": [
         "Work Out"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/blood-sweat-and-gear"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/blood-sweat-and-gear",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/nate"
     },
     {
       "id": "sfh-taxi",
@@ -3886,7 +3894,8 @@
       "mapLabels": [
         "Shut Down the Labs"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/spin-on-this"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/spin-on-this",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/tyrone"
     },
     {
       "id": "delivery-day",
@@ -3923,7 +3932,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/delivery-day",
       "mapLabels": [
         "Meet Randy"
-      ]
+      ],
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
     },
     {
       "id": "find-donnies-package",
@@ -4008,7 +4018,8 @@
       "aliases": [
         "The Unknown Stuntman"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_INTRO"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_INTRO",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
     },
     {
       "id": "trial-by-tire",
@@ -4054,7 +4065,8 @@
       "mapLabels": [
         "Meet the AudaCity Engineer"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_FSTNT"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_FSTNT",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
     },
     {
       "id": "quit-your-job-sell-your-house",
@@ -4102,7 +4114,8 @@
       "mapLabels": [
         "Help Papa Audacity"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_STADM"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_STADM",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
     },
     {
       "id": "audacity-stunts",
@@ -4138,7 +4151,8 @@
       "giver": "Papa Audacity",
       "aliases": [
         "AudaCity Stunts"
-      ]
+      ],
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
     },
     {
       "id": "catching-a-whale",
@@ -4184,7 +4198,8 @@
       "mapLabels": [
         "Help Papa Audacity"
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_PLANE"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_PLANE",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
     },
     {
       "id": "the-audacity",
@@ -4247,7 +4262,8 @@
       "giver": "Papa Audacity",
       "mapLabels": [
         "Attend the Launch Party"
-      ]
+      ],
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
     },
     {
       "id": "get-shirleys-rum",
@@ -4273,7 +4289,8 @@
       "characters": [
         "Shirley"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shirley"
     },
     {
       "id": "steal-the-scooter",
@@ -4299,7 +4316,8 @@
       "characters": [
         "Shirley"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shirley"
     },
     {
       "id": "pick-up-groceries-drop-off-groceries",
@@ -4535,7 +4553,8 @@
         "Donnie",
         "Brian Heder"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/donnie"
     },
     {
       "id": "clock-out",
@@ -4867,7 +4886,8 @@
       "characters": [
         "Kyle"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle"
     },
     {
       "id": "collect-chemicals-for-kyle",
@@ -4893,7 +4913,8 @@
       "characters": [
         "Kyle"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle"
     },
     {
       "id": "hit-avery-pawn",
@@ -5030,7 +5051,8 @@
       "characters": [
         "Bret Vogel"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/bret"
     },
     {
       "id": "get-your-wheels",
@@ -5078,7 +5100,8 @@
       "characters": [
         "Yago"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
     },
     {
       "id": "send-money-to-lorena",
@@ -5161,7 +5184,8 @@
       "characters": [
         "Kyle"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle"
     },
     {
       "id": "meet-the-heders",
@@ -5255,7 +5279,8 @@
       "characters": [
         "Yago"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
     },
     {
       "id": "send-more-money-to-lorena",
@@ -5334,7 +5359,8 @@
       "characters": [
         "Yago"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
     },
     {
       "id": "heist-planning",
@@ -5392,7 +5418,8 @@
       "characters": [
         "Billy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
     },
     {
       "id": "brother-to-brother",
@@ -5421,7 +5448,8 @@
       "characters": [
         "Yago"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
     },
     {
       "id": "pool-day",
@@ -5527,7 +5555,8 @@
       "characters": [
         "Abe Gonzalez"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/abe-gonzalez"
     },
     {
       "id": "bad-driver",
@@ -5556,7 +5585,8 @@
       "characters": [
         "Andrea"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andrea"
     },
     {
       "id": "attend-eddie-acostas-party",
@@ -5582,7 +5612,8 @@
       "characters": [
         "Eddie Acosta"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/eddie-acosta"
     },
     {
       "id": "drequans-gift",
@@ -5636,7 +5667,8 @@
       "characters": [
         "Nate"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/nate"
     },
     {
       "id": "nate-will-be-in-touch",
@@ -5666,7 +5698,8 @@
       "characters": [
         "Nate"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/nate"
     },
     {
       "id": "childs-play",
@@ -5696,7 +5729,8 @@
       "characters": [
         "Andrés de León"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon"
     },
     {
       "id": "this-is-a-free-call-from",
@@ -5725,7 +5759,8 @@
       "characters": [
         "Shayna"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shayna"
     },
     {
       "id": "heist-plans-in-place",
@@ -5809,7 +5844,8 @@
       "characters": [
         "Yasmani"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/yasmani"
     },
     {
       "id": "call-valentina-back",
@@ -5835,7 +5871,8 @@
       "characters": [
         "Valentina"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina"
     },
     {
       "id": "sunset",
@@ -5948,7 +5985,8 @@
       "characters": [
         "Kirk"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk"
     },
     {
       "id": "search-for-tree-effigies",
@@ -5974,7 +6012,8 @@
       "characters": [
         "Kirk"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk"
     },
     {
       "id": "help-kirk-find-mr-mangrove",
@@ -6003,7 +6042,8 @@
       "characters": [
         "Kirk"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk"
     },
     {
       "id": "gellhorns-missing-tourists",
@@ -6079,7 +6119,8 @@
       "characters": [
         "Moses"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/moses"
     },
     {
       "id": "collect-moses-gift",
@@ -6104,7 +6145,8 @@
       "characters": [
         "Moses"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/moses"
     },
     {
       "id": "the-impaler",
@@ -6134,7 +6176,8 @@
       "characters": [
         "Billy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
     },
     {
       "id": "hometown-heroes",
@@ -6163,7 +6206,8 @@
       "characters": [
         "Billy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
     },
     {
       "id": "climbing-the-cellerichain",
@@ -6189,7 +6233,8 @@
       "characters": [
         "Andy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
     },
     {
       "id": "pay-the-cellerica-fee",
@@ -6215,7 +6260,8 @@
       "characters": [
         "Andy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
     },
     {
       "id": "peach",
@@ -6244,7 +6290,8 @@
       "characters": [
         "Andy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
     },
     {
       "id": "read-the-label",
@@ -6274,7 +6321,8 @@
         "Andy",
         "Cecilia"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
     },
     {
       "id": "puff-puff-pass",
@@ -6305,7 +6353,8 @@
         "Andy",
         "Cecilia"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
     },
     {
       "id": "dale-mamba",
@@ -6334,7 +6383,8 @@
       "characters": [
         "Randy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
     },
     {
       "id": "mansion-thrax",
@@ -6363,7 +6413,8 @@
       "characters": [
         "Randy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
     },
     {
       "id": "collect-the-tempesta",
@@ -6389,7 +6440,8 @@
       "characters": [
         "Randy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
     },
     {
       "id": "the-last-mile-passing-the-torch",
@@ -6418,7 +6470,8 @@
       "characters": [
         "Pilot Pete"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete"
     },
     {
       "id": "the-last-mile-backseat-pilot",
@@ -6447,7 +6500,8 @@
       "characters": [
         "Pilot Pete"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete"
     },
     {
       "id": "petes-deliveries-southpoint-airfield",
@@ -6473,7 +6527,8 @@
       "characters": [
         "Pilot Pete"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete"
     },
     {
       "id": "the-final-flush",
@@ -6502,7 +6557,8 @@
       "characters": [
         "Dr. Merle"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/dr-merle"
     },
     {
       "id": "retest-freddies-defenses",
@@ -6527,7 +6583,8 @@
       "characters": [
         "Freddie"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/freddie"
     },
     {
       "id": "bring-out-the-chimp",
@@ -6583,7 +6640,8 @@
       "characters": [
         "Rosebud"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/rosebud"
     },
     {
       "id": "twin-flames",

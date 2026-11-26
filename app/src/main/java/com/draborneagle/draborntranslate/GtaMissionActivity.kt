@@ -2,13 +2,12 @@
 package com.draborneagle.draborntranslate
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -25,12 +24,10 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import java.util.Locale
 import java.util.concurrent.Executors
 
-internal const val MISSION_EXTRA = "mission"
-internal const val MISSION_SCENE_EXTRA = "missionScene"
+private const val MISSION_EXTRA = "mission"
 private const val SEARCH_LANGUAGE = "mission_search_language"
 
 private fun Context.openMission(mission: GtaMission, language: GtaMissionSearchLanguage) {
@@ -39,20 +36,16 @@ private fun Context.openMission(mission: GtaMission, language: GtaMissionSearchL
         .putExtra(SEARCH_LANGUAGE, language.name))
 }
 
-private fun Context.missionAvatar(giver: String?, portrait: Bitmap?, size: Int) = FrameLayout(this).apply {
-    val colors = listOf(Miami.pink, Miami.aqua, Miami.coral, Miami.lavender)
-    val accent = colors[Math.floorMod(giver.orEmpty().hashCode(), colors.size)]
-    background = filled(mix(Miami.surface, accent, .23f), size / 2, mix(Miami.edge, accent, .45f))
+private fun Context.missionAvatar(giver: String?, portrait: GtaMissionImage?, size: Int) = FrameLayout(this).apply {
+    background = filled(mix(Miami.surface, Miami.aqua, .16f), size / 2, mix(Miami.edge, Miami.aqua, .4f))
     clipToOutline = true
-    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-    if (portrait == null) {
-        val initials = giver?.split(Regex("\\s+"))?.filter(String::isNotBlank)?.take(2)
-            ?.joinToString("") { it.take(1) }?.uppercase(Locale.ROOT) ?: "?"
-        addView(copy(initials, if (size > 52) 22 else 16, accent, true), FrameLayout.LayoutParams(-2, -2, Gravity.CENTER))
-    } else addView(ImageView(context).apply {
-        setImageBitmap(portrait)
-        scaleType = ImageView.ScaleType.CENTER_CROP
-    }, FrameLayout.LayoutParams(-1, -1))
+    val placeholder = glyph(R.drawable.ic_mission_character, Miami.aqua)
+    addView(placeholder, FrameLayout.LayoutParams(dp(size / 2), dp(size / 2), Gravity.CENTER))
+    if (portrait != null) {
+        addView(MissionImageView(context, portrait, 240) { placeholder.visibility = View.INVISIBLE }.apply {
+            contentDescription = "$giver profil resmi"
+        }, FrameLayout.LayoutParams(-1, -1))
+    }
 }
 
 class GtaMissionSearchActivity : Activity() {
@@ -65,7 +58,6 @@ class GtaMissionSearchActivity : Activity() {
     private lateinit var english: Button
     private var language = GtaMissionSearchLanguage.TURKISH
     private var catalog: GtaMissionCatalog? = null
-    private var portraits = emptyMap<String, Bitmap>()
     private var visibleCount = PAGE_SIZE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,15 +118,9 @@ class GtaMissionSearchActivity : Activity() {
         val app = applicationContext
         worker.execute {
             val loaded = runCatching { GtaMissionStore.catalog(app) }
-            val catalogImages = loaded.getOrNull()?.missions.orEmpty().mapNotNull { it.giver }.distinct()
-                .mapNotNull { name ->
-                    val file = MissionMedia.portrait(app, name)
-                    if (!file.isFile) null else MissionMedia.thumbnail(file, 148)?.let { name to it }
-                }.toMap()
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
                 catalog = loaded.getOrNull()
-                portraits = catalogImages
                 install.visibility = if (catalog == null) View.VISIBLE else View.GONE
                 if (catalog != null) renderResults() else {
                     results.removeAllViews()
@@ -184,7 +170,8 @@ class GtaMissionSearchActivity : Activity() {
         isFocusable = true
         contentDescription = title
         setOnClickListener { openMission(mission, language) }
-        addView(missionAvatar(mission.giver, mission.giver?.let(portraits::get), 49), LinearLayout.LayoutParams(dp(49), dp(49)))
+        addView(missionAvatar(mission.giver, catalog?.portrait(mission.giver), 53),
+            LinearLayout.LayoutParams(dp(53), dp(53)))
         addView(stack().apply {
             addView(copy(title, 18, Palette.white, true))
             if (mapLabel != null) addBelow(copy(mapLabel, 13, Miami.lavender, true), 2)
@@ -209,34 +196,30 @@ class GtaMissionSearchActivity : Activity() {
 }
 
 class GtaMissionDetailsActivity : Activity() {
+    private enum class Pane { INFO, CONVERSATIONS, TARGETS }
+
     private val worker = Executors.newSingleThreadExecutor()
     private lateinit var body: LinearLayout
     private lateinit var infoButton: Button
     private lateinit var textButton: Button
     private lateinit var catalog: GtaMissionCatalog
     private lateinit var mission: GtaMission
-    private lateinit var journal: MissionJournalPanel
     private val language by lazy { GtaMissionSearchLanguage.fromName(intent.getStringExtra(SEARCH_LANGUAGE)) }
-    private var showingTexts = false
-    private var showingTargets = false
-    private var textPage = 0
-    private var packLines: List<GtaMissionText>? = null
+    private var pane = Pane.INFO
+    private var visibleRows = PAGE_SIZE
+    private var rows: List<GtaMissionText>? = null
     private var packError: String? = null
-    private var portrait: Bitmap? = null
-    private var photos = emptyList<Pair<MissionPhoto, Bitmap>>()
-    private var galleryScene: String? = null
-    private var pendingResult: Pair<Int, Intent>? = null
     private var translation: GameTranslatorEngine? = null
-    private val translatedPackLines = mutableMapOf<GtaMissionText, String>()
-    private val translating = mutableSetOf<GtaMissionText>()
+    private val translatedLines = mutableMapOf<GtaMissionText, String>()
+    private val attemptedTranslations = mutableSetOf<GtaMissionText>()
+    private var renderVersion = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        showingTexts = savedInstanceState?.getBoolean("texts") == true
-        showingTargets = savedInstanceState?.getBoolean("targets") == true
-        galleryScene = savedInstanceState?.getString("galleryScene")
+        pane = Pane.entries.firstOrNull { it.name == savedInstanceState?.getString("missionPane") } ?: Pane.INFO
+        visibleRows = savedInstanceState?.getInt("missionRows", PAGE_SIZE) ?: PAGE_SIZE
         val content = miamiPage("Görev Detayı", Miami.pink)
-        val loading = miamiSection("Görev bilgileri", "Yükleniyor…")
+        val loading = copy("Görev yükleniyor…")
         content.addBelow(loading)
         val app = applicationContext
         val id = intent.getStringExtra(MISSION_EXTRA)
@@ -248,348 +231,311 @@ class GtaMissionDetailsActivity : Activity() {
             }.getOrNull()
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
+                content.removeView(loading)
                 if (selected == null) {
-                    content.removeView(loading)
                     content.addBelow(miamiSection("Görev açılamadı", "Görev aramasından tekrar seç."))
                     return@runOnUiThread
                 }
                 catalog = selected.first
                 mission = selected.second
-                journal = MissionJournalPanel(this, mission, savedInstanceState, worker)
-                content.removeView(loading)
-                content.addBelow(miamiHero(mission.nameIn(language),
-                    listOfNotNull(mission.alternateNameIn(language), mission.category).joinToString(" · "), Miami.pink))
-                infoButton = press("Görev bilgileri") { showingTexts = false; renderBody() }
-                textButton = press("Görev metinleri") { showingTexts = true; renderBody() }
+                content.addBelow(missionHero())
+                infoButton = press("Görev bilgileri") { select(Pane.INFO) }
+                textButton = press("Görev metinleri") { if (pane == Pane.INFO) select(Pane.CONVERSATIONS) }
                 content.addBelow(actionRow(infoButton, textButton), 12)
                 body = stack()
-                content.addBelow(body, 13)
-                renderBody()
-                loadMedia()
-                loadPackLines()
-                pendingResult?.let { (code, data) -> handleResult(code, data) }
-                pendingResult = null
+                content.addBelow(body, 12)
+                render()
+                loadTexts()
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (::journal.isInitialized && showingTexts && !showingTargets) journal.refresh()
+    private fun select(target: Pane) {
+        if (pane == target) return
+        pane = target
+        visibleRows = PAGE_SIZE
+        render()
     }
 
-    private fun renderBody() {
+    private fun missionHero() = FrameLayout(this).apply {
+        val height = 208
+        background = filled(Miami.night, 27, mix(Miami.edge, Miami.pink, 0.34f))
+        clipToOutline = true
+        val base = ImageView(context).apply {
+            setImageResource(R.drawable.miami_waterfront)
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        addView(base, FrameLayout.LayoutParams(-1, dp(height), Gravity.TOP))
+        mission.previews.firstOrNull()?.let { photo ->
+            addView(MissionImageView(context, photo, 800).apply {
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }, FrameLayout.LayoutParams(-1, dp(height), Gravity.TOP))
+        }
+        addView(View(context).apply {
+            background = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                intArrayOf(Miami.night, 0x9511182D.toInt(), 0x2011182D))
+        }, FrameLayout.LayoutParams(-1, dp(height), Gravity.BOTTOM))
+        addView(stack().apply {
+            gravity = Gravity.BOTTOM
+            minimumHeight = dp(height)
+            setPadding(dp(17), dp(14), dp(16), dp(15))
+            val category = copy(mission.category, 12, Miami.pink, true).apply {
+                background = filled(0xE8141930.toInt(), 12, mix(Miami.edge, Miami.pink, 0.4f))
+                setPadding(dp(10), dp(5), dp(10), dp(5))
+            }
+            addView(category, LinearLayout.LayoutParams(-2, -2))
+            addBelow(copy(mission.nameIn(language), 32, Palette.white, true).apply {
+                typeface = Typeface.create(Typeface.create("sans-serif-condensed", Typeface.NORMAL), 800, false)
+                isAccessibilityHeading = true
+                setShadowLayer(dp(3).toFloat(), 0f, dp(1).toFloat(), Miami.night)
+            }, 7)
+            mission.alternateNameIn(language)?.let { addBelow(copy(it, 15, Miami.aqua), 2) }
+        }, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+    }
+
+    private fun render() {
+        val version = ++renderVersion
         body.removeAllViews()
-        journal.detach()
-        infoButton.miamiChoice(!showingTexts, Miami.pink)
-        textButton.miamiChoice(showingTexts, Miami.aqua)
-        if (!showingTexts) {
+        infoButton.miamiChoice(pane == Pane.INFO, Miami.pink)
+        textButton.miamiChoice(pane != Pane.INFO, Miami.aqua)
+        if (pane == Pane.INFO) {
             showInfo()
             return
         }
-        val tabs = actionRow(
-            press("Konuşmalar") { showingTargets = false; textPage = 0; renderBody() }.apply { miamiChoice(!showingTargets, Miami.aqua) },
-            press("Hedefler ve mesajlar") { showingTargets = true; textPage = 0; renderBody() }
-                .apply { miamiChoice(showingTargets, Miami.coral) },
+        val options = actionRow(
+            press("Konuşmalar") { select(Pane.CONVERSATIONS) }.apply {
+                miamiChoice(pane == Pane.CONVERSATIONS, Miami.aqua)
+            },
+            press("Hedefler/Kaynaklar") { select(Pane.TARGETS) }.apply {
+                miamiChoice(pane == Pane.TARGETS, Miami.coral)
+            },
         )
-        body.addBelow(tabs)
-        if (showingTargets) showPackLines(targets = true)
-        else {
-            val personal = stack()
-            body.addBelow(personal, 12)
-            journal.attach(personal, packLines.orEmpty().count { it.type == GtaTextType.DIALOGUE })
-            showPackLines(targets = false)
-        }
-        addSources()
+        body.addBelow(options)
+        showPackText(version, conversations = pane == Pane.CONVERSATIONS)
+        if (pane == Pane.TARGETS) showSources()
     }
 
     private fun showInfo() {
-        body.addBelow(miamiSection("Genel bilgiler", mission.summary))
-        mission.location?.let { body.addBelow(miamiSection("Konum", it, Miami.aqua), 10) }
-        if (mission.mapLabels.isNotEmpty()) {
-            body.addBelow(miamiSection("Oyunda görünen adlar", mission.mapLabels.joinToString("\n"), Miami.coral), 10)
-        }
-        body.addBelow(giverPanel(), 10)
-        if (mission.characters.isNotEmpty()) {
-            body.addBelow(miamiSection("Görevde görülenler", mission.characters.joinToString(", ")), 10)
-        }
-        mission.scenes.forEach { scene ->
-            val panel = miamiSection(scene.title, scene.context.orEmpty(), Miami.coral)
-            scene.environment?.let { panel.addBelow(copy(it, 13, Miami.aqua), 6) }
-            body.addBelow(panel, 8)
-        }
-        if (mission.prerequisites.isNotEmpty()) body.addBelow(copy("Önce tamamlanacak görev", 15, Miami.pink, true), 12)
-        catalog.missions.filter { it.id in mission.prerequisites }.forEach { prerequisite ->
-            body.addBelow(press(prerequisite.nameIn(language)) { openMission(prerequisite, language) }, 8)
-        }
-        body.addBelow(galleryPanel(), 10)
-        addSources(includeDialogue = false)
-    }
-
-    private fun giverPanel() = miamiPanel(Miami.pink).apply {
-        val name = mission.giver
-        addView(row().apply {
-            addView(missionAvatar(name, portrait, 62), LinearLayout.LayoutParams(dp(62), dp(62)))
-            addView(stack().apply {
-                addView(copy("Görevi veren", 13, Miami.pink, true))
-                addBelow(copy(name ?: "Kaynakta belirtilmemiş", 18, Palette.white, true), 2)
-            }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(13) })
+        body.addBelow(miamiSection("Genel bilgiler", mission.summary, Miami.pink).apply {
+            background = detailSurface(Miami.pink)
+            mission.location?.let { addBelow(copy(it, 14, Miami.aqua, true), 10) }
         })
-        if (name != null) {
-            val photo = press(if (portrait == null) "Profil fotoğrafı ekle" else "Profil fotoğrafını değiştir") {
-                pickImages(PORTRAIT, multiple = false)
+        if (mission.mapLabels.isNotEmpty()) {
+            body.addBelow(miamiSection("Oyunda görünen adlar", mission.mapLabels.joinToString("\n"), Miami.coral), 8)
+        }
+        mission.giver?.let { body.addBelow(giverPanel(it), 10) }
+        if (mission.previews.size > 1) body.addBelow(missionStills(), 10)
+        if (mission.characters.isNotEmpty()) {
+            body.addBelow(miamiSection("Görevde görülenler", mission.characters.joinToString(", "), Miami.lavender), 10)
+        }
+        val notes = rows.orEmpty().filter { it.type == GtaTextType.GUIDE && it.sceneId != null }.groupBy { it.sceneId }
+        if (mission.scenes.isNotEmpty()) body.addBelow(copy("Sahneler", 18, Palette.white, true).apply {
+            isAccessibilityHeading = true
+        }, 15)
+        mission.scenes.forEachIndexed { index, scene ->
+            val accent = if (index % 2 == 0) Miami.coral else Miami.aqua
+            val description = scene.context ?: notes[scene.id]?.firstNotNullOfOrNull { it.turkish }?.takeUnless {
+                it == mission.summary
             }
-            val source = mission.profileSource
-            if (source == null) addBelow(photo, 10)
-            else addBelow(actionRow(photo, press("Karakteri kaynakta gör") { openMissionSource(source) }), 10)
+            body.addBelow(row().apply {
+                background = detailSurface(accent)
+                setPadding(dp(13), dp(12), dp(15), dp(12))
+                addView(View(context).apply { background = filled(accent, 4) },
+                    LinearLayout.LayoutParams(dp(4), dp(35)).apply { gravity = Gravity.TOP; topMargin = dp(3) })
+                addView(stack().apply {
+                    addView(copy(scene.title, 17, accent, true))
+                    scene.environment?.let { addBelow(copy(it, 13, Palette.quiet), 3) }
+                    description?.let { addBelow(copy(it, 15, Palette.white), 6) }
+                }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
+            }, 8)
+        }
+        mission.prerequisites.mapNotNull { id -> catalog.missions.firstOrNull { it.id == id } }.forEach { previous ->
+            body.addBelow(prerequisite(previous), 10)
         }
     }
 
-    private fun galleryPanel() = miamiPanel(Miami.aqua).apply {
-        addView(copy("Oyun görüntüleri", 18, Palette.white, true).apply { isAccessibilityHeading = true })
-        if (photos.isNotEmpty()) addBelow(HorizontalScrollView(this@GtaMissionDetailsActivity).apply {
+    private fun detailSurface(accent: Int): GradientDrawable =
+        blend(mix(Miami.surface, accent, 0.12f), Miami.surface, 22).apply {
+            setStroke(dp(1), mix(Miami.edge, accent, 0.32f))
+        }
+
+    private fun giverPanel(name: String) = row().apply {
+        background = detailSurface(Miami.aqua)
+        setPadding(dp(13), dp(12), dp(13), dp(12))
+        addView(missionAvatar(name, catalog.portrait(name), 62), LinearLayout.LayoutParams(dp(62), dp(62)))
+        addView(stack().apply {
+            addView(copy("Görevi veren", 12, Miami.aqua, true))
+            addBelow(copy(name, 19, Palette.white, true), 2)
+        }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
+    }
+
+    private fun missionStills() = stack().apply {
+        addView(HorizontalScrollView(this@GtaMissionDetailsActivity).apply {
             isHorizontalScrollBarEnabled = false
+            val width = if (mission.previews.size == 2) 264 else 192
             addView(row().apply {
-                for ((photo, bitmap) in photos) {
-                    val caption = mission.scenes.firstOrNull { it.id == photo.sceneId }?.title ?: "Oyun görüntüsü"
+                mission.previews.drop(1).forEach { photo ->
                     addView(stack().apply {
+                        val label = photo.caption ?: "${mission.nameIn(language)} görev görüntüsü"
                         isFocusable = true
-                        contentDescription = caption
-                        setOnClickListener { viewPhoto(photo, caption) }
-                        addView(ImageView(context).apply {
-                            background = filled(Miami.night, 14, Miami.edge)
+                        contentDescription = label
+                        setOnClickListener { openMissionSource(photo.url) }
+                        addView(FrameLayout(context).apply {
+                            background = filled(Miami.surface, 17, Miami.edge)
                             clipToOutline = true
-                            scaleType = ImageView.ScaleType.CENTER_CROP
-                            setImageBitmap(bitmap)
-                            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-                        }, LinearLayout.LayoutParams(dp(156), dp(90)))
-                        addBelow(copy(caption, 13), 4)
-                    }, LinearLayout.LayoutParams(dp(156), -2).apply { marginEnd = dp(9) })
+                            val placeholder = glyph(R.drawable.ic_capture_album, Miami.lavender)
+                            addView(placeholder, FrameLayout.LayoutParams(dp(27), dp(27), Gravity.CENTER))
+                            addView(MissionImageView(context, photo, 580) { placeholder.visibility = View.INVISIBLE },
+                                FrameLayout.LayoutParams(-1, -1))
+                        }, LinearLayout.LayoutParams(-1, dp(if (width == 264) 145 else 108)))
+                        photo.caption?.let { addBelow(copy(it, 12, Palette.quiet), 4) }
+                    }, LinearLayout.LayoutParams(dp(width), -2).apply { marginEnd = dp(8) })
                 }
             })
-        }, 9)
-        addBelow(press("Oyundan görüntü ekle", Miami.aqua) {
-            chooseMissionScene(mission, "Görüntü hangi sahneye ait?") { scene ->
-                galleryScene = scene
-                pickImages(GALLERY, multiple = true)
-            }
-        }.apply { isEnabled = photos.size < MissionMedia.MAX_CAPTURES }, 10)
-        mission.gallerySource?.let { url ->
-            addBelow(press("Görevin kaynak görsellerini aç") { openMissionSource(url) }, 7)
+        })
+        mission.gallerySource?.let { gallery ->
+            val source = if (gallery.startsWith("https://www.gtabase.com/")) "GTABase" else "PowerPyx"
+            addBelow(copy("Görsel kaynağı · $source", 12, Miami.lavender).apply {
+                setPadding(dp(2), dp(10), dp(2), dp(8))
+                setOnClickListener { openMissionSource(gallery) }
+                isFocusable = true
+            }, 1)
         }
     }
 
-    private fun viewPhoto(photo: MissionPhoto, label: String) {
-        worker.execute {
-            val image = MissionMedia.thumbnail(photo.file, 1_440)
-            runOnUiThread {
-                if (image == null || isDestroyed || isFinishing) return@runOnUiThread
-                val view = ImageView(this).apply {
-                    setImageBitmap(image)
-                    adjustViewBounds = true
-                    scaleType = ImageView.ScaleType.FIT_CENTER
-                    contentDescription = label
-                }
-                AlertDialog.Builder(this).setTitle(label).setView(view).setPositiveButton("Kapat", null)
-                    .setNeutralButton("Kaldır") { _, _ ->
-                        AlertDialog.Builder(this).setTitle("Bu görüntü kaldırılsın mı?")
-                            .setNegativeButton("Vazgeç", null).setPositiveButton("Kaldır") { _, _ ->
-                                worker.execute {
-                                    photo.file.delete()
-                                    runOnUiThread { if (!isFinishing && !isDestroyed) loadMedia() }
-                                }
-                            }.show()
-                    }.show()
-            }
+    private fun prerequisite(previous: GtaMission) = row().apply {
+        val title = previous.nameIn(language)
+        val gradient = GradientDrawable(GradientDrawable.Orientation.TL_BR,
+            intArrayOf(0xFFFFBC94.toInt(), 0xFFFFABD2.toInt(), 0xFF9FDCF5.toInt())).apply {
+            cornerRadius = dp(22).toFloat()
         }
+        background = RippleDrawable(ColorStateList.valueOf(0x368E286B), gradient, null)
+        setPadding(dp(14), dp(13), dp(12), dp(13))
+        isFocusable = true
+        minimumHeight = dp(72)
+        contentDescription = title
+        setOnClickListener { openMission(previous, language) }
+        addView(glyph(R.drawable.ic_arrow_back, Miami.night).apply {
+            background = filled(0x30FFFFFF, 14)
+            rotation = 180f
+            setPadding(dp(9), dp(9), dp(9), dp(9))
+        }, LinearLayout.LayoutParams(dp(42), dp(42)))
+        addView(stack().apply {
+            addView(copy("Önce tamamlanacak görev", 12, 0xFF4E294E.toInt(), true))
+            addBelow(copy(title, 19, Miami.night, true), 1)
+        }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
     }
 
-    private fun loadMedia() {
-        val app = applicationContext
-        val selected = mission
-        worker.execute {
-            val avatar = selected.giver?.let { MissionMedia.portrait(app, it) }?.takeIf { it.isFile }
-                ?.let { MissionMedia.thumbnail(it, 200) }
-            val captures = MissionMedia.photos(app, selected.id).mapNotNull { photo ->
-                MissionMedia.thumbnail(photo.file, 200)?.let { photo to it }
-            }
-            runOnUiThread {
-                if (isDestroyed || isFinishing) return@runOnUiThread
-                portrait = avatar
-                photos = captures
-                if (!showingTexts) renderBody()
-            }
-        }
-    }
-
-    private fun loadPackLines() {
+    private fun loadTexts() {
         val app = applicationContext
         worker.execute {
             val result = runCatching { GtaMissionStore.texts(app, catalog, mission) }
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
-                packLines = result.getOrNull()
+                rows = result.getOrNull()
                 packError = result.exceptionOrNull()?.message
-                if (showingTexts) renderBody()
+                render()
             }
         }
     }
 
-    private fun showPackLines(targets: Boolean) {
-        packError?.let {
-            body.addBelow(miamiSection("Paket metinleri açılamadı", it), 10)
-            body.addBelow(press("Yeniden dene") { loadPackLines() }, 6)
+    private fun showPackText(version: Int, conversations: Boolean) {
+        val available = rows
+        if (available == null) {
+            val issue = packError
+            body.addBelow(copy(issue ?: "Görev metinleri yükleniyor…"), 12)
+            if (issue != null) body.addBelow(press("Yeniden dene") { loadTexts() }, 8)
             return
         }
-        val entries = packLines?.filter {
-            if (targets) it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE else it.type == GtaTextType.DIALOGUE
+        val entries = available.filter {
+            if (conversations) it.type == GtaTextType.DIALOGUE
+            else it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE
         }
-        if (entries.isNullOrEmpty()) {
-            if (targets) body.addBelow(copy(if (entries == null) "Paket metinleri yükleniyor…" else
-                "Bu görev için pakette hedef veya mesaj kaydı yok."), 12)
-            return
-        }
-        val start = (textPage * PACK_PAGE).coerceAtMost(((entries.size - 1) / PACK_PAGE) * PACK_PAGE)
-        val end = minOf(start + PACK_PAGE, entries.size)
-        body.addBelow(copy(if (targets) "Paket hedefleri ve mesajlar" else "Paketteki diyaloglar",
-            15, Miami.coral, true).apply { isAccessibilityHeading = true }, 13)
-        if (entries.size > PACK_PAGE) body.addBelow(actionRow(
-            press("Önceki") { textPage = start / PACK_PAGE - 1; renderBody() }.apply { isEnabled = start > 0 },
-            press("Sonraki") { textPage = start / PACK_PAGE + 1; renderBody() }.apply { isEnabled = end < entries.size },
-        ), 6)
-        for (index in start until end) {
-            val line = entries[index]
-            val scene = mission.scenes.firstOrNull { it.id == line.sceneId }
-            val translated = line.turkish ?: translatedPackLines[line]
-            val title = listOfNotNull(line.speaker, scene?.title, line.type.label).joinToString(" · ")
-            body.addBelow(miamiSection(title, translated ?: line.english.orEmpty(), Miami.coral).apply {
-                listOfNotNull(scene?.environment, line.context,
-                    line.startMs?.let { missionTimeRange(it, line.endMs) },
-                    line.english?.takeIf { translated != null && it != translated }).forEach { addBelow(copy(it, 13), 4) }
-                if (translated == null && line.english != null) {
-                    val running = line in translating
-                    addBelow(press(if (running) "Çevriliyor…" else "Türkçeye çevir", Miami.aqua) {
-                        translatePackLine(line, entries.getOrNull(index - 1))
-                    }.apply { isEnabled = !running }, 8)
+        if (entries.isEmpty()) {
+            if (conversations) {
+                body.addBelow(miamiSection("Türkçe döküm", "Bu görevin Türkçe diyalog dökümü görev paketinde bulunmuyor.", Miami.aqua), 11)
+                mission.dialogueSource?.let { url ->
+                    body.addBelow(press("Görevin diyalog arşivini aç", Miami.aqua) { openMissionSource(url) }, 8)
                 }
+            } else body.addBelow(copy("Bu göreve ait paket hedefi bulunmuyor."), 12)
+            return
+        }
+        val scenes = mission.scenes.associateBy { it.id }
+        val pending = mutableListOf<Triple<GtaMissionText, String?, TextView>>()
+        entries.take(visibleRows).forEachIndexed { index, line ->
+            val scene = scenes[line.sceneId]
+            val translated = line.turkish ?: translatedLines[line]
+            val title = listOfNotNull(line.speaker, scene?.title).joinToString(" · ").ifBlank { line.type.label }
+            body.addBelow(miamiSection(title, "", if (conversations) Miami.aqua else Miami.coral).apply {
+                val lineText = copy(translated ?: line.english.orEmpty(), 16, Palette.white).apply { setTextIsSelectable(true) }
+                addBelow(lineText, 5)
+                val timing = line.startMs?.let { start ->
+                    val first = formatMissionTime(start)
+                    line.endMs?.let { end -> "$first–${formatMissionTime(end)}" } ?: first
+                }
+                val previous = entries.getOrNull(index - 1)?.takeIf { it.sceneId == line.sceneId }?.english
+                if (translated == null && line.english != null && line !in attemptedTranslations) {
+                    pending.add(Triple(line, previous, lineText))
+                }
+                listOfNotNull(scene?.environment, line.context, timing).forEach { addBelow(copy(it, 13), 4) }
             }, 8)
         }
+        if (entries.size > visibleRows) body.addBelow(press("Daha fazla metin göster") {
+            visibleRows += PAGE_SIZE
+            render()
+        }, 9)
+        translateRows(version, pending.iterator())
     }
 
-    private fun translatePackLine(line: GtaMissionText, previous: GtaMissionText?) {
-        val original = line.english ?: return
-        if (!translating.add(line)) return
+    private fun translateRows(version: Int, views: Iterator<Triple<GtaMissionText, String?, TextView>>) {
+        if (version != renderVersion || isFinishing || isDestroyed || !views.hasNext()) return
+        val (line, previous, view) = views.next()
+        val original = checkNotNull(line.english)
         val engine = translation ?: GameTranslatorEngine(applicationContext, GameReadingProfile.GTA_6).also { translation = it }
-        val previousText = previous?.english?.takeIf { line.sceneId != null && line.sceneId == previous.sceneId }
-        renderBody()
-        engine.translate(TranslationInput(original, previousSubtitle = previousText)) { reply ->
-            translating.remove(line)
-            if (isDestroyed || isFinishing) return@translate
+        engine.translate(TranslationInput(original, previousSubtitle = previous)) { reply ->
+            if (isFinishing || isDestroyed) return@translate
             val result = reply.text?.takeUnless { it.equals(original, ignoreCase = true) }
-            if (result != null) translatedPackLines[line] = result
-            else Toast.makeText(this, "Türkçe çeviri alınamadı.", Toast.LENGTH_SHORT).show()
-            if (showingTexts) renderBody()
-        }
-    }
-
-    private fun addSources(includeDialogue: Boolean = true) {
-        mission.source?.let { body.addBelow(press("Görev kaynağını aç") { openMissionSource(it) }, 10) }
-        mission.gameDataSource?.takeUnless { it == mission.source || it == mission.textSource }?.let { url ->
-            body.addBelow(press("Oyun verisindeki kaydı aç") { openMissionSource(url) }, 7)
-        }
-        if (!includeDialogue) return
-        val source = mission.textSource
-        if (source != null && source != mission.source) {
-            body.addBelow(press("Görev metinlerini kaynakta aç") { openMissionSource(source) }, 7)
-        }
-        if (source == null || !source.startsWith("https://six.mics.dev/dialogue")) {
-            body.addBelow(press("GTA VI Explorer’da diyalog ara") {
-                openMissionSource("https://six.mics.dev/dialogue")
-            }, 7)
-        }
-        body.addBelow(press("GitHub İngilizce metin kaynağı") {
-            openMissionSource("https://github.com/psviethoa/gta6-text-en")
-        }, 7)
-    }
-
-    @Suppress("DEPRECATION")
-    private fun pickImages(code: Int, multiple: Boolean) {
-        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            type = "image/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple)
-        }, code)
-    }
-
-    @Deprecated("Android activity result")
-    override fun onActivityResult(code: Int, result: Int, data: Intent?) {
-        super.onActivityResult(code, result, data)
-        if (result != RESULT_OK || data == null) return
-        if (::mission.isInitialized) handleResult(code, data) else pendingResult = code to data
-    }
-
-    private fun handleResult(code: Int, data: Intent) {
-        if (journal.handleResult(code, data)) return
-        val uris = buildList<Uri> {
-            data.data?.let { add(it) }
-            data.clipData?.let { selection -> for (i in 0 until selection.itemCount) add(selection.getItemAt(i).uri) }
-        }.distinct()
-        if (uris.isEmpty()) return
-        val app = applicationContext
-        val scene = galleryScene
-        worker.execute {
-            val message = runCatching {
-                when (code) {
-                    PORTRAIT -> {
-                        mission.giver?.let { MissionMedia.savePortrait(app, it, uris.first()) }
-                        "Profil fotoğrafı kaydedildi."
-                    }
-                    GALLERY -> "${MissionMedia.savePhotos(app, mission.id, scene, uris)} görüntü eklendi."
-                    else -> return@execute
-                }
-            }.getOrElse { it.message ?: "Görüntü kaydedilemedi." }
-            runOnUiThread {
-                if (isDestroyed || isFinishing) return@runOnUiThread
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                loadMedia()
+            if (result != null) {
+                translatedLines[line] = result
+                view.text = result
             }
+            attemptedTranslations.add(line)
+            translateRows(version, views)
         }
     }
+
+    private fun showSources() {
+        body.addBelow(copy("Kaynaklar", 18, Palette.white, true).apply { isAccessibilityHeading = true }, 15)
+        val links = linkedMapOf<String, String>()
+        fun add(url: String?, label: String) {
+            if (url != null) links.putIfAbsent(url, label)
+        }
+        add(mission.source, "Görev kaynağını aç")
+        add(mission.dialogueSource, "Görevin diyalog arşivini aç")
+        add(mission.textSource, "Görev metinlerini kaynakta aç")
+        add(mission.gallerySource, "Görev görüntülerinin kaynağını aç")
+        add(mission.profileSource, "Karakteri kaynakta gör")
+        add(mission.gameDataSource, "Oyun verisindeki kaydı aç")
+        if (mission.dialogueSource == null) add("https://six.mics.dev/dialogue", "GTA VI Explorer’da diyalog ara")
+        add("https://github.com/psviethoa/gta6-text-en", "GitHub İngilizce metin kaynağı")
+        links.forEach { (url, label) -> body.addBelow(press(label) { openMissionSource(url) }, 7) }
+    }
+
+    private fun formatMissionTime(ms: Long) =
+        String.format(Locale.ROOT, "%d:%02d.%03d", ms / 60_000, ms / 1000 % 60, ms % 1000)
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("texts", showingTexts)
-        outState.putBoolean("targets", showingTargets)
-        outState.putString("galleryScene", galleryScene)
-        if (::journal.isInitialized) journal.saveState(outState)
+        outState.putString("missionPane", pane.name)
+        outState.putInt("missionRows", visibleRows)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
-        if (::journal.isInitialized) journal.close()
         translation?.close()
         worker.shutdown()
         super.onDestroy()
     }
 
-    private companion object {
-        const val PORTRAIT = 61
-        const val GALLERY = 62
-        const val PACK_PAGE = 25
-    }
-}
-
-internal fun Activity.chooseMissionScene(mission: GtaMission, title: String, selected: (String?) -> Unit) {
-    if (mission.scenes.isEmpty()) {
-        selected(null)
-        return
-    }
-    val labels = listOf("Genel · sahne belirtme") + mission.scenes.map { it.title }
-    AlertDialog.Builder(this).setTitle(title).setItems(labels.toTypedArray()) { _, index ->
-        selected(mission.scenes.getOrNull(index - 1)?.id)
-    }.setNegativeButton("Vazgeç", null).show()
-}
-
-internal fun missionTimeRange(start: Long, end: Long? = null): String {
-    fun time(value: Long) = String.format(Locale.ROOT, "%d:%02d.%03d", value / 60_000, value / 1000 % 60, value % 1000)
-    return if (end == null) time(start) else "${time(start)}–${time(end)}"
+    private companion object { const val PAGE_SIZE = 34 }
 }

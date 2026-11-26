@@ -54,13 +54,14 @@ class ScreenNavigationTest {
                 entry("catalog.json", """
                     {"format":1,"version":"test","gameBuild":"Test",
                     "missions":[{"id":"launch","titleTr":"Lansman Partisine Katıl","titleEn":"The Audacity",
-                    "type":"side","chapter":3,"summaryTr":"Lansmandan önce daveti bekle.","textCount":1,
+                    "type":"side","chapter":3,"summaryTr":"Lansmandan önce daveti bekle.","textCount":2,
                     "aliases":["Attent the Launch Party"],"locationTr":"Neo Paloma Apartments",
                     "sourceUrl":"https://example.org/mission","textSourceUrl":"https://example.org/lines",
                     "scenes":[{"id":"lobby","titleTr":"Buluşma","environmentTr":"Giriş holü"}]}]}
                 """.trimIndent())
                 entry("texts/launch.json", """
-                    [{"type":"objective","tr":"Lansman partisine katıl.","sceneId":"lobby"}]
+                    [{"type":"objective","tr":"Lansman partisine katıl.","sceneId":"lobby"},
+                     {"type":"dialogue","tr":"Seni girişte bekleyeceğim.","sceneId":"lobby","speaker":"Deniz","startMs":2500}]
                 """.trimIndent())
             }
             ActivityScenario.launch(HomeActivity::class.java).use {
@@ -75,10 +76,15 @@ class ScreenNavigationTest {
                 click("The Audacity")
                 waitFor { resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") }
                 click("Görev metinleri")
-                click("Hedefler ve mesajlar")
+                waitFor { hasText("Seni girişte bekleyeceğim.") && hasText("Deniz · Buluşma") && hasText("Giriş holü") }
+                assertFalse(hasText("Canlı kayıt başlat"))
+                assertFalse(hasText("SRT / VTT ekle"))
+                assertFalse(hasText("Lansman partisine katıl."))
+                click("Hedefler/Kaynaklar")
                 waitFor { hasText("Lansman partisine katıl.") && hasText("Giriş holü") }
                 assertTrue(hasText("Görev kaynağını aç"))
                 assertTrue(hasText("Görev metinlerini kaynakta aç"))
+                assertFalse(hasText("Seni girişte bekleyeceğim."))
                 assertFalse(hasText("Neo Paloma Apartments"))
                 click("Görev bilgileri")
                 waitFor { hasText("Neo Paloma Apartments") }
@@ -93,39 +99,37 @@ class ScreenNavigationTest {
     }
 
     @Test
-    fun bundledCatalogFindsTheMapNameAndReopensTheRecordedMissionConversation() {
-        val mission = "rob-bank"
-        val sentence = "Yarın köprüde buluşalım."
-        val sample = JournalLine("Let's meet at the bridge tomorrow.", sentence, MissionLineSource.SUBTITLE_FILE,
-            "crew", "Deniz", startMs = 1_032, endMs = 3_000)
-        val saved = MissionJournal.add(app, mission, listOf(sample))
-        try {
-            assertEquals(1, saved)
-            assertEquals(0, MissionJournal.add(app, mission, listOf(sample)))
-            ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
-                waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
-                click("İngilizce")
-                onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Meet Raul's Crew") }
-                waitFor { hasText("Credit Check") && hasText("Meet Raul’s Crew") }
-                screenshot("06-gorev-ara")
-                click("Credit Check")
-                waitFor { resumed() is GtaMissionDetailsActivity && hasText("Raul Bautista") }
-                screenshot("07-gorev-detayi")
-                click("Görev metinleri")
-                waitFor { hasText(sentence) && hasText("Deniz · Ekiple tanışma") && hasText("Stockyard · Raul’un üssü") }
-                assertTrue(hasText("Konuşma kayıtlarım"))
-                assertTrue(hasText("Görev metinlerini kaynakta aç"))
-                assertFalse(hasText("Görev rehberi"))
-                screenshot("08-gorev-konusmalari")
+    fun bundledCatalogShowsAutomaticMissionMediaAndTheFilteredDialogueSource() {
+        ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
+            waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
+            click("İngilizce")
+            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Gone Fishing") }
+            waitFor {
+                hasText("Gone Fishing") && resumed()?.window?.decorView?.findChild {
+                    it is MissionImageView && it.contentDescription == "Cal Hampton profil resmi"
+                } != null
             }
-            ActivityScenario.launch(GamePacksActivity::class.java).use {
-                waitFor { resumed() is GamePacksActivity && hasText("GTA 6 Türkçe") }
-                screenshot("09-oyun-paketleri")
-            }
-        } finally {
-            MissionJournal.page(app, mission, 0, 25).lines.filter { it.line.turkish == sentence }.forEach {
-                MissionJournal.delete(app, mission, it.id)
-            }
+            screenshot("06-gorev-ara")
+            click("Gone Fishing")
+            waitFor { resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") && hasText("Buluşma noktası") }
+            assertFalse(hasText("Profil fotoğrafı ekle"))
+            assertFalse(hasText("Oyundan görüntü ekle"))
+            screenshot("07-gorev-detayi")
+            click("Görev metinleri")
+            waitFor { hasText("Görevin diyalog arşivini aç") }
+            assertFalse(hasText("Konuşma kayıtlarım"))
+            assertFalse(hasText("Altyazı geçmişinden seç"))
+            screenshot("08-gorev-konusmalari")
+            click("Hedefler/Kaynaklar")
+            waitFor { hasText("Kaynaklar") && hasText("Görevin diyalog arşivini aç") }
+            click("Geri")
+            waitFor { resumed() is GtaMissionSearchActivity }
+            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Lab Fees") }
+            waitFor { hasText("Lab Fees") }
+            click("Lab Fees")
+            waitFor { hasText("Önce tamamlanacak görev") }
+            click("Gone Fishing")
+            waitFor { resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") }
         }
     }
 

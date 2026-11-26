@@ -156,7 +156,7 @@ class CaptureService : Service() {
         }
         captions = CaptionSession(
             translate = language::translateFallback,
-            show = ::showReadCaption,
+            show = ::showCaption,
             lookup = language::lookupPack,
             onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
@@ -303,15 +303,6 @@ class CaptureService : Service() {
         SessionState.update(next)
         renderTranslation(next)
         if (caption != null) updateTranslationIssue(null)
-    }
-
-    private fun showReadCaption(caption: Caption?) {
-        if (!ended && caption != null && SessionState.current.portalPanel?.testing != true &&
-            (profile == GameReadingProfile.GTA_6 || readingArea == ReadingArea.SUBTITLES)) {
-            val route = if (connection == Source.PORTAL) MissionLineSource.PS_APP else MissionLineSource.REMOTE_PLAY
-            MissionJournal.observe(this, caption.source, caption.turkish, route)
-        }
-        showCaption(caption)
     }
 
     private fun showHud(blocks: List<HudBlock>) {

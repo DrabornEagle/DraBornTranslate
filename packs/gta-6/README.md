@@ -2,7 +2,9 @@
 
 **Oyun Paketleri → GTA 6 paketini indir** GitHub’daki manifesti ve ZIP’i indirir. Uygulamayla gelen görev kataloğu çevrimdışı arama için de kullanılabilir. **Görev Ara** Türkçe ve İngilizce başlıkları, oyunda görünen başlıkları ve teknik kodları eşleştirir.
 
-2026.11.26.3 kataloğu 204 görev ve görev adımı içerir. Bunların 114’ünde harita başlığı, 184’ünde kaynağa dayalı görev veren bilgisi ve 190’ında kaynak görsellerine bağlantı vardır. Özgün Türkçe sahne rehberleri **Görev Bilgileri** bölümünde yer alır. **Görev Metinleri** konuşma kayıtlarını, hedefleri ve mesajları ayrı açar. Kayda alınan veya kullanıcının içe aktardığı konuşmalar uygulama tarafından cihazda saklanır.
+2026.11.26.4 kataloğunda 204 görev ve görev adımı bulunur. Kaynaktan otomatik yüklenen 44 portre 176 görevde kullanılır. 151 görevde kaynak karesi ve 108 görevde filtreli diyalog bağlantısı bulunur. Paket görseller için yayıncının bağlantısını kullanır. **Görev Bilgileri** özgün Türkçe sahne rehberlerini gösterir.
+
+**Konuşmalar** etkin paketteki diyalogları görüntüler. Kaynak arşivindeki diyaloglar doğrulanmış görev bağlantılarıyla açılır. **Hedefler/Kaynaklar** görev hedefleri ve bağımsız kaynak bağlantılarını içerir.
 
 | Kaynak | Kapsam |
 | --- | --- |
@@ -19,7 +21,8 @@ Sahne zamanı için videonun veya sahnenin başlangıcına göre ölçüm gereki
 
 1. [catalog.json](catalog.json) dosyasında görev bilgilerini düzenle. Her görevin `id` değeri benzersiz olmalı. İsteğe bağlı `scenes`, `requires`, `mapLabels`, `giver`, `sourceUrl`, `textSourceUrl`, `gameDataSourceUrl`, `profileSourceUrl` ve `gallerySourceUrl` alanları sahne bilgilerini, farklı adları ve kaynakları bağlar.
 2. Eklemeye yetkili olduğun metinleri `texts/<görev-id>.json` dosyasına sıralı JSON dizisi olarak kaydet. Her satırda aşağıdaki alanları kullan.
-3. `python3 scripts/gta-mission-pack.py --build --directory <paket-klasörü>` komutuyla ZIP’i oluştur. Android’de **Oyun paketleri → Görev paketi seç (.zip)** düğmesiyle yükle. Özel ZIP aramada önceliklidir. **Yüklü paketleri yönet** menüsünden özel ZIP’i kaldırarak GitHub paketine dönebilirsin.
+3. İsteğe bağlı `media.json` içinde yayıncıya ait görsel URL'lerini `portraits` ve `previews`, doğrulanmış görev filtrelerini `dialogueSources` alanında tanımla.
+4. `python3 scripts/gta-mission-pack.py --build --directory <paket-klasörü>` komutuyla ZIP’i oluştur. Android’de **Oyun paketleri → Görev paketi seç (.zip)** düğmesiyle yükle. Özel ZIP aramada önceliklidir. **Yüklü paketleri yönet** menüsünden özel ZIP’i kaldırarak GitHub paketine dönebilirsin.
 
 | Alan | İçerik |
 | --- | --- |

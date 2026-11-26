@@ -130,6 +130,40 @@ class GtaMissionPackTest {
         assertFalse(lines.any { it.startMs != null })
     }
 
+    @Test
+    fun bundledMediaResolvesCalAndLabFeesFromTheirPublishers() {
+        val root = sequenceOf(File("packs/gta-6"), File("../packs/gta-6")).first { it.isDirectory }
+        val manifest = JSONObject(root.resolve("manifest.json").readText())
+        val checksum = manifest.getString("sha256")
+        val catalog = GtaMissionPack.validate(root.resolve("gta-6-tr-${checksum.take(12)}.zip"))
+        val cal = catalog.search("Gone Fishing").first()
+        assertTrue(catalog.portrait(cal.giver)?.url.orEmpty().contains("Cal_Hampton"))
+        assertEquals(3, cal.previews.size)
+        val lab = catalog.search("Lab Fees").first()
+        assertEquals(3, lab.previews.size)
+        assertTrue(lab.previews.all { it.url.contains("lab-fees") })
+        assertEquals("https://six.mics.dev/dialogue?mission=COM&q=COM_KBOS_SHOP", lab.dialogueSource)
+        assertEquals("https://six.mics.dev/dialogue?mission=t:INT_PROLO",
+            catalog.missions.first { it.id == "prologue" }.dialogueSource)
+        assertTrue(catalog.portrait("Unlisted Person") == null)
+    }
+
+    @Test
+    fun imageRequestsStayOnVerifiedHttpsMediaPaths() {
+        assertTrue(missionImageUri("https://www.gtabase.com/images/gta-6/characters/cal-hampton.jpg") != null)
+        assertTrue(missionImageUri("https://www.gtabase.com/images/jch-optimize/ng/cal-hampton.avif") != null)
+        assertTrue(missionImageUri("https://www.rockstargames.com/VI/_next/static/media/cal.jpg?imwidth=420") != null)
+        listOf(
+            "http://www.gtabase.com/images/gta-6/cal.jpg",
+            "https://www.gtabase.com@other.example/images/gta-6/cal.jpg",
+            "https://www.gtabase.com/images/gta-6/../../profile.jpg",
+            "https://www.gtabase.com/images/gta-6/%2e%2e/profile.jpg",
+            "https://www.gtabase.com:4040/images/gta-6/cal.jpg",
+            "https://www.gtabase.com/stream/cal.jpg",
+            "https://www.gtabase.com/images/gta-6/cal.html",
+        ).forEach { assertTrue(missionImageUri(it) == null) }
+    }
+
     private fun mission() = JSONObject(
         """{"id":"launch","titleTr":"Lansman Partisine Katıl","titleEn":"Attend the Launch Party","type":"side","chapter":3,
         "summaryTr":"Deneme görevi.","aliases":["Attent the Launch Party"],"textCount":2,

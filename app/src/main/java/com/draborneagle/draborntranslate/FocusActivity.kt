@@ -2,7 +2,6 @@
 package com.draborneagle.draborntranslate
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -22,9 +21,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 
 class FocusActivity : Activity() {
     private val disk = Executors.newSingleThreadExecutor()
@@ -42,16 +39,6 @@ class FocusActivity : Activity() {
     private lateinit var entire: Button
     private lateinit var follow: Button
     private lateinit var enlarge: Button
-    private var saveToMission: Button? = null
-    private var scanClip: Button? = null
-    private var scanCancelled: AtomicBoolean? = null
-    private val missionId by lazy { intent.getStringExtra(MISSION_EXTRA)?.takeIf {
-        intent.action != Intent.ACTION_SEND && it.length <= 80 && it.matches(Regex("[a-z0-9]+(?:-[a-z0-9]+)*"))
-    } }
-    private val missionScene by lazy { intent.getStringExtra(MISSION_SCENE_EXTRA) }
-    private val missionLabel by lazy { intent.getStringExtra(MISSION_LABEL_EXTRA)?.take(120) }
-    private var savingMission = false
-    private var pickerOpened = false
     private var sourcesDialog: Dialog? = null
     private var viewerDialog: Dialog? = null
     private var pendingFrame = false
@@ -86,10 +73,7 @@ class FocusActivity : Activity() {
         reader = FocusTranslator(this)
         val content = miamiPage(VISUAL_TRANSLATION, Miami.aqua)
         val selected = capture
-        pickerOpened = savedInstanceState?.getBoolean("missionPickerOpened") == true
-        content.addBelow(miamiHero(if (missionId == null) "Oyun görüntüsünü çevir" else missionLabel ?: "Görev konuşmaları",
-            if (missionId == null) "Canlı kareyi, fotoğrafı veya klibi aç."
-            else "Çevirdiğin altyazı satırlarını göreve ekle.", Miami.aqua))
+        content.addBelow(miamiHero("Oyun görüntüsünü çevir", "Canlı kareyi, fotoğrafı veya klibi aç.", Miami.aqua))
         if (selected == null) {
             val quick = miamiPanel(Miami.aqua)
             quick.addView(press("Güncel oyun karesini al", Miami.aqua) { showLive(promptSource = true) })
@@ -174,22 +158,9 @@ class FocusActivity : Activity() {
             translateArea()
         }
         content.addBelow(entire, 8)
-        if (missionId != null) {
-            saveToMission = press("Altyazıları göreve ekle", Miami.coral) { chooseMissionLines() }
-            content.addBelow(checkNotNull(saveToMission), 8)
-            if (selected?.video == true) {
-                scanClip = press("Klip altyazısını tara", Miami.coral) {
-                    scanCancelled?.set(true) ?: chooseScanRange()
-                }.also { content.addBelow(it, 8) }
-            }
-        }
         rows = stack()
         content.addBelow(rows, 9)
         updateControls()
-        if (!pickerOpened && missionId != null && selected == null && intent.getBooleanExtra(PICK_MISSION_MEDIA_EXTRA, false)) {
-            pickerOpened = true
-            content.post { if (!isFinishing && !isDestroyed) pickCapture() }
-        }
         capture?.let { loadCapture(it) } ?: run {
             selection = FocusRegion.saved(this) ?: FocusRegion.full
             showLive()
@@ -456,121 +427,10 @@ class FocusActivity : Activity() {
         entire.isEnabled = hasFrame && !busy
         sample.isEnabled = hasFrame && !busy
         enlarge.isEnabled = hasFrame
-        saveToMission?.isEnabled = hasFrame && result.isNotEmpty() && !busy && !savingMission
-        scanClip?.isEnabled = scanCancelled != null || hasFrame && !busy && !savingMission
-    }
-
-    private fun chooseScanRange() {
-        val frame = current ?: return
-        val duration = frame.durationMs.takeIf { it > 0 } ?: return
-        val description = if (selection == FocusRegion.full) "Varsayılan alt bölge seçili. Gerekirse önce ekrandaki altyazının çevresini sürükleyerek işaretle."
-            else "İşaretlediğin alanda görünen İngilizce altyazılar okunacak."
-        val ranges = if (duration <= MissionClipReader.SEGMENT_MS) arrayOf("Klibin tamamı")
-            else arrayOf("Baştan itibaren 2 dakika", "Seçili kareden itibaren 2 dakika")
-        AlertDialog.Builder(this).setTitle("Klip altyazılarını tara")
-            .setItems(ranges.map { "$it\n$description" }.toTypedArray()) { _, index ->
-                val start = if (index == 0) 0L else frame.timeMs
-                scanSubtitles(start, minOf(start + MissionClipReader.SEGMENT_MS, duration))
-            }.setNegativeButton("Vazgeç", null).show()
-    }
-
-    private fun scanSubtitles(start: Long, end: Long) {
-        val clip = capture ?: return
-        val cancellation = AtomicBoolean(false)
-        scanCancelled = cancellation
-        scanClip?.text = "Taramayı durdur"
-        setBusy(true)
-        status.text = "Klip altyazıları taranıyor…"
-        val area = selection.takeUnless { it == FocusRegion.full } ?: FocusRegion(0.12f, 0.69f, 0.88f, 0.98f)
-        val app = applicationContext
-        disk.execute {
-            var nextUpdate = 0L
-            val scanned = runCatching {
-                MissionClipReader.scan(app, clip, area, start, end, missionScene, cancellation::get) { position ->
-                    if (position >= nextUpdate) {
-                        nextUpdate = position + 4_000
-                        runOnUiThread {
-                            if (!isFinishing && !isDestroyed && !cancellation.get()) {
-                                status.text = "Klip altyazıları taranıyor · ${((position - start) * 100 / (end - start).coerceAtLeast(1)).toInt()}%"
-                            }
-                        }
-                    }
-                }
-            }
-            runOnUiThread {
-                if (isFinishing || isDestroyed) return@runOnUiThread
-                scanCancelled = null
-                scanClip?.text = "Klip altyazısını tara"
-                setBusy(false)
-                val lines = scanned.getOrDefault(emptyList())
-                status.text = when {
-                    cancellation.get() -> "Tarama durduruldu."
-                    scanned.isFailure -> "Klip altyazıları okunamadı."
-                    lines.isEmpty() -> "Bu aralıkta altyazı bulunamadı."
-                    else -> "${lines.size} altyazı kesiti okundu."
-                }
-                if (!cancellation.get() && lines.isNotEmpty()) previewScan(lines)
-            }
-        }
-    }
-
-    private fun previewScan(lines: List<JournalLine>) {
-        val selected = BooleanArray(lines.size) { true }
-        val labels = lines.map { "${missionTimeRange(it.startMs ?: 0)} · ${it.english}" }
-        AlertDialog.Builder(this).setTitle("Göreve eklenecek altyazılar")
-            .setMultiChoiceItems(labels.toTypedArray(), selected) { _, index, checked -> selected[index] = checked }
-            .setNegativeButton("Vazgeç", null)
-            .setPositiveButton("Göreve ekle") { _, _ -> saveMissionLines(lines.filterIndexed { index, _ -> selected[index] }) }
-            .show()
-    }
-
-    private fun chooseMissionLines() {
-        val frame = current ?: return
-        val readable = result.toList()
-        if (readable.isEmpty() || savingMission) return
-        val choices = BooleanArray(readable.size) { readable.size == 1 }
-        val labels = readable.map { it.turkish ?: it.source }.toTypedArray()
-        AlertDialog.Builder(this).setTitle("Göreve eklenecek altyazıları seç")
-            .setMultiChoiceItems(labels, choices) { _, index, selected -> choices[index] = selected }
-            .setNegativeButton("Vazgeç", null)
-            .setPositiveButton("Göreve ekle") { _, _ ->
-                val clips = frame.durationMs > 0
-                val origin = if (clips) MissionLineSource.CLIP else MissionLineSource.SCREENSHOT
-                val lines = readable.filterIndexed { i, _ -> choices[i] }.map {
-                    JournalLine(it.source, it.turkish, origin, missionScene, startMs = frame.timeMs.takeIf { clips })
-                }
-                saveMissionLines(lines)
-            }.show()
-    }
-
-    private fun saveMissionLines(lines: List<JournalLine>) {
-        val id = missionId ?: return
-        if (lines.isEmpty() || savingMission) return
-        savingMission = true
-        updateControls()
-        val app = applicationContext
-        disk.execute {
-            val saved = runCatching { MissionJournal.add(app, id, lines) }
-            runOnUiThread {
-                if (isFinishing || isDestroyed) return@runOnUiThread
-                savingMission = false
-                updateControls()
-                val message = saved.fold(
-                    { if (it > 0) "$it konuşma kaydı eklendi." else "Bu kayıtlar zaten eklenmiş." },
-                    { "Konuşma kaydedilemedi." },
-                )
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     @Suppress("DEPRECATION")
     private fun pickCapture() = startActivityForResult(mediaPicker(), PICK_MEDIA)
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("missionPickerOpened", pickerOpened)
-        super.onSaveInstanceState(outState)
-    }
 
     @Deprecated("Android activity result")
     override fun onActivityResult(code: Int, result: Int, data: Intent?) {
@@ -578,19 +438,11 @@ class FocusActivity : Activity() {
         if (code != PICK_MEDIA || result != RESULT_OK) return
         val uri = data?.data ?: return
         val video = contentResolver.getType(uri)?.startsWith("video/") == true
-        val target = captureIntent(SavedCapture(uri, if (video) "Seçilen klip" else "Seçilen görüntü", video, 0, 0))
-        missionId?.let {
-            target.putExtra(MISSION_EXTRA, it)
-            target.putExtra(MISSION_SCENE_EXTRA, missionScene)
-            target.putExtra(MISSION_LABEL_EXTRA, missionLabel)
-        }
-        startActivity(target)
-        if (missionId != null) finish()
+        startActivity(captureIntent(SavedCapture(uri, if (video) "Seçilen klip" else "Seçilen görüntü", video, 0, 0)))
     }
 
     override fun onDestroy() {
         serial++
-        scanCancelled?.set(true)
         sourcesDialog?.dismiss()
         viewerDialog?.dismiss()
         reader.close()

@@ -1,0 +1,1485 @@
+{
+  "portraits": {
+    "Abe Gonzalez": "https://www.gtabase.com/images/gta-6/missions/lawyer-up.jpg",
+    "Andrea": "https://www.gtabase.com/images/gta-6/characters/andrea.jpg",
+    "Andrés de León": "https://www.gtabase.com/images/jch-optimize/ng/images_gta-6_characters_andres-de-leon.avif",
+    "Andy": "https://www.gtabase.com/images/gta-6/characters/andy.png",
+    "Billy": "https://www.gtabase.com/images/gta-6/characters/billy.png",
+    "Boobie Ike": "https://www.rockstargames.com/VI/_next/static/media/Boobie_Ike_01.0-wji2pg5anfs.jpg?akim=1&imdensity=1&imwidth=420",
+    "Bret Vogel": "https://www.gtabase.com/images/gta-6/characters/bret.jpg",
+    "Brian Heder": "https://www.rockstargames.com/VI/_next/static/media/Brian_Heder_01.0r.ute88os9k-.jpg?akim=1&imdensity=1&imwidth=420",
+    "Cal Hampton": "https://www.rockstargames.com/VI/_next/static/media/Cal_Hampton_01.0xlil231_osh4.jpg?akim=1&imdensity=1&imwidth=420",
+    "Donnie": "https://www.gtabase.com/images/gta-6/characters/donnie.png",
+    "Dr. Merle": "https://www.gtabase.com/images/gta-6/characters/dr-merle.png",
+    "Dre’Quan Priest": "https://www.rockstargames.com/VI/_next/static/media/DreQuan_Priest_01.0_0~wi-ipdj35.jpg?akim=1&imdensity=1&imwidth=420",
+    "Dunk": "https://www.gtabase.com/images/gta-6/characters/dunk.png",
+    "Eddie Acosta": "https://www.gtabase.com/images/gta-6/missions/attend-eddie-acostas-party.jpg",
+    "Francisco \"Cisco\" Delgado": "https://www.gtabase.com/images/gta-6/characters/francisco-delgado.jpg",
+    "Freddie": "https://www.gtabase.com/images/gta-6/characters/freddie.jpg",
+    "Giorgio Gallo": "https://www.gtabase.com/images/gta-6/characters/giorgio-gallo.jpg",
+    "Jason Duval": "https://www.rockstargames.com/VI/_next/static/media/Jason_Duval_01.07m377xeb6jhq.jpg?akim=1&imdensity=1&imwidth=420",
+    "Karim": "https://www.gtabase.com/images/gta-6/characters/karim.jpg",
+    "Kirk": "https://www.gtabase.com/images/gta-6/characters/kirk.jpg",
+    "Kordell Grant": "https://www.gtabase.com/images/gta-6/characters/kordell.png",
+    "Kyle": "https://www.gtabase.com/images/gta-6/missions/side-missions/check-out-mckittrick-farm.jpg",
+    "Linda": "https://www.gtabase.com/images/gta-6/characters/linda.png",
+    "Lucia Caminos": "https://www.rockstargames.com/VI/_next/static/media/Lucia_Caminos_01.0a7yqvewctkfp.jpg?akim=1&imdensity=1&imwidth=420",
+    "Mandy": "https://www.gtabase.com/images/gta-6/characters/mandy.png",
+    "Mattia Tauro": "https://www.gtabase.com/images/gta-6/characters/mattia.png",
+    "Mia Caminos": "https://www.gtabase.com/images/gta-6/characters/mia.png",
+    "Moses": "https://www.gtabase.com/images/gta-6/characters/moses.png",
+    "Nate": "https://www.gtabase.com/images/gta-6/characters/nate.png",
+    "Nicole Park": "https://www.gtabase.com/images/gta-6/characters/nicole-park.jpg",
+    "Papa Audacity": "https://www.gtabase.com/images/gta-6/characters/papa-audacity.jpg",
+    "Pilot Pete": "https://www.gtabase.com/images/gta-6/characters/pilot-pete.png",
+    "Randy": "https://www.gtabase.com/images/gta-6/characters/randy.jpg",
+    "Raul Bautista": "https://www.rockstargames.com/VI/_next/static/media/Raul_Bautista_01.0md1ii-yrn96r.jpg?akim=1&imdensity=1&imwidth=420",
+    "Rosebud": "https://www.gtabase.com/images/gta-6/characters/rosebud.png",
+    "Santino": "https://www.gtabase.com/images/gta-6/characters/resized/tba_60x34.jpg",
+    "Shayna": "https://www.gtabase.com/images/gta-6/missions/pick-up-shayna.jpg",
+    "Shirley": "https://www.gtabase.com/images/gta-6/characters/shirley.png",
+    "Tyrone": "https://www.gtabase.com/images/gta-6/characters/tyrone.jpg",
+    "Valentina": "https://www.gtabase.com/images/jch-optimize/ng/igallery_gta-6-screenshots-trailer_gta6-extendedlook-screen-85-468.avif",
+    "Vicki": "https://www.gtabase.com/images/gta-6/characters/vicki.png",
+    "Vinny Capsik": "https://www.gtabase.com/images/gta-6/characters/resized/tba_60x34.jpg",
+    "Yago": "https://www.gtabase.com/images/gta-6/characters/temp/yago.jpg",
+    "Yasmani": "https://www.gtabase.com/images/gta-6/characters/yasmani.jpg"
+  },
+  "previews": {
+    "prologue": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-3-300x169.jpg"
+      }
+    ],
+    "gone-fishing": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-boat.jpg",
+        "captionTr": "Tekneyle çıkış"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-deal.jpg",
+        "captionTr": "Buluşma noktası"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-search-for-donnie.jpg",
+        "captionTr": "Donnie’yi arama"
+      }
+    ],
+    "gear-up": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gear-up.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gear-up-ammunation.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gear-up-clerk.jpg"
+      }
+    ],
+    "ft-kmodshp": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-a-scratch.jpg"
+      }
+    ],
+    "com-kbos-shop": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees.jpg",
+        "captionTr": "Key Lento · dükkân"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-clerk.jpg",
+        "captionTr": "Kasadaki görüşme"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-keypad.jpg",
+        "captionTr": "Laboratuvarın kapısı"
+      }
+    ],
+    "com-kbos-colat": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention-meet-cal.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention-drive-hamlet.jpg"
+      }
+    ],
+    "hey-arnold": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hey-arnold.jpg"
+      }
+    ],
+    "pipework": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pipework-meet-mandy-.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pipework-follow-mandy-.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pipework-plunger-.jpg"
+      }
+    ],
+    "feng-shui": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/feng-shui.jpg"
+      }
+    ],
+    "coming-home": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-2_copy.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-anchor.jpg"
+      }
+    ],
+    "int-bank": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/buck-me.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/buck-me-reception.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/buck-me-ask.jpg"
+      }
+    ],
+    "down-to-earth": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth-brian.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth-clean.jpg"
+      }
+    ],
+    "int-plnsh": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies-2.jpg"
+      }
+    ],
+    "day-release": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/day-release.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/day-release-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/day-release-2.jpg"
+      }
+    ],
+    "swamped": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/swamped.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/swamped-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/swamped-2.jpg"
+      }
+    ],
+    "com-kbos-clean": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/don-gone.jpg"
+      }
+    ],
+    "tourist-trap": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-accept.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-pick-up.jpg"
+      }
+    ],
+    "discharge-time": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/discharge-time.jpg"
+      }
+    ],
+    "island-dreams": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-2.jpg"
+      }
+    ],
+    "whats-in-the-bag": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-the-bag.jpg"
+      }
+    ],
+    "mtl-drive": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-2.jpg"
+      }
+    ],
+    "moses": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/moses.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/moses-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/moses-2.jpg"
+      }
+    ],
+    "cti-mech-stfc": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver-2.jpg"
+      }
+    ],
+    "mtl-pain": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk.jpg"
+      }
+    ],
+    "breakfast-run": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/breakfast-run.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/breakfast-run-3.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/breakfast-run-1.jpg"
+      }
+    ],
+    "coffee-break": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/coffee-break.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/coffee-break-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/coffee-break-2.jpg"
+      }
+    ],
+    "afternoon-delight": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/afternoon-delight.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/afternoon-delight-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/afternoon-delight-2.jpg"
+      }
+    ],
+    "mtl-mud": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-thrillbillies-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-thrillbillies-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-thrillbillies-3-300x169.jpg"
+      }
+    ],
+    "csc-drt-cnvy": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-twist-wrist-smash-grab-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-twist-wrist-smash-grab-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-twist-wrist-smash-grab-4-300x169.jpg"
+      }
+    ],
+    "bil-motel": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/checking-out.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-0.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-1.jpg"
+      }
+    ],
+    "clb-meet": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-city.jpg"
+      }
+    ],
+    "play-nurse": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/take-care-of-jason-2.jpg"
+      }
+    ],
+    "up-mlspm": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/overnight-charges.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/overnight-charges-2.jpg"
+      }
+    ],
+    "behind-on-payments": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/behind-on-payments.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/behind-on-payments-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/behind-on-payments-1.jpg"
+      }
+    ],
+    "car-service": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/car-service.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/car-service-3.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/car-service-1.jpg"
+      }
+    ],
+    "clb-deal": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-0.jpg"
+      }
+    ],
+    "dubious-provenance": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-3.jpg"
+      }
+    ],
+    "mami-knows-best": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/mami-knows-best.jpg"
+      }
+    ],
+    "here-kitty-kitty": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/here-kitty-kitty.jpg"
+      }
+    ],
+    "top-billing": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/top-billing.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/top-billing-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/top-billing-2.jpg"
+      }
+    ],
+    "com-cbo-cbint": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/boobie-time.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/boobie-time-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/boobie-time-3.jpg"
+      }
+    ],
+    "rob-drive": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-2.jpg"
+      }
+    ],
+    "caught-slipping": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/caught-slipping.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/caught-slipping-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/caught-slipping-3.jpg"
+      }
+    ],
+    "rob-boat-j": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/crosstown-traffic.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/crosstown-traffic-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/crosstown-traffic-1.jpg"
+      }
+    ],
+    "rob-bank": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/credit-check.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-2.jpg"
+      }
+    ],
+    "clonin-keys-makin-gs": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/steal-the-zorrusso-for-randy.jpg"
+      }
+    ],
+    "ban-setup": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/sinfrontera-national-bank.jpg"
+      }
+    ],
+    "security-expert": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/security-expert.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/security-expert-4.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/security-expert-1.jpg"
+      }
+    ],
+    "clb-steal": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ride-or-die.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ride-or-die-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ride-or-die-2.jpg"
+      }
+    ],
+    "company-property": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/company-property.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/company-property-5.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/company-property-4.jpg"
+      }
+    ],
+    "ban-carte": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/the-missing-link.jpg"
+      }
+    ],
+    "ban-safe": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/safe-word.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/safe-word-3.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/safe-word-1.jpg"
+      }
+    ],
+    "clb-video": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/cooties.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/cooties-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/cooties-2.jpg"
+      }
+    ],
+    "bricked-up": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-2.jpg"
+      }
+    ],
+    "the-cartel-heist": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/the-cartel-heist.jpg"
+      }
+    ],
+    "dubious-provenance-ant-intro": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-3.jpg"
+      }
+    ],
+    "ban-pkbmb": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hidden-charges.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hidden-charges-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hidden-charges-2.jpg"
+      }
+    ],
+    "mny-hotel": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ocean-beach-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ocean-beach-0.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ocean-beach-1.jpg"
+      }
+    ],
+    "mny-car": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/company-cars.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/company-cars-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/company-cars-2.jpg"
+      }
+    ],
+    "lawyer-up": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lawyer-up.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lawyer-up-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lawyer-up-2.jpg"
+      }
+    ],
+    "mny-party": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/party-hard-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/party-hard-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/party-hard-3.jpg"
+      }
+    ],
+    "photo-shoot": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/photo-shoot.jpg"
+      }
+    ],
+    "air-train": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/making-gainz.jpg"
+      }
+    ],
+    "clb-promo": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/watch-it.jpg"
+      }
+    ],
+    "cash-injections": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/cash-injections.jpg"
+      }
+    ],
+    "amateur-hour": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/amateur-hour.jpg"
+      }
+    ],
+    "dirty-work": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dirty-work.jpg"
+      }
+    ],
+    "too-much-baggage": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/too-much-baggage.jpg"
+      }
+    ],
+    "adventures-in-babysitting": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/adventures-in-babysitting.jpg"
+      }
+    ],
+    "fresh-evidence": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/fresh-evidence.jpg"
+      }
+    ],
+    "air-truck": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/power-play.jpg"
+      }
+    ],
+    "mny-kidnp": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-rafas-kidnapping-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-rafas-kidnapping-2-300x169.jpg"
+      }
+    ],
+    "headliners": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/headliners.jpg"
+      }
+    ],
+    "close-surveillance": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/close-surveillance.jpg"
+      }
+    ],
+    "delivery-method": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/delivery-method.jpg"
+      }
+    ],
+    "team-building": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/team-building.jpg"
+      }
+    ],
+    "fully-catered": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/fully-catered.jpg"
+      }
+    ],
+    "vcia-takedown": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/vcia-takedown.jpg"
+      }
+    ],
+    "sfh-taxi": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/another-life.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/another-life-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/another-life-1.jpg"
+      }
+    ],
+    "starting-from-zero": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/starting-from-zero.jpg"
+      }
+    ],
+    "coa-helis": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/bird-in-the-hand.jpg"
+      }
+    ],
+    "bil-boss": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/taking-liberties.jpg"
+      }
+    ],
+    "bil-preg": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/vc-baby.jpg"
+      }
+    ],
+    "doggie-bag": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/doggie-bag.jpg"
+      }
+    ],
+    "coa-ship": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/operation-savage-glory.jpg"
+      }
+    ],
+    "bil-law": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/honest-abe.jpg"
+      }
+    ],
+    "south-leonida-real-estate": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/south-leonida-real-estate.jpg"
+      }
+    ],
+    "prologue-int-cred": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-3-300x169.jpg"
+      }
+    ],
+    "pick-up-groceries-drop-off-groceries": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-3-300x169.jpg"
+      }
+    ],
+    "buy-flowers": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buy-flowers-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buy-flowers-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buy-flowers-3-300x169.jpg"
+      }
+    ],
+    "buy-lucia-a-necklace": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buy-lucia-a-necklace-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buy-lucia-a-necklace-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buy-lucia-a-necklace-3-300x169.jpg"
+      }
+    ],
+    "get-the-chop": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-the-chop-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-the-chop-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-the-chop-3-300x169.jpg"
+      }
+    ],
+    "get-lucias-clothes": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-lucias-clothes-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-lucias-clothes-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-lucias-clothes-3-300x169.jpg"
+      }
+    ],
+    "clean-up-after-donnie": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/clean-up-after-donnie.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/clean-up-after-donnie-search.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/clean-up-after-donnie-examine.jpg"
+      }
+    ],
+    "deposit-cash-into-buckme": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/deposit-cash-into-buckme.jpg"
+      }
+    ],
+    "save-for-the-future": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/save-for-the-future.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/save-for-the-future-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/save-for-the-future-2.jpg"
+      }
+    ],
+    "find-the-lost-drugs": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-find-the-lost-drugs-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-find-the-lost-drugs-3-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-find-the-lost-drugs-2-300x169.jpg"
+      }
+    ],
+    "clock-out": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-clock-out-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-clock-out-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-clock-out-4-300x169.jpg"
+      }
+    ],
+    "building-a-life": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/building-a-life.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/building-a-life-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/building-a-life-2.jpg"
+      }
+    ],
+    "donnies-lost-drugs": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-3-300x169.jpg"
+      }
+    ],
+    "recalibration": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/recalibration.jpg"
+      }
+    ],
+    "home-sweet-home": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/home-sweet-home.jpg"
+      }
+    ],
+    "just-moved-in": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-moved-in.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-moved-in-front-store.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-moved-in-shop.jpg"
+      }
+    ],
+    "pick-up-a-gun": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-a-gun-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-a-gun-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-a-gun-3-300x169.jpg"
+      }
+    ],
+    "new-look": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/new-look.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/new-look-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/new-look-2.jpg"
+      }
+    ],
+    "how-do-i-look": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/how-do-i-look.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/how-do-i-look-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/how-do-i-look-2.jpg"
+      }
+    ],
+    "painkiller-supplier": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/painkiller-supplier.jpg"
+      }
+    ],
+    "ambulance-chaser": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ambulance-chaser.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ambulance-chaser-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/ambulance-chaser-3.jpg"
+      }
+    ],
+    "check-out-mckittrick-farm": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-check-out-mckittrick-farm-start-location-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-check-out-mckittrick-farm-start-location-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-check-out-mckittrick-farm-start-location-3-300x169.jpg"
+      }
+    ],
+    "collect-chemicals-for-kyle": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-collect-chemicals-for-kyle-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-collect-chemicals-for-kyle-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-collect-chemicals-for-kyle-3-300x169.jpg"
+      }
+    ],
+    "hit-avery-pawn": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hit-avery-pawn-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hit-avery-pawn-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hit-avery-pawn-3-300x169.jpg"
+      }
+    ],
+    "hit-kingpin-bowling": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hit-kingpin-bowling-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hit-kingpin-bowling-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hit-kingpin-bowling-3-300x169.jpg"
+      }
+    ],
+    "impounded-vehicle": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-impounded-vehicle-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-impounded-vehicle-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-impounded-vehicle-3-300x169.jpg"
+      }
+    ],
+    "prepare-for-vice-city": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/prepare-for-vice-city.jpg"
+      }
+    ],
+    "veteran-hunted": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-veteran-hunted-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-veteran-hunted-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-veteran-hunted-3-300x169.jpg"
+      }
+    ],
+    "get-your-wheels": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-3-300x169.jpg"
+      }
+    ],
+    "join-a-street-race": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-join-a-street-race-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-join-a-street-race-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-join-a-street-race-3-300x169.jpg"
+      }
+    ],
+    "send-money-to-lorena": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/send-money-to-lorena.jpg"
+      }
+    ],
+    "encrypted-hard-drive": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-encrypted-hard-drive-1-300x169.jpg"
+      }
+    ],
+    "buddy": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buddy-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buddy-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-buddy-3-300x169.jpg"
+      }
+    ],
+    "yasmanis-jewelry-jobs": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/yasmanis-jewelry-jobs.jpg"
+      }
+    ],
+    "bumper-to-bumper": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-bumper-to-bumper-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-bumper-to-bumper-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-bumper-to-bumper-3-300x169.jpg"
+      }
+    ],
+    "send-more-money-to-lorena": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/send-more-money-to-lorena.jpg"
+      }
+    ],
+    "rauls-next-job": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-rauls-next-job-1-300x169.jpg"
+      }
+    ],
+    "race-against-yago": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-race-against-yago-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-race-against-yago-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-race-against-yago-3-300x169.jpg"
+      }
+    ],
+    "mall-rats": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-mall-rats-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-mall-rats-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-mall-rats-3-300x169.jpg"
+      }
+    ],
+    "brother-to-brother": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-brother-to-brother-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-brother-to-brother-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-brother-to-brother-3-300x169.jpg"
+      }
+    ],
+    "pool-day": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pool-day.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pool-day-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pool-day-2.jpg"
+      }
+    ],
+    "heavy-lifting": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/heavy-lifting.jpg"
+      }
+    ],
+    "its-a-date": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-its-a-date-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-its-a-date-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-its-a-date-3-300x169.jpg"
+      }
+    ],
+    "pay-abes-fee": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-pay-abes-fee-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-pay-abes-fee-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-pay-abes-fee-3-300x169.jpg"
+      }
+    ],
+    "attend-eddie-acostas-party": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-attend-eddie-acostas-party-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-attend-eddie-acostas-party-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-attend-eddie-acostas-party-3-300x169.jpg"
+      }
+    ],
+    "call-nate": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-call-nate-300x169.jpg"
+      }
+    ],
+    "nate-will-be-in-touch": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-nate-will-be-in-touch-300x169.jpg"
+      }
+    ],
+    "heist-plans-in-place": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-heist-plans-in-place-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-heist-plans-in-place-2-300x169.jpg"
+      }
+    ],
+    "tie-up-loose-ends": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/tie-up-loose-ends.jpg"
+      }
+    ],
+    "sunset": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/sunset.jpg"
+      }
+    ],
+    "unfinished-business": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/unfinished-business-2.jpg"
+      }
+    ],
+    "search-for-the-skunk-ape": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-search-for-skunk-ape-location-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-search-for-skunk-ape-location-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-search-for-skunk-ape-location-3-300x169.jpg"
+      }
+    ],
+    "search-for-tree-effigies": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-search-for-tree-effigies-start-location-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-search-for-tree-effigies-start-location-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-search-for-tree-effigies-start-location-3-300x169.jpg"
+      }
+    ],
+    "help-kirk-find-mr-mangrove": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-help-kirk-find-mr-mangrove-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-help-kirk-find-mr-mangrove-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-help-kirk-find-mr-mangrove-3-300x169.jpg"
+      }
+    ],
+    "the-impaler": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-impaler-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-impaler-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-impaler-4-300x169.jpg"
+      }
+    ],
+    "hometown-heroes": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hometown-heroes-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hometown-heroes-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-hometown-heroes-3-300x169.jpg"
+      }
+    ],
+    "climbing-the-cellerichain": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-climbing-the-cellerichain-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-climbing-the-cellerichain-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-climbing-the-cellerichain-3-300x169.jpg"
+      }
+    ],
+    "pay-the-cellerica-fee": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pay-cellerica-fee-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pay-cellerica-fee-2-300x169.jpg"
+      }
+    ],
+    "peach": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-peach-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-peach-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-peach-3-300x169.jpg"
+      }
+    ],
+    "read-the-label": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-read-the-label-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-read-the-label-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-read-the-label-3-300x169.jpg"
+      }
+    ],
+    "puff-puff-pass": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-puff-puff-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-puff-puff-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-puff-puff-3-300x169.jpg"
+      }
+    ],
+    "the-last-mile-passing-the-torch": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-passing-the-torch-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-passing-the-torch-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-passing-the-torch-3-300x169.jpg"
+      }
+    ],
+    "the-last-mile-backseat-pilot": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-3-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-4-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-6-300x169.jpg"
+      }
+    ],
+    "petes-deliveries-southpoint-airfield": [
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-petes-deliveries-1-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-petes-deliveries-2-300x169.jpg"
+      },
+      {
+        "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-petes-deliveries-3-300x169.jpg"
+      }
+    ]
+  },
+  "dialogueSources": {
+    "prologue": "https://six.mics.dev/dialogue?mission=t:INT_PROLO",
+    "gone-fishing": "https://six.mics.dev/dialogue?mission=t:INT_CHASE",
+    "gear-up": "https://six.mics.dev/dialogue?mission=t:FT_AMUCO",
+    "ft-kmodshp": "https://six.mics.dev/dialogue?mission=FT&q=FT_KMODSHP",
+    "com-kbos-shop": "https://six.mics.dev/dialogue?mission=COM&q=COM_KBOS_SHOP",
+    "hey-arnold": "https://six.mics.dev/dialogue?mission=COM&q=COM_KBOS_RADR",
+    "feng-shui": "https://six.mics.dev/dialogue?mission=t:COM_SFH_MVFN",
+    "coming-home": "https://six.mics.dev/dialogue?mission=t:INT_PRISO",
+    "int-bank": "https://six.mics.dev/dialogue?mission=INT&q=INT_BANK",
+    "int-plnsh": "https://six.mics.dev/dialogue?mission=INT&q=INT_PLNSH",
+    "day-release": "https://six.mics.dev/dialogue?mission=t:BIL_FUN",
+    "swamped": "https://six.mics.dev/dialogue?mission=t:INT_AIR",
+    "ho-par-keyco": "https://six.mics.dev/dialogue?mission=HO&q=HO_PAR_KEYCO",
+    "tourist-trap": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_PICK",
+    "bil-house": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_HOUSE",
+    "discharge-time": "https://six.mics.dev/dialogue?mission=t:BIL_WHEEL",
+    "island-dreams": "https://six.mics.dev/dialogue?mission=t:CSC_TRH_CHART",
+    "whats-in-the-bag": "https://six.mics.dev/dialogue?mission=MTL&q=MTL_WAKE",
+    "ft-motel-shop": "https://six.mics.dev/dialogue?mission=FT&q=FT_MOTEL_SHOP",
+    "mtl-drive": "https://six.mics.dev/dialogue?mission=MTL&q=MTL_DRIVE",
+    "moses": "https://six.mics.dev/dialogue?mission=t:COM_MECH_INTR",
+    "cti-mech-stfc": "https://six.mics.dev/dialogue?mission=CTI&q=CTI_MECH_STFC",
+    "mtl-pain": "https://six.mics.dev/dialogue?mission=MTL&q=MTL_PAIN",
+    "breakfast-run": "https://six.mics.dev/dialogue?mission=t:MTL_MONT",
+    "coffee-break": "https://six.mics.dev/dialogue?mission=t:HO_PAR_FRINT",
+    "afternoon-delight": "https://six.mics.dev/dialogue?mission=t:MTL_CONT",
+    "mtl-mud": "https://six.mics.dev/dialogue?mission=MTL&q=MTL_MUD",
+    "csc-drt-cnvy": "https://six.mics.dev/dialogue?mission=CSC&q=CSC_DRT_CNVY",
+    "bil-motel": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_MOTEL",
+    "clb-meet": "https://six.mics.dev/dialogue?mission=CLB&q=CLB_MEET",
+    "play-nurse": "https://six.mics.dev/dialogue?mission=MTL&q=MTL_CHECK",
+    "up-mlspm": "https://six.mics.dev/dialogue?mission=UP&q=UP_MLSPM",
+    "behind-on-payments": "https://six.mics.dev/dialogue?mission=t:FT_UP_MMRENT",
+    "clb-deal": "https://six.mics.dev/dialogue?mission=CLB&q=CLB_DEAL",
+    "rob-veh": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_VEH",
+    "dubious-provenance": "https://six.mics.dev/dialogue?mission=t:ANT_CHASE",
+    "mami-knows-best": "https://six.mics.dev/dialogue?mission=t:CSC_MOM_FLIP",
+    "tyrone": "https://six.mics.dev/dialogue?mission=t:COM_DEAL_INTR",
+    "here-kitty-kitty": "https://six.mics.dev/dialogue?mission=t:COM_DLR_MISS",
+    "top-billing": "https://six.mics.dev/dialogue?mission=t:CLB_SCUFF",
+    "com-cbo-cbint": "https://six.mics.dev/dialogue?mission=COM&q=COM_CBO_CBINT",
+    "rob-drive": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_DRIVE",
+    "caught-slipping": "https://six.mics.dev/dialogue?mission=t:BIL_RED",
+    "rob-boat-j": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_BOAT_J",
+    "rob-bank": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_BANK",
+    "clonin-keys-makin-gs": "https://six.mics.dev/dialogue?mission=t:CTI_SHOW_HATH",
+    "ban-setup": "https://six.mics.dev/dialogue?mission=BAN&q=BAN_SETUP",
+    "security-expert": "https://six.mics.dev/dialogue?mission=t:BAN_RESCU",
+    "clb-steal": "https://six.mics.dev/dialogue?mission=CLB&q=CLB_STEAL",
+    "company-property": "https://six.mics.dev/dialogue?mission=t:BAN_EXPLO",
+    "ban-carte": "https://six.mics.dev/dialogue?mission=BAN&q=BAN_CARTE",
+    "ban-safe": "https://six.mics.dev/dialogue?mission=BAN&q=BAN_SAFE",
+    "clb-video": "https://six.mics.dev/dialogue?mission=CLB&q=CLB_VIDEO",
+    "bricked-up": "https://six.mics.dev/dialogue?mission=t:CLB_TOWER",
+    "ft-ban-distr": "https://six.mics.dev/dialogue?mission=FT&q=FT_BAN_DISTR",
+    "the-cartel-heist": "https://six.mics.dev/dialogue?mission=t:BAN_FINAL",
+    "ant-recov": "https://six.mics.dev/dialogue?mission=ANT&q=ANT_RECOV",
+    "dubious-provenance-ant-intro": "https://six.mics.dev/dialogue?mission=t:ANT_INTRO",
+    "ant-give": "https://six.mics.dev/dialogue?mission=ANT&q=ANT_GIVE",
+    "ban-pkbmb": "https://six.mics.dev/dialogue?mission=BAN&q=BAN_PKBMB",
+    "mny-hotel": "https://six.mics.dev/dialogue?mission=MNY&q=MNY_HOTEL",
+    "mny-car": "https://six.mics.dev/dialogue?mission=MNY&q=MNY_CAR",
+    "lawyer-up": "https://six.mics.dev/dialogue?mission=t:CSC_DIG_DATA",
+    "mny-party": "https://six.mics.dev/dialogue?mission=MNY&q=MNY_PARTY",
+    "air-tail": "https://six.mics.dev/dialogue?mission=AIR&q=AIR_TAIL",
+    "photo-shoot": "https://six.mics.dev/dialogue?mission=t:CLB_HELI",
+    "air-train": "https://six.mics.dev/dialogue?mission=AIR&q=AIR_TRAIN",
+    "clb-promo": "https://six.mics.dev/dialogue?mission=CLB&q=CLB_PROMO",
+    "cash-injections": "https://six.mics.dev/dialogue?mission=t:AIR_BEACH",
+    "amateur-hour": "https://six.mics.dev/dialogue?mission=t:AIR_BUS",
+    "dirty-work": "https://six.mics.dev/dialogue?mission=t:AIR_GANG",
+    "too-much-baggage": "https://six.mics.dev/dialogue?mission=t:AIR_SCOPE",
+    "adventures-in-babysitting": "https://six.mics.dev/dialogue?mission=t:MNY_ESCRT",
+    "fresh-evidence": "https://six.mics.dev/dialogue?mission=t:CLB_EVI",
+    "air-truck": "https://six.mics.dev/dialogue?mission=AIR&q=AIR_TRUCK",
+    "mny-kidnp": "https://six.mics.dev/dialogue?mission=MNY&q=MNY_KIDNP",
+    "headliners": "https://six.mics.dev/dialogue?mission=t:CLB_PARTY",
+    "close-surveillance": "https://six.mics.dev/dialogue?mission=t:AIR_DRONE",
+    "delivery-method": "https://six.mics.dev/dialogue?mission=t:AIR_HACK",
+    "team-building": "https://six.mics.dev/dialogue?mission=t:AIR_RECRU",
+    "fully-catered": "https://six.mics.dev/dialogue?mission=t:AIR_CATER",
+    "vcia-takedown": "https://six.mics.dev/dialogue?mission=t:AIR_FINAL",
+    "blood-sweat-and-gear": "https://six.mics.dev/dialogue?mission=t:COM_UP_BBWOR",
+    "sfh-taxi": "https://six.mics.dev/dialogue?mission=SFH&q=SFH_TAXI",
+    "rob-death": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_DEATH",
+    "starting-from-zero": "https://six.mics.dev/dialogue?mission=t:BIL_CONFR",
+    "coa-helis": "https://six.mics.dev/dialogue?mission=COA&q=COA_HELIS",
+    "bil-boss": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_BOSS",
+    "bil-preg": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_PREG",
+    "doggie-bag": "https://six.mics.dev/dialogue?mission=t:COA_DOG",
+    "coa-ship": "https://six.mics.dev/dialogue?mission=COA&q=COA_SHIP",
+    "bil-preci": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_PRECI",
+    "the-end-of-the-road": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_PENT",
+    "bil-law": "https://six.mics.dev/dialogue?mission=BIL&q=BIL_LAW",
+    "south-leonida-real-estate": "https://six.mics.dev/dialogue?mission=t:CSC_MOM_MSEVN",
+    "spin-on-this": "https://six.mics.dev/dialogue?mission=t:COM_DLR_COOK",
+    "find-donnies-package": "https://six.mics.dev/dialogue?mission=t:CTI_PIL_RD_SH",
+    "the-unknown-stuntman": "https://six.mics.dev/dialogue?mission=t:CSC_STU_INTRO",
+    "trial-by-tire": "https://six.mics.dev/dialogue?mission=t:CSC_STU_FSTNT",
+    "quit-your-job-sell-your-house": "https://six.mics.dev/dialogue?mission=t:CSC_STU_STADM",
+    "catching-a-whale": "https://six.mics.dev/dialogue?mission=t:CSC_STU_PLANE",
+    "the-audacity": "https://six.mics.dev/dialogue?mission=t:CSC_STU_PARTY",
+    "bumper-to-bumper": "https://six.mics.dev/dialogue?mission=t:CSC_SRS_ROPES",
+    "mall-rats": "https://six.mics.dev/dialogue?mission=t:CSC_DRT_MALL",
+    "the-impaler": "https://six.mics.dev/dialogue?mission=t:CSC_DRT_PREP",
+    "puff-puff-pass": "https://six.mics.dev/dialogue?mission=t:CSC_MLM_WRHS",
+    "the-final-flush": "https://six.mics.dev/dialogue?mission=t:CSS_SKYMR",
+    "twin-flames": "https://six.mics.dev/dialogue?mission=t:CSC_ECO_FRACK"
+  }
+}
