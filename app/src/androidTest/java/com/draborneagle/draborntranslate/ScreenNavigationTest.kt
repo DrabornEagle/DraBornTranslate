@@ -76,7 +76,7 @@ class ScreenNavigationTest {
                 click("The Audacity")
                 waitFor { resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") }
                 click("Görev metinleri")
-                waitFor { hasText("Seni girişte bekleyeceğim.") && hasText("Deniz · Buluşma") && hasText("Giriş holü") }
+                waitFor { hasText("Seni girişte bekleyeceğim.") && hasText("Deniz") && hasText("Buluşma") && hasText("Giriş holü") }
                 assertFalse(hasText("Canlı kayıt başlat"))
                 assertFalse(hasText("SRT / VTT ekle"))
                 assertFalse(hasText("Lansman partisine katıl."))
@@ -99,7 +99,7 @@ class ScreenNavigationTest {
     }
 
     @Test
-    fun bundledCatalogShowsAutomaticMissionMediaAndTheFilteredDialogueSource() {
+    fun bundledCatalogShowsMissionMediaAndTurkishScenesWithNoArchiveButton() {
         ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
             waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
             click("İngilizce")
@@ -114,14 +114,17 @@ class ScreenNavigationTest {
             waitFor { resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") && hasText("Buluşma noktası") }
             assertFalse(hasText("Profil fotoğrafı ekle"))
             assertFalse(hasText("Oyundan görüntü ekle"))
+            assertFalse(hasText("Görsel kaynağı · GTABase"))
             screenshot("07-gorev-detayi")
             click("Görev metinleri")
-            waitFor { hasText("Görevin diyalog arşivini aç") }
+            waitFor { hasText("Sahne özetleri") && hasText("Teknedeki iş") && hasText("Kampı terk ederken") }
+            assertFalse(hasText("Görevin diyalog arşivini aç"))
             assertFalse(hasText("Konuşma kayıtlarım"))
             assertFalse(hasText("Altyazı geçmişinden seç"))
             screenshot("08-gorev-konusmalari")
             click("Hedefler/Kaynaklar")
-            waitFor { hasText("Kaynaklar") && hasText("Görevin diyalog arşivini aç") }
+            waitFor { hasText("Kaynaklar") && hasText("Görev kaynağını aç") }
+            assertFalse(hasText("Görevin diyalog arşivini aç"))
             click("Geri")
             waitFor { resumed() is GtaMissionSearchActivity }
             onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("lab fees") }
@@ -130,6 +133,22 @@ class ScreenNavigationTest {
             waitFor { hasText("Önce tamamlanacak görev") }
             click("Gone Fishing")
             waitFor { resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") }
+        }
+    }
+
+    @Test
+    fun oldMissionCodesOpenTheNamedStoryMission() {
+        ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
+            waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
+            click("İngilizce")
+            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("rob_veh") }
+            waitFor { hasText("Meet the Heders") }
+            assertFalse(hasText("Görev adı doğrulanmadı"))
+            click("Meet the Heders")
+            waitFor { hasText("Brian’la balkon görüşmesi") }
+            click("Görev metinleri")
+            waitFor { hasText("Balkondaki konuşma") }
+            assertFalse(hasText("Görevin diyalog arşivini aç"))
         }
     }
 

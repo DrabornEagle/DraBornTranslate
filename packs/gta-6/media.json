@@ -43,7 +43,12 @@
     "Vicki": "https://www.gtabase.com/images/gta-6/characters/vicki.png",
     "Vinny Capsik": "https://www.gtabase.com/images/gta-6/characters/resized/tba_60x34.jpg",
     "Yago": "https://www.gtabase.com/images/gta-6/characters/temp/yago.jpg",
-    "Yasmani": "https://www.gtabase.com/images/gta-6/characters/yasmani.jpg"
+    "Yasmani": "https://www.gtabase.com/images/gta-6/characters/yasmani.jpg",
+    "Kenton Rees": "https://www.gtabase.com/images/gta-6/characters/kenton-2.jpg",
+    "Benedict Halifax": "https://www.gtabase.com/images/gta-6/characters/halifax.jpg",
+    "Evelyn Andrews": "https://www.gtabase.com/images/gta-6/characters/evelyn.jpg",
+    "Felipe": "https://www.gtabase.com/images/gta-6/characters/felipe.jpg",
+    "Alvan West": "https://www.gtabase.com/images/gta-6/characters/alvan-west.jpg"
   },
   "previews": {
     "prologue": [
@@ -85,6 +90,12 @@
     "ft-kmodshp": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/just-a-scratch.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/scratch-drive-.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/scratch-talk-.jpg"
       }
     ],
     "com-kbos-shop": [
@@ -115,6 +126,12 @@
     "hey-arnold": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/hey-arnold.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-hey-arnold-mission-walkthrough-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-hey-arnold-mission-walkthrough-6.jpg"
       }
     ],
     "pipework": [
@@ -131,6 +148,12 @@
     "feng-shui": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/feng-shui.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-feng-shui-walkthrough-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-feng-shui-walkthrough-4.jpg"
       }
     ],
     "coming-home": [
@@ -218,6 +241,12 @@
     "discharge-time": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/discharge-time.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/discharge-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/discharge-3.jpg"
       }
     ],
     "island-dreams": [
@@ -234,6 +263,12 @@
     "whats-in-the-bag": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-the-bag.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-bag-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-bag-2.jpg"
       }
     ],
     "mtl-drive": [
@@ -272,6 +307,14 @@
     "mtl-pain": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-opening.jpeg",
+        "captionTr": "Dunk’la buluşma"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-dr-bill.jpeg",
+        "captionTr": "Dr. Bill"
       }
     ],
     "breakfast-run": [
@@ -343,11 +386,25 @@
     "clb-meet": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-city.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-5.jpg",
+        "captionTr": "Vice City’ye giriş"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-3.jpg",
+        "captionTr": "Jack of Hearts"
       }
     ],
     "play-nurse": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/take-care-of-jason-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/play-nurse-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/play-nurse-2.jpg"
       }
     ],
     "up-mlspm": [
@@ -399,17 +456,30 @@
         "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-2.jpg"
       },
       {
-        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-3.jpg"
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-1.jpg",
+        "captionTr": "Sweet Bay Inn"
       }
     ],
     "mami-knows-best": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/mami-knows-best.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/miami-knows-6.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/mami-knows-7.jpg"
       }
     ],
     "here-kitty-kitty": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/here-kitty-kitty.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/here-kitty-3.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/here-kitty-6.jpg"
       }
     ],
     "top-billing": [
@@ -481,11 +551,25 @@
     "clonin-keys-makin-gs": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/steal-the-zorrusso-for-randy.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/zorusso-2.jpg",
+        "captionTr": "Anahtar kopyalayıcı"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/zorusso-4.jpg",
+        "captionTr": "Randy’nin araç panosu"
       }
     ],
     "ban-setup": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/sinfrontera-national-bank.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/snb-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/snb-2.jpg"
       }
     ],
     "security-expert": [
@@ -524,6 +608,12 @@
     "ban-carte": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/the-missing-link.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/missing-link-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/missing-link-3.jpg"
       }
     ],
     "ban-safe": [
@@ -767,6 +857,12 @@
     "south-leonida-real-estate": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/south-leonida-real-estate.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/south-leonida-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/south-leonida-2.jpg"
       }
     ],
     "prologue-int-cred": [
@@ -849,6 +945,12 @@
     "deposit-cash-into-buckme": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/deposit-cash-into-buckme.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/deposit-cash-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/deposit-cash-3.jpg"
       }
     ],
     "save-for-the-future": [
@@ -909,11 +1011,26 @@
     "recalibration": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/recalibration.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/recalib-beer.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/recalib-talk-to-cal.jpg",
+        "captionTr": "Cal’in iskelesi"
       }
     ],
     "home-sweet-home": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/home-sweet-home.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/sweet-home-stash.jpg",
+        "captionTr": "Jason’ın evi"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/sweet-home-escape.jpg",
+        "captionTr": "Key Lento’dan çıkış"
       }
     ],
     "just-moved-in": [
@@ -963,6 +1080,9 @@
     "painkiller-supplier": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/painkiller-supplier.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/got-pills-1.jpg"
       }
     ],
     "ambulance-chaser": [
@@ -1034,6 +1154,9 @@
     "prepare-for-vice-city": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/prepare-for-vice-city.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/prepare-for-vice-city_copy.jpg"
       }
     ],
     "veteran-hunted": [
@@ -1072,6 +1195,9 @@
     "send-money-to-lorena": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/send-money-to-lorena.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/send-money-lorena-1.jpg"
       }
     ],
     "encrypted-hard-drive": [
@@ -1093,6 +1219,12 @@
     "yasmanis-jewelry-jobs": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/yasmanis-jewelry-jobs.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/yasmanis-jewelry-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/yasmanis-jewelry-2.jpg"
       }
     ],
     "bumper-to-bumper": [
@@ -1109,6 +1241,9 @@
     "send-more-money-to-lorena": [
       {
         "url": "https://www.gtabase.com/images/gta-6/missions/send-more-money-to-lorena.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/send-money-lorena-1.jpg"
       }
     ],
     "rauls-next-job": [
@@ -1370,6 +1505,269 @@
       {
         "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-petes-deliveries-3-300x169.jpg"
       }
+    ],
+    "ao-deal-t-synth": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/take-out-kitty-litter.jpg"
+      }
+    ],
+    "ft-ban-distr": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hidden-charges.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hidden-charges-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/hidden-charges-2.jpg",
+        "captionTr": "Hazırlık"
+      }
+    ],
+    "ant-give": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-2.jpg",
+        "captionTr": "Evelyn ve Halifax’la görüşme"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-3.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance.jpg"
+      }
+    ],
+    "spin-on-this": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/spin-on-this.jpg"
+      }
+    ],
+    "delivery-day": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/delivery-day.jpg"
+      }
+    ],
+    "find-donnies-package": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/find-the-lost-drugs.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lost-drugs-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/lost-drugs-tree.jpg"
+      }
+    ],
+    "get-shirleys-rum": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/get-shirleys-rum.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/rum-mission-start-.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/rum-location-.jpg"
+      }
+    ],
+    "steal-the-scooter": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/steal-the-scooter.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/steal-scooter-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/steal-scooter-3.jpg"
+      }
+    ],
+    "meet-the-heders": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/meet-heders-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/meet-heders-6.jpg",
+        "captionTr": "Brian’la balkon görüşmesi"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/meet-heders-3.jpg",
+        "captionTr": "SCOOP konteynerleri"
+      }
+    ],
+    "bad-driver": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/bad-driver.jpg"
+      }
+    ],
+    "childs-play": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/rafas-kidnapping.jpg"
+      }
+    ],
+    "this-is-a-free-call-from": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/pick-up-shayna.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/shayna-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/shayna-2.jpg"
+      }
+    ],
+    "thats-where-the-money-is": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/thats-where-the-money-is.jpg"
+      }
+    ],
+    "catch-a-bigger-fish": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/big-fish-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/big-fish-2.jpg"
+      }
+    ],
+    "gellhorns-missing-tourists": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/gellhorns-missing-tourists.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/missing-tourists-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/missing-tourists-2.jpg"
+      }
+    ],
+    "missing-person": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/missing-person.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/missing-person-1_copy.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/missing-person-2.jpg"
+      }
+    ],
+    "steal-vehicles-for-moses": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/steal-vehicles-for-moses.jpg"
+      }
+    ],
+    "dale-mamba": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/dale-mamba.jpg"
+      }
+    ],
+    "mansion-thrax": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/mansion-thrax.jpg"
+      }
+    ],
+    "collect-the-tempesta": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/collect-the-tempesta.jpg"
+      }
+    ],
+    "the-final-flush": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/final-flush.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/final-flush-0.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/final-flush-1.jpg"
+      }
+    ],
+    "retest-freddies-defenses": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/retest-freddies-defenses.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/freddie-bunker-9.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/freddie-bunker-3.jpg"
+      }
+    ],
+    "bring-out-the-chimp": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/bring-out-the-chimp.jpg"
+      }
+    ],
+    "sisters-of-the-sea": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/sisters-of-the-sea.jpg"
+      }
+    ],
+    "twin-flames": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/twin-flames.jpg"
+      }
+    ],
+    "dodo-rise": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/side-missions/dodo-rise.jpg"
+      }
+    ],
+    "bil-house": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/home-sweet-home.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/sweet-home-stash.jpg",
+        "captionTr": "Jason’ın evi"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/sweet-home-escape.jpg",
+        "captionTr": "Key Lento’dan çıkış"
+      }
+    ],
+    "com-sfh-fltpk": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/building-a-life.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/building-a-life-1.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/building-a-life-2.jpg"
+      }
+    ],
+    "ft-motel-shop": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-moved-in.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-moved-in-front-store.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/just-moved-in-shop.jpg"
+      }
+    ],
+    "rob-veh": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/meet-heders-2.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/meet-heders-6.jpg",
+        "captionTr": "Brian’la balkon görüşmesi"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/meet-heders-3.jpg",
+        "captionTr": "SCOOP konteynerleri"
+      }
+    ],
+    "ho-par-keyco": [
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/recalibration.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/recalib-beer.jpg"
+      },
+      {
+        "url": "https://www.gtabase.com/images/gta-6/missions/recalib-talk-to-cal.jpg",
+        "captionTr": "Cal’in iskelesi"
+      }
     ]
   },
   "dialogueSources": {
@@ -1481,5 +1879,20 @@
     "puff-puff-pass": "https://six.mics.dev/dialogue?mission=t:CSC_MLM_WRHS",
     "the-final-flush": "https://six.mics.dev/dialogue?mission=t:CSS_SKYMR",
     "twin-flames": "https://six.mics.dev/dialogue?mission=t:CSC_ECO_FRACK"
+  },
+  "portraitAliases": {
+    "Andrés": "Andrés de León",
+    "Boobie": "Boobie Ike",
+    "Brian": "Brian Heder",
+    "Cal": "Cal Hampton",
+    "Cisco": "Francisco \"Cisco\" Delgado",
+    "Dre’Quan": "Dre’Quan Priest",
+    "Evelyn": "Evelyn Andrews",
+    "Halifax": "Benedict Halifax",
+    "Jason": "Jason Duval",
+    "Kenton": "Kenton Rees",
+    "Lucia": "Lucia Caminos",
+    "Mattia": "Mattia Tauro",
+    "Raul": "Raul Bautista"
   }
 }

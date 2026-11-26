@@ -2,6 +2,7 @@
 package com.draborneagle.draborntranslate
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -20,7 +21,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -36,14 +36,14 @@ private fun Context.openMission(mission: GtaMission, language: GtaMissionSearchL
         .putExtra(SEARCH_LANGUAGE, language.name))
 }
 
-private fun Context.missionAvatar(giver: String?, portrait: GtaMissionImage?, size: Int) = FrameLayout(this).apply {
+private fun Context.missionAvatar(description: String, portrait: GtaMissionImage?, size: Int) = FrameLayout(this).apply {
     background = filled(mix(Miami.surface, Miami.aqua, .16f), size / 2, mix(Miami.edge, Miami.aqua, .4f))
     clipToOutline = true
     val placeholder = glyph(R.drawable.ic_mission_character, Miami.aqua)
     addView(placeholder, FrameLayout.LayoutParams(dp(size / 2), dp(size / 2), Gravity.CENTER))
     if (portrait != null) {
         addView(context.missionImageView(portrait, 240) { placeholder.visibility = View.INVISIBLE }.apply {
-            contentDescription = "$giver profil resmi"
+            contentDescription = description
         }, FrameLayout.LayoutParams(-1, -1))
     }
 }
@@ -162,7 +162,10 @@ class GtaMissionSearchActivity : Activity() {
             ?: mission.mapLabels.firstOrNull()
         val secondary = mission.alternateNameIn(language)
         val mapLabel = alias?.takeUnless { it == title || it == secondary }
-        val alternate = secondary ?: mission.code.takeIf { mission.englishTitle == null && mapLabel == null }
+        val alternate = secondary ?: mission.code.takeIf { it != title && mission.englishTitle == null && mapLabel == null }
+        val portrait = catalog?.missionPortrait(mission)
+        val thumbnail = portrait?.second ?: mission.previews.firstOrNull()
+        val imageLabel = portrait?.let { "${it.first} profil resmi" } ?: "$title görev görüntüsü"
         background = RippleDrawable(ColorStateList.valueOf(0x28FFFFFF),
             filled(Miami.surface, 20, Miami.edge), null)
         setPadding(dp(12), dp(11), dp(10), dp(11))
@@ -170,7 +173,7 @@ class GtaMissionSearchActivity : Activity() {
         isFocusable = true
         contentDescription = title
         setOnClickListener { openMission(mission, language) }
-        addView(missionAvatar(mission.giver, catalog?.portrait(mission.giver), 53),
+        addView(missionAvatar(imageLabel, thumbnail, 53),
             LinearLayout.LayoutParams(dp(53), dp(53)))
         addView(stack().apply {
             addView(copy(title, 18, Palette.white, true))
@@ -226,7 +229,7 @@ class GtaMissionDetailsActivity : Activity() {
         worker.execute {
             val selected = runCatching {
                 val pack = GtaMissionStore.catalog(app) ?: return@runCatching null
-                val item = pack.missions.firstOrNull { it.id == id } ?: return@runCatching null
+                val item = pack.mission(id) ?: return@runCatching null
                 pack to item
             }.getOrNull()
             runOnUiThread {
@@ -297,23 +300,49 @@ class GtaMissionDetailsActivity : Activity() {
     private fun render() {
         val version = ++renderVersion
         body.removeAllViews()
-        infoButton.miamiChoice(pane == Pane.INFO, Miami.pink)
-        textButton.miamiChoice(pane != Pane.INFO, Miami.aqua)
+        infoButton.missionTab(pane == Pane.INFO, Miami.coral, Miami.pink, R.drawable.ic_portal_steps)
+        textButton.missionTab(pane != Pane.INFO, Miami.aqua, 0xFFB9D2FF.toInt(), R.drawable.ic_mission_text)
         if (pane == Pane.INFO) {
             showInfo()
             return
         }
         val options = actionRow(
             press("Konuşmalar") { select(Pane.CONVERSATIONS) }.apply {
-                miamiChoice(pane == Pane.CONVERSATIONS, Miami.aqua)
+                missionTab(pane == Pane.CONVERSATIONS, Miami.aqua, 0xFF9AE1FA.toInt())
             },
             press("Hedefler/Kaynaklar") { select(Pane.TARGETS) }.apply {
-                miamiChoice(pane == Pane.TARGETS, Miami.coral)
+                missionTab(pane == Pane.TARGETS, Miami.lavender, Miami.pink)
             },
-        )
+        ).apply {
+            background = detailSurface(Miami.lavender)
+            setPadding(dp(7), dp(7), dp(7), dp(7))
+        }
         body.addBelow(options)
         showPackText(version, conversations = pane == Pane.CONVERSATIONS)
         if (pane == Pane.TARGETS) showSources()
+    }
+
+    private fun Button.missionTab(selected: Boolean, accent: Int, end: Int, icon: Int? = null) {
+        isSelected = selected
+        val foreground = if (selected) Miami.night else accent
+        val stops = if (selected) intArrayOf(accent, end)
+            else intArrayOf(mix(Miami.surface, accent, 0.19f), mix(Miami.surface, end, 0.06f))
+        val gradient = GradientDrawable(GradientDrawable.Orientation.TL_BR, stops).apply {
+            cornerRadius = dp(if (icon == null) 15 else 20).toFloat()
+            setStroke(dp(if (selected) 2 else 1), if (selected) mix(end, Palette.white, 0.5f) else mix(Miami.edge, accent, 0.5f))
+        }
+        background = RippleDrawable(ColorStateList.valueOf(if (selected) 0x24090C19 else 0x28FFFFFF), gradient, null)
+        setTextColor(foreground)
+        gravity = Gravity.CENTER
+        minHeight = dp(if (icon == null) 48 else 66)
+        setPadding(dp(6), dp(8), dp(6), dp(8))
+        icon?.let { res ->
+            val drawable = context.getDrawable(res)?.mutate()
+            drawable?.setTint(foreground)
+            drawable?.setBounds(0, 0, dp(19), dp(19))
+            compoundDrawablePadding = dp(5)
+            setCompoundDrawables(null, drawable, null, null)
+        }
     }
 
     private fun showInfo() {
@@ -325,7 +354,7 @@ class GtaMissionDetailsActivity : Activity() {
             body.addBelow(miamiSection("Oyunda görünen adlar", mission.mapLabels.joinToString("\n"), Miami.coral), 8)
         }
         mission.giver?.let { body.addBelow(giverPanel(it), 10) }
-        if (mission.previews.size > 1) body.addBelow(missionStills(), 10)
+        if (mission.previews.isNotEmpty()) body.addBelow(missionStills(), 10)
         if (mission.characters.isNotEmpty()) {
             body.addBelow(miamiSection("Görevde görülenler", mission.characters.joinToString(", "), Miami.lavender), 10)
         }
@@ -350,7 +379,7 @@ class GtaMissionDetailsActivity : Activity() {
                 }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
             }, 8)
         }
-        mission.prerequisites.mapNotNull { id -> catalog.missions.firstOrNull { it.id == id } }.forEach { previous ->
+        mission.prerequisites.mapNotNull(catalog::mission).distinctBy { it.id }.forEach { previous ->
             body.addBelow(prerequisite(previous), 10)
         }
     }
@@ -363,45 +392,54 @@ class GtaMissionDetailsActivity : Activity() {
     private fun giverPanel(name: String) = row().apply {
         background = detailSurface(Miami.aqua)
         setPadding(dp(13), dp(12), dp(13), dp(12))
-        addView(missionAvatar(name, catalog.portrait(name), 62), LinearLayout.LayoutParams(dp(62), dp(62)))
+        addView(missionAvatar("$name profil resmi", catalog.portrait(name), 62), LinearLayout.LayoutParams(dp(62), dp(62)))
         addView(stack().apply {
             addView(copy("Görevi veren", 12, Miami.aqua, true))
             addBelow(copy(name, 19, Palette.white, true), 2)
         }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
     }
 
-    private fun missionStills() = stack().apply {
-        addView(HorizontalScrollView(this@GtaMissionDetailsActivity).apply {
-            isHorizontalScrollBarEnabled = false
-            val width = if (mission.previews.size == 2) 264 else 192
-            addView(row().apply {
-                mission.previews.drop(1).forEach { photo ->
-                    addView(stack().apply {
-                        val label = photo.caption ?: "${mission.nameIn(language)} görev görüntüsü"
-                        isFocusable = true
-                        contentDescription = label
-                        setOnClickListener { openMissionSource(photo.url) }
-                        addView(FrameLayout(context).apply {
-                            background = filled(Miami.surface, 17, Miami.edge)
-                            clipToOutline = true
-                            val placeholder = glyph(R.drawable.ic_capture_album, Miami.lavender)
-                            addView(placeholder, FrameLayout.LayoutParams(dp(27), dp(27), Gravity.CENTER))
-                            addView(context.missionImageView(photo, 580) { placeholder.visibility = View.INVISIBLE },
-                                FrameLayout.LayoutParams(-1, -1))
-                        }, LinearLayout.LayoutParams(-1, dp(if (width == 264) 145 else 108)))
-                        photo.caption?.let { addBelow(copy(it, 12, Palette.quiet), 4) }
-                    }, LinearLayout.LayoutParams(dp(width), -2).apply { marginEnd = dp(8) })
+    private fun missionStills(): LinearLayout {
+        val photos = mission.previews.drop(1).ifEmpty { mission.previews }
+        return row().apply {
+            gravity = Gravity.TOP
+            photos.forEachIndexed { index, photo ->
+                val label = photo.caption ?: "${mission.nameIn(language)} görev görüntüsü ${index + 1}"
+                val frame = stack().apply {
+                    val picture = still(photo, if (photos.size == 1) 150 else 108)
+                    picture.contentDescription = label
+                    picture.isFocusable = true
+                    picture.setOnClickListener { showStill(photo, label) }
+                    addView(picture)
+                    photo.caption?.let { addBelow(copy(it, 12, Palette.quiet), 5) }
                 }
-            })
-        })
-        mission.gallerySource?.let { gallery ->
-            val source = if (gallery.startsWith("https://www.gtabase.com/")) "GTABase" else "PowerPyx"
-            addBelow(copy("Görsel kaynağı · $source", 12, Miami.lavender).apply {
-                setPadding(dp(2), dp(10), dp(2), dp(8))
-                setOnClickListener { openMissionSource(gallery) }
-                isFocusable = true
-            }, 1)
+                addView(frame, LinearLayout.LayoutParams(0, -2, 1f).apply {
+                    if (index > 0) marginStart = dp(8)
+                })
+            }
         }
+    }
+
+    private fun still(photo: GtaMissionImage, height: Int, large: Boolean = false) = FrameLayout(this).apply {
+        minimumHeight = dp(height)
+        background = filled(Miami.surface, 16, Miami.edge)
+        clipToOutline = true
+        val placeholder = glyph(R.drawable.ic_capture_album, Miami.lavender)
+        addView(placeholder, FrameLayout.LayoutParams(dp(28), dp(28), Gravity.CENTER))
+        addView(context.missionImageView(photo, if (large) 1280 else 640) {
+            placeholder.visibility = View.INVISIBLE
+        }.apply {
+            if (large) scaleType = ImageView.ScaleType.FIT_CENTER
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, FrameLayout.LayoutParams(-1, dp(height)))
+    }
+
+    private fun showStill(photo: GtaMissionImage, label: String) {
+        AlertDialog.Builder(this)
+            .setTitle(label)
+            .setView(still(photo, 260, large = true))
+            .setPositiveButton("Kapat", null)
+            .show()
     }
 
     private fun prerequisite(previous: GtaMission) = row().apply {
@@ -453,39 +491,81 @@ class GtaMissionDetailsActivity : Activity() {
             else it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE
         }
         if (entries.isEmpty()) {
-            if (conversations) {
-                body.addBelow(miamiSection("Türkçe döküm", "Bu görevin Türkçe diyalog dökümü görev paketinde bulunmuyor.", Miami.aqua), 11)
-                mission.dialogueSource?.let { url ->
-                    body.addBelow(press("Görevin diyalog arşivini aç", Miami.aqua) { openMissionSource(url) }, 8)
-                }
-            } else body.addBelow(copy("Bu göreve ait paket hedefi bulunmuyor."), 12)
+            if (conversations) showConversationSummaries()
+            else body.addBelow(miamiSection("Hedefler", "Bu görev için kayıtlı hedef bulunmuyor.", Miami.lavender), 10)
             return
         }
         val scenes = mission.scenes.associateBy { it.id }
         val pending = mutableListOf<Triple<GtaMissionText, String?, TextView>>()
         entries.take(visibleRows).forEachIndexed { index, line ->
             val scene = scenes[line.sceneId]
+            val previousLine = entries.getOrNull(index - 1)
+            if (conversations && (index == 0 || line.sceneId != previousLine?.sceneId)) {
+                body.addBelow(sceneHeading(scene?.title ?: "Diyaloglar", scene?.environment, Miami.aqua), 12)
+            }
             val translated = line.turkish ?: translatedLines[line]
-            val title = listOfNotNull(line.speaker, scene?.title).joinToString(" · ").ifBlank { line.type.label }
-            body.addBelow(miamiSection(title, "", if (conversations) Miami.aqua else Miami.coral).apply {
+            val accent = if (conversations) Miami.aqua else if (index % 2 == 0) Miami.coral else Miami.lavender
+            body.addBelow(textCard(accent).apply {
+                val title = if (conversations) line.speaker else line.type.label
+                title?.let { addView(copy(it, 14, accent, true)) }
                 val lineText = copy(translated ?: line.english.orEmpty(), 16, Palette.white).apply { setTextIsSelectable(true) }
-                addBelow(lineText, 5)
+                addBelow(lineText, if (title == null) 0 else 5)
                 val timing = line.startMs?.let { start ->
                     val first = formatMissionTime(start)
                     line.endMs?.let { end -> "$first–${formatMissionTime(end)}" } ?: first
                 }
-                val previous = entries.getOrNull(index - 1)?.takeIf { it.sceneId == line.sceneId }?.english
+                val previous = previousLine?.takeIf { it.sceneId == line.sceneId }?.english
                 if (translated == null && line.english != null && line !in attemptedTranslations) {
                     pending.add(Triple(line, previous, lineText))
                 }
-                listOfNotNull(scene?.environment, line.context, timing).forEach { addBelow(copy(it, 13), 4) }
+                val environment = scene?.environment?.takeUnless { conversations }
+                listOfNotNull(environment, line.context, timing).forEach { addBelow(copy(it, 13), 4) }
             }, 8)
         }
-        if (entries.size > visibleRows) body.addBelow(press("Daha fazla metin göster") {
+        if (entries.size > visibleRows) body.addBelow(press("Daha fazla metin göster", Miami.lavender) {
             visibleRows += PAGE_SIZE
             render()
         }, 9)
         translateRows(version, pending.iterator())
+    }
+
+    private fun showConversationSummaries() {
+        val summaries = mission.conversationSummaries
+        if (summaries.isEmpty()) {
+            body.addBelow(miamiSection("Konuşmalar", "Bu görev için sahne konuşması henüz bulunmuyor.", Miami.aqua), 10)
+            return
+        }
+        body.addBelow(copy("Sahne özetleri", 19, Palette.white, true).apply { isAccessibilityHeading = true }, 13)
+        val colors = listOf(Miami.aqua, Miami.coral, Miami.lavender)
+        summaries.forEachIndexed { index, summary ->
+            val accent = colors[index % colors.size]
+            body.addBelow(textCard(accent).apply {
+                addView(sceneHeading(summary.title, summary.location, accent))
+                if (summary.speakers.isNotEmpty()) {
+                    addBelow(copy(summary.speakers.joinToString(" · "), 13, accent, true).apply {
+                        background = filled(mix(Miami.surface, accent, 0.15f), 10)
+                        setPadding(dp(8), dp(4), dp(8), dp(4))
+                    }, 9)
+                }
+                addBelow(copy(summary.text, 16, Palette.white).apply { setTextIsSelectable(true) }, 9)
+            }, 9)
+        }
+    }
+
+    private fun sceneHeading(title: String, location: String?, accent: Int) = row().apply {
+        gravity = Gravity.TOP
+        addView(glyph(R.drawable.ic_mission_text, accent).apply {
+            background = filled(mix(Miami.surface, accent, 0.2f), 10)
+            setPadding(dp(7), dp(7), dp(7), dp(7))
+        }, LinearLayout.LayoutParams(dp(35), dp(35)))
+        addView(stack().apply {
+            addView(copy(title, 17, Palette.white, true).apply { isAccessibilityHeading = true })
+            location?.let { addBelow(copy(it, 13), 1) }
+        }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(9) })
+    }
+
+    private fun textCard(accent: Int) = miamiPanel(accent).apply {
+        background = detailSurface(accent)
     }
 
     private fun translateRows(version: Int, views: Iterator<Triple<GtaMissionText, String?, TextView>>) {
@@ -512,12 +592,11 @@ class GtaMissionDetailsActivity : Activity() {
             if (url != null) links.putIfAbsent(url, label)
         }
         add(mission.source, "Görev kaynağını aç")
-        add(mission.dialogueSource, "Görevin diyalog arşivini aç")
-        add(mission.textSource, "Görev metinlerini kaynakta aç")
+        add(mission.textSource?.takeUnless { it.startsWith("https://six.mics.dev/dialogue") },
+            "Görev metinlerini kaynakta aç")
         add(mission.gallerySource, "Görev görüntülerinin kaynağını aç")
         add(mission.profileSource, "Karakteri kaynakta gör")
         add(mission.gameDataSource, "Oyun verisindeki kaydı aç")
-        if (mission.dialogueSource == null) add("https://six.mics.dev/dialogue", "GTA VI Explorer’da diyalog ara")
         add("https://github.com/psviethoa/gta6-text-en", "GitHub İngilizce metin kaynağı")
         links.forEach { (url, label) -> body.addBelow(press(label) { openMissionSource(url) }, 7) }
     }

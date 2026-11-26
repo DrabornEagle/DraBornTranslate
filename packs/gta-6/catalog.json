@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "2026.11.26.4",
+  "version": "2026.11.26.5",
   "gameBuild": "Xbox Series 1.0.2.1",
   "missions": [
     {
@@ -452,6 +452,10 @@
           "titleTr": "Arama bağlamı",
           "environmentTr": "Bataklık çevresi"
         }
+      ],
+      "characters": [
+        "Donnie",
+        "Jason Duval"
       ]
     },
     {
@@ -678,7 +682,8 @@
           "titleTr": "Sahnenin amacı",
           "environmentTr": "Kıyı ve su çevresi"
         }
-      ]
+      ],
+      "searchTarget": "recalibration"
     },
     {
       "id": "tourist-trap",
@@ -740,7 +745,8 @@
           "titleTr": "Bölgeden çıkış",
           "environmentTr": "Key Lento yolları"
         }
-      ]
+      ],
+      "searchTarget": "home-sweet-home"
     },
     {
       "id": "discharge-time",
@@ -837,7 +843,8 @@
           "titleTr": "Ev sahnesi",
           "environmentTr": "Evin içi"
         }
-      ]
+      ],
+      "searchTarget": "building-a-life"
     },
     {
       "id": "whats-in-the-bag",
@@ -878,7 +885,8 @@
       "sourceUrl": "https://six.mics.dev/missions/ft-motel-shop",
       "aliases": [
         "FT_MOTEL_SHOP"
-      ]
+      ],
+      "searchTarget": "just-moved-in"
     },
     {
       "id": "mtl-drive",
@@ -1268,16 +1276,18 @@
       "id": "clb-meet",
       "titleTr": "Vice City’ye Hoş Geldin",
       "type": "story",
-      "chapter": 2,
-      "summaryTr": "Jason ile Lucia kulüpte Dre’Quan’la görüşür. İşaretler binanın arka tarafı ile iç mekân arasında geçiş gösterir.",
+      "chapter": 3,
+      "summaryTr": "Vice City’ye giren Jason ve Lucia, eski arkadaşları Dre’Quan’ın davetiyle Jack of Hearts’a gider. Orada tanıştıkları Boobie Ike, çifte kalacak bir daire teklif eder.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/welcome-to-vice-city",
       "aliases": [
         "CLB_MEET",
         "Welcome to Vice City"
       ],
       "characters": [
-        "Jason",
-        "Lucia"
+        "Jason Duval",
+        "Lucia Caminos",
+        "Dre’Quan Priest",
+        "Boobie Ike"
       ],
       "titleEn": "Welcome to Vice City",
       "scenes": [
@@ -1293,7 +1303,7 @@
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/welcome-to-vice-city",
-      "locationTr": "Automatically started after previous mission",
+      "locationTr": "Vice City · Crosstown, Jack of Hearts",
       "textSourceUrl": "https://six.mics.dev/missions/clb-meet"
     },
     {
@@ -1497,7 +1507,8 @@
           "environmentTr": "Tersane ve depo"
         }
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_VEH"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_VEH",
+      "searchTarget": "meet-the-heders"
     },
     {
       "id": "ant-srch",
@@ -1524,14 +1535,15 @@
           "titleTr": "Heykelin izi",
           "environmentTr": "Evelyn Andrews Antiques"
         }
-      ]
+      ],
+      "searchTarget": "dubious-provenance"
     },
     {
       "id": "dubious-provenance",
       "titleTr": "Şüpheli Köken",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Dubious Provenance adı katalogda birden fazla kez geçer. Bu kaydın oyun dosyasındaki ayırt edici kodu ANT_CHASE.",
+      "summaryTr": "Jason ve Lucia çantadaki heykeli Capri’de inceletir. Evelyn geri çevirince Halifax devreye girer. Seçimlere göre görüşmeler antikacı, motel ve Halifax’ın peşine düşülen sahnelere yayılır.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/dubious-provenance",
       "titleEn": "Dubious Provenance",
       "aliases": [
@@ -1539,8 +1551,10 @@
         "Dubious Provenance"
       ],
       "characters": [
-        "Jason",
-        "Lucia"
+        "Jason Duval",
+        "Lucia Caminos",
+        "Evelyn Andrews",
+        "Benedict Halifax"
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_CHASE",
       "scenes": [
@@ -1551,7 +1565,7 @@
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/dubious-provenance",
-      "locationTr": "Vice City · Bayside (Part 1), Mariana County · Capri (Parts 2 & 3)",
+      "locationTr": "Capri · Evelyn Andrews Antiques ve Sweet Bay Inn",
       "giver": "Jason Duval / Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
       "mapLabels": [
@@ -1691,7 +1705,11 @@
           "titleTr": "Üretim yerleri",
           "environmentTr": "Vice City’deki laboratuvarlar"
         }
-      ]
+      ],
+      "titleEn": "Take Out Kitty Litter",
+      "giver": "Tyrone",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/tyrone",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/take-out-kitty-litter"
     },
     {
       "id": "top-billing",
@@ -1959,10 +1977,10 @@
       "titleTr": "Anahtar Kopyala, Para Kazan",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "Randy’nin araç işinde hedef Granforma Zorrusso’dur. İş aracı Randy’ye teslim edince kapanır.",
+      "summaryTr": "Randy, Hathaway Apartments’ın garajındaki Granforma Zorrusso’yu ister ve aracı açmak için bir anahtar kopyalayıcı gönderir. Teslimat, galerideki nadir araçlar listesine bağlanır.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/steal-the-zorrusso-for-randy",
       "titleEn": "Clonin' Keys, Makin' Gs",
-      "locationTr": "Randy’nin teslim noktası",
+      "locationTr": "Vice City · Ocean Beach ve Leonida Auto World",
       "aliases": [
         "CTI_SHOW_HATH",
         "Clonin’ Keys, Makin’ GS",
@@ -2381,7 +2399,10 @@
       ],
       "mapLabels": [
         "Plant the Charge"
-      ]
+      ],
+      "giver": "Karim",
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/karim",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/hidden-charges"
     },
     {
       "id": "the-cartel-heist",
@@ -2428,10 +2449,10 @@
     },
     {
       "id": "ant-recov",
-      "titleTr": "ANT_RECOV",
+      "titleTr": "Antikacı · Ek Kayıt",
       "type": "story",
       "chapter": 3,
-      "summaryTr": "ANT_RECOV, aynı bölümdeki heykel arayışından ve Halifax’la buluşmadan ayrı bir oyun dosyası kaydıdır.",
+      "summaryTr": "Bölüm 3’te Jason ve Lucia’nın yer aldığı antikacı öyküsüne bağlı ek oyun kaydı.",
       "sourceUrl": "https://six.mics.dev/missions/ant-recov",
       "aliases": [
         "ANT_RECOV"
@@ -2484,7 +2505,8 @@
       "mapLabels": [
         "Visit the Antique Store"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/dubious-provenance-ant-intro"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/dubious-provenance-ant-intro",
+      "searchTarget": "dubious-provenance"
     },
     {
       "id": "ant-give",
@@ -2508,7 +2530,13 @@
           "titleTr": "Heykeli bırak",
           "environmentTr": "Antikacının görüşme alanı"
         }
-      ]
+      ],
+      "characters": [
+        "Benedict Halifax",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/dubious-provenance"
     },
     {
       "id": "ban-pkbmb",
@@ -3458,7 +3486,9 @@
           "environmentTr": "Raul’un teknesi"
         }
       ],
-      "textSourceUrl": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_DEATH"
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=ROB&q=ROB_DEATH",
+      "giver": "Raul Bautista",
+      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/raul"
     },
     {
       "id": "starting-from-zero",
@@ -3888,7 +3918,7 @@
           "environmentTr": "Bölüm 5"
         }
       ],
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-spin-on-this-shut-down-the-labs-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/spin-on-this",
       "locationTr": "Lummox County · Grayson",
       "giver": "Tyrone",
       "mapLabels": [
@@ -3927,7 +3957,7 @@
           "environmentTr": "Millport rıhtımları"
         }
       ],
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-delivery-day-meet-randy-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/delivery-day",
       "giver": "Randy",
       "textSourceUrl": "https://six.mics.dev/missions/delivery-day",
       "mapLabels": [
@@ -3959,7 +3989,12 @@
           "titleTr": "Kayıt ayrımı",
           "environmentTr": "Bölüm 5 oyun dizini"
         }
-      ]
+      ],
+      "characters": [
+        "Donnie",
+        "Jason Duval"
+      ],
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/find-the-lost-drugs"
     },
     {
       "id": "prologue-int-cred",
@@ -4273,7 +4308,7 @@
       "summaryTr": "Komşu Shirley, dükkândan rom alıp kendisine getirmen için Jason’dan yardım ister.",
       "chapter": 1,
       "sourceUrl": "https://www.powerpyx.com/gta-6-get-shirleys-rum-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-get-shirleys-rum-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/get-shirleys-rum",
       "locationTr": "Mariana County · Key Lento",
       "giver": "Shirley",
       "aliases": [
@@ -4300,7 +4335,7 @@
       "summaryTr": "Shirley, keyfini yerine getireceğini düşündüğü bir iş önerir. Görev komşusunun scooter’ıyla ilgilidir.",
       "chapter": 1,
       "sourceUrl": "https://www.powerpyx.com/gta-6-steal-the-scooter-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-steal-the-scooter-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/steal-the-scooter",
       "locationTr": "Mariana County · Key Lento",
       "giver": "Shirley",
       "aliases": [
@@ -4592,7 +4627,7 @@
       "chapter": 1,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/building-a-life",
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/building-a-life",
-      "locationTr": "starts immediately after “Clear Skies” at Jason’s House",
+      "locationTr": "Key Lento · Jason ve Lucia’nın evi",
       "giver": "Jason Duval / Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
       "aliases": [
@@ -4673,11 +4708,11 @@
       "titleTr": "Evim Güzel Evim",
       "titleEn": "Home Sweet Home",
       "type": "story",
-      "summaryTr": "Lucia kasabadan ayrılmadan önce Jason’ın evine dönüp onun eşyalarından bazılarını toplar.",
+      "summaryTr": "Lucia, şehirden ayrılmadan önce Jason’ın eşyalarını almak için Key Lento’daki eve döner. Yangından çıkınca Andy’den yardım isteyebilir.",
       "chapter": 1,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/home-sweet-home",
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/home-sweet-home",
-      "locationTr": "Mariana County · Key Lento · Jason’s House",
+      "locationTr": "Key Lento · Jason’ın evi",
       "giver": "Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
       "aliases": [
@@ -4691,7 +4726,8 @@
         }
       ],
       "characters": [
-        "Lucia Caminos"
+        "Lucia Caminos",
+        "Andy"
       ],
       "textCount": 1
     },
@@ -4704,7 +4740,7 @@
       "chapter": 2,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/just-moved-in",
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/just-moved-in",
-      "locationTr": "Kelly County · Starlet Motel",
+      "locationTr": "Kelly County · Starlet Motel ve Alpha Market",
       "giver": "Jason Duval / Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
       "aliases": [
@@ -5192,11 +5228,11 @@
       "titleTr": "Heder’larla Tanış",
       "titleEn": "Meet the Heders",
       "type": "story",
-      "summaryTr": "Jason ve Lucia, Brian ile Lori Heder’la bir akşam buluşmasına gider.",
+      "summaryTr": "Jason ve Lucia, Brian ile Lori’yle bir çatı restoranında buluşur. Akşam yemeğinin ardından Lucia, limandaki SCOOP konteynerlerinden birinde bulunan aracı teslim almaya gider.",
       "chapter": 3,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/meet-the-heders",
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/meet-the-heders",
-      "locationTr": "Vice City · Bayside",
+      "locationTr": "Vice City · çatı restoranı ve Port VC limanı",
       "giver": "Brian Heder",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/brian",
       "mapLabels": [
@@ -5213,7 +5249,10 @@
         }
       ],
       "characters": [
-        "Brian Heder"
+        "Brian Heder",
+        "Lori Heder",
+        "Jason Duval",
+        "Lucia Caminos"
       ],
       "textCount": 1
     },
@@ -5566,7 +5605,7 @@
       "summaryTr": "Andrea, önceki işten çekilen Felipe’nin Millport’ta olduğunu öğrenip onunla ilgili bir iş verir.",
       "chapter": 4,
       "sourceUrl": "https://www.powerpyx.com/gta-6-bad-driver-find-felipe-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-bad-driver-find-felipe-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/bad-driver",
       "locationTr": "Lummox County · Millport",
       "giver": "Andrea",
       "mapLabels": [
@@ -5740,7 +5779,7 @@
       "summaryTr": "Lucia, hapisten çıkan arkadaşı Shayna’yı almaya gider.",
       "chapter": 4,
       "sourceUrl": "https://www.powerpyx.com/gta-6-this-is-a-free-call-from-pick-up-shayna-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-this-is-a-free-call-from-pick-up-shayna-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/this-is-a-free-call-from",
       "locationTr": "Vice-Dale County · Hamlet",
       "giver": "Shayna",
       "mapLabels": [
@@ -5825,7 +5864,7 @@
       "summaryTr": "Yasmani bir banka işi için bilgi verir. Güvenlik minibüsünün izini sürmek üzere Cafe Orquidea’da beklenir.",
       "chapter": 4,
       "sourceUrl": "https://www.powerpyx.com/gta-6-thats-where-the-money-is-wait-at-the-cafe-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-thats-where-the-money-is-wait-at-the-cafe-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/thats-where-the-money-is",
       "locationTr": "Vice Beach · Ocean Beach",
       "giver": "Yasmani",
       "mapLabels": [
@@ -5939,7 +5978,7 @@
       "type": "side",
       "summaryTr": "Cal, iki pounddan ağır bir stoplight papağan balığı yakalamayı önerir.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-catch-a-bigger-fish-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-catch-a-bigger-fish-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/catch-a-bigger-fish",
       "locationTr": "Mariana County · Gambit Bay",
       "giver": "Cal Hampton",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/cal",
@@ -6053,7 +6092,7 @@
       "summaryTr": "Port Gellhorn’da kaybolan turistlere ilişkin ipuçları araştırılır.",
       "chapter": 2,
       "sourceUrl": "https://www.powerpyx.com/gta-6-gellhorns-missing-tourists-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-gellhorns-missing-tourists-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/gellhorns-missing-tourists",
       "locationTr": "Kelly County · Port Gellhorn",
       "aliases": [
         "Gellhorn’s Missing Tourists"
@@ -6075,7 +6114,7 @@
       "summaryTr": "İhbar hattındaki kişi, kayıp turistler hakkında görüşmek için kupa odasını buluşma yeri olarak verir.",
       "chapter": 2,
       "sourceUrl": "https://www.powerpyx.com/gta-6-missing-person-return-to-the-trophy-room-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-missing-person-return-to-the-trophy-room-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/missing-person",
       "locationTr": "Kelly County · Port Gellhorn",
       "giver": "Alvan West",
       "mapLabels": [
@@ -6103,7 +6142,7 @@
       "type": "side",
       "summaryTr": "Moses farklı araçlardan oluşan bir liste verir. Futo, Hellion ve Bandito istenen modeller arasındadır.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-steal-vehicles-for-moses-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-steal-vehicles-for-moses-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/steal-vehicles-for-moses",
       "locationTr": "Dependent on vehicle",
       "giver": "Moses",
       "aliases": [
@@ -6364,7 +6403,7 @@
       "summaryTr": "Leaf Links’ten Randy aranır. Randy, aradığı Declasse Mamba GT’ye ilişkin bilgi verir.",
       "chapter": 3,
       "sourceUrl": "https://www.powerpyx.com/gta-6-dale-mamba-steal-the-declasse-mamba-gt-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-dale-mamba-steal-the-declasse-mamba-gt-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/dale-mamba",
       "locationTr": "Vice Beach · Leaf Links",
       "giver": "Randy",
       "mapLabels": [
@@ -6394,7 +6433,7 @@
       "summaryTr": "Dalton Island Club’a varıldığında Randy, istediği Truffade Thrax’ın ayrıntılarını telefonda paylaşır.",
       "chapter": 3,
       "sourceUrl": "https://www.powerpyx.com/gta-6-mansion-thrax-steal-the-truffade-thrax-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-mansion-thrax-steal-the-truffade-thrax-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/mansion-thrax",
       "locationTr": "Vice Beach · Dalton Island",
       "giver": "Randy",
       "mapLabels": [
@@ -6424,7 +6463,7 @@
       "summaryTr": "İhracat listesi tamamlanınca Randy, daha önce Raul için alınan Pegassi Tempesta’yı ödül olarak bırakır.",
       "chapter": 3,
       "sourceUrl": "https://www.powerpyx.com/gta-6-collect-the-tempesta-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-collect-the-tempesta-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/collect-the-tempesta",
       "locationTr": "Vice City · Balsero",
       "giver": "Randy",
       "aliases": [
@@ -6537,7 +6576,7 @@
       "type": "side",
       "summaryTr": "No Flusher Movement’tan gelen yanıt, Vice City’deki Frank’s Waffles’a yönlendirir.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-the-final-flush-meet-at-franks-waffles-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-the-final-flush-meet-at-franks-waffles-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/the-final-flush",
       "locationTr": "Vice City · Tequesta",
       "giver": "Dr. Merle",
       "mapLabels": [
@@ -6567,7 +6606,7 @@
       "type": "side",
       "summaryTr": "Freddie, yerleşkesindeki yeni savunmaları sınamak için geri gelmeni ister.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-retest-freddies-defenses-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-retest-freddies-defenses-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/retest-freddies-defenses",
       "locationTr": "Leonard County · North Leonard County",
       "giver": "Freddie",
       "aliases": [
@@ -6593,7 +6632,7 @@
       "type": "side",
       "summaryTr": "Dodos Rising’den Noah, şempanze tesisini kapatmak için nehir kenarında buluşur.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-bring-out-the-chimp-help-save-the-chimps-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-bring-out-the-chimp-help-save-the-chimps-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/bring-out-the-chimp",
       "locationTr": "Vice City · Southside",
       "giver": "Noah",
       "mapLabels": [
@@ -6621,7 +6660,7 @@
       "type": "side",
       "summaryTr": "Rosebud, Vice City Oceanarium’daki orkayı serbest bırakmak için yardım ister.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-sisters-of-the-sea-help-free-the-orca-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-sisters-of-the-sea-help-free-the-orca-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/sisters-of-the-sea",
       "locationTr": "Vice City · Catalan Key",
       "giver": "Rosebud",
       "mapLabels": [
@@ -6650,7 +6689,7 @@
       "type": "side",
       "summaryTr": "Tyler, sondaj sahasını kapatma işi için Watson Bay’de buluşur.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-twin-flames-shut-down-the-fracking-site-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-twin-flames-shut-down-the-fracking-site-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/twin-flames",
       "locationTr": "Mariana County · Watson Bay",
       "giver": "Tyler",
       "mapLabels": [
@@ -6675,18 +6714,19 @@
     {
       "id": "dodo-rise",
       "titleTr": "Dodo’nun Yükselişi",
-      "titleEn": "Dodo Rise",
+      "titleEn": "Dodo, Rise!",
       "type": "side",
       "summaryTr": "Dodos Rising’in yeni işi, Emerald Springs’teki bir bağlantıyla görüşerek başlar.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-dodo-rise-meet-with-the-dodos-contact-walkthrough/",
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-dodo-rise-meet-with-the-dodos-contact-walkthrough/",
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/dodo-rise",
       "locationTr": "Kelly County · Emerald Springs",
       "giver": "Yvonne",
       "mapLabels": [
         "Meet with the Dodos Contact"
       ],
       "aliases": [
-        "Dodo Rise"
+        "Dodo Rise",
+        "Meet with the Dodos Contact"
       ],
       "scenes": [
         {

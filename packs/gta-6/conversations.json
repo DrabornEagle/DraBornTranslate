@@ -1,0 +1,806 @@
+{
+  "prologue": [
+    {
+      "titleTr": "Tahliye görüşmesi",
+      "locationTr": "Hamlet Cezaevi · görüşme odası",
+      "speakers": [
+        "Lucia Caminos",
+        "Cezaevi danışmanı"
+      ],
+      "summaryTr": "Danışman, Lucia’nın buraya nasıl geldiğini kendi ağzından duymak ister. Lucia soruya kısa ve mesafeli karşılık verir. Görüşme Lucia’nın tutuklanmasına yol açan olayları hatırlamasına açılır."
+    },
+    {
+      "titleTr": "Kafeye dönmesinin nedeni",
+      "locationTr": "Hamlet Cezaevi · görüşme ve geçmişe dönüş",
+      "speakers": [
+        "Lucia Caminos",
+        "Cezaevi danışmanı"
+      ],
+      "summaryTr": "Lucia’nın polis peşindeyken kafeye geri dönmesinin ardında oğlu Tommy vardır. Çocuk orada kalmıştır. Polis Lucia’yı gözaltına alır ve Tommy sosyal hizmetlere teslim edilir. Görüşme, Lucia’nın dışarı çıkıp oğluna kavuşmak istemesinin nedenini açığa çıkarır."
+    }
+  ],
+  "gone-fishing": [
+    {
+      "titleTr": "Teknedeki iş",
+      "locationTr": "Key Lento · tekne ve iskele",
+      "speakers": [
+        "Cal Hampton",
+        "Jason Duval"
+      ],
+      "summaryTr": "Cal, Jason’ı Donnie’yle bağlantılı bir teslimata dahil eder. İkilinin Donnie’yi uzaktan izlediği buluşmada işler ters gider. Karşı taraftakiler Donnie’yi alıkoyunca teslimatın yerini onu kurtarma işi alır."
+    },
+    {
+      "titleTr": "Kampı terk ederken",
+      "locationTr": "Pelican Valley · Kingfishers kampı",
+      "speakers": [
+        "Donnie",
+        "Jason Duval"
+      ],
+      "summaryTr": "Jason, Donnie’yi bağlı tutulduğu kulübeden çıkarır. Uçağa ilerlerken Donnie, yakındaki karavanda para bulunduğunu söyler. Jason bu bilgiyle parayı almaya uğrayabilir ya da doğruca kaçışa devam edebilir."
+    }
+  ],
+  "com-kbos-shop": [
+    {
+      "titleTr": "Dükkânın önündeki arama",
+      "locationTr": "Key Lento · hediyelik eşya dükkânı",
+      "speakers": [
+        "Jason Duval",
+        "Brian Heder"
+      ],
+      "summaryTr": "Jason kapalı dükkânın önünde Brian’ı arar. Geliş sebebi Brian adına dükkânın kirasını tahsil etmektir. Dükkân açılınca görüşmeyi kasadaki görevliyle sürdürür."
+    },
+    {
+      "titleTr": "Kiranın yerine ürün",
+      "locationTr": "Hediyelik eşya dükkânı · kasa",
+      "speakers": [
+        "Jason Duval",
+        "Dükkân görevlisi"
+      ],
+      "summaryTr": "Görevli kiranın parasının elinde olmadığını söyler. Jason üsteleyince görevli, arka odada bulunan ürünü ödeme yerine alabileceğini anlatır ve kapının şifresini verir. Kira görüşmesi böylece laboratuvardan mal alma işine dönüşür."
+    },
+    {
+      "titleTr": "Teslimat adresi",
+      "locationTr": "Dükkân çıkışı · telefon",
+      "speakers": [
+        "Jason Duval",
+        "Brian Heder"
+      ],
+      "summaryTr": "Jason, nakit yerine ürünü aldığını Brian’a bildirir. Brian, elindekini daha güneydeki deposuna bırakmasını ister. Jason’ın işi bu teslimatla kapanır ve ödeme sonradan evin posta kutusuna gelir."
+    }
+  ],
+  "island-dreams": [
+    {
+      "titleTr": "Kenton’ın çift amaçlı gezisi",
+      "locationTr": "Key Lento · Island Dreams dalış dükkânı",
+      "speakers": [
+        "Kenton Rees",
+        "Jason Duval"
+      ],
+      "summaryTr": "Kenton, Jason’dan bir bekârlığa veda grubuna batık gezisinde rehberlik etmesini ister. Üç yolcunun gezisi Kenton’a da yarayacaktır. Jason, müşterileri batığa götürürken Kenton için enkaz çevresinde değerli eşya arayacaktır."
+    },
+    {
+      "titleTr": "Dalışa giderken",
+      "locationTr": "Atlas Okyanusu · dalış teknesi",
+      "speakers": [
+        "Jason Duval",
+        "Dalış grubu"
+      ],
+      "summaryTr": "Yolculukta grup kendi arasında şakalaşır. Yolcular geziye eğlenmek için gelmiştir ve teknenin sohbeti bu havayı taşır. Kenton’ın hazine işi ise varıştan sonra Jason’ın sorumluluğundadır."
+    },
+    {
+      "titleTr": "İşin geleceği",
+      "locationTr": "Tekne ve dönüş",
+      "speakers": [
+        "Kenton Rees",
+        "Jason Duval"
+      ],
+      "summaryTr": "Jason, çıkardığı parçaları Kenton’a verir. Olayın ardından ikili başka batıklarda da birlikte çalışmayı sürdürür. Dobbs’un köpekbalığı saldırısından kurtulup kurtulmaması kapanıştaki konuşmayı değiştirir."
+    }
+  ],
+  "clonin-keys-makin-gs": [
+    {
+      "titleTr": "Randy’nin istediği araç",
+      "locationTr": "Ocean Beach · Hathaway Apartments, telefon",
+      "speakers": [
+        "Randy",
+        "Jason veya Lucia"
+      ],
+      "summaryTr": "Randy’nin istediği kırmızı Granforma Zorrusso apartmanın garajındadır. Randy, aracın gelişmiş bir takip sistemi olduğunu açıklar ve normal araç açma yöntemleri yerine telefona yüklenen anahtar kopyalayıcıyı gönderir."
+    },
+    {
+      "titleTr": "Garaj çıkışındaki uyarı",
+      "locationTr": "Hathaway Apartments · garaj çıkışı, mesaj",
+      "speakers": [
+        "Randy"
+      ],
+      "summaryTr": "Randy, aracı teslim ederken yavaş kalmanın takip sistemini polise haber verecek duruma getirebileceğini bildirir. Aracın hasarsız gelmesini de özellikle ister. Hasarsız teslimatın ayrı bir primi vardır."
+    },
+    {
+      "titleTr": "Nadir araçlar listesi",
+      "locationTr": "Vice City · Randy’nin galerisi",
+      "speakers": [
+        "Randy",
+        "Jason veya Lucia"
+      ],
+      "summaryTr": "Randy, Zorrusso teslim edilince arka taraftaki panoyu gösterir. Sıradaki istediği otomobiller nadir modellerdir. Yerleri baştan verilmez ve oyuncu her biri için Randy’den ayrı ayrı ipucu isteyebilir."
+    }
+  ],
+  "rob-drive": [
+    {
+      "titleTr": "Garaja yönlendirme",
+      "locationTr": "Vice Beach · Waxman Island, telefon",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Raul önce ekibi Waxman Island’daki aracı almaya, ardından Ocean Beach’te kendisiyle buluşmaya yönlendirir. Jason ile Lucia onun vereceği işin ayrıntılarını arabaya bindiğinde öğrenir."
+    },
+    {
+      "titleTr": "Arabadaki açıklama",
+      "locationTr": "Ocean Beach · araç içi",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Raul arabaya bindiğinde az önce bir Fleeca şubesini soyduğunu açıklar. Takip sırasında Lucia’yı Rialto Islands’a yönlendirir. Orada araç değiştirerek buluşmanın son kısmına geçerler."
+    },
+    {
+      "titleTr": "Asıl işin ortaya çıkması",
+      "locationTr": "Bayside · Raul’un bırakıldığı nokta",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Raul, şehirdeki kovalamanın ekibinin başka bir bölgede yürüttüğü daha büyük işi gizlediğini anlatır. Jason ile Lucia’ya ödeme yapar ve başka işler için yeniden haber vereceğini belirtir."
+    }
+  ],
+  "rob-bank": [
+    {
+      "titleTr": "Raul’un ekip tanıtımı",
+      "locationTr": "Vice City · Stockyard, ekip üssü",
+      "speakers": [
+        "Raul Bautista",
+        "Felipe",
+        "Karim",
+        "Andrea",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Raul ekibin görev dağılımını anlatır. Felipe araçtan, Karim teknik hazırlıktan, Andrea ise iletişim ve kılık değiştirme işlerinden sorumludur. Jason ile Lucia’nın daha büyük işe geçmeden önce küçük şubelerde birlikte çalışmasını ister."
+    },
+    {
+      "titleTr": "Hazırlık odasında",
+      "locationTr": "Stockyard · üst kat",
+      "speakers": [
+        "Andrea",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "İlk tanışmadan sonra görüşme Andrea’nın yanına taşınır. Maskeler hazırlığın parçasıdır ve ekip, şubelere çıkmadan önce burada kullanacağı iki takımdan birini seçer. Andrea’nın rolü bu aşamada ekibin gizliliğini ve haberleşmesini kurmaktır."
+    },
+    {
+      "titleTr": "Şubeler arasındaki koordinasyon",
+      "locationTr": "Crosstown · Fleeca şubeleri ve araç içi",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Şubeler tek bir büyük hedefe geçmeden önce birlikte çalışmayı oturtmak için seçilmiştir. Soygunlar ilerledikçe ekip, işaretli banknotların alarm veren boya paketlerini etkisizleştirebileceği bir cihaz edinir."
+    }
+  ],
+  "clb-meet": [
+    {
+      "titleTr": "Şehre girişte telefon",
+      "locationTr": "Vice City · otoyol, araç içi",
+      "speakers": [
+        "Jason Duval",
+        "Dre’Quan Priest",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Jason şehre girerken eski arkadaşı Dre’Quan’ı arar. Dre’Quan, buluşmak için Crosstown’daki Jack of Hearts’a gelmelerini ister. Jason ile Lucia’nın şehirdeki ilk bağlantısı bu telefonla kurulur."
+    },
+    {
+      "titleTr": "Kulüpteki teklif",
+      "locationTr": "Crosstown · Jack of Hearts, salon",
+      "speakers": [
+        "Dre’Quan Priest",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Dre’Quan ikiliyi karşılar ve Jason’a dansçılar için para teklif eder. Jason kabul etmezse Lucia parayı alıp kendi başına salona geçer, Dre’Quan ise Jason’ı doğrudan üst kata çıkarır."
+    },
+    {
+      "titleTr": "Kalacak yer",
+      "locationTr": "Crosstown · Jack of Hearts, üst kat",
+      "speakers": [
+        "Boobie Ike",
+        "Dre’Quan Priest",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Dre’Quan, Jason ile Lucia’yı Boobie Ike’la tanıştırır. Boobie çiftin yakındaki apartman dairesinde kalmasına izin verir. Kulüp görüşmesinden sonra yeni konaklama yerleri orası olur."
+    }
+  ],
+  "meet-the-heders": [
+    {
+      "titleTr": "Heder’larla akşam yemeği",
+      "locationTr": "Vice City · çatı restoranı",
+      "speakers": [
+        "Brian Heder",
+        "Lori Heder",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "İki çift önce restorandaki barda buluşur, sonra masaya geçer. Sipariş sırasında Lucia ne istediğini Jason’a söyler. Yemek sohbeti ilerlerken Brian ile Jason ayrı konuşmak üzere balkona geçer."
+    },
+    {
+      "titleTr": "Balkondaki konuşma",
+      "locationTr": "Çatı restoranı · balkon",
+      "speakers": [
+        "Brian Heder",
+        "Jason Duval"
+      ],
+      "summaryTr": "Brian, Jason’la masadan uzakta baş başa kalır ve puro ikram eder. Sahnenin ardından görev Lucia’ya geçer. Limandaki bir konteynerde bulunan araç Raul’un ekibi için alınacaktır."
+    }
+  ],
+  "dubious-provenance": [
+    {
+      "titleTr": "Heykel hakkında ilk görüş",
+      "locationTr": "Capri · Evelyn Andrews Antiques",
+      "speakers": [
+        "Evelyn Andrews",
+        "Benedict Halifax",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Evelyn, heykelin kökenini şüpheli bulur ve incelemeyi kabul etmez. Halifax ise dükkândan ayrılan çifti yakalar. İncelemeyi kendi başına yapmayı önerir ve güvence olarak değerli saatini bırakmayı teklif eder."
+    },
+    {
+      "titleTr": "Halifax’a güvenilecek mi?",
+      "locationTr": "Capri · Sweet Bay Inn, oda 111",
+      "speakers": [
+        "Benedict Halifax",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Halifax haber vermeyince çift izini motele kadar sürer. Onu odasında bulduklarında bir kez daha güvenip güvenmeyeceklerine karar verirler. Güvenme seçeneği bekleyişi uzatır, diğeri karakterleri hemen antikacıya geri götürür."
+    },
+    {
+      "titleTr": "Evelyn’in yeni bilgisi",
+      "locationTr": "Capri · antikacı dükkânı",
+      "speakers": [
+        "Evelyn Andrews",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Olayın devamında Evelyn çiftle yeniden bağlantı kurar. Halifax’ın nerede olabileceğine dair bir adres verir. Heykeli geri alma çabası bu adresteki buluşmaya ve ardından takibe dönüşür."
+    },
+    {
+      "titleTr": "Son karşılaşma",
+      "locationTr": "Capri · kovalamacanın sonu",
+      "speakers": [
+        "Benedict Halifax",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Lucia, Halifax’ı durdurduğunda Jason’ı telefonla çağırır. İkili yeniden bir araya gelince heykeli geri alır. Halifax’ı bırakmak ya da cezalandırmak bu sahnenin seçimidir."
+    }
+  ],
+  "ant-give": [
+    {
+      "titleTr": "Değer biçme anlaşması",
+      "locationTr": "Capri · antikacı çevresi",
+      "speakers": [
+        "Benedict Halifax",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Evelyn’in geri çevirdiği heykeli Halifax kendi imkânlarıyla incelemek ister. İlk görüşmede kabul edilirse güvence olarak saatini bırakır. Teklif o anda reddedilirse daha sonra telefonla ulaşıp heykeli teslim etmek mümkündür."
+    }
+  ],
+  "up-mlspm": [
+    {
+      "titleTr": "Linda’nın kira talebi",
+      "locationTr": "Starlet Motel · resepsiyon",
+      "speakers": [
+        "Linda",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Linda oda parasını hemen ister ve başlangıçtaki konuşmada borcu 900 dolar olarak açıklar. Lucia’nın kolyesi varsa, nakit ödeme yapılana kadar onu güvence olarak Linda’ya bırakır."
+    }
+  ],
+  "behind-on-payments": [
+    {
+      "titleTr": "Oda borcunu kapatma",
+      "locationTr": "Starlet Motel · resepsiyon",
+      "speakers": [
+        "Linda",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Lucia yeterli parayı bulduktan sonra resepsiyona döner ve Linda’ya olan oda borcunu kapatır. Linda’nın önceden güvenceye aldığı bir kolye varsa ödeme sırasında onu Lucia’ya geri verir."
+    }
+  ],
+  "car-service": [
+    {
+      "titleTr": "Raul’un siparişi",
+      "locationTr": "Salton · araç işi başlangıcı",
+      "speakers": [
+        "Raul Bautista",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Raul, Lucia’dan bir Schafter V12 almasını ister. Araç söküm atölyesindeki hedef, Raul’un daha sonra Jason ve Lucia’yla kuracağı iş ilişkisinin bir parçasıdır."
+    },
+    {
+      "titleTr": "Randy’yle ilk tanışma",
+      "locationTr": "Vice City · Leonida Auto World",
+      "speakers": [
+        "Randy",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Lucia arabayı galeride Randy’ye teslim eder. Randy bu teslimatla ekibin araç bağlantısı olur. Daha sonra istediği modelleri ve kabul ettiği diğer arabaları ona götürmek mümkün hale gelir."
+    }
+  ],
+  "clb-deal": [
+    {
+      "titleTr": "Stüdyodaki kayıt",
+      "locationTr": "Jack of Hearts · kayıt kabini",
+      "speakers": [
+        "Dre’Quan Priest",
+        "Jason Duval"
+      ],
+      "summaryTr": "Dre’Quan bir parçanın kaydını bitirirken Jason’ı stüdyoda karşılar. Jason beklerse şarkının nakaratıyla ilgili fikrini sorar. Jason doğrudan Boobie’yle görüşmek isterse bu kısa sohbet atlanır."
+    },
+    {
+      "titleTr": "Dairenin karşılığı",
+      "locationTr": "Jack of Hearts · Boobie’nin katı",
+      "speakers": [
+        "Boobie Ike",
+        "Dre’Quan Priest",
+        "Jason Duval"
+      ],
+      "summaryTr": "Boobie, daireyi kullanmalarının karşılığında bir iş istediğini Jason’a söyler. İş, Dre’Quan’la birlikte Tyrone’dan mal alıp yakındaki alıcılara götürmektir."
+    },
+    {
+      "titleTr": "Tyrone’un iki seçeneği",
+      "locationTr": "Crosstown · Tyrone’un dairesi",
+      "speakers": [
+        "Tyrone",
+        "Dre’Quan Priest",
+        "Jason Duval"
+      ],
+      "summaryTr": "Tyrone daha fazla para getirebilecek karıştırılmış ürünü ve daha az sorun çıkaracak saf ürünü sunar. Karar alıcılarla görüşmeyi değiştirir. Karışım anlaşılırsa Jason daha düşük fiyat teklif edebilir ve görüşme gerginleşebilir."
+    },
+    {
+      "titleTr": "Sabit disk için yeni bağlantı",
+      "locationTr": "Bayside · daire",
+      "speakers": [
+        "Cal Hampton",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Cal, çiftin elindeki sabit diski açamaz. Yine de Brian’ın Vice City’de bu işten anlayan eski bir tanıdığı olduğunu hatırlatır. Görüşme, dosyadaki bilgiyi öğrenmek için yeni bir kişiye gitmelerinin önünü açar."
+    }
+  ],
+  "building-a-life": [
+    {
+      "titleTr": "Evdeki kısa ders",
+      "locationTr": "Key Lento · Jason ve Lucia’nın evi",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Çift evde yeni masayı birlikte kurar. Ardından Jason, Lucia’ya silahı nasıl tutacağını gösterir. Evdeki bu kısa konuşma, ikilinin gündelik hayatından bir an olarak ilerler."
+    }
+  ],
+  "tourist-trap": [
+    {
+      "titleTr": "Mattia’nın ilk teklifi",
+      "locationTr": "Mariana County · Grassrivers bağlantısı",
+      "speakers": [
+        "Mattia Tauro",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Mattia, Jason ile Lucia’ya basit görünen bir çanta işi önerir. Bu işin daha iyi ücretli başka işler açabileceğini söyler. İkili dolaptan aldığı çantayla teklifin görünen kısmını yerine getirir."
+    }
+  ],
+  "home-sweet-home": [
+    {
+      "titleTr": "Andy’den yardım isteme",
+      "locationTr": "Key Lento · Jason’ın evi çevresi, telefon",
+      "speakers": [
+        "Lucia Caminos",
+        "Andy"
+      ],
+      "summaryTr": "Bu karşılaşma, Lucia yangın çıkan evden ayrıldıktan sonra Andy’yi aramayı seçerse yaşanır. Lucia bölgeden çıkmak için yardım ister ve Andy aracıyla onu almaya gelir."
+    }
+  ],
+  "bil-motel": [
+    {
+      "titleTr": "Port Gellhorn’dan ayrılma",
+      "locationTr": "Starlet Motel · oda",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Jason ile Lucia, motel dönemini bitirip Vice City’ye geçmeye karar verir. Orada Jason’ın eski arkadaşı Dre’Quan’la bağlantı kuracaklardır. Çıkış sırasında çıkan takip onları ayırır ve şehir yolunda yeniden buluşturur."
+    }
+  ],
+  "rob-boat-j": [
+    {
+      "titleTr": "Raul’un eşzamanlı planı",
+      "locationTr": "Stockyard ve La Perle",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval",
+        "Lucia Caminos",
+        "Karim"
+      ],
+      "summaryTr": "İşin iki ayağı vardır. Jason su yolundaki tekneleri takip ederken Lucia aynı çetenin adamına metroda ulaşır. Ayrı hareket etseler de ekip her iki hattı birlikte yürütür."
+    },
+    {
+      "titleTr": "Metroda zorlanan telefon",
+      "locationTr": "Vice City · metro vagonu",
+      "speakers": [
+        "Lucia Caminos",
+        "Guardia Brothers üyesi"
+      ],
+      "summaryTr": "Lucia, çete üyesini tekne tarafındaki adamlarını aramaya zorlar. Bu telefonun ardından teknedeki ekip harekete geçer ve görev Jason’a döner."
+    },
+    {
+      "titleTr": "Köprüdeki yönlendirme",
+      "locationTr": "Vice City · kanal yolu, ekip telsizi",
+      "speakers": [
+        "Karim",
+        "Jason Duval"
+      ],
+      "summaryTr": "Karim takibin sürdüğü sırada Jason’a köprüden sonra sağa yönelmesini söyler. Bu yönlendirme onu teknelerin rotasında tutar ve Lucia’yla yeniden buluşacağı bölüme bağlar."
+    }
+  ],
+  "ban-pkbmb": [
+    {
+      "titleTr": "Banka işinden önceki toplantı",
+      "locationTr": "Vice City · ekip planlama odası",
+      "speakers": [
+        "Raul Bautista",
+        "Karim",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Karim, bankanın iletişimini aksatmak için kulelerin hedef alınacağı hazırlığı anlatır. Jason ile Lucia ayrıca Tomás ve sabit diskten söz eder. Raul bu konuda onlara banka işi bittikten sonra yardım etmeyi kabul eder."
+    }
+  ],
+  "rauls-next-job": [
+    {
+      "titleTr": "Raul’dan haber bekleme",
+      "locationTr": "Vice City · telefon",
+      "speakers": [
+        "Raul Bautista"
+      ],
+      "summaryTr": "Bir süre sonra Raul, yeni banka işi için haber verir. Mesaj ekibi Sinfrontera National Bank’ı incelemeye yönlendirir. Böylece Fleeca şubelerinden sonraki bekleyiş sona erer."
+    }
+  ],
+  "randys-wish-list": [
+    {
+      "titleTr": "Panodaki araç talepleri",
+      "locationTr": "Leonida Auto World · Randy’nin galerisi",
+      "speakers": [
+        "Randy",
+        "Jason veya Lucia"
+      ],
+      "summaryTr": "Randy, özellikle istediği nadir araçları panoda gösterir. Her bir araç için yerini aramayı oyuncuya bırakır. Bir modele takıldığında Randy’den o araçla ilgili ipucu istenebilir."
+    }
+  ],
+  "twin-flames": [
+    {
+      "titleTr": "Dodos Rising’in planı",
+      "locationTr": "Watson Bay · benzin istasyonu",
+      "speakers": [
+        "Tyler",
+        "Steve",
+        "Jason veya Lucia"
+      ],
+      "summaryTr": "Tyler ile Steve, bir sürücüye elektrikli araçlar hakkında nutuk atarken ekiple buluşur. Planları, mobil tuvaletleri taşıyan kamyonla tesise girip içeride çalışmayı durdurmaktır. İkili yükte gizlenir ve kamyonu oyuncu sürer."
+    },
+    {
+      "titleTr": "Kapıdaki açıklama",
+      "locationTr": "Watson Bay · tesis girişi",
+      "speakers": [
+        "Tesis güvenliği",
+        "Oyuncu karakteri"
+      ],
+      "summaryTr": "Güvenlik görevlisi kamyonu kapıda durdurur. Oyuncunun taşıdığı mobil tuvaletlerin teslimat için geldiğini söylemesi ekibin içeri alınmasını sağlar."
+    }
+  ],
+  "coming-home": [
+    {
+      "titleTr": "Tahliye haberi",
+      "locationTr": "Key Lento · Jason’ın evi, telefon",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia yakında cezaevinden çıkacağını Jason’a bildirir. Kesin saati öğrenmek için bir sonraki aramayı beklemesi gerekir. Jason bu arada Lucia’nın dönüşüne hazırlanabilir."
+    },
+    {
+      "titleTr": "İkili baş başa",
+      "locationTr": "Rusty Anchor · barın arkası",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Jason içecekleri alıp Lucia’nın yanına gider. İkili, kutlamanın kalabalığından uzakta baş başa konuşur. Bu sakin an, cezaevindeki ayrılığın ardından yeniden yakınlaşmalarına yer açar."
+    },
+    {
+      "titleTr": "Mattia’nın bağlantısı",
+      "locationTr": "Rusty Anchor · bar",
+      "speakers": [
+        "Mattia Tauro",
+        "Jason Duval",
+        "Kat"
+      ],
+      "summaryTr": "Lucia’nın eski hücre arkadaşı Kat, Mattia’yla gelir. Jason ona bira getirdiğinde Mattia varlıklı birinin yanında çalıştığını ima eder. Daha sonra Jason’a bilardo oynamayı teklif eder."
+    }
+  ],
+  "whats-in-the-bag": [
+    {
+      "titleTr": "Çantadan çıkan iki eşya",
+      "locationTr": "Port Gellhorn · Starlet Motel, oda",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia çantada küçük bir heykel ve sabit disk bulur. Heykelin altındaki not, parçanın bir koleksiyondan geldiğini ve sahibine birini hatırlattığını anlatır. Motel odasında bilgisayar olmadığı için ikili sabit diskin içeriğini o sırada açamaz."
+    }
+  ],
+  "mtl-drive": [
+    {
+      "titleTr": "Jason için ilaç arayışı",
+      "locationTr": "Starlet Motel · odaların önü",
+      "speakers": [
+        "Lucia Caminos",
+        "Zach",
+        "Vicki"
+      ],
+      "summaryTr": "Yaralı Jason için ağrı kesici arayan Lucia, motelde Zach’le konuşur. Zach ona Vicki’nin kaldığı odayı gösterir. Vicki ilaç temin edebileceğini söyler ve Lucia ilk aldıkları için ödeme yapar."
+    },
+    {
+      "titleTr": "İlacın kaynağı",
+      "locationTr": "Port Gellhorn · Dunk’ın karavanı",
+      "speakers": [
+        "Dunk",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Lucia, Dunk’ı karavanına getirir. Dunk yanında ağrı kesici kalmadığını açıklar. Yeni ilaç bulmak için Dr. Bill adındaki eski tedarikçisine ulaşabileceğini söyler."
+    }
+  ],
+  "mtl-pain": [
+    {
+      "titleTr": "Dr. Bill’in açıklaması",
+      "locationTr": "Port Gellhorn · market ve otopark",
+      "speakers": [
+        "Dr. Bill",
+        "Dunk",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Dunk, Bill’le markette konuşmaya çalışınca Bill onu tanımazdan gelir. Arabada baskı altında artık emekli olduğunu ve reçeteye erişemediğini anlatır. İlaç için işaret ettiği bağlantı, daha önce çalıştığı Kolts çetesidir."
+    },
+    {
+      "titleTr": "Yeni iş bağlantısı",
+      "locationTr": "Port Gellhorn · görev sonrası telefon",
+      "speakers": [
+        "Dunk",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "İlaçlar Jason’a götürüldükten sonra Dunk Lucia’yı arar, bu işteki payını gönderir ve yeni soygun yerleri önerir. Böylece ağrı kesici arayışı, Port Gellhorn’da başka işler için bir bağlantıya dönüşür."
+    }
+  ],
+  "coffee-break": [
+    {
+      "titleTr": "Dre’Quan’a gitme planı",
+      "locationTr": "Starlet Motel · kahve masası",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Jason ile Lucia kazandıkları küçük paranın buradan ayrılmaya yetmeyeceğini konuşur. Birlikte daha büyük bir iş yapıp Vice City’ye taşınmak isterler. Jason eski okul arkadaşı Dre’Quan’ı şehirde başvurabilecekleri kişi olarak önerir."
+    },
+    {
+      "titleTr": "Wyman’ın yarış daveti",
+      "locationTr": "Starlet Motel · kafeterya",
+      "speakers": [
+        "Wyman",
+        "Jason Duval"
+      ],
+      "summaryTr": "Wyman, Port Gellhorn’daki Thrillbilly Mud Club’ın toprak yarışlarından söz eder. Bu sohbet yarış rotasını açar ve daha sonra Billy’nin grubuyla tanışmaya bağlanır."
+    }
+  ],
+  "afternoon-delight": [
+    {
+      "titleTr": "Vicki’nin önerisi",
+      "locationTr": "Port Gellhorn · telefon",
+      "speakers": [
+        "Vicki",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Vicki, ikiliye Delights’ta patronu Frankie’nin parasını almayı teklif eder. Kulübe giriş koşulları yüzünden Jason ile Lucia ayrı yollardan içeri girmek zorunda kalır."
+    },
+    {
+      "titleTr": "Mario’nun sahne teklifi",
+      "locationTr": "Delights · dansçıların soyunma odası",
+      "speakers": [
+        "Mario",
+        "Jason Duval"
+      ],
+      "summaryTr": "Jason arka taraftan içeri girdiğinde kulübün dansçılarıyla karşılaşır. Baş dansçı Mario, onun gösteriye katılmasını ister. Gecenin bu anı soygundan önce Jason’ı beklenmedik biçimde sahneye bağlar."
+    }
+  ],
+  "mtl-mud": [
+    {
+      "titleTr": "Yarış ekibiyle tanışma",
+      "locationTr": "Port Gellhorn · Thrillbilly Mud Club",
+      "speakers": [
+        "Billy",
+        "Ricky",
+        "Brittney",
+        "Wyman",
+        "Oyuncu karakteri"
+      ],
+      "summaryTr": "Billy ekibini tanıtır ve oyuncu ilk arazi sürüşüne katılır. Yarış bitince Billy yeniden haber vereceğini söyler. Tanışma, yarışın dışında yapacakları bir sonraki işe kapı açar."
+    }
+  ],
+  "csc-drt-cnvy": [
+    {
+      "titleTr": "Billy’nin yeni işi",
+      "locationTr": "Port Gellhorn · telefon ve buluşma noktası",
+      "speakers": [
+        "Billy",
+        "Oyuncu karakteri"
+      ],
+      "summaryTr": "Billy yarıştan birkaç saat sonra bir mesajla yeniden buluşmak ister. İkili motosikletle yola çıkınca işin bir zırhlı araca odaklandığı anlaşılır."
+    }
+  ],
+  "bricked-up": [
+    {
+      "titleTr": "Daire karşılığında iş",
+      "locationTr": "Vice City · Bayside Apartmanı",
+      "speakers": [
+        "Boobie Ike",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Boobie, konakladıkları daireyi kullanmaya devam ettikleri sürece kendisi için iş yapacaklarını hatırlatır. San4San çetesinin ona borçlu olduğu malları teslim almalarını ister."
+    },
+    {
+      "titleTr": "Arabayı nereye bırakmalı?",
+      "locationTr": "Rockridge · Venture Apartments çevresi",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Apartmana yaklaşırken Lucia arabayı görünür yerden uzak tutmayı önerir. Sonraki gelişmelerde aracı kaybetmemek için bu öneri önemlidir."
+    }
+  ],
+  "get-shirleys-rum": [
+    {
+      "titleTr": "Shirley’nin isteği",
+      "locationTr": "Key Lento · Shirley’nin evi çevresi",
+      "speakers": [
+        "Shirley",
+        "Jason Duval"
+      ],
+      "summaryTr": "Shirley yakınından geçen Jason’a seslenir ve kendisine rom almasını ister. Jason kabul edince uğrayacağı yer, güneydeki Three Sheets Liquor olur."
+    },
+    {
+      "titleTr": "Dükkânda rom isteme",
+      "locationTr": "Key Lento · Three Sheets Liquor",
+      "speakers": [
+        "Jason Duval",
+        "Dükkân görevlisi"
+      ],
+      "summaryTr": "Jason, dükkân görevlisine Shirley’nin istediği romu sorar. Ürünü aldıktan sonra komşusuna geri götürür."
+    }
+  ],
+  "ft-kmodshp": [
+    {
+      "titleTr": "Joey’yle tamir görüşmesi",
+      "locationTr": "Key Lento · tamirhane girişi",
+      "speakers": [
+        "Joey",
+        "Jason Duval"
+      ],
+      "summaryTr": "Jason, Ganado’yla garajın önüne gelip Joey’yle konuşur. Joey’nin garajına girdikten sonra araç için ücretsiz tamir ve yeni boya seçeneği açılır."
+    }
+  ],
+  "gear-up": [
+    {
+      "titleTr": "Yeni silah seçimi",
+      "locationTr": "Key Lento · Chuck’s Tackle & Shot",
+      "speakers": [
+        "Jason Duval",
+        "Dükkân görevlisi"
+      ],
+      "summaryTr": "Jason, tezgâhtaki görevliyle yeni bir silah almak için konuşur. Önüne pompalı tüfek ve taktik tüfek seçenekleri çıkar. Elindeki para hangi seçeneğin alınabileceğini belirler."
+    }
+  ],
+  "the-audacity": [
+    {
+      "titleTr": "Lansman daveti",
+      "locationTr": "Tequesta · telefon",
+      "speakers": [
+        "Papa Audacity",
+        "Jason veya Lucia"
+      ],
+      "summaryTr": "Papa Audacity, önceki işin ardından lansman gecesinin haberini verir. Neo Paloma’daki etkinlik AudaCity ve DacityCoin için düzenlenir. Girişte oyuncuyu ekibin mühendisleri karşılar."
+    },
+    {
+      "titleTr": "Sahne arkasında buluşma",
+      "locationTr": "Neo Paloma · lansman alanı",
+      "speakers": [
+        "AudaCity mühendisi",
+        "Papa Audacity",
+        "Jason veya Lucia"
+      ],
+      "summaryTr": "Gösterinin ilk bölümünden sonra bir mühendis oyuncuyu sahne arkasındaki Papa Audacity’ye götürür. Lansman buradan helikopter ve büyük atlayış gösterisine taşınır. Gösteri esnasında coin fiyatı da değişir."
+    }
+  ],
+  "catch-a-bigger-fish": [
+    {
+      "titleTr": "Cal’in meydan okuması",
+      "locationTr": "Gambit Bay · telefon mesajı",
+      "speakers": [
+        "Cal Hampton",
+        "Jason Duval"
+      ],
+      "summaryTr": "Cal, Jason’a Gambit Bay’deki avını geçmesi için mesaj atar. Özellikle iki libreyi aşan bir papağan balığı bekler. Jason yakaladığı balığı Cal’e bildirerek meydan okumayı tamamlar."
+    }
+  ],
+  "feng-shui": [
+    {
+      "titleTr": "Lucia gelmeden salonu düzenleme",
+      "locationTr": "Key Lento · Jason’ın evi",
+      "speakers": [
+        "Cal Hampton",
+        "Jason Duval"
+      ],
+      "summaryTr": "Cal, Lucia’nın tahliyesinden önce salonun düzenini değiştirmeyi önerir. Jason’la televizyonu, sehpayı ve oturma grubunu farklı yerlere taşırlar. Sonra koltuğa dönüp iki eski oyun oynayarak geceyi geçirirler."
+    }
+  ],
+  "recalibration": [
+    {
+      "titleTr": "Cal’e uğrama kararı",
+      "locationTr": "Key Lento · Jason’ın evi, telefon",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Donnie’nin ölümünden sonra Lucia, Cal’in pek iyi olmadığını Jason’a söyler ve onu yalnız bırakmamayı önerir. Birkaç bira alıp Cal’in iskelesine giderler ve birlikte balığa çıkarlar."
+    },
+    {
+      "titleTr": "İskeleye dönüş",
+      "locationTr": "Key Lento · Cal’in iskelesi",
+      "speakers": [
+        "Cal Hampton",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Balıktan sonra üçü iskeleye geri gelir. Jason yakaladıkları balığı Cal’le birlikte hazırlar. Sessiz geçen bu ziyaret, Donnie’yi kaybeden Cal’le zaman geçirmek içindir."
+    }
+  ],
+  "dodo-rise": [
+    {
+      "titleTr": "Bilinmeyen numara",
+      "locationTr": "Telefon · Dodos Rising bağlantısı",
+      "speakers": [
+        "Yvonne",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Lucia, Twin Flames’in ardından tanımadığı bir numaradan mesaj alır. Yvonne, Dodos Rising adına onunla bağlantı kurar. İstediği şey hayvanat bahçesinde tutulan özel bir yumurtanın alınmasıdır."
+    }
+  ]
+}

@@ -20,6 +20,34 @@ def json_bytes(value):
     return (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
 
 
+def attach_conversation_summaries(directory, missions):
+    path = directory / "conversations.json"
+    if not path.is_file():
+        return
+    summaries = json.loads(path.read_text(encoding="utf-8"))
+    by_id = {mission["id"]: mission for mission in missions}
+    if not isinstance(summaries, dict) or summaries.keys() - by_id.keys():
+        raise ValueError("Conversation summaries must belong to existing missions")
+
+    def valid_text(value, limit):
+        return isinstance(value, str) and 0 < len(value.strip()) <= limit
+
+    for mission_id, scenes in summaries.items():
+        if not isinstance(scenes, list) or not 1 <= len(scenes) <= 32:
+            raise ValueError(f"Invalid conversation summary list for {mission_id}")
+        for scene in scenes:
+            if not isinstance(scene, dict) or not all(
+                valid_text(scene.get(field), limit) for field, limit in (("titleTr", 120), ("summaryTr", 1200))
+            ):
+                raise ValueError(f"Invalid conversation summary for {mission_id}")
+            if "locationTr" in scene and not valid_text(scene["locationTr"], 180):
+                raise ValueError(f"Invalid conversation location for {mission_id}")
+            names = scene.get("speakers", [])
+            if not isinstance(names, list) or len(names) > 12 or not all(valid_text(name, 120) for name in names):
+                raise ValueError(f"Invalid conversation speakers for {mission_id}")
+        by_id[mission_id]["conversationSummaries"] = scenes
+
+
 def archive_inputs(directory):
     catalog = json.loads((directory / "catalog.json").read_text(encoding="utf-8"))
     missions = catalog["missions"]
@@ -28,6 +56,7 @@ def archive_inputs(directory):
     ids = [mission["id"] for mission in missions]
     if len(set(ids)) != len(ids) or any(len(id_) > 80 or not MISSION_ID.fullmatch(id_) for id_ in ids):
         raise ValueError("Mission IDs must be unique lowercase slugs")
+    attach_conversation_summaries(directory, missions)
     text_files = {path.stem: path for path in (directory / "texts").glob("*.json")}
     unknown = text_files.keys() - set(ids)
     if unknown:

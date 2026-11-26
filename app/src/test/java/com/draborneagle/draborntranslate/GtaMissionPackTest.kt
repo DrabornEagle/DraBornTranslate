@@ -145,7 +145,39 @@ class GtaMissionPackTest {
         assertEquals("https://six.mics.dev/dialogue?mission=COM&q=COM_KBOS_SHOP", lab.dialogueSource)
         assertEquals("https://six.mics.dev/dialogue?mission=t:INT_PROLO",
             catalog.missions.first { it.id == "prologue" }.dialogueSource)
+        val kenton = catalog.search("Island Dreams").single()
+        assertTrue(catalog.missionPortrait(kenton)?.second?.url.orEmpty().endsWith("/kenton-2.jpg"))
+        val welcome = catalog.search("Welcome to Vice City").single()
+        assertTrue(welcome.conversationSummaries.any { "Dre’Quan Priest" in it.speakers })
+        assertEquals(3, welcome.previews.size)
+        assertTrue(catalog.missionPortrait(welcome) != null)
+        val clonin = catalog.search("Clonin' Keys, Makin' Gs").single()
+        assertEquals(3, clonin.previews.size)
+        assertEquals(3, clonin.conversationSummaries.size)
         assertTrue(catalog.portrait("Unlisted Person") == null)
+    }
+
+    @Test
+    fun resolvedCodesFindTheNamedMissionAndMissingRedirectsAreRejected() {
+        val root = sequenceOf(File("packs/gta-6"), File("../packs/gta-6")).first { it.isDirectory }
+        val checksum = JSONObject(root.resolve("manifest.json").readText()).getString("sha256")
+        val catalog = GtaMissionPack.validate(root.resolve("gta-6-tr-${checksum.take(12)}.zip"))
+        val titles = mapOf(
+            "BIL_HOUSE" to "Home Sweet Home",
+            "ROB_VEH" to "Meet the Heders",
+            "ANT_SRCH" to "Dubious Provenance",
+            "FT_MOTEL_SHOP" to "Just Moved In",
+            "COM_SFH_FLTPK" to "Building a Life",
+        )
+        for ((code, title) in titles) {
+            val mission = catalog.search(code, GtaMissionSearchLanguage.ENGLISH).single()
+            assertEquals(title, mission.englishTitle)
+            assertTrue(mission.previews.isNotEmpty())
+            assertEquals(mission, catalog.search(title, GtaMissionSearchLanguage.ENGLISH).single())
+        }
+        assertThrows(IOException::class.java) {
+            GtaMissionPack.validate(archive(entry = mission().put("searchTarget", "missing")))
+        }
     }
 
     @Test

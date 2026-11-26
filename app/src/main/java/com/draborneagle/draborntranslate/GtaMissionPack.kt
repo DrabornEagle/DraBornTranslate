@@ -38,6 +38,13 @@ internal data class GtaMissionScene(
     val context: String?,
 )
 
+internal data class GtaConversationSummary(
+    val title: String,
+    val location: String?,
+    val speakers: List<String>,
+    val text: String,
+)
+
 internal data class GtaMission(
     val id: String,
     val title: String,
@@ -61,6 +68,8 @@ internal data class GtaMission(
     val gameDataSource: String? = null,
     val previews: List<GtaMissionImage> = emptyList(),
     val dialogueSource: String? = null,
+    val conversationSummaries: List<GtaConversationSummary> = emptyList(),
+    val searchTarget: String? = null,
 ) {
     val category: String get() = listOfNotNull(type.label, chapter?.let { "Bölüm $it" }, series).joinToString(" · ")
     val code: String? get() = (listOfNotNull(englishTitle, title) + aliases).firstOrNull { missionCode.matches(it) }
@@ -70,7 +79,7 @@ internal data class GtaMission(
 
     fun nameIn(language: GtaMissionSearchLanguage): String {
         val names = if (language == GtaMissionSearchLanguage.ENGLISH) englishName to turkishName else turkishName to englishName
-        return names.first ?: names.second ?: "Görev adı doğrulanmadı"
+        return names.first ?: names.second ?: title
     }
 
     fun alternateNameIn(language: GtaMissionSearchLanguage): String? {
@@ -89,15 +98,29 @@ internal data class GtaMissionCatalog(
     val missions: List<GtaMission>,
     private val portraits: Map<String, GtaMissionImage> = emptyMap(),
 ) {
+    private val byId = missions.associateBy { it.id }
+    private val searchEntries = missions.groupBy { it.searchTarget ?: it.id }.mapNotNull { (id, records) ->
+        byId[id]?.let { it to records.flatMap(GtaMission::searchNames).distinct() }
+    }
+
+    fun mission(id: String?): GtaMission? {
+        val item = byId[id] ?: return null
+        return byId[item.searchTarget] ?: item
+    }
+
     fun portrait(giver: String?): GtaMissionImage? =
         giver?.split(" / ")?.firstNotNullOfOrNull { portraits[missionNameKey(it)] }
 
+    fun missionPortrait(mission: GtaMission): Pair<String, GtaMissionImage>? =
+        (listOfNotNull(mission.giver) + mission.characters).asSequence()
+            .flatMap { it.split(" / ").asSequence() }
+            .firstNotNullOfOrNull { name -> portrait(name)?.let { name to it } }
+
     fun search(query: String, language: GtaMissionSearchLanguage = GtaMissionSearchLanguage.TURKISH): List<GtaMission> {
         val name = missionNameKey(query)
-        if (name.isEmpty()) return missions
+        if (name.isEmpty()) return searchEntries.map { it.first }
         val words = name.split(' ')
-        return missions.mapNotNull { mission ->
-            val names = mission.searchNames
+        return searchEntries.mapNotNull { (mission, names) ->
             val rank = when {
                 name in names -> 0
                 names.any { it.startsWith(name) } -> 1
@@ -175,6 +198,13 @@ internal object GtaMissionPack {
                 missionNameKey(name) to GtaMissionImage(imageUrl(values.requiredText(name)))
             }
         }.orEmpty()
+        val portraitAliases = media?.optJSONObject("portraitAliases")?.let { values ->
+            checkPack(values.length() <= MAX_MISSIONS)
+            values.keys().asSequence().associate { name ->
+                checkPack(name.isNotBlank() && name.length <= 120)
+                missionNameKey(name) to (portraits[missionNameKey(values.requiredText(name))] ?: invalid())
+            }
+        }.orEmpty()
         checkPack((galleries?.length() ?: 0) <= MAX_MISSIONS && (dialogues?.length() ?: 0) <= MAX_MISSIONS)
         val missions = entries.objects().map { entry ->
             val id = entry.id()
@@ -187,13 +217,14 @@ internal object GtaMissionPack {
             }.orEmpty()
             mission(entry, previews, dialogues?.sourceUrl(id))
         }
-        val ids = missions.mapTo(mutableSetOf()) { it.id }
-        checkPack(ids.size == missions.size && missions.all { mission ->
-            mission.prerequisites.all { it in ids && it != mission.id }
+        val byId = missions.associateBy { it.id }
+        checkPack(byId.size == missions.size && missions.all { mission ->
+            mission.prerequisites.all { it in byId && it != mission.id } &&
+                mission.searchTarget?.let { it != mission.id && it in byId && byId.getValue(it).searchTarget == null } != false
         })
-        checkPack(galleries?.keys()?.asSequence()?.all { it in ids } != false &&
-            dialogues?.keys()?.asSequence()?.all { it in ids } != false)
-        return GtaMissionCatalog(data.requiredText("version"), data.requiredText("gameBuild"), missions, portraits)
+        checkPack(galleries?.keys()?.asSequence()?.all { it in byId } != false &&
+            dialogues?.keys()?.asSequence()?.all { it in byId } != false)
+        return GtaMissionCatalog(data.requiredText("version"), data.requiredText("gameBuild"), missions, portraitAliases + portraits)
     }
 
     private fun mission(data: JSONObject, previews: List<GtaMissionImage>, dialogue: String?): GtaMission {
@@ -205,12 +236,23 @@ internal object GtaMissionPack {
         val chapter = data.optionalNumber("chapter")?.also { checkPack(it in 1L..5L) }?.toInt()
         val count = data.optionalNumber("textCount") ?: 0L
         checkPack(count in 0L..30_000L)
+        val conversations = if (data.has("conversationSummaries")) {
+            val notes = data.getJSONArray("conversationSummaries")
+            checkPack(notes.length() in 1..32)
+            notes.objects().map { note ->
+                GtaConversationSummary(note.requiredText("titleTr").also { checkPack(it.length <= 120) },
+                    note.text("locationTr")?.also { checkPack(it.length <= 180) },
+                    note.strings("speakers").also { names -> checkPack(names.size <= 12 && names.all { it.length <= 120 }) },
+                    note.requiredText("summaryTr").also { checkPack(it.length <= 1200) })
+            }
+        } else emptyList()
         return GtaMission(data.id(), data.requiredText("titleTr"), data.text("titleEn"), type, chapter,
             data.text("series"), data.requiredText("summaryTr"), data.text("locationTr"), data.strings("characters"),
             scenes, data.sourceUrl("sourceUrl"), data.sourceUrl("textSourceUrl"), count.toInt(), data.strings("aliases"),
             data.strings("requires"), data.strings("mapLabels"), data.text("giver"),
             data.sourceUrl("profileSourceUrl"), data.sourceUrl("gallerySourceUrl"), data.sourceUrl("gameDataSourceUrl"),
-            previews, dialogue ?: data.sourceUrl("textSourceUrl")?.takeIf { it.startsWith("https://six.mics.dev/dialogue?") })
+            previews, dialogue ?: data.sourceUrl("textSourceUrl")?.takeIf { it.startsWith("https://six.mics.dev/dialogue?") },
+            conversations, data.text("searchTarget"))
     }
 
     private fun texts(zip: ZipFile, mission: GtaMission): List<GtaMissionText> {
