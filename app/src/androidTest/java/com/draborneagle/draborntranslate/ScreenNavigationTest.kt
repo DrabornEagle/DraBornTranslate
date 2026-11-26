@@ -319,12 +319,13 @@ class ScreenNavigationTest {
     fun capicheShowsBrowserActionsAndWaitsForTheConsoleBeforeSharing() {
         ActivityScenario.launch(CapicheActivity::class.java).use {
             waitFor { resumed() is CapicheActivity && hasText("Capiche’yi aç") && hasText("Capiche’ye bağış yap") }
-            val window = onMain {
-                resumed()?.window?.decorView?.findChild { it is TextView && it.text == "Oyun penceresini paylaş" }
+            onMain {
+                val screen = checkNotNull(resumed()?.window?.decorView)
+                val window = checkNotNull(screen.findChild { it is TextView && it.text == "Oyun penceresini paylaş" })
+                val copy = checkNotNull(screen.findChild { it is TextView && it.text == "Oyun bağlantısını kopyala" })
+                assertFalse(window.isEnabled)
+                assertEquals(View.GONE, copy.visibility)
             }
-            assertNotNull(window)
-            assertFalse(window!!.isEnabled)
-            assertFalse(hasText("Oyun bağlantısını kopyala"))
         }
     }
 
