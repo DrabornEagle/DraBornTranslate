@@ -60,6 +60,64 @@ class GtaMissionPackTest {
     }
 
     @Test
+    fun syncedDialogueRequiresMatchingMissionIdAndRealSceneAndSpeakerFields() {
+        val file = archive()
+        assertEquals(GtaDialoguePackCoverage("test", 1, 1), GtaMissionPack.validateDialogue(file, setOf("launch")))
+        assertEquals(null, GtaMissionPack.dialogue(file, "unrelated"))
+        assertEquals("Deniz", GtaMissionPack.dialogue(file, "launch")?.lines?.single()?.speaker)
+        assertThrows(IOException::class.java) { GtaMissionPack.validateDialogue(file, setOf("unrelated")) }
+
+        val withoutSpeaker = texts().also { it.getJSONObject(1).remove("speaker") }
+        val withoutScene = texts().also {
+            it.getJSONObject(1).apply {
+                remove("sceneId")
+                remove("startMs")
+                remove("endMs")
+            }
+        }
+        listOf(withoutSpeaker, withoutScene).forEach { rows ->
+            assertThrows(IOException::class.java) { GtaMissionPack.validateDialogue(archive(rows = rows), setOf("launch")) }
+        }
+        val objectivesOnly = texts().also { it.getJSONObject(1).put("type", "objective") }
+        assertThrows(IOException::class.java) {
+            GtaMissionPack.validateDialogue(archive(rows = objectivesOnly), setOf("launch"))
+        }
+    }
+
+    @Test
+    fun sceneGroupsPreserveAuthoredSceneOrderAndReplyOrder() {
+        val entry = mission().put("textCount", 4)
+        entry.getJSONArray("scenes").put(JSONObject("""{"id":"exit","titleTr":"Çıkış"}"""))
+        val rows = JSONArray("""
+            [{"type":"dialogue","tr":"Dışarıda bekliyorum.","sceneId":"exit","speaker":"Deniz"},
+             {"type":"objective","tr":"Çıkışa git.","sceneId":"exit"},
+             {"type":"dialogue","tr":"Merhaba.","sceneId":"arrival","speaker":"Ece"},
+             {"type":"dialogue","tr":"Geliyorum.","sceneId":"exit","speaker":"Ece"}]
+        """.trimIndent())
+        val file = archive(entry = entry, rows = rows)
+        val transcript = checkNotNull(GtaMissionPack.dialogue(file, "launch"))
+        assertEquals(listOf("Varış", "Çıkış"), transcript.scenes.map { it.title })
+        assertEquals(listOf("Merhaba.", "Dışarıda bekliyorum.", "Geliyorum."), transcript.inSceneOrder().map { it.turkish })
+    }
+
+    @Test
+    fun onlyGitHubManifestFileUrlsResolveToPublishedPackRequests() {
+        val raw = "https://raw.githubusercontent.com/example/mission-pack/main/tr/manifest.json"
+        assertEquals(raw, githubDialogueManifest(raw)?.toString())
+        assertEquals(raw, githubDialogueManifest("https://github.com/example/mission-pack/blob/main/tr/manifest.json")?.toString())
+        listOf(
+            "http://github.com/example/mission-pack/blob/main/tr/manifest.json",
+            "https://github.com@example.org/example/mission-pack/blob/main/tr/manifest.json",
+            "https://github.com:444/example/mission-pack/blob/main/tr/manifest.json",
+            "https://github.com/example/mission-pack/tree/main/tr/manifest.json",
+            "https://github.com/example/mission-pack/blob/main/../manifest.json",
+            "https://raw.githubusercontent.com/example/mission-pack/main/tr/manifest.json?token=example",
+            "https://raw.githubusercontent.com/example/mission-pack/main/%2e/manifest.json",
+            "https://example.org/example/mission-pack/main/tr/manifest.json",
+        ).forEach { assertEquals(null, githubDialogueManifest(it)) }
+    }
+
+    @Test
     fun rejectsInvalidManifestReferencesAndIncompleteOrUnexpectedEntries() {
         val unknownScene = texts().also { it.getJSONObject(1).put("sceneId", "unknown") }
         val endBeforeStart = texts().also { it.getJSONObject(1).put("endMs", 2000L) }

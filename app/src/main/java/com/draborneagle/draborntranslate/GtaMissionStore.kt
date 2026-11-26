@@ -18,8 +18,12 @@ internal object GtaMissionStore {
     private val repository = URI("https://raw.githubusercontent.com/DrabornEagle/DraBornTranslate/main/packs/gta-6/")
     private val digestPattern = Regex("[a-f0-9]{64}")
     private val lock = Any()
+    private val dialogueLock = Any()
     private val bundledPrefix = "gta-6-reference-"
     private val publishedVersion = Regex("[0-9]{4}[.][0-9]{2}[.][0-9]{2}[.][0-9]+")
+    private const val DIALOGUE_MANIFEST = "manifest"
+    private const val DIALOGUE_LAST_CHECK = "lastCheck"
+    private const val DIALOGUE_CHECK_INTERVAL = 60L * 60 * 1000
 
     fun installed(context: Context): Boolean = hasDownload(context) || hasLocal(context)
     fun hasDownload(context: Context): Boolean = destination(context, local = false).isFile
@@ -35,8 +39,71 @@ internal object GtaMissionStore {
     }
 
     fun download(context: Context): GtaMissionCatalog = synchronized(lock) {
+        downloadPublishedPack(repository.resolve("manifest.json"), destination(context, local = false),
+            GtaMissionCatalog::version) { file, existing ->
+            if (existing) GtaMissionPack.catalog(file) else GtaMissionPack.validate(file)
+        }
+    }
+
+    fun dialogueSource(context: Context): String? = dialoguePreferences(context).getString(DIALOGUE_MANIFEST, null)
+
+    fun dialogue(context: Context, missionId: String): GtaMissionDialogue? {
+        val source = dialogueSource(context) ?: return null
+        val file = dialogueFile(context, source)
+        return if (file.isFile) GtaMissionPack.dialogue(file, missionId) else null
+    }
+
+    fun connectDialogue(context: Context, address: String): GtaDialoguePackCoverage = synchronized(dialogueLock) {
+        val source = githubDialogueManifest(address)
+            ?: throw IOException("GitHub’daki manifest.json dosyasının HTTPS bağlantısını gir.")
+        val activeSource = dialogueSource(context)
+        val result = downloadDialogue(context, source)
+        val preferences = dialoguePreferences(context)
+        if (!preferences.edit().putString(DIALOGUE_MANIFEST, source.toString())
+                .putLong(DIALOGUE_LAST_CHECK, System.currentTimeMillis()).commit()) {
+            throw IOException("Replik kaynağı kaydedilemedi.")
+        }
+        if (activeSource != null && activeSource != source.toString()) {
+            dialogueFile(context, activeSource).delete()
+        }
+        result
+    }
+
+    fun refreshDialogue(context: Context) {
+        synchronized(dialogueLock) {
+            val source = dialogueSource(context)?.let(::githubDialogueManifest) ?: return
+            val preferences = dialoguePreferences(context)
+            val now = System.currentTimeMillis()
+            if (now - preferences.getLong(DIALOGUE_LAST_CHECK, 0L) in 0L until DIALOGUE_CHECK_INTERVAL) return
+            preferences.edit().putLong(DIALOGUE_LAST_CHECK, now).apply()
+            downloadDialogue(context, source)
+        }
+    }
+
+    fun removeDialogue(context: Context) = synchronized(dialogueLock) {
+        val source = dialogueSource(context) ?: return@synchronized
+        if (!dialoguePreferences(context).edit().clear().commit()) throw IOException("Replik kaynağı kaldırılamadı.")
+        Files.deleteIfExists(dialogueFile(context, source).toPath())
+        Unit
+    }
+
+    private fun downloadDialogue(context: Context, source: URI): GtaDialoguePackCoverage {
+        val missionIds = catalog(context)?.search("")?.mapTo(mutableSetOf()) { it.id }
+            ?: throw IOException("Görev kataloğu açılamadı.")
+        return downloadPublishedPack(source, dialogueFile(context, source.toString()),
+            GtaDialoguePackCoverage::version) { file, _ ->
+            GtaMissionPack.validateDialogue(file, missionIds)
+        }
+    }
+
+    private fun <T> downloadPublishedPack(
+        source: URI,
+        destination: File,
+        versionOf: (T) -> String,
+        inspect: (File, Boolean) -> T,
+    ): T {
         val manifest = try {
-            JSONObject(requestPackBytes(8 * 1024) { connection("manifest.json") }.toString(Charsets.UTF_8))
+            JSONObject(requestPackBytes(8 * 1024) { connection(source) }.toString(Charsets.UTF_8))
         } catch (error: JSONException) {
             throw IOException("GitHub paket bilgisi okunamadı.", error)
         }
@@ -46,18 +113,18 @@ internal object GtaMissionStore {
         if (!digestPattern.matches(checksum) || size !in 1L..GtaMissionPack.MAX_ARCHIVE_BYTES.toLong() || version.isBlank()) {
             throw IOException("GitHub paket bilgisi geçersiz.")
         }
-        val destination = destination(context, local = false)
-        if (destination.isFile && destination.length() == size && sha256(destination) == checksum) {
-            val catalog = GtaMissionPack.catalog(destination)
-            if (catalog.version != version) throw IOException("GitHub paketinin sürüm bilgisi uyuşmuyor.")
-            return@synchronized catalog
+        fun validate(file: File, existing: Boolean): T {
+            val result = inspect(file, existing)
+            if (versionOf(result) != version) throw IOException("GitHub paketinin sürüm bilgisi uyuşmuyor.")
+            return result
         }
-        stage(destination) { temp ->
-            requestPackFile(size.toInt(), temp) { connection("gta-6-tr-${checksum.take(12)}.zip") }
+        if (destination.isFile && destination.length() == size && sha256(destination) == checksum) {
+            return validate(destination, existing = true)
+        }
+        return stage(destination) { temp ->
+            requestPackFile(size.toInt(), temp) { connection(source.resolve("gta-6-tr-${checksum.take(12)}.zip")) }
             if (sha256(temp) != checksum) throw IOException("GitHub paketinin bütünlüğü doğrulanamadı.")
-            val catalog = GtaMissionPack.validate(temp)
-            if (catalog.version != version) throw IOException("GitHub paketinin sürüm bilgisi uyuşmuyor.")
-            catalog
+            validate(temp, existing = false)
         }
     }
 
@@ -73,19 +140,19 @@ internal object GtaMissionStore {
         synchronized(lock) { Files.deleteIfExists(destination(context, local).toPath()) }
     }
 
-    private fun stage(destination: File, prepare: (File) -> GtaMissionCatalog): GtaMissionCatalog {
+    private fun <T> stage(destination: File, prepare: (File) -> T): T {
         val pending = File.createTempFile("gta-missions-", ".part", destination.parentFile)
         try {
-            val catalog = prepare(pending)
+            val result = prepare(pending)
             Files.move(pending.toPath(), destination.toPath(), ATOMIC_MOVE, REPLACE_EXISTING)
-            return catalog
+            return result
         } finally {
             pending.delete()
         }
     }
 
-    private fun connection(asset: String): HttpsURLConnection =
-        (repository.resolve(asset).toURL().openConnection() as HttpsURLConnection).apply {
+    private fun connection(url: URI): HttpsURLConnection =
+        (url.toURL().openConnection() as HttpsURLConnection).apply {
             setRequestProperty("User-Agent", "DraBornTranslate Android")
         }
 
@@ -125,6 +192,15 @@ internal object GtaMissionStore {
     private fun destination(context: Context, local: Boolean) = File(context.filesDir,
         if (local) "gta-6-missions-local.zip" else "gta-6-missions.zip")
 
+    private fun dialoguePreferences(context: Context) =
+        context.getSharedPreferences("gta_mission_dialogue", Context.MODE_PRIVATE)
+
+    private fun dialogueFile(context: Context, source: String): File {
+        val digest = MessageDigest.getInstance("SHA-256").digest(source.toByteArray(Charsets.UTF_8))
+        val key = digest.joinToString("") { "%02x".format(it) }
+        return File(context.filesDir, "gta-6-dialogue-$key.zip")
+    }
+
     private fun sha256(file: File): String {
         val digest = MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->
@@ -137,4 +213,26 @@ internal object GtaMissionStore {
         }
         return digest.digest().joinToString("") { "%02x".format(it) }
     }
+}
+
+private val githubPathSegment = Regex("[a-zA-Z0-9._-]+")
+
+internal fun githubDialogueManifest(address: String): URI? {
+    val clean = address.trim()
+    if (clean.length > 640) return null
+    val uri = runCatching { URI(clean) }.getOrNull() ?: return null
+    if (uri.scheme != "https" || uri.rawUserInfo != null || uri.port !in listOf(-1, 443) ||
+        uri.rawQuery != null || uri.rawFragment != null) return null
+    val path = uri.rawPath?.removePrefix("/")?.split('/') ?: return null
+    if (path.size < 4 || path.last() != "manifest.json" ||
+        path.any { it == "." || it == ".." || !it.matches(githubPathSegment) }) return null
+    val rawPath = when (uri.host) {
+        "raw.githubusercontent.com" -> path
+        "github.com" -> {
+            if (path.size < 5 || path[2] != "blob") return null
+            path.take(2) + path.drop(3)
+        }
+        else -> return null
+    }
+    return URI("https://raw.githubusercontent.com/" + rawPath.joinToString("/"))
 }

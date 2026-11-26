@@ -6,8 +6,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import java.io.IOException
@@ -73,6 +75,7 @@ class GamePacksActivity : Activity() {
     private lateinit var download: Button
     private lateinit var liveDownload: Button
     private lateinit var missionImport: Button
+    private lateinit var dialogueConnect: Button
     private lateinit var imported: Button
     private lateinit var manage: Button
     private lateinit var state: TextView
@@ -100,6 +103,8 @@ class GamePacksActivity : Activity() {
         }, 8)
         missionImport = press("Görev paketi seç (.zip)") { chooseFile(MISSION_IMPORT, "application/zip") }
         missions.addBelow(missionImport, 8)
+        dialogueConnect = press("Replik paketi bağla") { showDialogueSource() }
+        missions.addBelow(dialogueConnect, 8)
         content.addBelow(missions, 14)
         val subtitles = miamiPanel(Miami.aqua)
         subtitles.addView(copy("Canlı altyazı", 19, Palette.white, true).apply { isAccessibilityHeading = true })
@@ -132,6 +137,39 @@ class GamePacksActivity : Activity() {
         render()
     }
 
+    private fun showDialogueSource() {
+        val current = GtaMissionStore.dialogueSource(this)
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+            setSingleLine(true)
+            hint = "GitHub manifest.json bağlantısı"
+            setText(current.orEmpty())
+        }
+        val form = stack().apply {
+            setPadding(dp(24), dp(4), dp(24), 0)
+            addView(input)
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Görev replik paketi")
+            .setMessage("Yayımlama izni olan paketin GitHub manifest bağlantısını gir.")
+            .setView(form)
+            .setNegativeButton("Vazgeç", null)
+            .setPositiveButton(if (current == null) "Bağla ve indir" else "Kontrol et", null)
+            .show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val source = githubDialogueManifest(input.text.toString())
+            if (source == null) {
+                input.error = "GitHub’daki manifest.json dosyasının HTTPS bağlantısını gir."
+                return@setOnClickListener
+            }
+            dialog.dismiss()
+            perform { app ->
+                val coverage = GtaMissionStore.connectDialogue(app, source.toString())
+                "Replik paketi hazır · ${coverage.missions} görev · ${coverage.lines} replik"
+            }
+        }
+    }
+
     private fun missionStatus(catalog: GtaMissionCatalog): String {
         return "GitHub paketi hazır · ${catalog.missions.size} görev"
     }
@@ -144,8 +182,9 @@ class GamePacksActivity : Activity() {
             downloaded -> "GitHub görev paketi çevrimdışı kullanıma hazır."
             else -> "Uygulamaya dâhil görev rehberi çevrimdışı hazır."
         }
-        listOf(download, liveDownload, missionImport, imported, manage).forEach { it.isEnabled = !busy }
+        listOf(download, liveDownload, missionImport, dialogueConnect, imported, manage).forEach { it.isEnabled = !busy }
         download.text = if (downloaded) "GitHub’daki görev paketini güncelle" else "GTA 6 paketini indir"
+        dialogueConnect.text = if (GtaMissionStore.dialogueSource(this) == null) "Replik paketi bağla" else "Replik paketini güncelle"
         liveDownload.text = if (ImportedGamePack.hasGta(this)) "Altyazı paketi güncellemesini denetle" else "GTA 6 altyazı paketini indir"
     }
 
@@ -172,6 +211,9 @@ class GamePacksActivity : Activity() {
             }
             if (GtaMissionStore.hasLocal(this@GamePacksActivity)) {
                 add("Özel görev paketi" to { app -> GtaMissionStore.remove(app, local = true) })
+            }
+            if (GtaMissionStore.dialogueSource(this@GamePacksActivity) != null) {
+                add("Görev replik paketi" to GtaMissionStore::removeDialogue)
             }
             if (ImportedGamePack.hasGta(this@GamePacksActivity)) add("GTA 6 altyazı paketi" to { app ->
                 ImportedGamePack.remove(app, gta = true)

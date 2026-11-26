@@ -149,6 +149,15 @@ internal data class GtaMissionText(
     val endMs: Long?,
 )
 
+internal data class GtaMissionDialogue(val scenes: List<GtaMissionScene>, val lines: List<GtaMissionText>) {
+    fun inSceneOrder(): List<GtaMissionText> {
+        val byScene = lines.groupBy { it.sceneId }
+        return scenes.flatMap { byScene[it.id].orEmpty() } + byScene[null].orEmpty()
+    }
+}
+
+internal data class GtaDialoguePackCoverage(val version: String, val missions: Int, val lines: Int)
+
 internal object GtaMissionPack {
     const val MAX_ARCHIVE_BYTES = 48 * 1024 * 1024
     private const val MAX_CATALOG_BYTES = 2 * 1024 * 1024
@@ -160,7 +169,30 @@ internal object GtaMissionPack {
 
     fun catalog(file: File): GtaMissionCatalog = read(file) { catalog(it) }
 
-    fun validate(file: File): GtaMissionCatalog = read(file) { zip ->
+    fun validate(file: File): GtaMissionCatalog = validate(file) { _, _ -> }
+
+    fun validateDialogue(file: File, missionIds: Set<String>): GtaDialoguePackCoverage {
+        var missionCount = 0
+        var lineCount = 0
+        val catalog = validate(file) { mission, texts ->
+            val lines = texts.filter { it.type == GtaTextType.DIALOGUE }
+            if (lines.isEmpty()) return@validate
+            if (lines.any { it.sceneId == null || it.speaker == null }) {
+                throw IOException("Replik paketindeki her satırda sahne ve konuşmacı bilgisi gerekli.")
+            }
+            if (mission.id in missionIds && mission.searchTarget == null) {
+                missionCount++
+                lineCount += lines.size
+            }
+        }
+        if (lineCount == 0) throw IOException("Paket, katalogdaki görevlerle eşleşen replik içermiyor.")
+        return GtaDialoguePackCoverage(catalog.version, missionCount, lineCount)
+    }
+
+    private fun validate(
+        file: File,
+        inspect: (GtaMission, List<GtaMissionText>) -> Unit,
+    ): GtaMissionCatalog = read(file) { zip ->
         val catalog = catalog(zip)
         val expected = catalog.missions.filter { it.textCount > 0 }.mapTo(mutableSetOf(CATALOG)) { textsPath(it.id) }
         var expanded = 0L
@@ -174,13 +206,19 @@ internal object GtaMissionPack {
             checkPack(expanded <= MAX_EXPANDED_BYTES)
         }
         checkPack(expected.isEmpty())
-        catalog.missions.filter { it.textCount > 0 }.forEach { texts(zip, it) }
+        catalog.missions.filter { it.textCount > 0 }.forEach { inspect(it, texts(zip, it)) }
         catalog
     }
 
     fun texts(file: File, catalogVersion: String, mission: GtaMission): List<GtaMissionText> = read(file) { zip ->
         if (catalog(zip).version != catalogVersion) throw IOException("Görev paketi güncellendi. Görev aramasını yeniden aç.")
         texts(zip, mission)
+    }
+
+    fun dialogue(file: File, missionId: String): GtaMissionDialogue? = read(file) { zip ->
+        val mission = catalog(zip).mission(missionId)?.takeIf { it.id == missionId } ?: return@read null
+        val lines = texts(zip, mission).filter { it.type == GtaTextType.DIALOGUE }
+        if (lines.isEmpty()) null else GtaMissionDialogue(mission.scenes, lines)
     }
 
     private fun catalog(zip: ZipFile): GtaMissionCatalog {

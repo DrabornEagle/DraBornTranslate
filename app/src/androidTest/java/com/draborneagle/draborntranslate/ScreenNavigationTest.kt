@@ -3,6 +3,8 @@ package com.draborneagle.draborntranslate
 
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -28,6 +30,9 @@ import androidx.test.runner.lifecycle.Stage
 import com.gametranslator.gametranslator_mobile.ConsoleStudioActivity
 import com.gametranslator.gametranslator_mobile.Store
 import java.io.File
+import java.security.MessageDigest
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -112,6 +117,59 @@ class ScreenNavigationTest {
             }
         } finally {
             if (backup == null) file.delete() else file.writeBytes(backup)
+        }
+    }
+
+    @Test
+    fun downloadedDialogueShowsItsOwnScenesAlongsideTheExistingMission() {
+        val base = File(app.filesDir, "gta-6-missions-local.zip")
+        val backup = base.takeIf(File::isFile)?.readBytes()
+        val source = "https://raw.githubusercontent.com/example/mission-pack/main/manifest.json"
+        val sourceHash = MessageDigest.getInstance("SHA-256").digest(source.toByteArray()).joinToString("") { "%02x".format(it) }
+        val cache = File(app.filesDir, "gta-6-dialogue-$sourceHash.zip")
+        val preferences = app.getSharedPreferences("gta_mission_dialogue", Context.MODE_PRIVATE)
+        val previousSource = preferences.getString("manifest", null)
+        val previousCheck = preferences.getLong("lastCheck", 0L)
+        try {
+            writeDialogueFixture(base, "base", "entrance", "Giriş", """
+                [{"type":"objective","sceneId":"entrance","tr":"Girişe git."}]
+            """.trimIndent())
+            writeDialogueFixture(cache, "synced", "garden", "Bahçedeki buluşma", """
+                [{"type":"dialogue","sceneId":"garden","speaker":"Deniz","tr":"Yardımın için teşekkürler."}]
+            """.trimIndent())
+            preferences.edit().putString("manifest", source).putLong("lastCheck", System.currentTimeMillis()).apply()
+            ActivityScenario.launch<GtaMissionDetailsActivity>(Intent(app, GtaMissionDetailsActivity::class.java)
+                .putExtra("mission", "dialogue-test")).use {
+                waitFor { hasText("Deneme görevi") && hasText("Görev metinleri") }
+                click("Görev metinleri")
+                val dialogueOrder = listOf("Bahçedeki buluşma", "Deniz", "Yardımın için teşekkürler.")
+                waitFor { dialogueOrder.all(::hasText) }
+                assertReadingOrder(dialogueOrder)
+                assertFalse(hasText("Girişe git."))
+                assertFalse(hasText("Replik paketini güncelle"))
+                click("Hedefler/Kaynaklar")
+                waitFor { hasText("Girişe git.") }
+                assertFalse(hasText("Yardımın için teşekkürler."))
+            }
+        } finally {
+            preferences.edit().putString("manifest", previousSource).putLong("lastCheck", previousCheck).apply()
+            cache.delete()
+            if (backup == null) base.delete() else base.writeBytes(backup)
+        }
+    }
+
+    private fun writeDialogueFixture(file: File, version: String, sceneId: String, sceneTitle: String, lines: String) {
+        val catalog = """
+            {"format":1,"version":"$version","gameBuild":"Test",
+             "missions":[{"id":"dialogue-test","titleTr":"Deneme görevi","type":"story","summaryTr":"Bir buluşma.",
+             "textCount":1,"scenes":[{"id":"$sceneId","titleTr":"$sceneTitle"}]}]}
+        """.trimIndent()
+        ZipOutputStream(file.outputStream()).use { zip ->
+            for ((name, text) in mapOf("catalog.json" to catalog, "texts/dialogue-test.json" to lines)) {
+                zip.putNextEntry(ZipEntry(name))
+                zip.write(text.toByteArray(Charsets.UTF_8))
+                zip.closeEntry()
+            }
         }
     }
 

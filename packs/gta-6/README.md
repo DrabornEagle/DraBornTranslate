@@ -4,7 +4,7 @@
 
 2026.11.26.6 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** bölümünde aşamalar, sahne özetlerinin üstünde yer alır. Aramada açılan 197 görev kartının 195’inde toplam 311 Türkçe sahne özeti bulunur. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
 
-**Konuşmalar** etkin paketteki `dialogue` kayıtlarını konuşmacı ve sahne bilgisiyle satır satır gösterir. Hazır görev paketinde replik kaydı bulunmuyor. **Hedefler/Kaynaklar** görev hedefleri ve rehber bağlantılarını içerir.
+**Konuşmalar** etkin görev paketindeki veya bağlı replik paketindeki `dialogue` kayıtlarını sahne ve konuşmacı bilgisiyle satır satır gösterir. Hazır görev paketi 0 replik içerir. **Hedefler/Kaynaklar** görev hedefleri ve rehber bağlantılarını içerir.
 
 | Kaynak | Kapsam |
 | --- | --- |
@@ -28,9 +28,17 @@ Sahne zamanı için videonun veya sahnenin başlangıcına göre ölçüm gereki
 | Alan | İçerik |
 | --- | --- |
 | `type` | `dialogue`, `objective`, `message`, `hint`, `ui`, `guide` veya `other` |
-| `tr`, `en` | Türkçe metin ve varsa İngilizce kaynak. Yalnız İngilizce sağlandığında cihazda **Türkçeye çevir** seçeneği çıkar. |
+| `tr`, `en` | Türkçe metin ve varsa İngilizce metin. Yalnız İngilizce sağlandığında cihazda otomatik olarak Türkçeye çevrilir. |
 | `sceneId` | Görev kaydındaki sahne kimliği |
 | `speaker`, `contextTr` | Konuşan kişi ve varsa satırın Türkçe bağlamı |
 | `startMs`, `endMs` | Varsa sahnenin başlangıcından itibaren doğrulanmış milisaniye değerleri |
 
 GitHub paketini güncellerken katalogdaki `version` değerini değiştir, komutu yeniden çalıştır ve manifesti yeni ZIP’le aynı commit’te gönder. Dosya adı ZIP’in SHA-256 özetinden üretilir.
+
+## GitHub’dan replikleri eşitleme
+
+1. Yayımlama izni olan replikler için yukarıdaki biçimde bir paket oluştur. Katalogdaki görev `id` değerlerini kullan, sahne dizisini okuma sırasına göre yaz ve her replikte `sceneId` ile `speaker` belirt. Görev başına satırlar sahne içindeki yazılış sırasıyla görünür.
+2. `manifest.json` dosyasını ve üretilen ZIP’i herkese açık GitHub deponda aynı dizine koy. Uygulama GitHub’daki dosya bağlantısını veya `raw.githubusercontent.com` bağlantısını kabul eder.
+3. Android’de **Oyun Paketleri → Replik paketi bağla** seç ve manifest bağlantısını gir. Uygulama eşleşen görev ve replik sayısını gösterir. **Konuşmalar** açıldığında en fazla saatte bir güncelleme aranır. **Replik paketini güncelle** üzerinden hemen kontrol edebilirsin.
+
+Son doğrulanan dosya cihazda saklanır. Bir görev özel ZIP içinde replik içeriyorsa o satırlar önceliklidir.

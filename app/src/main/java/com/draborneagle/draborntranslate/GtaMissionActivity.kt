@@ -200,6 +200,7 @@ class GtaMissionSearchActivity : Activity() {
 
 class GtaMissionDetailsActivity : Activity() {
     private enum class Pane { INFO, CONVERSATIONS, TARGETS }
+    private enum class DialogueSync { IDLE, CHECKING, READY, FAILED }
 
     private val worker = Executors.newSingleThreadExecutor()
     private lateinit var body: LinearLayout
@@ -211,6 +212,8 @@ class GtaMissionDetailsActivity : Activity() {
     private var pane = Pane.INFO
     private var visibleRows = PAGE_SIZE
     private var rows: List<GtaMissionText>? = null
+    private var dialogue: GtaMissionDialogue? = null
+    private var dialogueSync = DialogueSync.IDLE
     private var packError: String? = null
     private var translation: GameTranslatorEngine? = null
     private val translatedLines = mutableMapOf<GtaMissionText, String>()
@@ -249,6 +252,7 @@ class GtaMissionDetailsActivity : Activity() {
                 content.addBelow(body, 12)
                 render()
                 loadTexts()
+                if (pane == Pane.CONVERSATIONS) refreshDialogue()
             }
         }
     }
@@ -257,6 +261,7 @@ class GtaMissionDetailsActivity : Activity() {
         if (pane == target) return
         pane = target
         visibleRows = PAGE_SIZE
+        if (pane == Pane.CONVERSATIONS) refreshDialogue()
         render()
     }
 
@@ -476,33 +481,64 @@ class GtaMissionDetailsActivity : Activity() {
         val app = applicationContext
         worker.execute {
             val result = runCatching { GtaMissionStore.texts(app, catalog, mission) }
+            val cached = runCatching { GtaMissionStore.dialogue(app, mission.id) }
             runOnUiThread {
                 if (isDestroyed || isFinishing) return@runOnUiThread
                 rows = result.getOrNull()
+                dialogue = cached.getOrNull()
                 packError = result.exceptionOrNull()?.message
                 render()
             }
         }
     }
 
+    private fun refreshDialogue() {
+        if (dialogueSync != DialogueSync.IDLE || GtaMissionStore.dialogueSource(this) == null) return
+        dialogueSync = DialogueSync.CHECKING
+        val app = applicationContext
+        worker.execute {
+            val result = runCatching {
+                GtaMissionStore.refreshDialogue(app)
+                GtaMissionStore.dialogue(app, mission.id)
+            }
+            runOnUiThread {
+                if (isDestroyed || isFinishing) return@runOnUiThread
+                val previous = dialogue
+                result.onSuccess { dialogue = it }
+                dialogueSync = if (result.isSuccess) DialogueSync.READY else DialogueSync.FAILED
+                if (pane == Pane.CONVERSATIONS && (previous == null || previous != dialogue)) render()
+            }
+        }
+    }
+
     private fun showPackText(version: Int, conversations: Boolean) {
-        val available = rows
-        if (available == null) {
+        if (rows == null && (!conversations || dialogue == null)) {
             val issue = packError
             body.addBelow(copy(issue ?: "Görev metinleri yükleniyor…"), 12)
-            if (issue != null) body.addBelow(press("Yeniden dene") { loadTexts() }, 8)
+            if (issue != null && !conversations) body.addBelow(press("Yeniden dene") { loadTexts() }, 8)
             return
         }
-        val entries = available.filter {
-            if (conversations) it.type == GtaTextType.DIALOGUE
-            else it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE
+        val available = rows.orEmpty()
+        val transcript = if (conversations) {
+            val packLines = available.filter { it.type == GtaTextType.DIALOGUE }
+            if (packLines.isEmpty()) dialogue else GtaMissionDialogue(mission.scenes, packLines)
+        } else null
+        val entries = if (conversations) transcript?.inSceneOrder().orEmpty() else available.filter {
+            it.type != GtaTextType.DIALOGUE && it.type != GtaTextType.GUIDE
         }
         if (entries.isEmpty()) {
-            if (conversations) body.addBelow(copy("Bu görev için kayıtlı replik bulunmuyor."), 12)
-            else body.addBelow(miamiSection("Hedefler", "Bu görev için kayıtlı hedef bulunmuyor.", Miami.lavender), 10)
+            if (conversations) {
+                val status = when (dialogueSync) {
+                    DialogueSync.CHECKING -> "Görev replikleri güncelleniyor…"
+                    DialogueSync.FAILED -> "Replik kaynağına şu anda ulaşılamadı."
+                    DialogueSync.READY -> "Bağlı pakette bu görevin repliği yok."
+                    else -> "Bu görev için kayıtlı replik bulunmuyor."
+                }
+                body.addBelow(copy(status).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }, 12)
+            } else body.addBelow(miamiSection("Hedefler", "Bu görev için kayıtlı hedef bulunmuyor.", Miami.lavender), 10)
             return
         }
-        val scenes = mission.scenes.associateBy { it.id }
+        val scenes = (transcript?.scenes ?: mission.scenes).associateBy { it.id }
         val pending = mutableListOf<Triple<GtaMissionText, String?, TextView>>()
         entries.take(visibleRows).forEachIndexed { index, line ->
             val scene = scenes[line.sceneId]
