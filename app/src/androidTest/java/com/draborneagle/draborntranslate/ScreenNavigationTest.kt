@@ -88,15 +88,7 @@ class ScreenNavigationTest {
                 val readingOrder = listOf("Buluşma", "Deniz", "Seni girişte bekleyeceğim.", "Ece", "Birazdan oradayım.",
                     "Koridora geçiş", "Mert", "Kapıyı açık bıraktım.")
                 waitFor { readingOrder.all(::hasText) && hasText("Giriş holü") && hasText("Arka koridor") }
-                val positions = onMain {
-                    val screen = checkNotNull(resumed()?.window?.decorView)
-                    readingOrder.map { label ->
-                        val item = checkNotNull(screen.findChild { it is TextView && it.text.toString() == label })
-                        IntArray(2).also(item::getLocationInWindow)[1]
-                    }
-                }
-                assertTrue("Scene headings and dialogue should follow the package order",
-                    positions.zipWithNext().all { (first, next) -> first < next })
+                assertReadingOrder(readingOrder)
                 assertFalse(hasText("Canlı kayıt başlat"))
                 assertFalse(hasText("SRT / VTT ekle"))
                 assertFalse(hasText("Lansman partisine katıl."))
@@ -188,6 +180,7 @@ class ScreenNavigationTest {
                 hasText("Garaja yönlendirme") && hasText("Arabadaki açıklama") &&
                     hasText("Asıl işin ortaya çıkması")
             }
+            assertReadingOrder(listOf("Görev aşamaları", "Sahne özetleri", "Garaja yönlendirme"))
             click("Görev metinleri")
             waitFor { hasText("Bu görev için kayıtlı replik bulunmuyor.") }
             assertFalse(hasText("Garaja yönlendirme"))
@@ -491,6 +484,17 @@ class ScreenNavigationTest {
 
     private fun hasText(value: String): Boolean = onMain {
         resumed()?.window?.decorView?.findChild { it is TextView && it.text.toString() == value } != null
+    }
+
+    private fun assertReadingOrder(labels: List<String>) {
+        val positions = onMain {
+            val screen = checkNotNull(resumed()?.window?.decorView)
+            labels.map { label ->
+                val item = checkNotNull(screen.findChild { it is TextView && it.text.toString() == label })
+                IntArray(2).also(item::getLocationInWindow)[1]
+            }
+        }
+        assertTrue("Expected vertical order: $labels", positions.zipWithNext().all { (first, next) -> first < next })
     }
 
     private fun hasAccessibleText(value: String): Boolean =

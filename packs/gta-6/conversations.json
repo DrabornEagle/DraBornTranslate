@@ -802,5 +802,1604 @@
       ],
       "summaryTr": "Lucia, Twin Flames’in ardından tanımadığı bir numaradan mesaj alır. Yvonne, Dodos Rising adına onunla bağlantı kurar. İstediği şey hayvanat bahçesinde tutulan özel bir yumurtanın alınmasıdır."
     }
+  ],
+  "com-kbos-colat": [
+    {
+      "titleTr": "Brian’ın alacağı",
+      "locationTr": "Hamlet · polis otoparkı çevresi",
+      "speakers": [
+        "Jason Duval",
+        "Cal Hampton"
+      ],
+      "summaryTr": "Brian’ın alacağı, polis tarafından otoparka çekilmiş kırmızı Phoenix’te kalmıştır. Jason ve Cal, otoparka gidip çekiciye bağlı aracı bulur."
+    },
+    {
+      "titleTr": "Phoenix’in dönüşü",
+      "locationTr": "Hamlet · boya atölyesi ve Brian’ın garajı",
+      "speakers": [
+        "Jason Duval"
+      ],
+      "summaryTr": "Otoparktan çıkışta polis takibi başlar. Jason aracı takibin dışına çıkarır, rengini değiştirir ve Phoenix’i Brian’ın garajına bırakır."
+    }
+  ],
+  "pipework": [
+    {
+      "titleTr": "Kira görüşmesi",
+      "locationTr": "Key Lento · Mandy’nin evi",
+      "speakers": [
+        "Mandy",
+        "Jason Duval"
+      ],
+      "summaryTr": "Jason, Brian adına kirayı almaya gider. Mandy onu içeri alır ve konuşma tıkalı lavabonun onarımına döner. Jason, gerekli pompayı sorarak sohbeti kısa kesebilir."
+    },
+    {
+      "titleTr": "Onarım sonrası",
+      "locationTr": "Mandy’nin mutfağı",
+      "speakers": [
+        "Mandy",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lavabo açılınca Mandy, onarım karşılığında puro teklif eder. Mandy’nin yakınlaşma girişimini geri çeviren Jason ayrılmaya hazırlanırken Mandy puro kutusunu sokağa atar."
+    }
+  ],
+  "discharge-time": [
+    {
+      "titleTr": "Jason’ın odası",
+      "locationTr": "Vice City Hospital · ikinci kat",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia, Jason’ı görmek için hastaneye gelir. Odasına ulaştığında onu tekerlekli sandalyeye alır. Evi basan kişilerin hastaneye gönderdiği takviye, ikilinin çıkış yolunu keser."
+    },
+    {
+      "titleTr": "Ambulansla kaçış",
+      "locationTr": "Vice City Hospital · servis alanı ve batı yolları",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia bir ambulansla geri döner ve Jason’ı alır. İkili hastanenin dışındaki takibi atlatınca Kelly County’ye kaçar. Sonraki bölüm motel odasında açılır."
+    }
+  ],
+  "just-moved-in": [
+    {
+      "titleTr": "İlk alışveriş",
+      "locationTr": "Kelly County · Alpha Market",
+      "speakers": [
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Motele yerleşen Lucia, yakındaki marketten odada ihtiyaç duydukları malzemeleri alır. Alışveriş, yaralı Jason’ın bakımı için yapılır."
+    },
+    {
+      "titleTr": "Odaya dönüş",
+      "locationTr": "Kelly County · Starlet Motel",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia aldığı malzemeleri odaya getirir. Motel bu bölümde hem geçici sığınak hem de Jason iyileşirken dönülen yer olur."
+    }
+  ],
+  "play-nurse": [
+    {
+      "titleTr": "Jason’ın bakımı",
+      "locationTr": "Kelly County · Starlet Motel odası",
+      "speakers": [
+        "Lucia Caminos",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia, Jason’ın iyileşme sürecinde odaya düzenli olarak uğrar. Bu bakım sahneleri diğer motel görevleriyle aynı dönemde ilerler. Görev, Breakfast Run tamamlandığında kapanır."
+    }
+  ],
+  "com-cbo-cbint": [
+    {
+      "titleTr": "Boobie’nin tahsilat turu",
+      "locationTr": "Vice City · otopark ve bina girişi",
+      "speakers": [
+        "Jason Duval",
+        "Boobie Ike"
+      ],
+      "summaryTr": "Jason, Boobie’nin alacaklarını topladığı duraklar arasında arabayı kullanır. İlk durakta görüşme araç yanında, sonraki durakta bina merdivenleri yakınında geçer."
+    },
+    {
+      "titleTr": "Çantanın peşinde",
+      "locationTr": "Vice City · nehir kenarındaki kulüp",
+      "speakers": [
+        "Jason Duval",
+        "Boobie Ike"
+      ],
+      "summaryTr": "Boobie nehir kıyısındaki binayı gelecekteki kulübü olarak gösterirken araçtaki para çantası alınır. Jason su üzerinden takip edip çantayı geri getirir. Gezi, Yasmani’yle tanışmayla devam eder."
+    }
+  ],
+  "here-kitty-kitty": [
+    {
+      "titleTr": "Charles’ın adresi",
+      "locationTr": "Vice City · Rockridge",
+      "speakers": [
+        "Jason Duval",
+        "Dook"
+      ],
+      "summaryTr": "Dook, Tyrone’dan ayrılan Jason’a Charles’ın fotoğrafını ve adresini yollar. Jason apartmandaki kişiden yardım alır ya da dairede bir iz bularak La Perle’deki kampın yerini öğrenir."
+    },
+    {
+      "titleTr": "Kitty Litter izi",
+      "locationTr": "Vice City · La Perle’deki kamp",
+      "speakers": [
+        "Jason Duval",
+        "Charles"
+      ],
+      "summaryTr": "Charles, Jason’ı görünce binanın üst katlarına kaçar. Takip sonunda Charles’ın üzerinde bulunan paket, onun Kitty Litter’la bağlantısını doğrular."
+    }
+  ],
+  "caught-slipping": [
+    {
+      "titleTr": "Bayside’daki iki takip",
+      "locationTr": "Bayside · apartman ve bitişik şantiye",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Jason ile Lucia daireye giren iki hırsızın peşine ayrı ayrı düşer. Takip sırasında kontrol iki karakter arasında geçer ve alınan çantalar incelenir."
+    },
+    {
+      "titleTr": "Depoda buluşma",
+      "locationTr": "Vice City · Big House Storage",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "İkili apartmanın önünde yeniden buluşur, ardından Jason’ın ayarladığı depoya gider. Asansörle depo bölümüne çıkmaları görevi tamamlar."
+    }
+  ],
+  "company-property": [
+    {
+      "titleTr": "Pete’in sevkiyatı",
+      "locationTr": "Havaalanı · hangar ve pist",
+      "speakers": [
+        "Jason Duval",
+        "Pilot Pete",
+        "Lucia Caminos",
+        "Brian Heder"
+      ],
+      "summaryTr": "Sevkiyat sırasında IAA görevlileri ekibi sıkıştırır. Jason, Pilot Pete’le piste ilerler ve hangardaki uçakla ayrılır. Lucia, Brian’ın kamyonundaki yükün yanında kalır."
+    },
+    {
+      "titleTr": "Yük ve zorunlu iniş",
+      "locationTr": "Karayolu · nehrin yakınındaki tarla",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos",
+        "Pilot Pete"
+      ],
+      "summaryTr": "Kamyon takibinde kutuların bir kısmı düşebilir. Korunan yük, Hidden Charges hazırlığında ne kadar malzeme kullanılacağını etkiler. Hasar alan uçakla Jason yakındaki tarlaya mecburi iniş yapar."
+    }
+  ],
+  "the-cartel-heist": [
+    {
+      "titleTr": "Bankada iş bölümü",
+      "locationTr": "Sinfrontera National Bank · çatı ve kasa katı",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos",
+        "Nicole Park"
+      ],
+      "summaryTr": "Jason binanın üst bölümlerindeki ekibe geçerken Lucia, Nicole’le birlikte kasaya ulaşır. Lucia’nın daha önce Safe Word sırasında yaptığı prova burada işe yarar."
+    },
+    {
+      "titleTr": "Kaçış planının değişmesi",
+      "locationTr": "Sinfrontera National Bank · yükleme alanı",
+      "speakers": [
+        "Felipe",
+        "Raul Bautista",
+        "Karim"
+      ],
+      "summaryTr": "Kasadaki iş alarmdan önce bitirilirse Felipe kaçış aracını yükleme alanına getirir. Süre dolduğunda Raul ile Karim ekibi acil çıkış planına geçirir."
+    },
+    {
+      "titleTr": "İşin sonrası",
+      "locationTr": "Vice City · konaklama bağlantısı",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Soygunun ardından Raul bir avans ve konaklama ayarladığını bildirir. Bu haber, sonraki bölümdeki Y Hotel’e geçişi başlatır."
+    }
+  ],
+  "fully-catered": [
+    {
+      "titleTr": "İkram aracının teslimi",
+      "locationTr": "Vice City · havaalanı ve Rockridge",
+      "summaryTr": "Ekip, havaalanına ikram servisi kılığında geri dönebilmek için bir servis kamyoneti alır. Araç Rockridge’deki teslim noktasına bırakılır."
+    },
+    {
+      "titleTr": "Planlama odasında çantalar",
+      "locationTr": "Vice City · ekip üssü",
+      "speakers": [
+        "Raul Bautista",
+        "Jason Duval"
+      ],
+      "summaryTr": "Raul ile Jason sahte paraları çantalara yerleştirir. Hazırlığın amacı, VCIA işinde bu çantaları ekibin aradığı gerçek parayla değiştirebilmektir."
+    }
+  ],
+  "vcia-takedown": [
+    {
+      "titleTr": "Terminale iki koldan giriş",
+      "locationTr": "Vice City International Airport · yolcu ve yük terminalleri",
+      "speakers": [
+        "Lucia Caminos",
+        "Nate",
+        "Jason Duval"
+      ],
+      "summaryTr": "Lucia yolcu terminalinde Nate’le hareket eder. Jason, ikram kamyonetiyle ekibin diğer kısmını yük terminaline götürür."
+    },
+    {
+      "titleTr": "Kasa yöneticisiyle karşılaşma",
+      "locationTr": "Havaalanı · servis asansörü",
+      "speakers": [
+        "Lucia Caminos",
+        "Nate",
+        "Kasa yöneticisi"
+      ],
+      "summaryTr": "Nate ve Lucia, şarap kasasının yanında yöneticiyi takip eder. Yönetici asansörde şarap hakkında soru sorar. Görüşme sürerken ekibin diğer kolu çatıdaki ağ terminaline ilerler."
+    },
+    {
+      "titleTr": "Kasada ekip değişimi",
+      "locationTr": "Havaalanı · kasa bölümü",
+      "speakers": [
+        "Lucia Caminos",
+        "Kordell Grant",
+        "Francisco"
+      ],
+      "summaryTr": "Kordell’in işaretiyle kasa bölümündeki plan uygulamaya geçer. Lucia çantaları alıp Francisco’yla tekrar asansöre yönelir."
+    }
+  ],
+  "the-end-of-the-road": [
+    {
+      "titleTr": "Marinadaki son hazırlık",
+      "locationTr": "Key Lento · Brian’ın marina hangarı",
+      "speakers": [
+        "Cal Hampton",
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Cal sabit disk üzerinde çalışırken Jason ile Lucia son işe hazırlanır. İkilinin hedefi Giorgio’nun üst kattaki ofisinde bulunan diski ele geçirmektir."
+    },
+    {
+      "titleTr": "Ofise ulaşma",
+      "locationTr": "Vice City · Giorgio’nun çatı katı",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "Jason binaya girip Cal’in donanımını ofisteki bilgisayara bağlar. Lucia helikopterden onu korur. Çatışma ikiliyi farklı katlara ayırır ve yeniden garajda bir araya getirir."
+    },
+    {
+      "titleTr": "Köprüdeki son karar",
+      "locationTr": "Mariana County · havaalanına giden köprü",
+      "speakers": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "summaryTr": "İkili havaalanına yönelirken köprüde polis barikatıyla karşılaşır. Buradaki karar ve daha önceki seçimler, hikâyenin hangi sonla kapanacağını belirler."
+    }
+  ],
+  "hey-arnold": [
+    {
+      "titleTr": "Aramanın nedeni",
+      "locationTr": "Brian’ın görev bağlantısı",
+      "summaryTr": "Brian uzun süredir iş yaptığı Arnold’dan haber alamaz. Jason ve Cal, Arnold’un nerede olduğunu öğrenmek için birlikte hareket eder."
+    },
+    {
+      "titleTr": "Görevi bul",
+      "locationTr": "Bölüm 1 haritası",
+      "summaryTr": "Haritada Brian’la görüşme biçiminde başlayan kayıt, görevin adı ekrana çıktığında Hey Arnold! olarak tanınır."
+    }
+  ],
+  "int-bank": [
+    {
+      "titleTr": "Lucia’nın hesabı",
+      "locationTr": "Fleeca şubesi",
+      "summaryTr": "Lucia’nın toplum hizmetinden kazanacağı parayı alabilmesi için finans işlemi başlatılır. Jason’la banka şubesindeki buluşma Buck Me adıyla bulunur."
+    },
+    {
+      "titleTr": "Görüşme sırası",
+      "locationTr": "Bankanın müşteri alanı",
+      "summaryTr": "Şubedeki görüşmeyi bitir. Para yatırma ve birikimle ilgili sonraki adımlar haritada ayrı hedefler olarak görünebilir."
+    }
+  ],
+  "cti-pil-rd-bc-parent": [
+    {
+      "titleTr": "Kayıp sevkiyat",
+      "locationTr": "Grassrivers",
+      "summaryTr": "Donnie’nin taşıdığı paket sulak alanda kalır. Jason’ın görevi, Donnie’nin bıraktığı yükü geri getirmektir."
+    }
+  ],
+  "down-to-earth": [
+    {
+      "titleTr": "Yeni iş için görüşme",
+      "locationTr": "Marina",
+      "summaryTr": "Brian Jason’ı yeni bir iş konuşmak üzere marinaya çağırır. Lucia da buluşmaya katılır."
+    },
+    {
+      "titleTr": "Görüşmenin yeri",
+      "locationTr": "Rıhtım ve tekne çevresi",
+      "summaryTr": "Brian’ın harita işaretine git. Bu kayıttaki buluşma başlangıcını, Donnie’yle daha sonra yapılan uçak işinden ayır."
+    }
+  ],
+  "int-plnsh": [
+    {
+      "titleTr": "Planlı uçuş",
+      "locationTr": "Leonida hava sahası",
+      "summaryTr": "Jason ile Donnie, Brian’ın beklediği uçağın bölgeye fark edilmeden ulaşmasına yardım eder."
+    },
+    {
+      "titleTr": "Donnie’nin ek hamlesi",
+      "locationTr": "Yerel motosikletçi grubun buluşması",
+      "summaryTr": "Donnie hat dışına çıkarak ayrı bir satış görüşmesi ayarlar. Görüşme kötüleştiğinde Jason, Donnie’yle birlikte bölgeden ayrılır."
+    }
+  ],
+  "day-release": [
+    {
+      "titleTr": "Mattia’yla buluşma",
+      "locationTr": "Rusty Anchor",
+      "summaryTr": "Mattia ilkin Rusty Anchor’da buluşur. Lucia’nın elektronik kelepçesi çıkarılır."
+    },
+    {
+      "titleTr": "Vice City gecesi",
+      "locationTr": "Yat ve Club NINE1NINE",
+      "summaryTr": "Kat ve arkadaşlarıyla önce yata, sonra NINE1NINE’a gidilir."
+    },
+    {
+      "titleTr": "İş teklifi",
+      "locationTr": "Ertesi sabah",
+      "summaryTr": "Mattia ertesi sabah Grassrivers’taki ziyaretçi merkezinden bir çanta alınmasını önerir."
+    }
+  ],
+  "swamped": [
+    {
+      "titleTr": "Gergin buluşma",
+      "locationTr": "Grassrivers",
+      "summaryTr": "Brian ve Lori, Donnie yüzünden açılan anlaşmazlığı Kingfishers’la çözmek ister. Buluşma planlandığı gibi gitmez."
+    },
+    {
+      "titleTr": "Sulak alandaki takip",
+      "locationTr": "Grassrivers kanalları",
+      "summaryTr": "Görüşme bittikten sonra olay sulak alanı geçen bir takibe dönüşür. Bu kısım Lori’yi kurtarmaya odaklanır."
+    }
+  ],
+  "com-kbos-clean": [
+    {
+      "titleTr": "Karavana dön",
+      "locationTr": "Donnie’nin karavanı",
+      "summaryTr": "Donnie’nin ardından Brian’ı işlere bağlayan eşyaları ortadan kaldırmak gerekir. Aranan kanıtlar karavanın bulunduğu alandadır."
+    },
+    {
+      "titleTr": "İşi tanı",
+      "locationTr": "Görev işareti",
+      "summaryTr": "Aynı bölümde Donnie’nin kayıp paketine ilişkin ayrı kayıtlar bulunur. Bu görevde ekranda karavanı temizlemeye yönelik hedefleri izle."
+    }
+  ],
+  "moses": [
+    {
+      "titleTr": "Tamirciyle tanışma",
+      "locationTr": "Oto tamir atölyesi",
+      "summaryTr": "Atölyede Moses, Lucia’ya ileride hangi araçları kendisine getirebileceğini anlatır."
+    },
+    {
+      "titleTr": "Araç bağlantısı",
+      "locationTr": "Moses Watkins’in garajı",
+      "summaryTr": "Moses, Lucia’nın göze çarpmayan bir araçla gelmesini ister. Atölyedeki tanışma, teslim edilecek Crawler görevinden önce gerçekleşir."
+    }
+  ],
+  "cti-mech-stfc": [
+    {
+      "titleTr": "Aranan araç",
+      "locationTr": "Port Gellhorn ve çevresi",
+      "summaryTr": "Moses, 1982 model Canis Crawler aramaktadır. Haritada farklı bir araç hedefiyle karşılaşırsan model adını kontrol et."
+    },
+    {
+      "titleTr": "Atölye teslimi",
+      "locationTr": "Moses’ın atölyesi",
+      "summaryTr": "Ödeme için Crawler’ı Moses’a getir. Bu, tamirciyle tanıştıktan sonra açılan araç işi."
+    }
+  ],
+  "breakfast-run": [
+    {
+      "titleTr": "Jason’ı kontrol et",
+      "locationTr": "Port Gellhorn moteli",
+      "summaryTr": "Dışarıdaki işlerin ardından Lucia Jason’ı görmek için motel odasına döner."
+    },
+    {
+      "titleTr": "Motel sahnesi",
+      "locationTr": "Jason’ın kaldığı oda",
+      "summaryTr": "Bu dönüş Jason’ın yaralanmasına bağlıdır. Vicki ve Dunk’la bağlantılı tedarik görevleri ayrı kayıtlarda izlenir."
+    }
+  ],
+  "mami-knows-best": [
+    {
+      "titleTr": "Satılacak eve ziyaret",
+      "locationTr": "Bakım isteyen bir konut",
+      "summaryTr": "Mia, Lucia’yı satışa hazırladığı evi görmeye götürür."
+    },
+    {
+      "titleTr": "Komşularla karşılaşma",
+      "locationTr": "M7 üyelerinin bulunduğu yan ev",
+      "summaryTr": "Yan evdeki M7 üyeleriyle karşılaşma, anne kızın planını değiştirir."
+    },
+    {
+      "titleTr": "Ziyaretin sonucu",
+      "locationTr": "Mia’nın portföyündeki ev",
+      "summaryTr": "Boş evin durumu ve komşuların yaklaşımı Mia’nın satış planını bozar. Lucia’nın mahalleyle ilgili karşılaştığı risk burada görünür."
+    }
+  ],
+  "tyrone": [
+    {
+      "titleTr": "İş arayışı",
+      "locationTr": "Vice City",
+      "summaryTr": "Jason iş için Boobie’nin bağlantısı Tyrone’a gider. Tyrone’un üzerinde durduğu konu, şehirde hızla yayılan Kitty Litter’dır."
+    }
+  ],
+  "ao-deal-t-synth": [
+    {
+      "titleTr": "Tyrone’un hedefi",
+      "locationTr": "Vice City",
+      "summaryTr": "Tyrone, Kitty Litter’ın hem müşterileri hem şehirdeki insanlar üzerindeki etkisine tepki gösterir."
+    },
+    {
+      "titleTr": "Üretim yerleri",
+      "locationTr": "Vice City’deki laboratuvarlar",
+      "summaryTr": "Jason ile Lucia, şehirdeki üretim noktalarını takip eder. Bölüm 5’te son üretim yerine ilişkin ayrı bir kayıt bulunur."
+    }
+  ],
+  "top-billing": [
+    {
+      "titleTr": "Real Dimez sahnede",
+      "locationTr": "Jack of Hearts kulübü",
+      "summaryTr": "Real Dimez için kulübe gidilir. DWNPLY sahneye karışınca Roxy gösteriyi bırakır."
+    },
+    {
+      "titleTr": "Roxy’yi bulma",
+      "locationTr": "Ev partisi",
+      "summaryTr": "Ekip, Roxy’yle konuşmak için gittiği ev partisinde yeniden bir araya gelir."
+    },
+    {
+      "titleTr": "Gösteriden ev partisine",
+      "locationTr": "Jack of Hearts ve sonraki buluşma",
+      "summaryTr": "Roxy’nin ayrılmasıyla Dre’Quan ve Bae-Luxe, Jason ve Lucia’yla birlikte onu aramaya yönelir. Kulüp mekânı ile ev partisi aynı geceye ait iki farklı sahnedir."
+    }
+  ],
+  "ban-setup": [
+    {
+      "titleTr": "İşin hedefi",
+      "locationTr": "Sinfrontera National Bank",
+      "summaryTr": "Raul’un planı, La Polilla Negra’nın kullandığı bankaya odaklanır. Hazırlık ekibi bankanın düzeni ve giriş çıkışları hakkında bilgi toplar."
+    },
+    {
+      "titleTr": "Uzman bağlantısı",
+      "locationTr": "Planlama görüşmesi",
+      "summaryTr": "Raul ve Andrea, güvenlik düzenini anlamak için Nicole Park’ın gerekli olduğunu açıklar. Onu bulma kısmı Güvenlik Uzmanı görevine bağlı."
+    }
+  ],
+  "security-expert": [
+    {
+      "titleTr": "Nicole Park’ı bul",
+      "locationTr": "Banka hazırlığı",
+      "summaryTr": "Nicole, Sinfrontera’nın güvenlik sistemine ilişkin uzmanlığı nedeniyle ekibin planına dahil olur."
+    },
+    {
+      "titleTr": "Raul’a götür",
+      "locationTr": "Teslimata giden yol",
+      "summaryTr": "Nicole’la buluştuktan sonra hedef, onu Raul’un bulunduğu noktaya ulaştırmaktır. İşin tamamlanması bankadan önceki hazırlığı ilerletir."
+    }
+  ],
+  "clb-steal": [
+    {
+      "titleTr": "Eris’te buluş",
+      "locationTr": "Eris Flagship mağazası",
+      "summaryTr": "Dre’Quan, Real Dimez’le yaşanan sahne geriliminin ardından Jason’ı DWNPLY’nin otomobiliyle ilgili işe çağırır."
+    },
+    {
+      "titleTr": "Arabayı götür",
+      "locationTr": "Vice City sokakları",
+      "summaryTr": "Mağazanın dışında DWNPLY’nin koruması Bush ve Cash City ekibi devreye girer. Otomobil daha sonra Real Dimez klibiyle bağlantılıdır."
+    }
+  ],
+  "ban-carte": [
+    {
+      "titleTr": "Monty’yle görüş",
+      "locationTr": "Watson Bay",
+      "summaryTr": "Andrea ve Lucia, La Polilla Negra’dan Monty’yle Watson Bay’de buluşur. Monty, görüşmede cartel sosyal medyası için görüntü almak ister."
+    },
+    {
+      "titleTr": "Başka yere geç",
+      "locationTr": "Vice City",
+      "summaryTr": "İlk buluşma bozulunca ekip Monty’yi başka bir noktaya götürür. Raul’un ekibi, banka planı için Monty’den bilgi almaya çalışır."
+    }
+  ],
+  "ban-safe": [
+    {
+      "titleTr": "Gil’in malikanesi",
+      "locationTr": "Malikane ve çalışma odası",
+      "summaryTr": "Banka hazırlığının bu bölümü Gil’in evindeki kasayla ilgilidir. Ekrandaki hedefler eve giriş ve kasanın bulunması arasında değişir."
+    },
+    {
+      "titleTr": "Kasayı taşı",
+      "locationTr": "Malikaneden Felipe’nin teslim noktasına",
+      "summaryTr": "Kasa bulunduğunda Felipe’nin aracıyla taşınır. Kasayı ya da aracı kaybetmek, teslimatı tamamlamadan işi durdurur."
+    }
+  ],
+  "clb-video": [
+    {
+      "titleTr": "Çekimi kur",
+      "locationTr": "Müzik klibi seti",
+      "summaryTr": "Real Dimez yeni klibi için DWNPLY’nin otomobilini kullanır. Araç, Dre’Quan’ın önceki işinden gelir."
+    },
+    {
+      "titleTr": "Setin amacı",
+      "locationTr": "Klip çekimi",
+      "summaryTr": "Bu kayıt klibin çekimine aittir. Jack of Hearts ve VYB’deki canlı konserler farklı görevler olarak aranabilir."
+    }
+  ],
+  "ft-ban-distr": [
+    {
+      "titleTr": "Karim’in hazırlığı",
+      "locationTr": "Vice City haberleşme kuleleri",
+      "summaryTr": "Sinfrontera işi yaklaşırken Karim, bankanın acil iletişimini etkileyecek bir hazırlık planlar."
+    },
+    {
+      "titleTr": "Hikâye bağlantısı",
+      "locationTr": "Raul’la görüşme",
+      "summaryTr": "Çalışmanın sonunda Tomás ve sabit disk konusu Raul’a açılır. Raul bu meseleyi banka işi bitince ele alacağını söyler."
+    }
+  ],
+  "mny-hotel": [
+    {
+      "titleTr": "Otele yerleşme",
+      "locationTr": "Y Hotel süiti",
+      "summaryTr": "Jason ve Lucia burada otel görevlisi Santino ve Valentina’nın sonraki planıyla tanışır."
+    }
+  ],
+  "mny-car": [
+    {
+      "titleTr": "Araçları al",
+      "locationTr": "Araç teslim noktaları",
+      "summaryTr": "Valentina iki otomobili önceden ayarlamıştır. Ekrandaki hedef, yeni araçları teslim yerinden almaya yönlendirir."
+    },
+    {
+      "titleTr": "Otele dön",
+      "locationTr": "Y Hotel",
+      "summaryTr": "Araçları Y Hotel’e getirmek bu kaydın tamamlanma kısmıdır. Otel süitine taşınma farklı bir kayıt olarak bulunur."
+    }
+  ],
+  "lawyer-up": [
+    {
+      "titleTr": "Avukatı bul",
+      "locationTr": "Vice City",
+      "summaryTr": "Valentina’nın ayarladığı avukat Abraham Gonzalez, Jason ile Lucia’nın yasal durumuyla ilgili bir yol açabilir."
+    },
+    {
+      "titleTr": "Görüşmenin bağlamı",
+      "locationTr": "Avukat görüşmesi",
+      "summaryTr": "Bu ilk bağlantı Valentina’nın otel görüşmesinde bahsettiği tavsiyeye dayanır. Abe’yle final öncesindeki anlaşma görüşmesi farklı görev kaydıdır."
+    }
+  ],
+  "mny-party": [
+    {
+      "titleTr": "Açılışı izle",
+      "locationTr": "Megamundo Network merkezi",
+      "summaryTr": "Jason ve Lucia, Andrés de León’un katıldığı açılışta güvenliğe destek verir. Bu işi avukatla kurdukları bağlantı üzerinden alırlar."
+    },
+    {
+      "titleTr": "Etkinliğin seyri",
+      "locationTr": "Megamundo’nun açılış alanı",
+      "summaryTr": "FAP’ın müdahalesiyle organizasyon rehine durumuna dönüşür. César ve Petra’nın da bulunduğu konuklar olayın merkezindedir."
+    }
+  ],
+  "air-tail": [
+    {
+      "titleTr": "Kordell’in ekibi",
+      "locationTr": "Ajax Gym ve Vice City",
+      "summaryTr": "Raul, Jason ile Lucia’ya Kordell Grant’in ekibini araştırma işi verir. İlk hareketler ekibin kullandığı spor salonu çevresinde izlenir."
+    },
+    {
+      "titleTr": "Havaalanı bağlantısı",
+      "locationTr": "Araç takibi",
+      "summaryTr": "Takip sonunda hazırlanan işin Vice City International Airport’la ilgisi anlaşılır. Karim de sabit diskin Giorgio’ya ait olabileceğine ilişkin bilgi getirir."
+    }
+  ],
+  "photo-shoot": [
+    {
+      "titleTr": "Dre’Quan’ın çekimi",
+      "locationTr": "Vice City tanıtım seti",
+      "summaryTr": "Dre’Quan, Jason ve Lucia’yı bir tanıtım çekimine dahil eder."
+    },
+    {
+      "titleTr": "Çekimin türü",
+      "locationTr": "Tanıtım sahnesi",
+      "summaryTr": "Görev adı Photo/Shoot olarak görünür. Real Dimez’in DWNPLY’nin aracıyla çektiği klip, katalogda ayrı bir kayıttır."
+    }
+  ],
+  "air-train": [
+    {
+      "titleTr": "Nate’le çalış",
+      "locationTr": "Ajax Gym",
+      "summaryTr": "Lucia, Kordell’in çevresine ulaşmak için Nate’le düzenli antrenman yapar."
+    },
+    {
+      "titleTr": "Özel salon",
+      "locationTr": "Ajax Gym’in Trauma Floor bölümü",
+      "summaryTr": "Nate’le yakınlık kurulunca Lucia ekibin diğer üyeleriyle tanışır. Özel antrenman alanına girmesi yeni işlere zemin hazırlar."
+    }
+  ],
+  "clb-promo": [
+    {
+      "titleTr": "Organizatöre ulaş",
+      "locationTr": "Vice City kulüp çevresi",
+      "summaryTr": "Dre’Quan, Royce Jones’un ilgisini çekmek için destek ister."
+    },
+    {
+      "titleTr": "Müzik işleri bağlantısı",
+      "locationTr": "Kulüp tanıtımı",
+      "summaryTr": "Royce, VYB’deki sonraki Real Dimez planına bağlanır. Bu kayıt gösteriden önceki tanıtım görüşmesine aittir."
+    }
+  ],
+  "cash-injections": [
+    {
+      "titleTr": "Nate’le buluş",
+      "locationTr": "Ocean Beach",
+      "summaryTr": "Nate’in satış görüşmesine Lucia da eşlik eder. Bu iş, Lucia’nın ekibin güvenini kazanma çabasının parçası."
+    },
+    {
+      "titleTr": "Kordell bağlantısı",
+      "locationTr": "Ocean Beach teslim noktası",
+      "summaryTr": "Görüşmenin ardından Nate, Lucia’yı Kordell’e önerebileceğini belirtir."
+    }
+  ],
+  "amateur-hour": [
+    {
+      "titleTr": "Cisco’nun ricası",
+      "locationTr": "Vice City",
+      "summaryTr": "Cisco, kendisine borcu olan bir yapımcıyla görüşmek için Lucia’dan yardım ister."
+    },
+    {
+      "titleTr": "Ekibe yaklaşma",
+      "locationTr": "Cisco’nun buluşması",
+      "summaryTr": "Lucia’nın destek vermesi, Nate ve Kordell’in çevresinde güven kazanma planıyla bağlantılıdır."
+    }
+  ],
+  "dirty-work": [
+    {
+      "titleTr": "Raina’yla bağlantı",
+      "locationTr": "Vice City",
+      "summaryTr": "Jason ve Lucia, Raina’nın dahil olduğu bir işi ele alır. Bu görev ekibin şehirdeki yeni iş bağlantılarını genişletir."
+    },
+    {
+      "titleTr": "Sahne için kaynak",
+      "locationTr": "Bölüm 4",
+      "summaryTr": "Rehberlerde Dirty Work adıyla geçen bu kayıtta izlenebilen kesin konum için görev kaynağını aç."
+    }
+  ],
+  "too-much-baggage": [
+    {
+      "titleTr": "Bagaj vardiyası",
+      "locationTr": "Vice City International Airport",
+      "summaryTr": "Jason, Omar’ın yönettiği bagaj ekibine katılır. Vardiyadaki görevler yolcu bagajlarının işlendiği alanı tanıtır."
+    },
+    {
+      "titleTr": "Karim’in hazırlığı",
+      "locationTr": "Havaalanı bagaj alanı",
+      "summaryTr": "Jason’ın bu işe başlaması havaalanının güvenlik düzeni hakkında bilgi edinmek içindir. Karim’in hazırlığıyla ilgili hedefler vardiyaya bağlanır."
+    }
+  ],
+  "adventures-in-babysitting": [
+    {
+      "titleTr": "Güvenlik vardiyası",
+      "locationTr": "The Vault gece kulübü",
+      "summaryTr": "Jason, Andrés de León’a kulüpte eşlik eder. FAP’ın girişimiyle güvenlik işi aniden kaçışa döner."
+    },
+    {
+      "titleTr": "Eve dönüş",
+      "locationTr": "Andrés’in evi",
+      "summaryTr": "Jason ve Andrés eve ulaştığında Rafa’nın götürüldüğü anlaşılır. Bu gelişme çimento fabrikasındaki sonraki görevi başlatır."
+    }
+  ],
+  "fresh-evidence": [
+    {
+      "titleTr": "Kanıtı ara",
+      "locationTr": "Dante Fresh’in malikanesi",
+      "summaryTr": "Jason ve Dre’Quan, Dante’nin Royce’u baskı altında tutan kayıtlarına ulaşmaya çalışır."
+    },
+    {
+      "titleTr": "Briana’yla bağlantı",
+      "locationTr": "VYB açılış hazırlığı",
+      "summaryTr": "Malikanedeki işten sonra Royce’un asistanı Briana, Real Dimez’in VYB açılışında üstleneceği rolü açıklar."
+    }
+  ],
+  "air-truck": [
+    {
+      "titleTr": "Kordell’e ulaş",
+      "locationTr": "Bina resepsiyonu ve planlama odası",
+      "summaryTr": "Görev kaydında Lucia, Nate ve Kordell’le bağlantılı bir görüşme başlatır. Ekip, hazırlanan işin planlarını arar."
+    },
+    {
+      "titleTr": "Ekipte kal",
+      "locationTr": "Yol ve planlama alanı",
+      "summaryTr": "Yol üzerindeki hedefler ekibi koruyup planları almayı içerir. Nate, Kordell veya Francisco’nun kaybı görev akışını kesebilir."
+    }
+  ],
+  "mny-kidnp": [
+    {
+      "titleTr": "Rafa’nın yeri",
+      "locationTr": "Çimento fabrikası",
+      "summaryTr": "Andrés, Jason ve Lucia’yla birlikte Rafa’yı bulmak için fabrikaya gider."
+    },
+    {
+      "titleTr": "Görüşmenin sonu",
+      "locationTr": "Fabrikadan ayrılış",
+      "summaryTr": "Çatışmanın ardından Rafa ailesine döner. Abe daha sonra Jason ve Lucia’nın yeni kimlikleri hakkında haber verir."
+    }
+  ],
+  "headliners": [
+    {
+      "titleTr": "Gösteriye hazırlan",
+      "locationTr": "VYB",
+      "summaryTr": "Jason ile Lucia, Real Dimez’in VYB açılışındaki performansı için mekâna gelir."
+    },
+    {
+      "titleTr": "Sanatçı odasına git",
+      "locationTr": "VYB sahne arkası",
+      "summaryTr": "DWNPLY gösteriyi ele geçirmeye çalıştığında ekip Real Dimez’e sahne arkasından ulaşır. Olay sona erince konser devam eder."
+    }
+  ],
+  "close-surveillance": [
+    {
+      "titleTr": "Nate ve Cisco’yu izle",
+      "locationTr": "Ocean Beach",
+      "summaryTr": "Jason ve Karim, iki kişiyi uzaktan izleyerek ilişkide oldukları noktaları belirler."
+    },
+    {
+      "titleTr": "Omar’ın dairesi",
+      "locationTr": "Vice City",
+      "summaryTr": "Takip, havaalanı çalışanı Omar’ın evinde yoğunlaşır. Karim’in çözmeye başladığı sabit disk, burada Camila Fuentes’le bağlantı kazanır."
+    }
+  ],
+  "delivery-method": [
+    {
+      "titleTr": "TSS’ye git",
+      "locationTr": "TSS ofisleri",
+      "summaryTr": "Havaalanı işine hazırlık için Lucia’nın kaydını TSS sistemine yerleştirmek gerekir."
+    },
+    {
+      "titleTr": "Sistem hazırlığı",
+      "locationTr": "Ofis içi",
+      "summaryTr": "Oyun içindeki hedef, işi ofiste tamamlamaya yönlendirir. Bu kayıt havaalanındaki ana operasyon başlamadan önce geçer."
+    }
+  ],
+  "team-building": [
+    {
+      "titleTr": "Ekiple tanış",
+      "locationTr": "Kordell’in buluşması",
+      "summaryTr": "Kordell, Lucia’yı çevresindeki diğer kişilerle tanıştırır. Bu görüşme Nate’le kurulan ilişkinin ilerlediği aşamadır."
+    },
+    {
+      "titleTr": "Hazırlık bağlamı",
+      "locationTr": "Vice City",
+      "summaryTr": "Lucia’nın spor salonuna erişim süreci gelecekteki havaalanı işi için bilgi sağlar."
+    }
+  ],
+  "blood-sweat-and-gear": [
+    {
+      "titleTr": "Ekibin antrenmanı",
+      "locationTr": "Ajax Gym özel alanı",
+      "summaryTr": "Lucia, Kordell’in ekibinin kullandığı özel salonda onlarla antrenman yapar."
+    },
+    {
+      "titleTr": "Çalışmanın sonucu",
+      "locationTr": "Ajax Gym",
+      "summaryTr": "Burada amaç ekibin Lucia’yı kendi çevresine kabul etmesini sağlamaktır. Sonraki görevlerde salon bağlantıları havaalanı hazırlığına açılır."
+    }
+  ],
+  "sfh-taxi": [
+    {
+      "titleTr": "Geçmişe dönüş",
+      "locationTr": "Lucia’nın hatırladığı sabah",
+      "summaryTr": "Lucia’nın tutuklanmasından önce Tomás’la geçirdiği son sabaha dönülür."
+    },
+    {
+      "titleTr": "Olayın zamanı",
+      "locationTr": "Geçmiş sahnesi",
+      "summaryTr": "Bu kayıt, Jason ve Lucia’nın Bölüm 5’teki şimdiki zamanından önce geçer. Hangi sözün hangi zamana ait olduğunu ayırt etmek için açılış geçişine dikkat et."
+    }
+  ],
+  "rob-death": [
+    {
+      "titleTr": "Raul’la görüş",
+      "locationTr": "Ocean Beach Marina",
+      "summaryTr": "Tekneye gitmek için Raul’un Ocean Beach Marina’daki işaretini takip et."
+    },
+    {
+      "titleTr": "Hikâye bağlantısı",
+      "locationTr": "Raul’un teknesi",
+      "summaryTr": "Bu görüşmenin sonrasındaki gelişmeler Sıfırdan Başlamak kaydının gerekçesini oluşturur."
+    }
+  ],
+  "starting-from-zero": [
+    {
+      "titleTr": "Dikkat çekmeden ilerle",
+      "locationTr": "Vice City",
+      "summaryTr": "Raul’un ölümünden sonra Jason ve Lucia önceliklerini değiştirir. Yüksek görünürlükten kaçınarak değerli eşyalarını geri almaya yönelirler."
+    },
+    {
+      "titleTr": "Kayıt bağlamı",
+      "locationTr": "Şehirdeki takip",
+      "summaryTr": "Bu bölümün hedefi toparlanmaktır. Giorgio’yla yapılan sonraki görüşmeler, sahil güvenlik işini farklı görevlerde açar."
+    }
+  ],
+  "coa-helis": [
+    {
+      "titleTr": "Giorgio’nun açıklaması",
+      "locationTr": "Giorgio’nun çatı katı",
+      "summaryTr": "Sabit diski geri alan Giorgio, sahil güvenliğin elindeki yükü geri almak için hazırlık yapar."
+    },
+    {
+      "titleTr": "Tesis keşfi",
+      "locationTr": "Sahil güvenlik merkezi ve Mile Zero Air Station",
+      "summaryTr": "Vinny, Kevin ve Liz keşfe katılır. Bu kayıt hava istasyonundaki helikopter aşamasına kadar uzanır."
+    }
+  ],
+  "bil-boss": [
+    {
+      "titleTr": "Spa görüşmesi",
+      "locationTr": "Giorgio’nun spası",
+      "summaryTr": "Giorgio, Jason ile Lucia’ya bir af ayarlayabileceğini söyler. Karşılığında onlardan işlerine yardım etmelerini ister."
+    },
+    {
+      "titleTr": "Yeni koşul",
+      "locationTr": "Spa ve çıkış alanı",
+      "summaryTr": "Görüşmedeki saldırı, ekibin önüne rakip sevkiyatı durdurma işi koyar."
+    }
+  ],
+  "bil-preg": [
+    {
+      "titleTr": "Kat’ın durumu",
+      "locationTr": "Giorgio’nun çatı katı",
+      "summaryTr": "Kat doğuma yaklaşırken Mattia yardım istemek için Jason ile Lucia’ya ulaşır."
+    },
+    {
+      "titleTr": "Yol hazırlığı",
+      "locationTr": "Çatı katı ve binadan çıkış",
+      "summaryTr": "Bu kaydın önceliği Kat’a yardım etmektir. Çatı katındaki diğer Giorgio görüşmeleri farklı hedeflere bağlanır."
+    }
+  ],
+  "doggie-bag": [
+    {
+      "titleTr": "Rocco’yu bulma",
+      "locationTr": "Limanda bağlı yolcu gemisi",
+      "summaryTr": "Vinny ve Lucia limandaki yolcu gemisinde sahil güvenlik köpeği Rocco’yu arar."
+    },
+    {
+      "titleTr": "Gemiden ayrılma",
+      "locationTr": "Gemi ve helikopter",
+      "summaryTr": "Rocco’yu aldıktan sonra ekip helikopterle gemiyi terk eder."
+    },
+    {
+      "titleTr": "Rocco’nun önemi",
+      "locationTr": "Liman",
+      "summaryTr": "Vinny’nin planında Rocco, sonraki sevkiyat işinde yükün bulunmasına yardım edecektir. Yolcu gemisindeki hareketlilik ona ulaşmak için kullanılır."
+    }
+  ],
+  "coa-ship": [
+    {
+      "titleTr": "Rakip sevkiyat",
+      "locationTr": "Yük gemisi",
+      "summaryTr": "Giorgio’nun ekibi denizdeki sevkiyata müdahale eder. Daha önce Rocco için yapılan görev, gemi bölümünün hazırlığıdır."
+    },
+    {
+      "titleTr": "El konulan yük",
+      "locationTr": "Sahil güvenlik merkezi",
+      "summaryTr": "Deniz bölümünün ardından Giorgio kendi el konulan yükünün geri alınmasını ister. Sonraki görüşme Jason ve Lucia’nın arandığı durumla bağlantılıdır."
+    }
+  ],
+  "bil-preci": [
+    {
+      "titleTr": "Ayrı görüşmeler",
+      "locationTr": "Gözaltı ve savcılık",
+      "summaryTr": "Giorgio’nun kararının ardından Jason ve Lucia ayrı ayrı gözaltına alınır. Danica Howard, Lucia’yla sabit diskin ele geçirilmesi konusunda konuşur."
+    },
+    {
+      "titleTr": "Çıkış",
+      "locationTr": "Polisle karşılaşma",
+      "summaryTr": "İkili ayrı kurtulma sahnelerinden geçer. Méndez’le karşılaşma bu kaydın sonraki kısmına aittir."
+    }
+  ],
+  "bil-law": [
+    {
+      "titleTr": "Anlaşmayı görüş",
+      "locationTr": "Abe Gonzalez’le görüşme",
+      "summaryTr": "Jason ile Lucia, bekleyen davalar konusunda Abe’yle bir çıkış yolu konuşur."
+    },
+    {
+      "titleTr": "Önceki avukat görüşmesi",
+      "locationTr": "Bölüm 5",
+      "summaryTr": "Avukata ilk tanışma Bölüm 4’te gerçekleşir. Buradaki konuşma, Giorgio’yla yaşanan gelişmelerden sonraki anlaşma ihtimali hakkındadır."
+    }
+  ],
+  "the-end-of-the-road-fin-cont": [
+    {
+      "titleTr": "Finalden sonra",
+      "locationTr": "Oyun bitiş ekranı",
+      "summaryTr": "Oyun, final öncesine dönüp ilerlemeyi sürdürmeyi veya yeni bir oyun açmayı sunar."
+    },
+    {
+      "titleTr": "Kayıt bağlamı",
+      "locationTr": "Menü",
+      "summaryTr": "Bu kayıtta görülen ifadeler, final sahnesindeki konuşmalardan farklı olarak devam seçenekleriyle ilgilidir."
+    }
+  ],
+  "south-leonida-real-estate": [
+    {
+      "titleTr": "Mia’yı bul",
+      "locationTr": "Güney Leonida",
+      "summaryTr": "Lucia, M7’nin elindeki Mia’ya ulaşmak isterken yakalanır."
+    },
+    {
+      "titleTr": "Mülk görüşmesi",
+      "locationTr": "Güney Leonida’daki yeni bina",
+      "summaryTr": "Mia, Terro’ya başka bir merkez bulmayı teklif eder. Yeni yer bulununca Viper’ın anlaşmazlığı Lucia’nın işini yeniden değiştirir."
+    }
+  ],
+  "spin-on-this": [
+    {
+      "titleTr": "Son üretim noktası",
+      "locationTr": "Kitty Litter tesisi",
+      "summaryTr": "Önceki üretim tesisleriyle bağlantılı bu iş, kalan son üretim noktasına odaklanır."
+    },
+    {
+      "titleTr": "Görevin yeri",
+      "locationTr": "Bölüm 5",
+      "summaryTr": "Bölüm 3’te Tyrone’la başlayan üretim araştırmasının son kayıtlarından biridir. Ayrıntılı dış referansa görev kaynağından geçilebilir."
+    }
+  ],
+  "delivery-day": [
+    {
+      "titleTr": "Son iki araç",
+      "locationTr": "Randy’nin araç teslimat rotası",
+      "summaryTr": "Randy’nin listesinde kalan iki lüks araç sevkiyat için rıhtıma götürülür."
+    },
+    {
+      "titleTr": "Rıhtıma ulaş",
+      "locationTr": "Millport rıhtımları",
+      "summaryTr": "Yolda rakip bir araç hırsızlığı ekibi belirir. Jason, Lucia ve Randy otomobilleri limana ulaştırmaya çalışır."
+    }
+  ],
+  "find-donnies-package": [
+    {
+      "titleTr": "Kaybolan paket",
+      "locationTr": "Bataklık",
+      "summaryTr": "Jason, Donnie’nin düşürdüğü yükün yerini aramak için sulak alana gider."
+    }
+  ],
+  "the-unknown-stuntman": [
+    {
+      "titleTr": "Sahil gösterisi",
+      "locationTr": "Ocean Beach gösteri alanı",
+      "summaryTr": "Papa Audacity’ye yardım ettikten sonra yakındaki mühendisle konuşulur. Bu görüşme bir sonraki daveti açar."
+    },
+    {
+      "titleTr": "İlk davet",
+      "locationTr": "Ocean Beach",
+      "summaryTr": "Sahildeki gösteride Papa Audacity ve girişimi tanıtılır. Gösteri bitince mühendisle konuşmak, ekibin sonraki sürüş sınavına davet almayı sağlar."
+    }
+  ],
+  "trial-by-tire": [
+    {
+      "titleTr": "Sürüş parkuru",
+      "locationTr": "Çok katlı otoparkın alt katı",
+      "summaryTr": "La Perle’de mühendisi bulunca ilk deneme için bekleyen motosiklete binilir. Parkur otoparkın alt katındadır."
+    },
+    {
+      "titleTr": "Sınava git",
+      "locationTr": "La Perle otoparkı",
+      "summaryTr": "AudaCity’nin sürüş denemesi, park alanının alt bölümünde başlar. Mühendis, sırasıyla geçilecek parkur girişlerini gösterir."
+    },
+    {
+      "titleTr": "Sınavın sonu",
+      "locationTr": "Otopark katları",
+      "summaryTr": "Parkur tamamlanınca mühendisle tekrar buluş. Bu görev, sonraki Peacock Bay tanıtım işinden önce gelir."
+    }
+  ],
+  "quit-your-job-sell-your-house": [
+    {
+      "titleTr": "Gösteriye hazırlık",
+      "locationTr": "Peacock Bay Condominiums ve helikopter pisti",
+      "summaryTr": "Peacock Bay’de ekiple buluşup binanın helikopter pistine çık."
+    },
+    {
+      "titleTr": "Havadaki gösteri",
+      "locationTr": "Catalan Key üzeri",
+      "summaryTr": "Gösteri ekibinin havadaki varış noktası Catalan Key üzerindedir."
+    },
+    {
+      "titleTr": "Hazırlık sahnesi",
+      "locationTr": "Peacock Bay Condominiums",
+      "summaryTr": "Papa Audacity son gösterinin hazırlığını binanın helikopter pistinde yapar. Jason ile Lucia’nın ikisi de bu işe katılır."
+    }
+  ],
+  "audacity-stunts": [
+    {
+      "titleTr": "Şehirde tanıtım atlayışları",
+      "locationTr": "Vice City’deki işaretli alanlar",
+      "summaryTr": "Şehirdeki AudaCity araçlarının bulunduğu farklı noktalarda gösteri atlayışları yapılır."
+    },
+    {
+      "titleTr": "Şehirdeki duraklar",
+      "locationTr": "Ocean Beach, Dalton Island ve Stockyard",
+      "summaryTr": "AudaCity araçlarında yapılan tanıtım atlayışları birden fazla noktaya dağılır. Noktalar tamamlanınca sonraki hava gösterisinin daveti gelebilir."
+    }
+  ],
+  "catching-a-whale": [
+    {
+      "titleTr": "Havaalanında buluşma",
+      "locationTr": "Sundown Airfield",
+      "summaryTr": "Önceki gösteriler tamamlandığında Papa Audacity Sundown Airfield’da bekler."
+    },
+    {
+      "titleTr": "Tanıtım uçuşu",
+      "locationTr": "Liman, Tequesta Retreat ve adliye çevresi",
+      "summaryTr": "Tanıtım uçuşu ilgi çekmek için liman ve Tequesta Retreat üzerinden şehrin diğer noktalarına uzanır."
+    },
+    {
+      "titleTr": "Lansmanın bağlantısı",
+      "locationTr": "Vice City hava rotası",
+      "summaryTr": "Bu uçuş sonrasında lansman daveti beklenir. Davet, daha sonra Neo Paloma Apartments’ta başlayan The Audacity görevine yönlendirir."
+    }
+  ],
+  "steal-the-scooter": [
+    {
+      "titleTr": "Scooter’ı Çal",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Shirley, keyfini yerine getireceğini düşündüğü bir iş önerir. Görev komşusunun scooter’ıyla ilgilidir."
+    }
+  ],
+  "pick-up-groceries-drop-off-groceries": [
+    {
+      "titleTr": "Market Alışverişini Yap ve Teslim Et",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Jason evin market alışverişini tamamlar ve aldığı malzemeleri eve bırakır."
+    }
+  ],
+  "buy-flowers": [
+    {
+      "titleTr": "Çiçek Al",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Lucia için eve bir çiçek siparişi verilir."
+    }
+  ],
+  "buy-lucia-a-necklace": [
+    {
+      "titleTr": "Lucia’ya Kolye Al",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Jason, The Siren’s Chest kuyumcusunda Lucia’ya bir kolye seçer."
+    }
+  ],
+  "get-the-chop": [
+    {
+      "titleTr": "Saçını Kestir",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Barnacle Beauties’te Jason’ın saçı veya sakalı için yeni bir görünüm seçilir."
+    }
+  ],
+  "get-lucias-clothes": [
+    {
+      "titleTr": "Lucia’nın Kıyafetlerini Al",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Lucia, Manatee’s Rest barındaki arkadaşı Andy’den kıyafetlerini almasını ister."
+    }
+  ],
+  "clean-up-after-donnie": [
+    {
+      "titleTr": "Donnie’nin Ardını Toparla",
+      "locationTr": "Vice Dale County · Hamlet",
+      "summaryTr": "Donnie’nin yarım kalan teslimatına ait bir paketin sinyali Hamlet’teki balık noktasından gelir."
+    }
+  ],
+  "deposit-cash-into-buckme": [
+    {
+      "titleTr": "BuckMe’ye Nakit Yatır",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Bir ATM üzerinden BuckMe hesabına nakit yatırılır."
+    }
+  ],
+  "save-for-the-future": [
+    {
+      "titleTr": "Gelecek İçin Biriktir",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Aile birikimine para eklenir. Birikim hedefleri ilerledikçe BuckMe yeni ayrıcalıklar açar."
+    }
+  ],
+  "find-the-lost-drugs": [
+    {
+      "titleTr": "Kayıp Uyuşturucuyu Bul",
+      "locationTr": "Mariana County",
+      "summaryTr": "Kayıp paketlerin sinyalleri dört ayrı arama bölgesine götürür."
+    }
+  ],
+  "clock-out": [
+    {
+      "titleTr": "Paydos",
+      "locationTr": "Mariana County · Key Lento",
+      "summaryTr": "Lucia’yı iş çıkışında eve bırakmak üzere saat 16.00’dan önce işyerine gidilir."
+    }
+  ],
+  "donnies-lost-drugs": [
+    {
+      "titleTr": "Donnie’nin Kayıp Uyuşturucusu",
+      "locationTr": "Leonida Straits Ocean in north-east of Mariana County",
+      "summaryTr": "Brian, Donnie’nin teknesinin Corsair Key açıklarına battığını söyler. Görev, teknede kalan yükün bulunmasıyla ilgilidir."
+    }
+  ],
+  "pick-up-a-gun": [
+    {
+      "titleTr": "Silah Al",
+      "locationTr": "Kelly County · Port Gellhorn · Gellhorn Outfitters (Ammu-Nation Gun Shop)",
+      "summaryTr": "Gellhorn Outfitters’ta bir silah satın alınabilir veya dolapta duran mevcut silahlardan biri alınabilir."
+    }
+  ],
+  "new-look": [
+    {
+      "titleTr": "Yeni Görünüm",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Lucia, Pearl House Hair Salon’da saç modelini değiştirir."
+    }
+  ],
+  "how-do-i-look": [
+    {
+      "titleTr": "Nasıl Görünüyorum?",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Lucia yeni kıyafet seçer. Bargain World daha ekonomik bir seçenek sunar."
+    }
+  ],
+  "painkiller-supplier": [
+    {
+      "titleTr": "Hap Var mı?",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Dunk, Jason’ın ihtiyacı olan ağrı kesicilere dair haber alırsa telefonla ulaşacaktır."
+    }
+  ],
+  "ambulance-chaser": [
+    {
+      "titleTr": "Ambulans Peşinde",
+      "locationTr": "Kelly County · Starlet Motel",
+      "summaryTr": "Hastane çıkışından kalan ambulans hâlâ civardadır. Lucia, polis aracı bulmadan ambulansı oradan uzaklaştırmak ister."
+    }
+  ],
+  "check-out-mckittrick-farm": [
+    {
+      "titleTr": "McKittrick Çiftliğine Bak",
+      "locationTr": "Read Kyle’s flyer outside Starlet Motel in Kelly County",
+      "summaryTr": "Bir ilan pilot işi için McKittrick Çiftliği’ne yönlendirir. İlanı değerlendirmek üzere Kyle’la buluşulur."
+    }
+  ],
+  "collect-chemicals-for-kyle": [
+    {
+      "titleTr": "Kyle İçin Kimyasalları Topla",
+      "locationTr": "Leonard County",
+      "summaryTr": "Kyle, ekinleri için hazırladığı ilacın malzemelerini ister ve depo adresini verir."
+    }
+  ],
+  "hit-avery-pawn": [
+    {
+      "titleTr": "Avery Rehincisini Soy",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Lucia, Port Gellhorn’daki Avery Pawn rehincisini birlikte hedef almayı önerir."
+    }
+  ],
+  "hit-kingpin-bowling": [
+    {
+      "titleTr": "Kingpin Bowling’i Soy",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Kolt & Associates bowling salonunun kontrolünü almıştır. Lucia, salonu ikili için yeni bir iş olarak görür."
+    }
+  ],
+  "impounded-vehicle": [
+    {
+      "titleTr": "Çekilen Araç",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Lucia’nın çekilen aracını geri alma işi."
+    }
+  ],
+  "prepare-for-vice-city": [
+    {
+      "titleTr": "Vice City’ye Hazırlan",
+      "locationTr": "Kelly County · Coffee room of Starlet Motel",
+      "summaryTr": "Dre’Quan Vice City’de kalacak yer ayarlarken Jason ile Lucia taşınma için 15.000 dolar toplamaya çalışır."
+    }
+  ],
+  "veteran-hunted": [
+    {
+      "titleTr": "Gazinin Peşinde",
+      "locationTr": "Lummox County",
+      "summaryTr": "Jason’ın eski dostu Bret Vogel, Mount Kalaga çevresindeki avcılık işi için yardım ister."
+    }
+  ],
+  "get-your-wheels": [
+    {
+      "titleTr": "Aracını Al",
+      "locationTr": "Vice City",
+      "summaryTr": "Vice City’de kullanmak üzere eski araç geri alınır veya yeni bir araç kaydedilir."
+    }
+  ],
+  "join-a-street-race": [
+    {
+      "titleTr": "Sokak Yarışına Katıl",
+      "locationTr": "Vice City › Salton",
+      "summaryTr": "Salton’da Hit ‘n’ Run VC grubunun sokak yarışına katılınır. Yarıştan para kazanmak mümkündür."
+    }
+  ],
+  "send-money-to-lorena": [
+    {
+      "titleTr": "Lorena’ya Para Gönder",
+      "locationTr": "Anywhere",
+      "summaryTr": "Lucia, Lorena’ya ilk para transferini yapar."
+    }
+  ],
+  "encrypted-hard-drive": [
+    {
+      "titleTr": "Şifreli Sabit Disk",
+      "locationTr": "Vice City",
+      "summaryTr": "Cal diskin şifresini çözemeyince yardım için Brian’ın bağlantılarını beklemek gerekir."
+    }
+  ],
+  "buddy": [
+    {
+      "titleTr": "Dostum?",
+      "locationTr": "Kelly County · McKittrick Farm",
+      "summaryTr": "Kyle’dan alışılmadık bir mesaj gelince iyi olup olmadığını görmek için çiftliğine dönülür."
+    }
+  ],
+  "yasmanis-jewelry-jobs": [
+    {
+      "titleTr": "Yasmani’nin Kuyumcu İşleri",
+      "locationTr": "Vice City/Ocean Beach Banks",
+      "summaryTr": "Yasmani, Vice City çevresindeki kuyumcuları işaret eder. İşin sonunda mücevherleri kendisi satın alır."
+    }
+  ],
+  "bumper-to-bumper": [
+    {
+      "titleTr": "Tampon Tampona",
+      "locationTr": "Vice City › Little Cuba",
+      "summaryTr": "Yago yarışlarda akıl danışmak için Jason’ı Little Cuba’daki restoranına çağırır."
+    }
+  ],
+  "send-more-money-to-lorena": [
+    {
+      "titleTr": "Lorena’ya Biraz Daha Para Gönder",
+      "locationTr": "Anywhere",
+      "summaryTr": "Lorena’ya önceki ödemenin ardından bir transfer daha yapılır."
+    }
+  ],
+  "race-against-yago": [
+    {
+      "titleTr": "Yago’yla Yarış",
+      "locationTr": "Vice City › Salton",
+      "summaryTr": "Yago oyuncuyu yeni bir yarışa davet eder."
+    }
+  ],
+  "heist-planning": [
+    {
+      "titleTr": "Soygun Planlaması",
+      "locationTr": "Vice City",
+      "summaryTr": "Raul, Sinfrontera National Bank için ekibi toplar ve soygundan önce gereken hazırlıkları planlar."
+    }
+  ],
+  "mall-rats": [
+    {
+      "titleTr": "AVM Müdavimleri",
+      "locationTr": "Vice City › Ocean Beach",
+      "summaryTr": "Billy, yeni iş konuşmak üzere Ocean Beach’teki Malibu’nun arkasında buluşma ayarlar."
+    }
+  ],
+  "brother-to-brother": [
+    {
+      "titleTr": "Kardeş Kardeşe",
+      "locationTr": "Vice City › Little Cuba",
+      "summaryTr": "Yago restoranında bekler. Oyuncunun yerel bir satıcıyla yapılacak görüşmeye eşlik etmesini ister."
+    }
+  ],
+  "pool-day": [
+    {
+      "titleTr": "Havuz Günü",
+      "locationTr": "Vice Beach · Washington Beach",
+      "summaryTr": "Jason ve Lucia havuz kenarında vakit geçirir."
+    }
+  ],
+  "heavy-lifting": [
+    {
+      "titleTr": "Ağır İş",
+      "locationTr": "Vice City › Crosstown",
+      "summaryTr": "Jason ile Lucia, şifreli sabit diski Raul’a ulaştırmak için yola çıkar."
+    }
+  ],
+  "its-a-date": [
+    {
+      "titleTr": "Bu Bir Randevu!",
+      "locationTr": "Vice City",
+      "summaryTr": "Stockyard’daki Courtyard Bar’a dönüp birlikte vakit geçirme fırsatı."
+    }
+  ],
+  "pay-abes-fee": [
+    {
+      "titleTr": "Abe’nin Ücretini Öde",
+      "locationTr": "Vice City",
+      "summaryTr": "Abe Gonzalez yeni kimlikler için 75.000 dolar ister. Ödeme BuckMe üzerinden Lucretia Law Group’a gönderilir."
+    }
+  ],
+  "bad-driver": [
+    {
+      "titleTr": "Kötü Sürücü!",
+      "locationTr": "Lummox County · Millport",
+      "summaryTr": "Andrea, önceki işten çekilen Felipe’nin Millport’ta olduğunu öğrenip onunla ilgili bir iş verir."
+    }
+  ],
+  "attend-eddie-acostas-party": [
+    {
+      "titleTr": "Eddie Acosta’nın Partisine Katıl",
+      "locationTr": "Vice City · Ocean Beach · Y Hotel",
+      "summaryTr": "Kripto meraklısı Eddie Acosta, Heathcliff Heights’ta düzenlediği partiye davet eder."
+    }
+  ],
+  "drequans-gift": [
+    {
+      "titleTr": "Dre’Quan’ın Hediyesi",
+      "locationTr": "Vice City › La Perle",
+      "summaryTr": "Dre’Quan, çekimdeki yardım için La Perle’de alınabilecek bir hediye bırakır."
+    }
+  ],
+  "call-nate": [
+    {
+      "titleTr": "Nate’i Ara",
+      "locationTr": "Anywhere (via phone call)",
+      "summaryTr": "Nate aranarak birlikte zaman geçirmek için bir buluşma ayarlanır."
+    }
+  ],
+  "nate-will-be-in-touch": [
+    {
+      "titleTr": "Nate Haber Verecek",
+      "locationTr": "Anywhere (via Phone Call)",
+      "summaryTr": "Kordell’in ekibiyle bağlantı kurulduktan sonra sıradaki işi Nate haber verecektir."
+    }
+  ],
+  "childs-play": [
+    {
+      "titleTr": "Çocuk Oyuncağı",
+      "locationTr": "Vice City › Downtown",
+      "summaryTr": "Jason ve Lucia, kaçırılan Rafa’yı taş ocağı ve çimento tesisi çevresinde bulmak üzere Andrés’e yardım eder."
+    }
+  ],
+  "this-is-a-free-call-from": [
+    {
+      "titleTr": "Bu Ücretsiz Arama Şu Kişiden…",
+      "locationTr": "Vice-Dale County · Hamlet",
+      "summaryTr": "Lucia, hapisten çıkan arkadaşı Shayna’yı almaya gider."
+    }
+  ],
+  "heist-plans-in-place": [
+    {
+      "titleTr": "Soygun Planı Hazır",
+      "locationTr": "Anywhere (via Phone Call)",
+      "summaryTr": "Havaalanı işinin hazırlıkları tamamlanır. Başlama zamanını Nate ekibe bildirecektir."
+    }
+  ],
+  "tie-up-loose-ends": [
+    {
+      "titleTr": "Yarım Kalan İşleri Bitir",
+      "locationTr": "Anywhere",
+      "summaryTr": "Havaalanındaki işin ardından Jason ve Lucia, disk hakkında Raul’dan haber bekler."
+    }
+  ],
+  "thats-where-the-money-is": [
+    {
+      "titleTr": "Para Orada…",
+      "locationTr": "Vice Beach · Ocean Beach",
+      "summaryTr": "Yasmani bir banka işi için bilgi verir. Güvenlik minibüsünün izini sürmek üzere Cafe Orquidea’da beklenir."
+    }
+  ],
+  "call-valentina-back": [
+    {
+      "titleTr": "Valentina’yı Geri Ara",
+      "locationTr": "Anywhere",
+      "summaryTr": "Valentina, sabit diske ilişkin anlaşmayı görüşür. Telefonla aramak görüşmenin ilerlemesini sağlayabilir."
+    }
+  ],
+  "sunset": [
+    {
+      "titleTr": "Gün Batımı",
+      "locationTr": "Vice Beach · Washington Beach",
+      "summaryTr": "Jason ve Lucia, sabit disk anlaşmasıyla ilgili yanıt ararken otelde resepsiyona uğrar."
+    }
+  ],
+  "unfinished-business": [
+    {
+      "titleTr": "Bitmemiş İş",
+      "locationTr": "Vice City › Lucretia Law Firm (Abe Gonzalez)",
+      "summaryTr": "Disk anlaşması kapanmak üzeredir. İkili yarım kalan işleri tamamlayabilir veya Abe’nin teklifini kabul ederek ilerleyebilir."
+    }
+  ],
+  "search-for-the-skunk-ape": [
+    {
+      "titleTr": "Skunk Ape’i Ara",
+      "locationTr": "Any Skunk Ape flyer",
+      "summaryTr": "Bir ilanda Skunk Ape hakkında bilgi arandığı yazılıdır. Jason, Pelican River yakınındaki ilan sahibi Kirk’le görüşür."
+    }
+  ],
+  "search-for-tree-effigies": [
+    {
+      "titleTr": "Ağaç Figürlerini Ara",
+      "locationTr": "Mariana County · Pelican Valley",
+      "summaryTr": "Kirk’e yardım etmek için Pelican Valley’de ağaçlara oyulmuş figürlerin konumları toplanır."
+    }
+  ],
+  "help-kirk-find-mr-mangrove": [
+    {
+      "titleTr": "Bay Mangrove’u Bulması İçin Kirk’e Yardım Et",
+      "locationTr": "Mariana County · Cottonmouth Lake",
+      "summaryTr": "Kirk, gizemli Bay Mangrove’u aramak için Cottonmouth Lake yakınında buluşmak ister."
+    }
+  ],
+  "gellhorns-missing-tourists": [
+    {
+      "titleTr": "Gellhorn’un Kayıp Turistleri",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Port Gellhorn’da kaybolan turistlere ilişkin ipuçları araştırılır."
+    }
+  ],
+  "missing-person": [
+    {
+      "titleTr": "Kayıp Kişi",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "İhbar hattındaki kişi, kayıp turistler hakkında görüşmek için kupa odasını buluşma yeri olarak verir."
+    }
+  ],
+  "steal-vehicles-for-moses": [
+    {
+      "titleTr": "Moses İçin Araç Çal",
+      "locationTr": "Dependent on vehicle",
+      "summaryTr": "Moses farklı araçlardan oluşan bir liste verir. Futo, Hellion ve Bandito istenen modeller arasındadır."
+    }
+  ],
+  "collect-moses-gift": [
+    {
+      "titleTr": "Moses’ın Hediyesini Al",
+      "locationTr": "Kelly County · Port Gellhorn",
+      "summaryTr": "Moses, araçları getirdiğin için atölyesinde teslim edilecek bir ödül hazırlar."
+    }
+  ],
+  "the-impaler": [
+    {
+      "titleTr": "The Impaler",
+      "locationTr": "Kelly County · Ambrosia",
+      "summaryTr": "Billy ve Wyman, Ambrosia polis otoparkındaki Impaler için oyuncuya başvurur."
+    }
+  ],
+  "hometown-heroes": [
+    {
+      "titleTr": "Memleket Kahramanları",
+      "locationTr": "Kelly County · Thrillbilly Mud Club",
+      "summaryTr": "Billy yeni iş için ekibini çamur kulübünde toplar."
+    }
+  ],
+  "climbing-the-cellerichain": [
+    {
+      "titleTr": "Cellerichain’de Yükselmek",
+      "locationTr": "Leonard County · Belville · Andy’s house",
+      "summaryTr": "Andy, Cellerica teslimatlarına yardım istemek için yeni adresinde buluşur."
+    }
+  ],
+  "pay-the-cellerica-fee": [
+    {
+      "titleTr": "Cellerica Ücretini Öde",
+      "locationTr": "Anywhere via phone message from Andy",
+      "summaryTr": "Cellerica giriş ücreti BuckMe üzerinden Andy’ye gönderilir."
+    }
+  ],
+  "peach": [
+    {
+      "titleTr": "Şeftali!",
+      "locationTr": "Leonard County · Belville",
+      "summaryTr": "Cellerica’ya kabul etkinliğinden önce Andy’yle grubun kampüsünde görüşülür."
+    }
+  ],
+  "read-the-label": [
+    {
+      "titleTr": "Etiketi Oku",
+      "locationTr": "Vice City",
+      "summaryTr": "Cecilia, çalınan minibüsü bularak Cellerica’nın deposuna bırakmanı ister."
+    }
+  ],
+  "puff-puff-pass": [
+    {
+      "titleTr": "Çek ve Uzat",
+      "locationTr": "Leonard County · Cecilia’s Mansion",
+      "summaryTr": "Cecilia, çözülmesini istediği bir sorun için Paper Boys deposuna çağırır."
+    }
+  ],
+  "dale-mamba": [
+    {
+      "titleTr": "Dale Mamba",
+      "locationTr": "Vice Beach · Leaf Links",
+      "summaryTr": "Leaf Links’ten Randy aranır. Randy, aradığı Declasse Mamba GT’ye ilişkin bilgi verir."
+    }
+  ],
+  "mansion-thrax": [
+    {
+      "titleTr": "Malikanedeki Thrax",
+      "locationTr": "Vice Beach · Dalton Island",
+      "summaryTr": "Dalton Island Club’a varıldığında Randy, istediği Truffade Thrax’ın ayrıntılarını telefonda paylaşır."
+    }
+  ],
+  "collect-the-tempesta": [
+    {
+      "titleTr": "Tempesta’yı Al",
+      "locationTr": "Vice City › Balsero",
+      "summaryTr": "İhracat listesi tamamlanınca Randy, daha önce Raul için alınan Pegassi Tempesta’yı ödül olarak bırakır."
+    }
+  ],
+  "the-last-mile-passing-the-torch": [
+    {
+      "titleTr": "Son Kilometre: Bayrağı Devretmek",
+      "locationTr": "Leonard County · Sundown Private Airfield",
+      "summaryTr": "Sundown Private Airfield’da Pilot Pete’in uçağı alınır ve onun planladığı teslimatlara çıkılır."
+    }
+  ],
+  "the-last-mile-backseat-pilot": [
+    {
+      "titleTr": "Son Kilometre: Arka Koltuktaki Pilot",
+      "locationTr": "Kelly County · Wild Hog Airfield",
+      "summaryTr": "Pilot Pete’in yeni teslimatları Wild Hog Airfield’dan başlar."
+    }
+  ],
+  "petes-deliveries-southpoint-airfield": [
+    {
+      "titleTr": "Pete’in Teslimatları: Southpoint Havaalanı",
+      "locationTr": "Mariana County (Southport Airfield) & Kelly County (Avery Allen & Co.)",
+      "summaryTr": "Southpoint Airfield’dan Pilot Pete adına bir teslimat turu yapılır."
+    }
+  ],
+  "the-final-flush": [
+    {
+      "titleTr": "Son Sifon",
+      "locationTr": "Vice City › Tequesta",
+      "summaryTr": "No Flusher Movement’tan gelen yanıt, Vice City’deki Frank’s Waffles’a yönlendirir."
+    }
+  ],
+  "retest-freddies-defenses": [
+    {
+      "titleTr": "Freddie’nin Savunmasını Yeniden Sına",
+      "locationTr": "Leonard County · North Leonard County",
+      "summaryTr": "Freddie, yerleşkesindeki yeni savunmaları sınamak için geri gelmeni ister."
+    }
+  ],
+  "bring-out-the-chimp": [
+    {
+      "titleTr": "Şempanzeyi Çıkar",
+      "locationTr": "Vice City › Southside",
+      "summaryTr": "Dodos Rising’den Noah, şempanze tesisini kapatmak için nehir kenarında buluşur."
+    }
+  ],
+  "sisters-of-the-sea": [
+    {
+      "titleTr": "Denizin Kız Kardeşleri",
+      "locationTr": "Vice City › Catalan Key",
+      "summaryTr": "Rosebud, Vice City Oceanarium’daki orkayı serbest bırakmak için yardım ister."
+    }
+  ],
+  "scarlet-sun": [
+    {
+      "titleTr": "Kızıl Güneş",
+      "locationTr": "Lummox County · Grayson",
+      "summaryTr": "Medyum Scarlet yeni bir aura okuması için tekrar uğramayı önerir."
+    }
   ]
 }

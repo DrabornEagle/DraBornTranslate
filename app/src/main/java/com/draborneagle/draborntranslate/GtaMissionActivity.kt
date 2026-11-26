@@ -346,10 +346,17 @@ class GtaMissionDetailsActivity : Activity() {
     }
 
     private fun showInfo() {
-        body.addBelow(miamiSection("Genel bilgiler", mission.summary, Miami.pink).apply {
-            background = detailSurface(Miami.pink)
-            mission.location?.let { addBelow(copy(it, 14, Miami.aqua, true), 10) }
-        })
+        val summaryTexts = mission.conversationSummaries.mapTo(mutableSetOf()) { it.text }
+        val overview = mission.summary.takeUnless { it in summaryTexts }
+        val location = mission.location?.takeUnless { place ->
+            overview == null && mission.conversationSummaries.any { it.location == place }
+        }
+        if (overview != null || location != null) {
+            body.addBelow(miamiSection("Genel bilgiler", overview.orEmpty(), Miami.pink).apply {
+                background = detailSurface(Miami.pink)
+                location?.let { addBelow(copy(it, 14, Miami.aqua, true), 10) }
+            })
+        }
         if (mission.mapLabels.isNotEmpty()) {
             body.addBelow(miamiSection("Oyunda görünen adlar", mission.mapLabels.joinToString("\n"), Miami.coral), 8)
         }
@@ -358,16 +365,14 @@ class GtaMissionDetailsActivity : Activity() {
         if (mission.characters.isNotEmpty()) {
             body.addBelow(miamiSection("Görevde görülenler", mission.characters.joinToString(", "), Miami.lavender), 10)
         }
-        showSceneSummaries()
         val notes = rows.orEmpty().filter { it.type == GtaTextType.GUIDE && it.sceneId != null }.groupBy { it.sceneId }
         if (mission.scenes.isNotEmpty()) body.addBelow(copy("Görev aşamaları", 18, Palette.white, true).apply {
             isAccessibilityHeading = true
         }, 15)
         mission.scenes.forEachIndexed { index, scene ->
             val accent = if (index % 2 == 0) Miami.coral else Miami.aqua
-            val description = scene.context ?: notes[scene.id]?.firstNotNullOfOrNull { it.turkish }?.takeUnless {
-                it == mission.summary
-            }
+            val description = (scene.context ?: notes[scene.id]?.firstNotNullOfOrNull { it.turkish })
+                ?.takeUnless { it == mission.summary || it in summaryTexts }
             body.addBelow(row().apply {
                 background = detailSurface(accent)
                 setPadding(dp(13), dp(12), dp(15), dp(12))
@@ -380,6 +385,7 @@ class GtaMissionDetailsActivity : Activity() {
                 }, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
             }, 8)
         }
+        showSceneSummaries()
         mission.prerequisites.mapNotNull(catalog::mission).distinctBy { it.id }.forEach { previous ->
             body.addBelow(prerequisite(previous), 10)
         }

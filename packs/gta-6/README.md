@@ -2,7 +2,7 @@
 
 **Oyun Paketleri → GTA 6 paketini indir** GitHub’daki manifesti ve ZIP’i indirir. Uygulamayla gelen görev kataloğu çevrimdışı arama için de kullanılabilir. **Görev Ara** Türkçe ve İngilizce başlıkları, oyunda görünen başlıkları ve teknik kodları eşleştirir.
 
-2026.11.26.5 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** Türkçe sahne özetlerini, konumları ve mevcut kareleri gösterir. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
+2026.11.26.6 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** bölümünde aşamalar, sahne özetlerinin üstünde yer alır. Aramada açılan 197 görev kartının 195’inde toplam 311 Türkçe sahne özeti bulunur. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
 
 **Konuşmalar** etkin paketteki `dialogue` kayıtlarını konuşmacı ve sahne bilgisiyle satır satır gösterir. Hazır görev paketinde replik kaydı bulunmuyor. **Hedefler/Kaynaklar** görev hedefleri ve rehber bağlantılarını içerir.
 
