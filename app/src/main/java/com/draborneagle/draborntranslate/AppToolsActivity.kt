@@ -75,6 +75,7 @@ class GamePacksActivity : Activity() {
     private lateinit var download: Button
     private lateinit var liveDownload: Button
     private lateinit var missionImport: Button
+    private lateinit var dialogueImport: Button
     private lateinit var dialogueConnect: Button
     private lateinit var imported: Button
     private lateinit var manage: Button
@@ -103,11 +104,13 @@ class GamePacksActivity : Activity() {
         }, 8)
         missionImport = press("Görev paketi seç (.zip)") { chooseFile(MISSION_IMPORT, "application/zip") }
         missions.addBelow(missionImport, 8)
+        dialogueImport = press("Replik paketi seç (.zip)") { chooseFile(DIALOGUE_IMPORT, "application/zip") }
+        missions.addBelow(dialogueImport, 8)
         dialogueConnect = press("Replik paketi bağla") { showDialogueSource() }
         missions.addBelow(dialogueConnect, 8)
         content.addBelow(missions, 14)
         val subtitles = miamiPanel(Miami.aqua)
-        subtitles.addView(copy("Canlı altyazı", 19, Palette.white, true).apply { isAccessibilityHeading = true })
+        subtitles.addView(copy("Türkçe altyazı", 19, Palette.white, true).apply { isAccessibilityHeading = true })
         liveDownload = press("GTA 6 altyazı paketini indir", Miami.aqua) {
             perform { app ->
                 val title = ImportedGamePack.downloadGta(app) ?: throw IOException("Altyazı paketi indirilemedi.")
@@ -116,7 +119,7 @@ class GamePacksActivity : Activity() {
             }
         }
         subtitles.addBelow(liveDownload, 10)
-        imported = press("Altyazı paketi seç (.json veya .json.gz)") { chooseFile(SUBTITLE_IMPORT, "*/*") }
+        imported = press("Altyazı paketi seç (.gz veya .json)") { chooseFile(SUBTITLE_IMPORT, "*/*") }
         subtitles.addBelow(imported, 8)
         content.addBelow(subtitles, 12)
         manage = press("Yüklü paketleri yönet") { managePacks() }
@@ -165,7 +168,7 @@ class GamePacksActivity : Activity() {
             dialog.dismiss()
             perform { app ->
                 val coverage = GtaMissionStore.connectDialogue(app, source.toString())
-                "Replik paketi hazır · ${coverage.missions} görev · ${coverage.lines} replik"
+                dialogueStatus(coverage)
             }
         }
     }
@@ -173,6 +176,9 @@ class GamePacksActivity : Activity() {
     private fun missionStatus(catalog: GtaMissionCatalog): String {
         return "GitHub paketi hazır · ${catalog.missions.size} görev"
     }
+
+    private fun dialogueStatus(coverage: GtaDialoguePackCoverage) =
+        "Replik paketi hazır · ${coverage.missions} görev · ${coverage.lines} replik kaydı"
 
     private fun render(message: String? = null) {
         val downloaded = GtaMissionStore.hasDownload(this)
@@ -182,10 +188,13 @@ class GamePacksActivity : Activity() {
             downloaded -> "GitHub görev paketi çevrimdışı kullanıma hazır."
             else -> "Uygulamaya dâhil görev rehberi çevrimdışı hazır."
         }
-        listOf(download, liveDownload, missionImport, dialogueConnect, imported, manage).forEach { it.isEnabled = !busy }
+        listOf(download, liveDownload, missionImport, dialogueImport, dialogueConnect, imported, manage)
+            .forEach { it.isEnabled = !busy }
         download.text = if (downloaded) "GitHub’daki görev paketini güncelle" else "GTA 6 paketini indir"
         dialogueConnect.text = if (GtaMissionStore.dialogueSource(this) == null) "Replik paketi bağla" else "Replik paketini güncelle"
-        liveDownload.text = if (ImportedGamePack.hasGta(this)) "Altyazı paketi güncellemesini denetle" else "GTA 6 altyazı paketini indir"
+        liveDownload.text = if (ImportedGamePack.hasGtaDownload(this)) {
+            "Altyazı paketi güncellemesini denetle"
+        } else "GTA 6 altyazı paketini indir"
     }
 
     private fun perform(operation: (Context) -> String) {
@@ -213,9 +222,15 @@ class GamePacksActivity : Activity() {
                 add("Özel görev paketi" to { app -> GtaMissionStore.remove(app, local = true) })
             }
             if (GtaMissionStore.dialogueSource(this@GamePacksActivity) != null) {
-                add("Görev replik paketi" to GtaMissionStore::removeDialogue)
+                add("GitHub replik paketi" to GtaMissionStore::removeDialogue)
             }
-            if (ImportedGamePack.hasGta(this@GamePacksActivity)) add("GTA 6 altyazı paketi" to { app ->
+            if (GtaMissionStore.hasLocalDialogue(this@GamePacksActivity)) {
+                add("Yerel görev replik paketi" to GtaMissionStore::removeLocalDialogue)
+            }
+            if (ImportedGamePack.hasLocalGta(this@GamePacksActivity)) {
+                add("Yerel GTA 6 altyazı paketi" to ImportedGamePack::removeLocalGta)
+            }
+            if (ImportedGamePack.hasGtaDownload(this@GamePacksActivity)) add("İndirilen GTA 6 altyazı paketi" to { app ->
                 ImportedGamePack.remove(app, gta = true)
                 preferences.edit().remove("gtaPackTitle").apply()
             })
@@ -250,8 +265,11 @@ class GamePacksActivity : Activity() {
         val uri = data?.data ?: return
         when (code) {
             MISSION_IMPORT -> perform { app -> missionStatus(GtaMissionStore.installLocal(app, uri)) }
+            DIALOGUE_IMPORT -> perform { app -> dialogueStatus(GtaMissionStore.installLocalDialogue(app, uri)) }
             SUBTITLE_IMPORT -> perform { app ->
-                ImportedGamePack.install(app, uri).also { title -> preferences.edit().putString("packTitle", title).apply() }
+                val installed = ImportedGamePack.install(app, uri)
+                if (!installed.gta) preferences.edit().putString("packTitle", installed.title).apply()
+                "${installed.title} · Paket hazır"
             }
         }
     }
@@ -264,5 +282,6 @@ class GamePacksActivity : Activity() {
     private companion object {
         const val SUBTITLE_IMPORT = 28
         const val MISSION_IMPORT = 29
+        const val DIALOGUE_IMPORT = 30
     }
 }

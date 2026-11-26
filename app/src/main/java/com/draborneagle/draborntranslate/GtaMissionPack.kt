@@ -147,12 +147,30 @@ internal data class GtaMissionText(
     val context: String?,
     val startMs: Long?,
     val endMs: Long?,
+    val subtitleKey: Long? = null,
 )
 
 internal data class GtaMissionDialogue(val scenes: List<GtaMissionScene>, val lines: List<GtaMissionText>) {
     fun inSceneOrder(): List<GtaMissionText> {
         val byScene = lines.groupBy { it.sceneId }
-        return scenes.flatMap { byScene[it.id].orEmpty() } + byScene[null].orEmpty()
+        return scenes.flatMap { byScene[it.id].orEmpty() }.filter { it.turkish != null || it.english != null }
+    }
+
+    fun resolveSubtitles(find: (Set<Long>) -> Map<Long, String>): GtaMissionDialogue {
+        val keys = lines.filter { it.turkish == null }.mapNotNullTo(mutableSetOf()) { it.subtitleKey }
+        if (keys.isEmpty()) return this
+        val translations = find(keys)
+        return copy(lines = lines.map { line ->
+            val translation = line.subtitleKey?.let(translations::get)
+            if (line.turkish == null && translation != null) line.copy(turkish = translation) else line
+        })
+    }
+
+    companion object {
+        fun fromTexts(scenes: List<GtaMissionScene>, texts: List<GtaMissionText>): GtaMissionDialogue? {
+            val spoken = texts.filter { it.type == GtaTextType.DIALOGUE && it.sceneId != null && it.speaker != null }
+            return if (spoken.isEmpty()) null else GtaMissionDialogue(scenes, spoken)
+        }
     }
 }
 
@@ -216,9 +234,9 @@ internal object GtaMissionPack {
     }
 
     fun dialogue(file: File, missionId: String): GtaMissionDialogue? = read(file) { zip ->
-        val mission = catalog(zip).mission(missionId)?.takeIf { it.id == missionId } ?: return@read null
-        val lines = texts(zip, mission).filter { it.type == GtaTextType.DIALOGUE }
-        if (lines.isEmpty()) null else GtaMissionDialogue(mission.scenes, lines)
+        val mission = catalog(zip).mission(missionId)?.takeIf { it.id == missionId && it.searchTarget == null }
+            ?: return@read null
+        GtaMissionDialogue.fromTexts(mission.scenes, texts(zip, mission))
     }
 
     private fun catalog(zip: ZipFile): GtaMissionCatalog {
@@ -307,9 +325,13 @@ internal object GtaMissionPack {
             checkPack(end == null || (start != null && end >= start))
             val turkish = data.text("tr")
             val english = data.text("en")
-            checkPack(turkish != null || english != null)
-            GtaMissionText(type, turkish, english, sceneId, data.text("speaker"),
-                data.text("contextTr"), start, end)
+            val speaker = data.text("speaker")
+            val subtitleKey = if (data.has("subtitleKey")) {
+                checkPack(type == GtaTextType.DIALOGUE && sceneId != null && speaker != null)
+                PackKey.number(data.requiredText("subtitleKey")) ?: invalid()
+            } else null
+            checkPack(turkish != null || english != null || subtitleKey != null)
+            GtaMissionText(type, turkish, english, sceneId, speaker, data.text("contextTr"), start, end, subtitleKey)
         }
     }
 

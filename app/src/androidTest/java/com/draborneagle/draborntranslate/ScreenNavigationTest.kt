@@ -29,8 +29,10 @@ import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.gametranslator.gametranslator_mobile.ConsoleStudioActivity
 import com.gametranslator.gametranslator_mobile.Store
+import com.gametranslator.gametranslator_mobile.core.PackKey
 import java.io.File
 import java.security.MessageDigest
+import java.util.zip.GZIPOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
@@ -158,12 +160,80 @@ class ScreenNavigationTest {
         }
     }
 
+    @Test
+    fun localSubtitleGzipSuppliesOnlyTheSelectedMissionsIndexedLines() {
+        val guide = File(app.filesDir, "gta-6-missions-local.zip")
+        val subtitles = File(app.filesDir, "gta-6-local.json.gz")
+        val dialogue = File(app.filesDir, "gta-6-dialogue-local.zip")
+        val backups = listOf(guide, subtitles, dialogue).associateWith { file -> file.takeIf(File::isFile)?.readBytes() }
+        val gzip = File(app.cacheDir, "indexed-subtitles.gz")
+        val zip = File(app.cacheDir, "indexed-dialogue.zip")
+        val reply = checkNotNull(PackKey.key("Meet me by the lift."))
+        val answer = checkNotNull(PackKey.key("I am on my way."))
+        val unrelated = checkNotNull(PackKey.key("Save your game."))
+        try {
+            writeDialogueFixture(guide, "base", "entrance", "Giriş", """
+                [{"type":"objective","sceneId":"entrance","tr":"Girişe git."}]
+            """.trimIndent())
+            GZIPOutputStream(gzip.outputStream()).bufferedWriter().use {
+                it.write("""
+                    {"format":2,"id":"gta-6","lang":"tr","title":"Deneme altyazıları",
+                    "entries":{"$reply":"<b>Asansörün yanında buluşalım.</>","$unrelated":"Oyunu kaydet."},
+                    "segments":{"$reply":"Önceliği düşük karşılık.","$answer":"Yoldayım."}}
+                """.trimIndent())
+            }
+            val installed = ImportedGamePack.install(app, Uri.fromFile(gzip))
+            assertTrue(installed.gta)
+            assertTrue(ImportedGamePack.hasGta(app))
+            assertEquals("Asansörün yanında buluşalım.",
+                ImportedGamePack.library(app, GameReadingProfile.GTA_6).find("Meet me by the lift."))
+            val indexCatalog = """
+                {"format":1,"version":"indexed","gameBuild":"Test","missions":[
+                 {"id":"dialogue-test","titleTr":"Deneme görevi","type":"story","summaryTr":"Buluşma.",
+                  "textCount":3,"scenes":[{"id":"lobby","titleTr":"Holde buluşma","environmentTr":"Apartman girişi"},
+                  {"id":"lift","titleTr":"Asansöre geçiş"}]}]}
+            """.trimIndent()
+            writeMissionFixture(zip, indexCatalog, """
+                [{"type":"dialogue","sceneId":"lift","speaker":"Ece","subtitleKey":"$answer"},
+                 {"type":"dialogue","sceneId":"lobby","speaker":"Deniz","subtitleKey":"$reply",
+                  "contextTr":"Replik açıklaması"},
+                 {"type":"dialogue","sceneId":"lobby","speaker":"Eşleşmeyen","subtitleKey":"0000000000000000"}]
+            """.trimIndent())
+            assertEquals(GtaDialoguePackCoverage("indexed", 1, 3), GtaMissionStore.installLocalDialogue(app, Uri.fromFile(zip)))
+            ActivityScenario.launch<GtaMissionDetailsActivity>(Intent(app, GtaMissionDetailsActivity::class.java)
+                .putExtra("mission", "dialogue-test")).use {
+                waitFor { hasText("Deneme görevi") && hasText("Görev metinleri") }
+                click("Görev metinleri")
+                val readingOrder = listOf("Holde buluşma", "Deniz", "Asansörün yanında buluşalım.",
+                    "Asansöre geçiş", "Ece", "Yoldayım.")
+                waitFor { readingOrder.all(::hasText) && hasText("Apartman girişi") }
+                assertReadingOrder(readingOrder)
+                listOf("Girişe git.", "Replik açıklaması", "Eşleşmeyen", "Oyunu kaydet.",
+                    "Önceliği düşük karşılık.", "Görevin diyalog arşivini aç").forEach { item ->
+                    assertFalse(item, hasText(item))
+                }
+                click("Hedefler/Kaynaklar")
+                waitFor { hasText("Girişe git.") }
+                assertFalse(hasText("Yoldayım."))
+            }
+        } finally {
+            gzip.delete()
+            zip.delete()
+            ImportedGamePack.removeLocalGta(app)
+            backups.forEach { (file, data) -> if (data == null) file.delete() else file.writeBytes(data) }
+        }
+    }
+
     private fun writeDialogueFixture(file: File, version: String, sceneId: String, sceneTitle: String, lines: String) {
         val catalog = """
             {"format":1,"version":"$version","gameBuild":"Test",
              "missions":[{"id":"dialogue-test","titleTr":"Deneme görevi","type":"story","summaryTr":"Bir buluşma.",
              "textCount":1,"scenes":[{"id":"$sceneId","titleTr":"$sceneTitle"}]}]}
         """.trimIndent()
+        writeMissionFixture(file, catalog, lines)
+    }
+
+    private fun writeMissionFixture(file: File, catalog: String, lines: String) {
         ZipOutputStream(file.outputStream()).use { zip ->
             for ((name, text) in mapOf("catalog.json" to catalog, "texts/dialogue-test.json" to lines)) {
                 zip.putNextEntry(ZipEntry(name))

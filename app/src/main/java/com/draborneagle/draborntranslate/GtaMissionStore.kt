@@ -28,6 +28,7 @@ internal object GtaMissionStore {
     fun installed(context: Context): Boolean = hasDownload(context) || hasLocal(context)
     fun hasDownload(context: Context): Boolean = destination(context, local = false).isFile
     fun hasLocal(context: Context): Boolean = destination(context, local = true).isFile
+    fun hasLocalDialogue(context: Context): Boolean = localDialogueFile(context).isFile
 
     fun catalog(context: Context): GtaMissionCatalog? = synchronized(lock) {
         activeFile(context)?.let(GtaMissionPack::catalog)
@@ -48,9 +49,23 @@ internal object GtaMissionStore {
     fun dialogueSource(context: Context): String? = dialoguePreferences(context).getString(DIALOGUE_MANIFEST, null)
 
     fun dialogue(context: Context, missionId: String): GtaMissionDialogue? {
+        val local = localDialogueFile(context)
+        if (local.isFile) GtaMissionPack.dialogue(local, missionId)?.let { return it }
         val source = dialogueSource(context) ?: return null
         val file = dialogueFile(context, source)
         return if (file.isFile) GtaMissionPack.dialogue(file, missionId) else null
+    }
+
+    fun installLocalDialogue(context: Context, uri: Uri): GtaDialoguePackCoverage = synchronized(dialogueLock) {
+        val missionIds = dialogueMissionIds(context)
+        stageImport(context, uri, localDialogueFile(context)) { file ->
+            GtaMissionPack.validateDialogue(file, missionIds)
+        }
+    }
+
+    fun removeLocalDialogue(context: Context) = synchronized(dialogueLock) {
+        Files.deleteIfExists(localDialogueFile(context).toPath())
+        Unit
     }
 
     fun connectDialogue(context: Context, address: String): GtaDialoguePackCoverage = synchronized(dialogueLock) {
@@ -69,15 +84,16 @@ internal object GtaMissionStore {
         result
     }
 
-    fun refreshDialogue(context: Context) {
-        synchronized(dialogueLock) {
-            val source = dialogueSource(context)?.let(::githubDialogueManifest) ?: return
-            val preferences = dialoguePreferences(context)
-            val now = System.currentTimeMillis()
-            if (now - preferences.getLong(DIALOGUE_LAST_CHECK, 0L) in 0L until DIALOGUE_CHECK_INTERVAL) return
-            preferences.edit().putLong(DIALOGUE_LAST_CHECK, now).apply()
-            downloadDialogue(context, source)
+    fun refreshDialogue(context: Context): Boolean = synchronized(dialogueLock) {
+        val source = dialogueSource(context)?.let(::githubDialogueManifest) ?: return@synchronized false
+        val preferences = dialoguePreferences(context)
+        val now = System.currentTimeMillis()
+        if (now - preferences.getLong(DIALOGUE_LAST_CHECK, 0L) in 0L until DIALOGUE_CHECK_INTERVAL) {
+            return@synchronized false
         }
+        preferences.edit().putLong(DIALOGUE_LAST_CHECK, now).apply()
+        downloadDialogue(context, source)
+        true
     }
 
     fun removeDialogue(context: Context) = synchronized(dialogueLock) {
@@ -88,13 +104,16 @@ internal object GtaMissionStore {
     }
 
     private fun downloadDialogue(context: Context, source: URI): GtaDialoguePackCoverage {
-        val missionIds = catalog(context)?.search("")?.mapTo(mutableSetOf()) { it.id }
-            ?: throw IOException("Görev kataloğu açılamadı.")
+        val missionIds = dialogueMissionIds(context)
         return downloadPublishedPack(source, dialogueFile(context, source.toString()),
             GtaDialoguePackCoverage::version) { file, _ ->
             GtaMissionPack.validateDialogue(file, missionIds)
         }
     }
+
+    private fun dialogueMissionIds(context: Context): Set<String> =
+        catalog(context)?.missions?.filter { it.searchTarget == null }?.mapTo(mutableSetOf()) { it.id }
+            ?: throw IOException("Görev kataloğu açılamadı.")
 
     private fun <T> downloadPublishedPack(
         source: URI,
@@ -129,12 +148,17 @@ internal object GtaMissionStore {
     }
 
     fun installLocal(context: Context, uri: Uri): GtaMissionCatalog = synchronized(lock) {
-        stage(destination(context, local = true)) { temp ->
-            val input = context.contentResolver.openInputStream(uri) ?: throw IOException("Görev paketi açılamadı.")
-            input.use { source -> temp.outputStream().use { copyLimited(source, it, GtaMissionPack.MAX_ARCHIVE_BYTES) } }
-            GtaMissionPack.validate(temp)
-        }
+        stageImport(context, uri, destination(context, local = true), GtaMissionPack::validate)
     }
+
+    private fun <T> stageImport(context: Context, uri: Uri, destination: File, validate: (File) -> T): T =
+        stage(destination) { pending ->
+            val input = context.contentResolver.openInputStream(uri) ?: throw IOException("Görev paketi açılamadı.")
+            input.use { source ->
+                pending.outputStream().use { copyLimited(source, it, GtaMissionPack.MAX_ARCHIVE_BYTES) }
+            }
+            validate(pending)
+        }
 
     fun remove(context: Context, local: Boolean) {
         synchronized(lock) { Files.deleteIfExists(destination(context, local).toPath()) }
@@ -194,6 +218,8 @@ internal object GtaMissionStore {
 
     private fun dialoguePreferences(context: Context) =
         context.getSharedPreferences("gta_mission_dialogue", Context.MODE_PRIVATE)
+
+    private fun localDialogueFile(context: Context) = File(context.filesDir, "gta-6-dialogue-local.zip")
 
     private fun dialogueFile(context: Context, source: String): File {
         val digest = MessageDigest.getInstance("SHA-256").digest(source.toByteArray(Charsets.UTF_8))

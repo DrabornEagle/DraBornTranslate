@@ -101,6 +101,41 @@ class GtaMissionPackTest {
     }
 
     @Test
+    fun indexedDialogueKeepsRepeatedKeysInTheirScenesAndHidesUnmatchedRows() {
+        val entry = mission().put("textCount", 4)
+        entry.getJSONArray("scenes").put(JSONObject("""{"id":"exit","titleTr":"Çıkış"}"""))
+        val rows = JSONArray("""
+            [{"type":"dialogue","subtitleKey":"FFFFFFFFFFFFFFFF","sceneId":"exit","speaker":"Deniz"},
+             {"type":"dialogue","subtitleKey":"0000000000000002","sceneId":"arrival","speaker":"Mert"},
+             {"type":"dialogue","subtitleKey":"ffffffffffffffff","sceneId":"arrival","speaker":"Ece"},
+             {"type":"dialogue","subtitleKey":"0000000000000003","sceneId":"exit","speaker":"Ece","tr":"Görüşürüz."}]
+        """.trimIndent())
+        val file = archive(entry = entry, rows = rows)
+        assertEquals(GtaDialoguePackCoverage("test", 1, 4), GtaMissionPack.validateDialogue(file, setOf("launch")))
+        val transcript = checkNotNull(GtaMissionPack.dialogue(file, "launch"))
+        val resolved = transcript.resolveSubtitles { keys ->
+            assertEquals(setOf(-1L, 2L), keys)
+            mapOf(-1L to "Buradayım.")
+        }.inSceneOrder()
+        assertEquals(listOf("arrival", "exit", "exit"), resolved.map { it.sceneId })
+        assertEquals(listOf("Ece", "Deniz", "Ece"), resolved.map { it.speaker })
+        assertEquals(listOf("Buradayım.", "Buradayım.", "Görüşürüz."), resolved.map { it.turkish })
+    }
+
+    @Test
+    fun subtitleKeysRequireAValidDialogueSceneAndSpeaker() {
+        listOf<(JSONObject) -> Unit>(
+            { it.put("subtitleKey", "short") },
+            { it.remove("speaker") },
+            { it.put("sceneId", "unknown") },
+            { it.put("type", "objective") },
+        ).forEach { change ->
+            val rows = texts().also { change(it.getJSONObject(1).put("subtitleKey", "0123456789abcdef")) }
+            assertThrows(IOException::class.java) { GtaMissionPack.validate(archive(rows = rows)) }
+        }
+    }
+
+    @Test
     fun onlyGitHubManifestFileUrlsResolveToPublishedPackRequests() {
         val raw = "https://raw.githubusercontent.com/example/mission-pack/main/tr/manifest.json"
         assertEquals(raw, githubDialogueManifest(raw)?.toString())
