@@ -106,7 +106,7 @@ class ScreenNavigationTest {
             onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Gone Fishing") }
             waitFor {
                 hasText("Gone Fishing") && resumed()?.window?.decorView?.findChild {
-                    it is MissionImageView && it.contentDescription == "Cal Hampton profil resmi"
+                    it is ImageView && it.contentDescription == "Cal Hampton profil resmi"
                 } != null
             }
             screenshot("06-gorev-ara")

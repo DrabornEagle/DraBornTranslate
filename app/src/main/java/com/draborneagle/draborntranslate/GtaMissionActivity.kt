@@ -42,7 +42,7 @@ private fun Context.missionAvatar(giver: String?, portrait: GtaMissionImage?, si
     val placeholder = glyph(R.drawable.ic_mission_character, Miami.aqua)
     addView(placeholder, FrameLayout.LayoutParams(dp(size / 2), dp(size / 2), Gravity.CENTER))
     if (portrait != null) {
-        addView(MissionImageView(context, portrait, 240) { placeholder.visibility = View.INVISIBLE }.apply {
+        addView(context.missionImageView(portrait, 240) { placeholder.visibility = View.INVISIBLE }.apply {
             contentDescription = "$giver profil resmi"
         }, FrameLayout.LayoutParams(-1, -1))
     }
@@ -268,7 +268,7 @@ class GtaMissionDetailsActivity : Activity() {
         }
         addView(base, FrameLayout.LayoutParams(-1, dp(height), Gravity.TOP))
         mission.previews.firstOrNull()?.let { photo ->
-            addView(MissionImageView(context, photo, 800).apply {
+            addView(context.missionImageView(photo, 800).apply {
                 importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
             }, FrameLayout.LayoutParams(-1, dp(height), Gravity.TOP))
         }
@@ -386,7 +386,7 @@ class GtaMissionDetailsActivity : Activity() {
                             clipToOutline = true
                             val placeholder = glyph(R.drawable.ic_capture_album, Miami.lavender)
                             addView(placeholder, FrameLayout.LayoutParams(dp(27), dp(27), Gravity.CENTER))
-                            addView(MissionImageView(context, photo, 580) { placeholder.visibility = View.INVISIBLE },
+                            addView(context.missionImageView(photo, 580) { placeholder.visibility = View.INVISIBLE },
                                 FrameLayout.LayoutParams(-1, -1))
                         }, LinearLayout.LayoutParams(-1, dp(if (width == 264) 145 else 108)))
                         photo.caption?.let { addBelow(copy(it, 12, Palette.quiet), 4) }

@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.Looper
 import android.util.LruCache
+import android.view.View
 import android.widget.ImageView
 import java.net.URI
 import java.util.concurrent.Executors
@@ -85,19 +86,18 @@ internal object MissionImages {
     private const val MAX_BYTES = 2 * 1024 * 1024
 }
 
-internal class MissionImageView(
-    context: Context,
-    private val source: GtaMissionImage,
-    private val maxSize: Int,
-    private val onLoaded: (() -> Unit)? = null,
-) : ImageView(context) {
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        MissionImages.load(source, maxSize) { bitmap ->
-            if (!isAttachedToWindow || bitmap == null) return@load
-            setImageBitmap(bitmap)
-            scaleType = ScaleType.CENTER_CROP
-            onLoaded?.invoke()
-        }
+internal fun Context.missionImageView(source: GtaMissionImage, maxSize: Int, onLoaded: (() -> Unit)? = null) =
+    ImageView(this).also { image ->
+        image.scaleType = ImageView.ScaleType.CENTER_CROP
+        image.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) {
+                MissionImages.load(source, maxSize) { bitmap ->
+                    if (!image.isAttachedToWindow || bitmap == null) return@load
+                    image.setImageBitmap(bitmap)
+                    onLoaded?.invoke()
+                }
+            }
+
+            override fun onViewDetachedFromWindow(view: View) = Unit
+        })
     }
-}
