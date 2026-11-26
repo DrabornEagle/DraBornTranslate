@@ -403,7 +403,11 @@ class MainActivity : Activity() {
             else -> "Oyun profili · ${config.gameProfile.label}"
         }
         packButton.isEnabled = controlsAvailable && demoTranslator == null
-        packButton.text = if (ImportedGamePack.hasGta(this)) "GTA 6 Türkçe paketi hazır" else "Oyun paketleri"
+        packButton.text = when {
+            GtaMissionStore.installed(this) -> "GTA 6 görev paketi hazır"
+            ImportedGamePack.hasGta(this) -> "GTA 6 altyazı paketi hazır"
+            else -> "Oyun paketleri"
+        }
         bandSettings.visibility = if (config.captionEnabled && config.readingArea == ReadingArea.SUBTITLES && !config.gtaProfileActive)
             View.VISIBLE else View.GONE
         voiceButton.visibility = if (config.speakOnPhone) View.VISIBLE else View.GONE
@@ -502,12 +506,14 @@ class MainActivity : Activity() {
                     dialog.dismiss()
                     selectGameProfile()
                 }, 8)
-                if (!ImportedGamePack.hasGta(this@MainActivity)) {
-                    append(button("GTA 6 Türkçe paketini aç") {
-                        dialog.dismiss()
-                        startActivity(Intent(this@MainActivity, GamePacksActivity::class.java))
-                    }, 8)
-                }
+                append(button("Görev ara") {
+                    dialog.dismiss()
+                    startActivity(Intent(this@MainActivity, GtaMissionSearchActivity::class.java))
+                }, 8)
+                append(button("GTA 6 paketini aç") {
+                    dialog.dismiss()
+                    startActivity(Intent(this@MainActivity, GamePacksActivity::class.java))
+                }, 8)
             }
         }
     }

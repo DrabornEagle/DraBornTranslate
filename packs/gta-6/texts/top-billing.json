@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Real Dimez için kulübe gidilir. DWNPLY sahneye karışınca Roxy gösteriyi bırakır.",
+    "sceneId": "club"
+  },
+  {
+    "type": "guide",
+    "tr": "Ekip, Roxy’yle konuşmak için gittiği ev partisinde yeniden bir araya gelir.",
+    "sceneId": "house-party"
+  }
+]

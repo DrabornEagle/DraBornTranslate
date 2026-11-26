@@ -109,8 +109,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   /// Sürüm duyurusu: ana ekran ilk açıldığında bir kez; yalnız çeviri dili Türkçe olana (GTA 6 paketi Türkçedir).
-  /// Gösterilmeden önce görüldü sayılır. Yeni duyuru için kimlik değişir (Windows ve Mac'teki ReleaseNotice ile aynı).
-  static const noticeId = '2026-11-paket-sunucusu';
+  /// Yeni bir duyuru için kimliği değiştir.
+  static const noticeId = '2026-11-gta6-gorev-arama';
   bool noticeOffered = false;
 
   Future<void> offerNotice(AppSettings loaded) async {
@@ -362,6 +362,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               title: 'Oyun paketleri',
               chevron: true,
               onTap: () => Bridge.openTool('packs'),
+            ),
+            Cell(
+              icon: CupertinoIcons.search,
+              iconColor: Tokens.purple,
+              title: t('home.missions.title'),
+              chevron: true,
+              onTap: () => Bridge.openTool('missions'),
             ),
             Cell(
               key: const ValueKey('home-history'),

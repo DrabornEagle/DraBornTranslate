@@ -14,7 +14,13 @@
 
 **Portal’a bağlan → Oyun profili → GTA 6** yoluyla altyazı, görev, ipucu, mesaj bildirimi ve oyun içi telefon alanlarını otomatik seç. Telefon paneli için sohbet balonlarını veya sade görünümü seçebilirsin. Çevirileri Portal panelinde de görmek için **Telefon ve Portal paneli** çıkışını seç.
 
-GTA 6 paketi ilk altyazıdan itibaren önceliklidir. Aynı repliğin bozuk okunan bir karesi pakette bulunamadığında ekrandaki doğru çeviri korunur.
+GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repliğin bozuk okunan bir karesi pakette bulunamadığında ekrandaki doğru çeviri korunur.
+
+## GTA 6 görev araması · v0.6.1
+
+**Oyun paketleri → GTA 6 paketini indir** ile görev kataloğunu GitHub’dan yükle. **Görev ara** bölümünde Türkçe veya İngilizce görev adını yaz. **Görev bilgileri** özet, karakterler ve bilinen sahne ortamlarını gösterir. **Görev metinleri** paketteki Türkçe kayıtları ve mevcut kaynak bağlantılarını açar.
+
+**Attend the Launch Party** veya **Attent the Launch Party** araması Papa Audacity’nin **The Audacity** yan görevini bulur. [Paket içeriği ve kaynaklar](packs/gta-6/README.md)
 
 ## Uygulamadan · v0.5.5
 
@@ -37,7 +43,7 @@ GTA 6 paketi ilk altyazıdan itibaren önceliklidir. Aynı repliğin bozuk okuna
 | PlayStation Portal | **Portal’a bağlan** | PlayStation App yayını, telefon ya da desteklenen Portal yan paneli |
 | Telefondaki PS Remote Play | **Telefonda oyna** | Oyun görüntüsünün üzerinde altyazı |
 
-- **Canlı altyazı** oyun metnini telefonda okur ve Türkçeye çevirir. **Oyun paketleri → Türkçe paketi indir** yoluyla GTA 6 paketini ekleyebilirsin. Pakete uyan satırlar yerel tablodan, diğer metinler cihazdaki Töz-Çevir modelinden gelir.
+- **Canlı altyazı** oyun metnini telefonda okur ve Türkçeye çevirir. **Oyun paketleri → GTA 6 altyazı paketini indir** yoluyla GTA 6 canlı altyazı paketini ekleyebilirsin. Pakete uyan satırlar yerel tablodan, diğer metinler cihazdaki Töz-Çevir modelinden gelir.
 - **Görsel Çeviri** görüntüde seçtiğin alanın Türkçesini kareye yerleştirir. Kareyi tam ekranda yakınlaştırabilir ve orijinal görüntüye geçebilirsin.
 - **Güncel oyun karesini al** açık oturumdaki son kareyi getirir. Kare yoksa görüntü kaynağını seçebilirsin. Kayıtlı fotoğraflar ve klipler **Yakalamalar** bölümünden açılır.
 - **Yakalamalar** PS App’ten indirilen fotoğraf ve klipleri listeler. **Paylaş → DraBornTranslate** ile bir yakalamayı doğrudan açabilir, klipte çevrilecek kareyi seçebilirsin.

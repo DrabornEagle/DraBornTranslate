@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.GridView
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
@@ -38,6 +39,46 @@ import org.junit.runner.RunWith
 class ScreenNavigationTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val app = instrumentation.targetContext
+
+    @Test
+    fun missionSearchOpensDetailsAndContextForAUserPack() {
+        val file = File(app.filesDir, "gta-6-missions-local.zip")
+        val backup = file.takeIf(File::isFile)?.readBytes()
+        try {
+            java.util.zip.ZipOutputStream(file.outputStream()).use { zip ->
+                fun entry(name: String, content: String) {
+                    zip.putNextEntry(java.util.zip.ZipEntry(name))
+                    zip.write(content.toByteArray(Charsets.UTF_8))
+                    zip.closeEntry()
+                }
+                entry("catalog.json", """
+                    {"format":1,"version":"test","gameBuild":"Test",
+                    "missions":[{"id":"launch","titleTr":"Lansman Partisine Katıl","titleEn":"The Audacity",
+                    "type":"side","chapter":3,"summaryTr":"Lansmandan önce daveti bekle.","textCount":1,
+                    "aliases":["Attent the Launch Party"],"locationTr":"Neo Paloma Apartments",
+                    "scenes":[{"id":"lobby","titleTr":"Buluşma","environmentTr":"Giriş holü"}]}]}
+                """.trimIndent())
+                entry("texts/launch.json", """
+                    [{"type":"objective","tr":"Lansman partisine katıl.","sceneId":"lobby"}]
+                """.trimIndent())
+            }
+            ActivityScenario.launch(HomeActivity::class.java).use {
+                waitFor { resumed() is HomeActivity }
+                click("Görev ara")
+                waitFor { resumed() is GtaMissionSearchActivity && hasText("Lansman Partisine Katıl") }
+                onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Attent the Launch Party") }
+                click("Lansman Partisine Katıl")
+                waitFor { resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") }
+                click("Görev metinleri")
+                waitFor { hasText("Lansman partisine katıl.") && hasText("Giriş holü") }
+                assertFalse(hasText("Neo Paloma Apartments"))
+                click("Görev bilgileri")
+                waitFor { hasText("Neo Paloma Apartments") }
+            }
+        } finally {
+            if (backup == null) file.delete() else file.writeBytes(backup)
+        }
+    }
 
     @Test
     fun connectionsOpenTheirOwnScreensAndReturnToHome() {

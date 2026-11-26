@@ -7,19 +7,12 @@ import android.util.AtomicFile
 import com.gametranslator.gametranslator_mobile.core.GamePack
 import com.gametranslator.gametranslator_mobile.core.GamePackLibrary
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.EOFException
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
-import java.io.InterruptedIOException
-import java.net.HttpURLConnection
 import java.net.URI
 import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
-import javax.net.ssl.SSLHandshakeException
-import javax.net.ssl.SSLPeerUnverifiedException
 
 internal object ImportedGamePack {
     private const val MAX_JSON_BYTES = 96 * 1024 * 1024
@@ -162,64 +155,4 @@ internal object ImportedGamePack {
 
     private fun sha256(data: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(data).joinToString("") { "%02x".format(it.toInt() and 0xff) }
-}
-
-private class PackHttpError(val status: Int) : IOException("Paket sunucusu HTTP $status döndürdü.")
-private class PackSizeError : IOException("Oyun paketi belirtilen boyutu aşıyor.")
-
-internal fun requestPackBytes(
-    maxBytes: Int,
-    exactSize: Boolean = false,
-    waitBeforeRetry: (Long) -> Unit = Thread::sleep,
-    connect: () -> HttpURLConnection,
-): ByteArray {
-    var attempt = 1
-    while (true) {
-        try {
-            val connection = connect()
-            try {
-                connection.connectTimeout = 15_000
-                connection.readTimeout = 30_000
-                connection.instanceFollowRedirects = false
-                connection.useCaches = false
-                connection.setRequestProperty("Accept-Encoding", "identity")
-                connection.setRequestProperty("Connection", "close")
-                val code = connection.responseCode
-                if (code != HttpURLConnection.HTTP_OK) throw PackHttpError(code)
-                val data = connection.inputStream.use { readLimited(it, maxBytes) }
-                if (exactSize && data.size != maxBytes) throw EOFException("Incomplete game pack")
-                return data
-            } finally {
-                connection.disconnect()
-            }
-        } catch (error: IOException) {
-            when (error) {
-                is PackSizeError -> throw error
-                is PackHttpError -> if (error.status != 408 && error.status !in 500..599) throw error
-                is SSLHandshakeException, is SSLPeerUnverifiedException ->
-                    throw IOException("Paket sunucusuyla güvenli bağlantı kurulamadı.", error)
-            }
-            if (attempt == 3) {
-                throw IOException("Oyun paketi indirilemedi. İnternet bağlantını kontrol edip tekrar dene.", error)
-            }
-            try {
-                waitBeforeRetry(350L * attempt * attempt)
-            } catch (interrupted: InterruptedException) {
-                Thread.currentThread().interrupt()
-                throw InterruptedIOException("Oyun paketi indirmesi durduruldu.").apply { initCause(interrupted) }
-            }
-            attempt++
-        }
-    }
-}
-
-private fun readLimited(input: InputStream, maxBytes: Int): ByteArray {
-    val output = ByteArrayOutputStream(minOf(maxBytes, 256 * 1024))
-    val buffer = ByteArray(64 * 1024)
-    while (true) {
-        val count = input.read(buffer)
-        if (count < 0) return output.toByteArray()
-        if (output.size() + count > maxBytes) throw PackSizeError()
-        output.write(buffer, 0, count)
-    }
 }

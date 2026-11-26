@@ -1,0 +1,2169 @@
+{
+  "format": 1,
+  "version": "2026.11.26.1",
+  "gameBuild": "Xbox Series 1.0.2.1",
+  "missions": [
+    {
+      "id": "prologue",
+      "titleTr": "Prolog",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Hikâye Lucia’nın cezaevindeki görüşmesiyle açılır. Görüşmede tutuklanması ve erken tahliye ihtimali gündeme gelir.",
+      "sourceUrl": "https://six.mics.dev/missions/prologue",
+      "titleEn": "Prologue",
+      "locationTr": "Cezaevi · danışman görüşmesi",
+      "characters": [
+        "Lucia"
+      ],
+      "aliases": [
+        "Açılış",
+        "Önsöz",
+        "INT_PROLO"
+      ],
+      "scenes": [
+        {
+          "id": "interview",
+          "titleTr": "Danışmanla görüşme",
+          "environmentTr": "Cezaevi görüşme odası",
+          "contextTr": "Lucia’nın cezaevindeki durumunu tanıtan açılış sahnesi."
+        }
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_PROLO"
+    },
+    {
+      "id": "gone-fishing",
+      "titleTr": "Balığa Çıktık",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Cal ve Donnie’yle yapılan kaçakçılık işi aksayınca Jason, Kingfishers’ın hâkim olduğu Pelican Valley’ye gider.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/gone-fishing",
+      "titleEn": "Gone Fishing",
+      "locationTr": "Pelican Valley",
+      "characters": [
+        "Jason",
+        "Cal",
+        "Donnie"
+      ],
+      "aliases": [
+        "Balığa Çıkmak",
+        "INT_CHASE"
+      ],
+      "scenes": [
+        {
+          "id": "pelican-valley",
+          "titleTr": "Kingfishers bölgesi",
+          "environmentTr": "Pelican Valley",
+          "contextTr": "Aksayan işin ardından Jason’ın yöneldiği bölge."
+        }
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_CHASE"
+    },
+    {
+      "id": "gear-up",
+      "titleTr": "Ekipmanını Hazırla",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason, yeni bir uzun namlulu silah almak için Ammu-Nation dükkânına gider.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/gear-up",
+      "titleEn": "Gear Up",
+      "locationTr": "Ammu-Nation",
+      "aliases": [
+        "FT_AMUCO"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:FT_AMUCO"
+    },
+    {
+      "id": "ft-kmodshp",
+      "titleTr": "Ganado’yu Tamir Ettir",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason hasarlı Ganado’sunu Joey’ye göstermek için Coastal Auto Care’e uğrar.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/just-a-scratch",
+      "locationTr": "Coastal Auto Care",
+      "aliases": [
+        "Just a Scratch",
+        "FT_KMODSHP"
+      ],
+      "characters": [
+        "Joey"
+      ]
+    },
+    {
+      "id": "com-kbos-shop",
+      "titleTr": "Dükkân Kirası",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason, Brian adına bir hediyelik eşya dükkânının kirasını almaya gider ve dükkânın farklı bir işe de ev sahipliği yaptığını görür.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/lab-fees",
+      "locationTr": "Hediyelik eşya dükkânı",
+      "aliases": [
+        "Lab Fees",
+        "COM_KBOS_SHOP"
+      ],
+      "characters": [
+        "Jason"
+      ]
+    },
+    {
+      "id": "com-kbos-colat",
+      "titleTr": "Otoparktaki Alacak",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Brian’a ait ödeme, polisin el koyduğu bir aracın bagajındadır. Jason ve Cal aracı almak için Hamlet’e gelir.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/unwanted-attention",
+      "locationTr": "Hamlet · polis otoparkı",
+      "aliases": [
+        "Unwanted Attention",
+        "COM_KBOS_COLAT"
+      ],
+      "characters": [
+        "Cal"
+      ]
+    },
+    {
+      "id": "hey-arnold",
+      "titleTr": "Hey, Arnold!",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Brian uzun süredir birlikte çalıştığı Arnold’a ulaşamayınca Jason ve Cal onu aramaya çıkar.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/hey-arnold",
+      "titleEn": "Hey Arnold!",
+      "aliases": [
+        "COM_KBOS_RADR"
+      ],
+      "characters": [
+        "Cal",
+        "Jason",
+        "Arnold",
+        "Brian"
+      ]
+    },
+    {
+      "id": "pipework",
+      "titleTr": "Tesisat İşi",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason, Brian’ın kiracısı Mandy’ye kira için uğrar. Ziyaret sırasında evdeki bir tamir işine yardım eder.",
+      "sourceUrl": "https://six.mics.dev/missions/pipework",
+      "titleEn": "Pipework",
+      "locationTr": "Mandy’nin evi",
+      "aliases": [
+        "COM_KBOS_NEIGHB"
+      ]
+    },
+    {
+      "id": "feng-shui",
+      "titleTr": "Feng Shui",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Lucia’nın dönüşü yaklaşırken Jason ile Cal evi hazırlar. Görev, ikilinin Lucia gelmeden önce evde geçirdiği zamana odaklanır.",
+      "sourceUrl": "https://six.mics.dev/missions/feng-shui",
+      "titleEn": "Feng Shui",
+      "locationTr": "Jason’ın evi",
+      "characters": [
+        "Jason",
+        "Cal",
+        "Lucia"
+      ],
+      "scenes": [
+        {
+          "id": "home",
+          "titleTr": "Evi hazırlama",
+          "environmentTr": "Evin içi",
+          "contextTr": "Mobilyaların yerini değiştirme ve dönüş için yapılan hazırlık."
+        }
+      ],
+      "aliases": [
+        "COM_SFH_MVFN"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_SFH_MVFN"
+    },
+    {
+      "id": "coming-home",
+      "titleTr": "Eve Dönüş",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason, cezaevinden çıkan Lucia’yı karşılar. Birlikte Rusty Anchor’a gittiklerinde Lucia’nın eski koğuş arkadaşı Kat ve Mattia da kutlamaya katılır.",
+      "sourceUrl": "https://six.mics.dev/missions/coming-home",
+      "titleEn": "Coming Home",
+      "locationTr": "Hamlet Correctional ve Rusty Anchor",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Kat",
+        "Mattia"
+      ],
+      "scenes": [
+        {
+          "id": "release",
+          "titleTr": "Lucia’yı karşılama",
+          "environmentTr": "Hamlet Correctional",
+          "contextTr": "Lucia’nın tahliyesinden sonraki buluşma."
+        },
+        {
+          "id": "rusty-anchor",
+          "titleTr": "Kutlama",
+          "environmentTr": "Rusty Anchor barı",
+          "contextTr": "Kat ve Mattia’nın katıldığı akşam, çıkan kavganın ardından sona erer."
+        }
+      ],
+      "aliases": [
+        "INT_PRISO"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_PRISO"
+    },
+    {
+      "id": "int-bank",
+      "titleTr": "Banka Hesabı",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Lucia toplum hizmetinden alacağı ödeme için bir hesap açmak ister ve Jason’la Fleeca’da buluşur.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/buck-me",
+      "locationTr": "Fleeca şubesi",
+      "aliases": [
+        "Buck Me",
+        "INT_BANK"
+      ],
+      "characters": [
+        "Jason"
+      ]
+    },
+    {
+      "id": "cti-pil-rd-bc-parent",
+      "titleTr": "Donnie’nin Düşürdüğü Paket",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Donnie’nin kaybettiği paketi bulma işi Jason’ı Grassrivers’a götürür.",
+      "sourceUrl": "https://six.mics.dev/missions/cti-pil-rd-bc-parent",
+      "locationTr": "Grassrivers",
+      "aliases": [
+        "CTI_PIL_RD_BC_PARENT"
+      ]
+    },
+    {
+      "id": "down-to-earth",
+      "titleTr": "Ayakları Yere Basmak",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Brian’ın yeni işi için Jason’ı marinaya çağırmasıyla Lucia da onunla gitmeye karar verir.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/down-to-earth",
+      "titleEn": "Down to Earth",
+      "locationTr": "Marina",
+      "aliases": [
+        "COM_KBOS_PLNDATE"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Brian"
+      ]
+    },
+    {
+      "id": "int-plnsh",
+      "titleTr": "Donnie’yle Ek İş",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Brian’ın uçak işi sırasında Donnie, motosikletçi bir grupla plan dışı bir görüşme ayarlar. İş aksayınca Jason ikisini oradan çıkarır.",
+      "sourceUrl": "https://six.mics.dev/missions/int-plnsh",
+      "locationTr": "Leonida · uçuş ve motosikletçi grubun buluşması",
+      "aliases": [
+        "INT_PLNSH"
+      ],
+      "characters": [
+        "Donnie",
+        "Brian"
+      ]
+    },
+    {
+      "id": "day-release",
+      "titleTr": "Bir Günlük Özgürlük",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Mattia’nın düzenlediği buluşma Lucia’nın elektronik kelepçesinin çıkarılmasıyla başlar. Gecenin ardından teklif ettiği yeni iş Jason’ın içine sinmez.",
+      "sourceUrl": "https://six.mics.dev/missions/day-release",
+      "titleEn": "Day Release",
+      "locationTr": "Rusty Anchor, Vice City’de bir yat ve Club NINE1NINE",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Mattia",
+        "Kat"
+      ],
+      "scenes": [
+        {
+          "id": "rusty-anchor",
+          "titleTr": "Mattia’yla buluşma",
+          "environmentTr": "Rusty Anchor",
+          "contextTr": "Lucia’nın elektronik kelepçesi burada çıkarılır."
+        },
+        {
+          "id": "night-out",
+          "titleTr": "Vice City gecesi",
+          "environmentTr": "Yat ve Club NINE1NINE",
+          "contextTr": "Kat ve Mattia’nın çevresiyle geçirilen gece."
+        },
+        {
+          "id": "offer",
+          "titleTr": "İş teklifi",
+          "environmentTr": "Ertesi sabah",
+          "contextTr": "Teklifin konusu Grassrivers ziyaretçi merkezindeki bir dolapta bulunan çantadır."
+        }
+      ],
+      "aliases": [
+        "BIL_FUN"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_FUN"
+    },
+    {
+      "id": "swamped",
+      "titleTr": "Bataklığa Saplandık",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Brian ve Lori, Kingfishers’la Donnie yüzünden açılan anlaşmazlığı çözmek ister. Buluşmanın ardından olaylar Grassrivers’ta bir takibe dönüşür.",
+      "sourceUrl": "https://six.mics.dev/missions/swamped",
+      "titleEn": "Swamped",
+      "locationTr": "Grassrivers",
+      "aliases": [
+        "INT_AIR"
+      ],
+      "characters": [
+        "Jason",
+        "Lori",
+        "Brian"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_AIR"
+    },
+    {
+      "id": "com-kbos-clean",
+      "titleTr": "Donnie’nin Karavanını Temizle",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Brian’la bağlantısını gösteren izleri kaldırmak için Donnie’nin karavanına dönülür.",
+      "sourceUrl": "https://six.mics.dev/missions/com-kbos-clean",
+      "locationTr": "Donnie’nin karavanı",
+      "aliases": [
+        "Clean Up After Donnie",
+        "COM_KBOS_CLEAN"
+      ],
+      "characters": [
+        "Jason"
+      ]
+    },
+    {
+      "id": "ho-par-keyco",
+      "titleTr": "Cal’le Balığa Çık",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason ile Lucia, Donnie’nin kaybından sonra Cal’i balığa götürerek onun yanında olur.",
+      "sourceUrl": "https://six.mics.dev/missions/ho-par-keyco",
+      "locationTr": "Balık tutulan alan",
+      "aliases": [
+        "HO_PAR_KEYCO"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "tourist-trap",
+      "titleTr": "Turist Tuzağı",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Mattia, Jason ve Lucia’ya ileride daha yüksek ücretli işler getirebilecek bir başlangıç görevi önerir.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/tourist-trap",
+      "titleEn": "Tourist Trap",
+      "aliases": [
+        "BIL_PICK"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "bil-house",
+      "titleTr": "BIL_HOUSE",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/bil-house",
+      "aliases": [
+        "BIL_HOUSE"
+      ],
+      "characters": [
+        "Lucia"
+      ]
+    },
+    {
+      "id": "discharge-time",
+      "titleTr": "Taburcu Olma Vakti",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Lucia Vice City Hospital’a gider. Hastane ziyareti beklediğinden daha sorunlu geçer.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/discharge-time",
+      "titleEn": "Discharge Time",
+      "locationTr": "Vice City Hospital",
+      "aliases": [
+        "BIL_WHEEL"
+      ],
+      "characters": [
+        "Lucia",
+        "Jason"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_WHEEL"
+    },
+    {
+      "id": "island-dreams",
+      "titleTr": "Ada Hayalleri",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Kenton, Jason’dan bir bekârlığa veda grubuna dalış rehberliği yapmasını ister. Gezi, enkazdaki hazineyi aramak için de fırsat yaratır.",
+      "sourceUrl": "https://six.mics.dev/missions/island-dreams",
+      "titleEn": "Island Dreams",
+      "locationTr": "Dalış teknesi ve su altındaki gemi enkazı",
+      "characters": [
+        "Jason",
+        "Kenton"
+      ],
+      "scenes": [
+        {
+          "id": "dive",
+          "titleTr": "Batığa dalış",
+          "environmentTr": "Gemi enkazı",
+          "contextTr": "Rehberlik edilen dalış grubu ile hazine arayışı aynı bölgede buluşur."
+        }
+      ],
+      "aliases": [
+        "CSC_TRH_CHART"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_TRH_CHART"
+    },
+    {
+      "id": "com-sfh-fltpk",
+      "titleTr": "Mobilyaları Kur",
+      "type": "story",
+      "chapter": 1,
+      "summaryTr": "Jason ve Lucia birlikte mobilya kurarken evde zaman geçirir.",
+      "sourceUrl": "https://six.mics.dev/missions/com-sfh-fltpk",
+      "locationTr": "Evin içi",
+      "aliases": [
+        "COM_SFH_FLTPK"
+      ]
+    },
+    {
+      "id": "whats-in-the-bag",
+      "titleTr": "Çantanın İçinde Ne Var?",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Jason ve Lucia, Port Gellhorn’daki motelde uyandıklarında yanlarında getirdikleri çantayı açar.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/whats-in-the-bag",
+      "titleEn": "What's in the Bag?",
+      "locationTr": "Port Gellhorn · motel odası",
+      "aliases": [
+        "MTL_WAKE"
+      ]
+    },
+    {
+      "id": "ft-motel-shop",
+      "titleTr": "FT_MOTEL_SHOP",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/ft-motel-shop",
+      "aliases": [
+        "FT_MOTEL_SHOP"
+      ]
+    },
+    {
+      "id": "mtl-drive",
+      "titleTr": "Vicki’yle Port Gellhorn",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Jason’ın yarası için yardım arayan Lucia, motelde Vicki’yle tanışır. Vicki ona Port Gellhorn’u gösterir ve Dunk’la tanıştırır.",
+      "sourceUrl": "https://six.mics.dev/missions/mtl-drive",
+      "locationTr": "Motel ve Port Gellhorn",
+      "aliases": [
+        "MTL_DRIVE"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Frankie",
+        "Vicki",
+        "Dunk"
+      ]
+    },
+    {
+      "id": "moses",
+      "titleTr": "Moses",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Lucia, Vicki’nin yönlendirmesiyle Moses Watkins’i bulur. Tamirciyle tanışmak, takip cihazı bulunmayan araçlarla ilgili yeni bir iş bağlantısı açar.",
+      "sourceUrl": "https://six.mics.dev/missions/moses",
+      "titleEn": "Moses",
+      "locationTr": "Moses Watkins’in atölyesi",
+      "characters": [
+        "Lucia",
+        "Moses Watkins",
+        "Vicki"
+      ],
+      "scenes": [
+        {
+          "id": "shop",
+          "titleTr": "Tamirciyle tanışma",
+          "environmentTr": "Oto tamir atölyesi",
+          "contextTr": "Görüşmede Moses’ın hangi araçlarla ilgilendiği anlaşılır."
+        }
+      ],
+      "aliases": [
+        "COM_MECH_INTR"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_MECH_INTR"
+    },
+    {
+      "id": "cti-mech-stfc",
+      "titleTr": "Moses’ın Canis Crawler İşi",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Moses, gözüne kestirdiği Canis Crawler’ın kendisine getirilmesi için Lucia’ya ödeme teklif eder.",
+      "sourceUrl": "https://six.mics.dev/missions/cti-mech-stfc",
+      "locationTr": "Moses’ın atölyesi ve araç teslimatı",
+      "aliases": [
+        "CTI_MECH_STFC"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "mtl-pain",
+      "titleTr": "MTL_PAIN",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/mtl-pain",
+      "aliases": [
+        "MTL_PAIN"
+      ],
+      "characters": [
+        "Dunk"
+      ]
+    },
+    {
+      "id": "breakfast-run",
+      "titleTr": "Kahvaltı Turu",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Lucia, Jason’ın durumunu görmek için motele döner.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/breakfast-run",
+      "titleEn": "Breakfast Run",
+      "locationTr": "Motel",
+      "aliases": [
+        "MTL_MONT"
+      ],
+      "characters": [
+        "Jason"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MTL_MONT"
+    },
+    {
+      "id": "coffee-break",
+      "titleTr": "Kahve Molası",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Jason ve Lucia, peş peşe yaptıkları işlerin ardından kahve başında bir sonraki adımı konuşur.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/coffee-break",
+      "titleEn": "Coffee Break",
+      "aliases": [
+        "HO_PAR_FRINT"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Wyman"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:HO_PAR_FRINT"
+    },
+    {
+      "id": "afternoon-delight",
+      "titleTr": "Delights Gecesi",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Vicki, Jason ve Lucia’ya Delights Cabaret’deki özel geceden yararlanabilecekleri bir iş önerir. Kulüpteki gösteri ve Mario’nun çevresi, planın uygulandığı ortamı belirler.",
+      "sourceUrl": "https://six.mics.dev/missions/afternoon-delight",
+      "titleEn": "Afternoon Delight",
+      "locationTr": "Delights Cabaret",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Vicki",
+        "Mario"
+      ],
+      "scenes": [
+        {
+          "id": "night",
+          "titleTr": "Kulüpteki özel gece",
+          "environmentTr": "Delights Cabaret’nin gösteri alanı",
+          "contextTr": "Vicki’nin önerisi, mekânın kadınlara ayrılan gecesinde hayata geçer."
+        }
+      ],
+      "aliases": [
+        "MTL_CONT"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MTL_CONT"
+    },
+    {
+      "id": "mtl-mud",
+      "titleTr": "Thrillbilly Mud Club",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Wyman’dan kulüpteki ödülleri duyan Jason ve Lucia, Billy’yle tanışır. Billy, yeni işlerden söz etmeden önce onları yarışta görmek ister.",
+      "sourceUrl": "https://six.mics.dev/missions/mtl-mud",
+      "locationTr": "Thrillbilly Mud Club · çamur pisti",
+      "aliases": [
+        "MTL_MUD"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Billy",
+        "Wyman"
+      ]
+    },
+    {
+      "id": "csc-drt-cnvy",
+      "titleTr": "Zırhlı Konvoy",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Yarışın ardından Billy, Jason ve Lucia’yı Kelly County’deki bir zırhlı araç işine çağırır. Ekip parayı alır fakat sürücülerden biri kaybolur.",
+      "sourceUrl": "https://six.mics.dev/missions/csc-drt-cnvy",
+      "locationTr": "Kelly County",
+      "aliases": [
+        "CSC_DRT_CNVY"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Ian",
+        "Ricky",
+        "Brittney",
+        "Billy",
+        "EJ"
+      ]
+    },
+    {
+      "id": "bil-motel",
+      "titleTr": "Motelden Ayrıl",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Jason ve Lucia, moteldeki durum kötüleşince Vice City’ye doğru yola çıkar.",
+      "sourceUrl": "https://six.mics.dev/missions/bil-motel",
+      "locationTr": "Motel ve Vice City güzergâhı",
+      "aliases": [
+        "BIL_MOTEL"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "clb-meet",
+      "titleTr": "CLB_MEET",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/clb-meet",
+      "aliases": [
+        "CLB_MEET"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "play-nurse",
+      "titleTr": "Hemşire Rolü",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Lucia, Jason iyileşirken ulaşımı ve ihtiyaç duydukları malzemeleri ayarlar. Para kazanabilecekleri yeni bir yol da bulur.",
+      "sourceUrl": "https://six.mics.dev/missions/play-nurse",
+      "titleEn": "Play Nurse",
+      "aliases": [
+        "MTL_CHECK"
+      ]
+    },
+    {
+      "id": "up-mlspm",
+      "titleTr": "Motel Hesabı",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Lucia odanın borcunu öğrenmek için Starlet Motel’in resepsiyonuna gider. Linda oda ücretini peşin almak ister.",
+      "sourceUrl": "https://six.mics.dev/missions/up-mlspm",
+      "locationTr": "Starlet Motel resepsiyonu",
+      "aliases": [
+        "UP_MLSPM"
+      ]
+    },
+    {
+      "id": "behind-on-payments",
+      "titleTr": "Geciken Ödeme",
+      "type": "story",
+      "chapter": 2,
+      "summaryTr": "Motel borcu 900 dolardır. Linda, borç kapanana kadar kolyeyi teminat olarak tutar.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/behind-on-payments",
+      "titleEn": "Behind on Payments",
+      "locationTr": "Starlet Motel",
+      "aliases": [
+        "FT_UP_MMRENT"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:FT_UP_MMRENT"
+    },
+    {
+      "id": "car-service",
+      "titleTr": "Araç Servisi",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Raul, yüz yüze görüşme öncesi Lucia’ya bir araç işi verir. Aracı Balsero’ya götürmek, Randy Kozlov’la ilerideki işler için tanışmasını sağlar.",
+      "sourceUrl": "https://six.mics.dev/missions/car-service",
+      "titleEn": "Car Service",
+      "locationTr": "Salton ve Balsero",
+      "characters": [
+        "Lucia",
+        "Raul",
+        "Randy Kozlov"
+      ],
+      "scenes": [
+        {
+          "id": "salton",
+          "titleTr": "Aracı alma",
+          "environmentTr": "Salton’daki atölye",
+          "contextTr": "Lucia’nın Raul için yaptığı deneme işi burada başlar."
+        },
+        {
+          "id": "balsero",
+          "titleTr": "Teslimat",
+          "environmentTr": "Balsero’daki araç satıcısı",
+          "contextTr": "Teslim noktası Randy Kozlov’un işyeridir."
+        }
+      ],
+      "aliases": [
+        "CTI_ROB_DRIVEPREP"
+      ]
+    },
+    {
+      "id": "clb-deal",
+      "titleTr": "Boobie’ye Borç",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Boobie, evinde kalmalarına karşılık Jason’dan bir iş ister. Dre’Quan ona eşlik eder ve Jason, Tyrone’la tanışır.",
+      "sourceUrl": "https://six.mics.dev/missions/clb-deal",
+      "locationTr": "Vice City · Crosstown",
+      "aliases": [
+        "CLB_DEAL"
+      ],
+      "characters": [
+        "Dre'Quan"
+      ]
+    },
+    {
+      "id": "rob-veh",
+      "titleTr": "ROB_VEH",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/rob-veh",
+      "aliases": [
+        "ROB_VEH"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "ant-srch",
+      "titleTr": "ANT_SRCH",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/ant-srch",
+      "aliases": [
+        "ANT_SRCH"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "dubious-provenance",
+      "titleTr": "Şüpheli Köken",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/dubious-provenance",
+      "titleEn": "Dubious Provenance",
+      "aliases": [
+        "ANT_CHASE"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_CHASE"
+    },
+    {
+      "id": "mami-knows-best",
+      "titleTr": "Annem En İyisini Bilir",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Lucia’nın annesi Mia yeni emlak işi için bir evi satışa hazırlamaktadır. Evin durumu ve yan komşularla yaşanan gerilim ziyaretin yönünü değiştirir.",
+      "sourceUrl": "https://six.mics.dev/missions/mami-knows-best",
+      "titleEn": "Mami Knows Best",
+      "locationTr": "Mia’nın satmaya çalıştığı konut ve yan parsel",
+      "characters": [
+        "Lucia",
+        "Mia",
+        "M7 üyeleri"
+      ],
+      "scenes": [
+        {
+          "id": "property",
+          "titleTr": "Satılacak eve ziyaret",
+          "environmentTr": "Bakım isteyen bir konut",
+          "contextTr": "Anne ve kız, satış öncesi mülkün durumunu görür."
+        },
+        {
+          "id": "next-door",
+          "titleTr": "Komşularla karşılaşma",
+          "environmentTr": "M7 üyelerinin bulunduğu yan ev",
+          "contextTr": "Komşularla yaşanan anlaşmazlık ziyaretin merkezine oturur."
+        }
+      ],
+      "aliases": [
+        "CSC_MOM_FLIP"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_MOM_FLIP"
+    },
+    {
+      "id": "tyrone",
+      "titleTr": "Tyrone",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Yeni iş arayan Jason, Boobie’nin bağlantısı Tyrone’la görüşür. Sohbet Vice City’de yayılan Kitty Litter’a döner.",
+      "sourceUrl": "https://six.mics.dev/missions/tyrone",
+      "titleEn": "Tyrone",
+      "locationTr": "Vice City",
+      "aliases": [
+        "COM_DEAL_INTR"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DEAL_INTR"
+    },
+    {
+      "id": "here-kitty-kitty",
+      "titleTr": "Pisi Pisi",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Jason, Kitty Litter’ın nereden geldiğini öğrenmek için Charles’ı bulur. Karşılaşma Charles’ın maddeyi kullandığını ortaya çıkarır.",
+      "sourceUrl": "https://six.mics.dev/missions/here-kitty-kitty",
+      "titleEn": "Here, Kitty Kitty",
+      "aliases": [
+        "COM_DLR_MISS"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DLR_MISS"
+    },
+    {
+      "id": "ao-deal-t-synth",
+      "titleTr": "Kitty Litter Laboratuvarları",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Tyrone, artan ölümlerin ardından Jason ve Lucia’dan Kitty Litter’ın üretildiği yerleri bulup faaliyeti durdurmalarını ister.",
+      "sourceUrl": "https://six.mics.dev/missions/ao-deal-t-synth",
+      "locationTr": "Vice City’deki laboratuvarlar",
+      "aliases": [
+        "AO_DEAL_T_SYNTH"
+      ]
+    },
+    {
+      "id": "top-billing",
+      "titleTr": "Assolist",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Dre’Quan ikiliyi Real Dimez’in gösterisine çağırır. DWNPLY performansı kesintiye uğratınca Roxy mekândan ayrılır ve gecenin devamı bir ev partisinde geçer.",
+      "sourceUrl": "https://six.mics.dev/missions/top-billing",
+      "titleEn": "Top Billing",
+      "locationTr": "Jack of Hearts ve ev partisi",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Dre’Quan",
+        "Roxy",
+        "Bae-Luxe",
+        "DWNPLY"
+      ],
+      "scenes": [
+        {
+          "id": "club",
+          "titleTr": "Real Dimez sahnede",
+          "environmentTr": "Jack of Hearts kulübü",
+          "contextTr": "Baş sanatçı olarak çıkılan gecede DWNPLY sahneyi ele geçirir."
+        },
+        {
+          "id": "house-party",
+          "titleTr": "Roxy’yi bulma",
+          "environmentTr": "Ev partisi",
+          "contextTr": "Roxy ile ekibin yeniden konuştuğu yer."
+        }
+      ],
+      "aliases": [
+        "CLB_SCUFF"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_SCUFF"
+    },
+    {
+      "id": "com-cbo-cbint",
+      "titleTr": "Boobie’yle Şehir Turu",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Jason, alacaklarını toplayan Boobie’ye şoförlük eder. Yolculukta Little Cuba’da iş yapan Yasmani’yle tanışır.",
+      "sourceUrl": "https://six.mics.dev/missions/com-cbo-cbint",
+      "locationTr": "Vice City · Little Cuba",
+      "aliases": [
+        "COM_CBO_CBINT"
+      ],
+      "characters": [
+        "Yasmani",
+        "Big Mike",
+        "Boobie"
+      ]
+    },
+    {
+      "id": "rob-drive",
+      "titleTr": "ROB_DRIVE",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/rob-drive",
+      "aliases": [
+        "ROB_DRIVE"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Raul"
+      ]
+    },
+    {
+      "id": "caught-slipping",
+      "titleTr": "Hazırlıksız Yakalandık",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Eve dönen ikili bir hırsızlıkla karşılaşır. Takibin ardından daha önce sakladıkları sabit diskin yerinde olduğunu görürler.",
+      "sourceUrl": "https://six.mics.dev/missions/caught-slipping",
+      "titleEn": "Caught Slipping",
+      "locationTr": "Jason ve Lucia’nın kaldığı daire",
+      "aliases": [
+        "BIL_RED"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_RED"
+    },
+    {
+      "id": "rob-boat-j",
+      "titleTr": "Vice River Konvoyu",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Raul’un gözü Guardia kardeşlere ait teknelerdeki yükün üzerindedir. İş, Jason ile Lucia’nın Vice River’da birbirini tamamlayan roller üstlenmesini gerektirir.",
+      "sourceUrl": "https://six.mics.dev/missions/rob-boat-j",
+      "locationTr": "Vice River",
+      "aliases": [
+        "ROB_BOAT_J"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "rob-bank",
+      "titleTr": "ROB_BANK",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/rob-bank",
+      "aliases": [
+        "ROB_BANK"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "clonin-keys-makin-gs",
+      "titleTr": "Anahtar Kopyala, Para Kazan",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Randy’nin araç işinde hedef Granforma Zorrusso’dur. İş aracı Randy’ye teslim edince kapanır.",
+      "sourceUrl": "https://six.mics.dev/missions/clonin-keys-makin-gs",
+      "titleEn": "Clonin' Keys, Makin' Gs",
+      "locationTr": "Randy’nin teslim noktası",
+      "aliases": [
+        "CTI_SHOW_HATH"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CTI_SHOW_HATH"
+    },
+    {
+      "id": "randys-wish-list",
+      "titleTr": "Randy’nin İstek Listesi",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Randy Kozlov, showroom’una getirilecek lüks otomobillerin bir listesini verir.",
+      "sourceUrl": "https://six.mics.dev/missions/randys-wish-list",
+      "titleEn": "Randy's Wish List",
+      "locationTr": "Randy Kozlov’un showroom’u",
+      "aliases": [
+        "AO_SHOW_L_EXP"
+      ]
+    },
+    {
+      "id": "ban-setup",
+      "titleTr": "Sinfrontera Hazırlığı",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Raul, La Polilla Negra’nın kullandığı Sinfrontera National Bank’ı hedef olarak açıklar. Keşfin ardından ekip Nicole Park’ı aramaya yönelir.",
+      "sourceUrl": "https://six.mics.dev/missions/ban-setup",
+      "locationTr": "Sinfrontera National Bank",
+      "aliases": [
+        "BAN_SETUP"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "security-expert",
+      "titleTr": "Güvenlik Uzmanı",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Raul’un planı için aranan kasa uzmanı Nicole Park bu görevin merkezindedir. Jason ile Lucia onu Raul’a götürmekle görevlendirilir.",
+      "sourceUrl": "https://six.mics.dev/missions/security-expert",
+      "titleEn": "Security Expert",
+      "aliases": [
+        "BAN_RESCU"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Nicole"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_RESCU"
+    },
+    {
+      "id": "clb-steal",
+      "titleTr": "DWNPLY’nin Arabası",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Dre’Quan, Real Dimez’in sahnesini basan DWNPLY’ye karşı bir plan kurar. Jason ona Eris’in mağazasında başlayan araç işinde yardım eder.",
+      "sourceUrl": "https://six.mics.dev/missions/clb-steal",
+      "locationTr": "Eris Flagship mağazası",
+      "aliases": [
+        "CLB_STEAL"
+      ],
+      "characters": [
+        "Jason"
+      ]
+    },
+    {
+      "id": "company-property",
+      "titleTr": "Şirket Malı",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Raul’un işi için gereken sevkiyatı Brian, Pilot Pete aracılığıyla ayarlar. Lucia ve Jason da teslimata katılır.",
+      "sourceUrl": "https://six.mics.dev/missions/company-property",
+      "titleEn": "Company Property",
+      "aliases": [
+        "BAN_EXPLO"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Pete",
+        "Brian"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_EXPLO"
+    },
+    {
+      "id": "ban-carte",
+      "titleTr": "Watson Bay Buluşması",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Andrea, La Polilla Negra’dan Monty’yle Watson Bay’de buluşmayı ayarlar. Lucia ona eşlik eder ve görüşme beklediklerinden farklı ilerler.",
+      "sourceUrl": "https://six.mics.dev/missions/ban-carte",
+      "locationTr": "Watson Bay · buluşma alanı",
+      "aliases": [
+        "BAN_CARTE"
+      ],
+      "characters": [
+        "Lucia",
+        "Andrea",
+        "Monty",
+        "Karim",
+        "Raul"
+      ]
+    },
+    {
+      "id": "ban-safe",
+      "titleTr": "BAN_SAFE",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/ban-safe",
+      "aliases": [
+        "BAN_SAFE"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Felipe"
+      ]
+    },
+    {
+      "id": "clb-video",
+      "titleTr": "Real Dimez Klibi",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "DWNPLY’nin otomobili, Real Dimez’in yeni müzik klibinde kullanılır. Ekip çekimi hazırlamak için bir araya gelir.",
+      "sourceUrl": "https://six.mics.dev/missions/clb-video",
+      "aliases": [
+        "CLB_VIDEO"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "bricked-up",
+      "titleTr": "Boobie’nin İşi",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Jason ve Lucia, Boobie’nin verdiği bir işi birlikte üstlenir.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/bricked-up",
+      "titleEn": "Bricked Up",
+      "aliases": [
+        "CLB_TOWER"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Boobie"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_TOWER"
+    },
+    {
+      "id": "ft-ban-distr",
+      "titleTr": "Banka İçin Dikkat Dağıtma",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Karim, Sinfrontera işi sırasında bankanın iletişimini kesmek üzere Jason ve Lucia’yı Vice City’deki haberleşme kulelerine yollar.",
+      "sourceUrl": "https://six.mics.dev/missions/ft-ban-distr",
+      "locationTr": "Vice City · haberleşme kuleleri",
+      "aliases": [
+        "FT_BAN_DISTR"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "the-cartel-heist",
+      "titleTr": "Kartel Soygunu",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Hazırlıklar tamamlanınca Raul’un ekibi Sinfrontera National Bank’a girer. Sonrasında Raul kazançlarından bir avans ve Y Hotel’de bir süit ayarlar.",
+      "sourceUrl": "https://six.mics.dev/missions/the-cartel-heist",
+      "titleEn": "The Cartel Heist",
+      "locationTr": "Sinfrontera National Bank",
+      "aliases": [
+        "BAN_FINAL"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Nicole",
+        "Andrea",
+        "Karim",
+        "Raul"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BAN_FINAL"
+    },
+    {
+      "id": "ant-recov",
+      "titleTr": "ANT_RECOV",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/ant-recov",
+      "aliases": [
+        "ANT_RECOV"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "dubious-provenance-ant-intro",
+      "titleTr": "Şüpheli Köken · Antikacı",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Bulunan heykelin değerini araştırmak için Capri’deki antikacıya gidilir.",
+      "sourceUrl": "https://six.mics.dev/missions/dubious-provenance-ant-intro",
+      "titleEn": "Dubious Provenance",
+      "locationTr": "Capri · antikacı dükkânı",
+      "aliases": [
+        "ANT_INTRO"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:ANT_INTRO"
+    },
+    {
+      "id": "ant-give",
+      "titleTr": "Heykeli Halifax’a Ver",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Jason ve Lucia, heykelin gerçekliğini incelemesi için Halifax’la buluşup heykeli teslim eder.",
+      "sourceUrl": "https://six.mics.dev/missions/ant-give",
+      "locationTr": "Capri · antikacı dükkânı",
+      "aliases": [
+        "ANT_GIVE"
+      ]
+    },
+    {
+      "id": "ban-pkbmb",
+      "titleTr": "Karim’le Hazırlık",
+      "type": "story",
+      "chapter": 3,
+      "summaryTr": "Karim hazırlık sırasında ekibe eşlik eder ve görevdeki işaretli noktaları gösterir.",
+      "sourceUrl": "https://six.mics.dev/missions/ban-pkbmb",
+      "aliases": [
+        "BAN_PKBMB"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Karim"
+      ]
+    },
+    {
+      "id": "mny-hotel",
+      "titleTr": "Otel Süitine Taşınma",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Valentina’nın ayarladığı süite yerleşen Jason ve Lucia, otelde Santino ile tanışır.",
+      "sourceUrl": "https://six.mics.dev/missions/mny-hotel",
+      "locationTr": "Y Hotel",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Valentina",
+        "Santino"
+      ],
+      "aliases": [
+        "MNY_HOTEL"
+      ],
+      "scenes": [
+        {
+          "id": "suite",
+          "titleTr": "Otele yerleşme",
+          "environmentTr": "Y Hotel süiti",
+          "contextTr": "İkilinin yeni konaklama düzeninin kurulduğu bölüm."
+        }
+      ]
+    },
+    {
+      "id": "mny-car",
+      "titleTr": "Yeni Otomobiller",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Valentina’nın ayarladığı iki otomobil alınır ve otele geri götürülür.",
+      "sourceUrl": "https://six.mics.dev/missions/mny-car",
+      "locationTr": "Y Hotel ve araç teslim noktaları",
+      "aliases": [
+        "MNY_CAR"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Rob"
+      ]
+    },
+    {
+      "id": "lawyer-up",
+      "titleTr": "Avukatla Görüş",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Valentina, Jason ve Lucia’yı Abraham Gonzalez’le buluşturur. Avukatla kurulan bağlantı bu görevin ana konusudur.",
+      "sourceUrl": "https://six.mics.dev/missions/lawyer-up",
+      "titleEn": "Lawyer Up",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Valentina",
+        "Abraham Gonzalez"
+      ],
+      "aliases": [
+        "Abe Gonzalez",
+        "CSC_DIG_DATA"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_DIG_DATA"
+    },
+    {
+      "id": "mny-party",
+      "titleTr": "Megamundo Açılışı",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Lucia, Andrés de León’un güvenliği için Megamundo Network açılışına katılır. Etkinlikte bir rehine olayı çıkar.",
+      "sourceUrl": "https://six.mics.dev/missions/mny-party",
+      "locationTr": "Megamundo Network merkezi",
+      "aliases": [
+        "MNY_PARTY"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Andrés",
+        "Valentina",
+        "Petra",
+        "Elonzo"
+      ]
+    },
+    {
+      "id": "air-tail",
+      "titleTr": "Zırhlı Araç Ekibini Takip Et",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Raul, rakibi Kordell Grant’in ekibinin hazırlığını öğrenmek ister. Jason ve Lucia görevlilerden birinin telefonuna erişmenin yolunu arar.",
+      "sourceUrl": "https://six.mics.dev/missions/air-tail",
+      "aliases": [
+        "AIR_TAIL"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Nate",
+        "J-Wang"
+      ]
+    },
+    {
+      "id": "photo-shoot",
+      "titleTr": "Tanıtım Çekimi",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Lucia, Dre’Quan’ın tanıtım çekimine katılır.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/photo-shoot",
+      "titleEn": "Photo/Shoot",
+      "aliases": [
+        "CLB_HELI"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_HELI"
+    },
+    {
+      "id": "air-train",
+      "titleTr": "Spor Salonunda Tanışma",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Lucia, Kordell’in çevresine girmek için Nate’le antrenman yapar. Birkaç haftanın ardından Nate onu ekibin diğer üyeleriyle tanıştırır.",
+      "sourceUrl": "https://six.mics.dev/missions/air-train",
+      "locationTr": "Spor salonu",
+      "aliases": [
+        "AIR_TRAIN"
+      ],
+      "characters": [
+        "Lucia",
+        "Nate",
+        "Jason"
+      ]
+    },
+    {
+      "id": "clb-promo",
+      "titleTr": "Kulüp Tanıtımı",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Dre’Quan, kulüp organizatörü Royce Jones’la çalışmak için yaklaşımını gösterir ve bu görüşmede yardım ister.",
+      "sourceUrl": "https://six.mics.dev/missions/clb-promo",
+      "characters": [
+        "Dre’Quan",
+        "Royce Jones"
+      ],
+      "aliases": [
+        "CLB_PROMO"
+      ]
+    },
+    {
+      "id": "cash-injections",
+      "titleTr": "Nakit Enjeksiyonu",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Lucia, Ocean Beach’te satışı olan Nate’e eşlik ederek onun güvenini kazanmaya çalışır. Nate de onu Kordell’e önermeyi düşünür.",
+      "sourceUrl": "https://six.mics.dev/missions/cash-injections",
+      "titleEn": "Cash Injections",
+      "locationTr": "Ocean Beach",
+      "aliases": [
+        "AIR_BEACH"
+      ],
+      "characters": [
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_BEACH"
+    },
+    {
+      "id": "amateur-hour",
+      "titleTr": "Amatör Saati",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Cisco, kendisine borcu olan bir yönetmenle görüşecektir. Lucia, Cisco’yla ilişkisini güçlendirmek için ona destek verir.",
+      "sourceUrl": "https://six.mics.dev/missions/amateur-hour",
+      "titleEn": "Amateur Hour",
+      "aliases": [
+        "AIR_BUS"
+      ],
+      "characters": [
+        "Francisco",
+        "Omar"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_BUS"
+    },
+    {
+      "id": "dirty-work",
+      "titleTr": "Kirli İş",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Lucia, Raina’yla ilgili bir işi hallederken yeni bağlantılar edinir.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/dirty-work",
+      "titleEn": "Dirty Work",
+      "aliases": [
+        "AIR_GANG"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_GANG"
+    },
+    {
+      "id": "too-much-baggage",
+      "titleTr": "Fazla Bagaj",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason, Omar’ın ekibinde bagaj görevlisi olarak çalışmaya başlar. Havaalanındaki bu iş Karim’in güvenlik sistemine erişim planının parçasıdır.",
+      "sourceUrl": "https://six.mics.dev/missions/too-much-baggage",
+      "titleEn": "Too Much Baggage",
+      "locationTr": "Vice City International Airport · bagaj bölümü",
+      "aliases": [
+        "AIR_SCOPE"
+      ],
+      "characters": [
+        "Jason"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_SCOPE"
+    },
+    {
+      "id": "adventures-in-babysitting",
+      "titleTr": "Bakıcı Macerası",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "The Vault’ta Andrés de León’a güvenlik sağlayan Jason bir kaçırma girişimiyle karşılaşır. Eve döndüklerinde Andrés’in oğlu Rafa’nın götürüldüğünü öğrenirler.",
+      "sourceUrl": "https://six.mics.dev/missions/adventures-in-babysitting",
+      "titleEn": "Adventures in Babysitting",
+      "locationTr": "The Vault gece kulübü ve Andrés’in evi",
+      "aliases": [
+        "MNY_ESCRT"
+      ],
+      "characters": [
+        "Jason"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:MNY_ESCRT"
+    },
+    {
+      "id": "fresh-evidence",
+      "titleTr": "Yeni Kanıt",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Dre’Quan, Dante Fresh’in Royce Jones’a karşı kullandığı malzemeyi arar. Ardından Briana’dan Real Dimez’in VYB açılışında sahneye çıkacağını duyarlar.",
+      "sourceUrl": "https://six.mics.dev/missions/fresh-evidence",
+      "titleEn": "Fresh Evidence",
+      "locationTr": "Dante Fresh’in malikanesi",
+      "aliases": [
+        "CLB_EVI"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_EVI"
+    },
+    {
+      "id": "air-truck",
+      "titleTr": "AIR_TRUCK",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/air-truck",
+      "aliases": [
+        "AIR_TRUCK"
+      ],
+      "characters": [
+        "Lucia",
+        "Nate"
+      ]
+    },
+    {
+      "id": "mny-kidnp",
+      "titleTr": "Rafa’yı Kurtar",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Lucia, Andrés’le birlikte Rafa’yı FAP’ın elinden çıkarmak için bir çimento fabrikasına gider.",
+      "sourceUrl": "https://six.mics.dev/missions/mny-kidnp",
+      "locationTr": "Çimento fabrikası",
+      "aliases": [
+        "MNY_KIDNP"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "headliners",
+      "titleTr": "Gecenin Yıldızları",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Real Dimez, VYB’de baş sanatçıdır. DWNPLY ekibiyle kulübü ele geçirmeye çalışınca Jason ve Lucia ikiliyi sahne arkasından çıkarır.",
+      "sourceUrl": "https://six.mics.dev/missions/headliners",
+      "titleEn": "Headliners",
+      "locationTr": "VYB gece kulübü ve sanatçı odası",
+      "aliases": [
+        "CLB_PARTY"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CLB_PARTY"
+    },
+    {
+      "id": "close-surveillance",
+      "titleTr": "Yakın Gözetim",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Karim, Ocean Beach’te Nate ile Cisco’yu izler. İkili, havaalanı bagaj ekibinden Omar’ın evine gider.",
+      "sourceUrl": "https://six.mics.dev/missions/close-surveillance",
+      "titleEn": "Close Surveillance",
+      "locationTr": "Ocean Beach ve Omar’ın evi",
+      "aliases": [
+        "AIR_DRONE"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_DRONE"
+    },
+    {
+      "id": "delivery-method",
+      "titleTr": "Teslimat Yöntemi",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Lucia’nın parmak izlerini sisteme eklemeyi amaçlayan hazırlık TSS ofislerinde geçer.",
+      "sourceUrl": "https://six.mics.dev/missions/delivery-method",
+      "titleEn": "Delivery Method",
+      "locationTr": "TSS ofisleri",
+      "aliases": [
+        "AIR_HACK"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_HACK"
+    },
+    {
+      "id": "team-building",
+      "titleTr": "Ekiple Tanışma",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Kordell, Lucia’yı çevresindeki bazı kişilerle tanıştırmak ister.",
+      "sourceUrl": "https://six.mics.dev/missions/team-building",
+      "titleEn": "Team Building",
+      "aliases": [
+        "AIR_RECRU"
+      ],
+      "characters": [
+        "Lucia",
+        "Kordell"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_RECRU"
+    },
+    {
+      "id": "fully-catered",
+      "titleTr": "İkram Servisi",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Raul’un havaalanı işi için bir ikram kamyoneti gerekir. Araç hazırlanırken ekip soygunda kullanılacak çantalar üzerinde çalışır.",
+      "sourceUrl": "https://six.mics.dev/missions/fully-catered",
+      "titleEn": "Fully Catered",
+      "locationTr": "Havaalanı ikram aracı",
+      "aliases": [
+        "AIR_CATER"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Raul"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_CATER"
+    },
+    {
+      "id": "vcia-takedown",
+      "titleTr": "Havaalanı Operasyonu",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Jason ve Lucia, Kordell’in ekibine karşı hazırlanan işte Raul ve adamlarıyla birlikte hareket eder.",
+      "sourceUrl": "https://six.mics.dev/missions/vcia-takedown",
+      "titleEn": "VCIA Takedown",
+      "locationTr": "Vice City International Airport",
+      "aliases": [
+        "AIR_FINAL"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Janice",
+        "Nate",
+        "Andrea",
+        "Francisco"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:AIR_FINAL"
+    },
+    {
+      "id": "blood-sweat-and-gear",
+      "titleTr": "Kan, Ter ve Ağırlık",
+      "type": "story",
+      "chapter": 4,
+      "summaryTr": "Lucia güvenlerini kazanmak için Kordell’in ekibiyle birlikte, onların kullandığı özel bölümde antrenman yapar.",
+      "sourceUrl": "https://six.mics.dev/missions/blood-sweat-and-gear",
+      "titleEn": "Blood Sweat and Gear",
+      "locationTr": "Ajax Gym",
+      "aliases": [
+        "COM_UP_BBWOR"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_UP_BBWOR"
+    },
+    {
+      "id": "sfh-taxi",
+      "titleTr": "Tomás’la Son Sabah",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Lucia, Tomás’la geçirdiği son sabahı ve tutuklanmasından önce yaşananları hatırlar.",
+      "sourceUrl": "https://six.mics.dev/missions/sfh-taxi",
+      "aliases": [
+        "SFH_TAXI"
+      ]
+    },
+    {
+      "id": "rob-death",
+      "titleTr": "Marinada Raul’la Buluş",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Raul’la görüşmek için Ocean Beach Marina’daki teknesine gidilir.",
+      "sourceUrl": "https://six.mics.dev/missions/rob-death",
+      "locationTr": "Ocean Beach Marina · Raul’un teknesi",
+      "aliases": [
+        "ROB_DEATH"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "starting-from-zero",
+      "titleTr": "Sıfırdan Başlamak",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Raul’un ölümünün ardından Jason ve Lucia’nın önceliği dikkat çekmeden eşyalarını geri almaktır.",
+      "sourceUrl": "https://six.mics.dev/missions/starting-from-zero",
+      "titleEn": "Starting From Zero",
+      "locationTr": "Vice City",
+      "characters": [
+        "Jason",
+        "Lucia"
+      ],
+      "aliases": [
+        "Sıfırdan Başla",
+        "BIL_CONFR"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:BIL_CONFR"
+    },
+    {
+      "id": "coa-helis",
+      "titleTr": "Sahil Güvenliği Keşfet",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Giorgio, sabit diski geri aldıktan sonra planını yeniden devreye sokar. Bunun için ekibin sahil güvenliği hakkında bilgi toplamasını ister.",
+      "sourceUrl": "https://six.mics.dev/missions/coa-helis",
+      "locationTr": "Giorgio’nun çatı katı ve sahil güvenlik çevresi",
+      "aliases": [
+        "COA_HELIS"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Giorgio",
+        "Vinny"
+      ]
+    },
+    {
+      "id": "bil-boss",
+      "titleTr": "Giorgio’yla Spa Buluşması",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Giorgio, Jason ve Lucia’ya destekleri karşılığında bir af ayarlayabileceğini söyler. Görüşme bir saldırıyla kesilir.",
+      "sourceUrl": "https://six.mics.dev/missions/bil-boss",
+      "locationTr": "Giorgio’nun spası",
+      "aliases": [
+        "BIL_BOSS"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "bil-preg",
+      "titleTr": "Kat’a Yardım Et",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Kat’ın sancıları Giorgio’nun evindeyken başlar. Mattia, hastaneye yetişebilmek için Jason ve Lucia’dan yardım ister.",
+      "sourceUrl": "https://six.mics.dev/missions/bil-preg",
+      "locationTr": "Giorgio’nun çatı katı",
+      "aliases": [
+        "BIL_PREG"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Kat",
+        "Mattia",
+        "Dardan"
+      ]
+    },
+    {
+      "id": "doggie-bag",
+      "titleTr": "Rocco Operasyonu",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Vinny ve Lucia, sahil güvenliğin arama köpeği Rocco’ya ulaşmak için limandaki yolcu gemisine gider. Rocco, Giorgio’nun sonraki planında önemli bir rol oynar.",
+      "sourceUrl": "https://six.mics.dev/missions/doggie-bag",
+      "titleEn": "Doggie Bag",
+      "locationTr": "Liman ve yolcu gemisi",
+      "characters": [
+        "Lucia",
+        "Vinny",
+        "Rocco",
+        "Giorgio"
+      ],
+      "scenes": [
+        {
+          "id": "cruise",
+          "titleTr": "Rocco’yu bulma",
+          "environmentTr": "Limanda bağlı yolcu gemisi",
+          "contextTr": "Sahil güvenliğin gemiye yönelmesi Rocco’ya ulaşma fırsatı yaratır."
+        },
+        {
+          "id": "evacuation",
+          "titleTr": "Gemiden ayrılma",
+          "environmentTr": "Gemi ve helikopter",
+          "contextTr": "Lucia ile Vinny köpekle birlikte gemiden uzaklaşır."
+        }
+      ],
+      "aliases": [
+        "COA_DOG"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COA_DOG"
+    },
+    {
+      "id": "coa-ship",
+      "titleTr": "Sahil Güvenlikteki Yük",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Jason ile Lucia, Giorgio’nun ekibiyle birlikte hem rakip sevkiyata hem de sahil güvenliğin elindeki yüke yönelir.",
+      "sourceUrl": "https://six.mics.dev/missions/coa-ship",
+      "locationTr": "Yük gemisi ve sahil güvenlik merkezi",
+      "aliases": [
+        "COA_SHIP"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Rocco"
+      ]
+    },
+    {
+      "id": "bil-preci",
+      "titleTr": "Savcının Teklifi",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Giorgio’nun ihanetiyle Jason ve Lucia ayrı ayrı gözaltına alınır. Savcı Danica Howard, Lucia’ya sabit diskle ilgili bir teklif yapar.",
+      "sourceUrl": "https://six.mics.dev/missions/bil-preci",
+      "locationTr": "Gözaltı ve savcılık görüşmesi",
+      "aliases": [
+        "BIL_PRECI"
+      ],
+      "characters": [
+        "Dardan",
+        "Lucia",
+        "Jason"
+      ]
+    },
+    {
+      "id": "the-end-of-the-road",
+      "titleTr": "Yolun Sonu",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Jason ve Lucia’nın ana hikâyesini tamamlayan final görevi.",
+      "sourceUrl": "https://www.gtabase.com/gta-6/missions/the-end-of-the-road",
+      "titleEn": "The End of the Road",
+      "aliases": [
+        "BIL_PENT"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia"
+      ]
+    },
+    {
+      "id": "bil-law",
+      "titleTr": "Abe’yle Anlaşma Görüşmesi",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Jason ile Lucia, bekleyen hukuki sorunlarına bir çözüm bulmak için avukatları Abe Gonzalez’e gider.",
+      "sourceUrl": "https://six.mics.dev/missions/bil-law",
+      "aliases": [
+        "BIL_LAW"
+      ]
+    },
+    {
+      "id": "the-end-of-the-road-fin-cont",
+      "titleTr": "Yolun Sonu · Devam Seçimi",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Final sonrasında oyun, final öncesine dönüp ilerlemeyi tamamlamayı veya yeni bir oyun başlatmayı sunar.",
+      "sourceUrl": "https://six.mics.dev/missions/the-end-of-the-road-fin-cont",
+      "titleEn": "The End of the Road",
+      "aliases": [
+        "FIN_CONT"
+      ]
+    },
+    {
+      "id": "south-leonida-real-estate",
+      "titleTr": "Güney Leonida Emlak",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Mia’nın M7 tarafından kaçırılması Lucia’yı bir kurtarma girişimine sürükler. Mia, çıkış yolu olarak Terro’ya yeni bir merkez bulmayı önerir.",
+      "sourceUrl": "https://six.mics.dev/missions/south-leonida-real-estate",
+      "titleEn": "South Leonida Real Estate",
+      "locationTr": "Güney Leonida",
+      "aliases": [
+        "CSC_MOM_MSEVN"
+      ],
+      "characters": [
+        "Lucia"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_MOM_MSEVN"
+    },
+    {
+      "id": "spin-on-this",
+      "titleTr": "Son Üretim Tesisi",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Kitty Litter üretimini tamamen kapatmak için son tesise gidilir.",
+      "sourceUrl": "https://six.mics.dev/missions/spin-on-this",
+      "titleEn": "Spin on This",
+      "aliases": [
+        "COM_DLR_COOK"
+      ],
+      "characters": [
+        "Tyrone",
+        "Dook"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:COM_DLR_COOK"
+    },
+    {
+      "id": "delivery-day",
+      "titleTr": "Teslimat Günü",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Randy’nin listedeki son iki aracı Millport’tan gönderilecektir. Limana giderken rakip bir araç hırsızlığı ekibi peşlerine düşer.",
+      "sourceUrl": "https://six.mics.dev/missions/delivery-day",
+      "titleEn": "Delivery Day",
+      "locationTr": "Millport rıhtımları",
+      "aliases": [
+        "COM_SHOW_TRAILER"
+      ],
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Randy"
+      ]
+    },
+    {
+      "id": "find-donnies-package",
+      "titleTr": "Donnie’nin Paketini Bul",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Jason, Donnie’nin kaybettiği yükü aramak için bataklık bölgesine gider.",
+      "sourceUrl": "https://six.mics.dev/missions/find-donnies-package",
+      "titleEn": "Find Donnie's Package",
+      "locationTr": "Bataklık",
+      "aliases": [
+        "CTI_PIL_RD_SH"
+      ],
+      "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CTI_PIL_RD_SH"
+    },
+    {
+      "id": "prologue-int-cred",
+      "titleTr": "Prolog · Jenerik Kaydı",
+      "type": "story",
+      "chapter": 5,
+      "summaryTr": "Bu kayıt görev dizininde yer alıyor. Türkçe hikâye özeti için ek doğrulama gerekiyor.",
+      "sourceUrl": "https://six.mics.dev/missions/prologue-int-cred",
+      "titleEn": "Prologue",
+      "aliases": [
+        "INT_CRED"
+      ]
+    },
+    {
+      "id": "the-unknown-stuntman",
+      "titleTr": "Gizemli Dublör",
+      "type": "side",
+      "chapter": 3,
+      "summaryTr": "Ocean Beach’te yapılan tanıtım gösterisi, Papa Audacity ve AudaCity ekibiyle ilk karşılaşmadır. Gösteriden sonra girişimin mühendislerinden biriyle tanışılır.",
+      "sourceUrl": "https://www.powerpyx.com/gta-6-the-unknown-stuntman-walkthrough/",
+      "titleEn": "The Unknown Stuntman",
+      "locationTr": "Vice Beach · Ocean Beach",
+      "characters": [
+        "Papa Audacity",
+        "AudaCity mühendisi"
+      ],
+      "series": "Papa Audacity / AudaCity",
+      "scenes": [
+        {
+          "id": "show",
+          "titleTr": "Sahil gösterisi",
+          "environmentTr": "Ocean Beach gösteri alanı",
+          "contextTr": "Papa Audacity’nin motosiklet gösterisi projeyi tanıtır."
+        }
+      ]
+    },
+    {
+      "id": "trial-by-tire",
+      "titleTr": "Motosiklet Denemesi",
+      "type": "side",
+      "chapter": 3,
+      "summaryTr": "İlk gösterinin ardından AudaCity ekibi, projeye katılmadan önce bir sürüş denemesi için La Perle’ye çağırır.",
+      "sourceUrl": "https://www.powerpyx.com/gta-6-trial-by-tire-meet-the-audacity-engineer-walkthrough/",
+      "titleEn": "Trial by Tire",
+      "locationTr": "Vice City · La Perle otoparkı",
+      "characters": [
+        "AudaCity mühendisi"
+      ],
+      "series": "Papa Audacity / AudaCity",
+      "aliases": [
+        "Meet the AudaCity Engineer",
+        "AudaCity mühendisiyle buluş"
+      ],
+      "scenes": [
+        {
+          "id": "garage",
+          "titleTr": "Sürüş parkuru",
+          "environmentTr": "Çok katlı otoparkın alt katı",
+          "contextTr": "İlk motosiklet parkuru için yönlendirme burada verilir."
+        }
+      ],
+      "requires": [
+        "the-unknown-stuntman"
+      ]
+    },
+    {
+      "id": "quit-your-job-sell-your-house",
+      "titleTr": "İşini Bırak, Evini Sat",
+      "type": "side",
+      "chapter": 3,
+      "summaryTr": "Sürüş denemesini geçtikten sonra Papa Audacity, yeni tanıtım gösterisini hazırlamak için iki karakteri Peacock Bay’e çağırır.",
+      "sourceUrl": "https://www.powerpyx.com/gta-6-quit-your-job-sell-your-house-help-papa-audacity-walkthrough/",
+      "titleEn": "Quit Your Job, Sell Your House",
+      "locationTr": "Peacock Bay Condominiums ve Catalan Key",
+      "characters": [
+        "Jason",
+        "Lucia",
+        "Papa Audacity"
+      ],
+      "series": "Papa Audacity / AudaCity",
+      "aliases": [
+        "Help Papa Audacity"
+      ],
+      "scenes": [
+        {
+          "id": "building",
+          "titleTr": "Gösteriye hazırlık",
+          "environmentTr": "Peacock Bay Condominiums ve helikopter pisti",
+          "contextTr": "Gruptaki roller ve gösterinin hazırlığı burada belirlenir."
+        },
+        {
+          "id": "jump",
+          "titleTr": "Havadaki gösteri",
+          "environmentTr": "Catalan Key üzeri",
+          "contextTr": "Ekip, atlayış için helikopterle bölgenin üzerine çıkar."
+        }
+      ],
+      "requires": [
+        "trial-by-tire"
+      ]
+    },
+    {
+      "id": "audacity-stunts",
+      "titleTr": "AudaCity Gösterileri",
+      "type": "side",
+      "chapter": 3,
+      "summaryTr": "AudaCity’yi gündemde tutmak için şehirde grubun araçlarıyla tanıtım atlayışları yapılır. Önceki Peacock Bay görevi tamamlandığında bu aşama açılır.",
+      "sourceUrl": "https://www.powerpyx.com/gta-6-audacity-stunts-walkthrough/",
+      "titleEn": "AudaCity Stunts",
+      "locationTr": "Ocean Beach, Dalton Island ve Stockyard",
+      "characters": [
+        "Papa Audacity",
+        "AudaCity mühendisleri"
+      ],
+      "series": "Papa Audacity / AudaCity",
+      "scenes": [
+        {
+          "id": "city",
+          "titleTr": "Şehirde tanıtım atlayışları",
+          "environmentTr": "Vice City’deki işaretli alanlar",
+          "contextTr": "Ayrı noktalardaki atlayışlar aynı tanıtım çalışmasına bağlıdır."
+        }
+      ],
+      "requires": [
+        "quit-your-job-sell-your-house"
+      ]
+    },
+    {
+      "id": "catching-a-whale",
+      "titleTr": "Büyük Yatırımcı Peşinde",
+      "type": "side",
+      "chapter": 3,
+      "summaryTr": "Şehirdeki atlayışlar bitince Papa Audacity, potansiyel yatırımcıların dikkatini çekmek için havadan tanıtım yapar. Bu iş tamamlandığında lansman partisi için davet gelir.",
+      "sourceUrl": "https://www.powerpyx.com/gta-6-catching-a-whale-help-papa-audacity-walkthrough/",
+      "titleEn": "Catching a Whale",
+      "locationTr": "Waning Sands · Sundown Airfield ve Vice City hava rotası",
+      "characters": [
+        "Papa Audacity"
+      ],
+      "series": "Papa Audacity / AudaCity",
+      "aliases": [
+        "Help Papa Audacity"
+      ],
+      "scenes": [
+        {
+          "id": "airfield",
+          "titleTr": "Havaalanında buluşma",
+          "environmentTr": "Sundown Airfield",
+          "contextTr": "Papa Audacity’nin uçuşla ilgili planı burada başlar."
+        },
+        {
+          "id": "flight",
+          "titleTr": "Tanıtım uçuşu",
+          "environmentTr": "Liman, Tequesta Retreat ve adliye çevresi",
+          "contextTr": "Şehir üstündeki farklı geçiş noktaları tanıtımın parçalarıdır."
+        }
+      ],
+      "requires": [
+        "audacity-stunts"
+      ]
+    },
+    {
+      "id": "the-audacity",
+      "titleTr": "Lansman Partisine Katıl",
+      "type": "side",
+      "chapter": 3,
+      "summaryTr": "Papa Audacity’nin AudaCity ve DacityCoin tanıtımını tamamlayan yan görev. Catching a Whale bittikten yaklaşık bir oyun içi gün sonra davet gelir. Jason veya Lucia katılabilir.",
+      "sourceUrl": "https://www.powerpyx.com/gta-6-the-audacity-attend-the-launch-party-walkthrough/",
+      "titleEn": "The Audacity",
+      "locationTr": "Vice City · Tequesta · Neo Paloma Apartments",
+      "characters": [
+        "Papa Audacity",
+        "AudaCity mühendisi",
+        "Jason veya Lucia"
+      ],
+      "series": "Papa Audacity / AudaCity",
+      "aliases": [
+        "Attend the Launch Party",
+        "Attent the Launch Party",
+        "Launch Party",
+        "DacityCoin lansmanı"
+      ],
+      "scenes": [
+        {
+          "id": "lobby",
+          "titleTr": "Davet ve buluşma",
+          "environmentTr": "Neo Paloma Apartments lobisi",
+          "contextTr": "Binaya girildiğinde mühendisler lobinin arkasındaki asansörlerin yakınındadır."
+        },
+        {
+          "id": "launch",
+          "titleTr": "Lansman sunumu",
+          "environmentTr": "Parti alanı ve sahne arkası",
+          "contextTr": "Mühendisle partiye çıkılır. Sunumun ardından Papa Audacity’yle sahne arkasında görüşülür. DacityCoin satışı bu aşamada açılır."
+        },
+        {
+          "id": "jump",
+          "titleTr": "Son gösteri",
+          "environmentTr": "Atlayış rampası ve çatı havuzu",
+          "contextTr": "Motosiklet gösterisi, rampadan çatı havuzuna uzanır."
+        },
+        {
+          "id": "exit",
+          "titleTr": "Partiden ayrılma",
+          "environmentTr": "Havuzun karşısındaki bina ve sokak",
+          "contextTr": "Gösterinin ardından kalabalıktan çıkış, binadaki asansör üzerinden gerçekleşir."
+        }
+      ],
+      "requires": [
+        "catching-a-whale"
+      ],
+      "textSourceUrl": "https://six.mics.dev/extras/audacity#what-you-do"
+    }
+  ]
+}
