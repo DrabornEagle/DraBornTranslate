@@ -103,7 +103,7 @@ class ScreenNavigationTest {
         ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
             waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
             click("İngilizce")
-            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Gone Fishing") }
+            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("gone fishing") }
             waitFor {
                 hasText("Gone Fishing") && resumed()?.window?.decorView?.findChild {
                     it is ImageView && it.contentDescription == "Cal Hampton profil resmi"
@@ -124,7 +124,7 @@ class ScreenNavigationTest {
             waitFor { hasText("Kaynaklar") && hasText("Görevin diyalog arşivini aç") }
             click("Geri")
             waitFor { resumed() is GtaMissionSearchActivity }
-            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Lab Fees") }
+            onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("lab fees") }
             waitFor { hasText("Lab Fees") }
             click("Lab Fees")
             waitFor { hasText("Önce tamamlanacak görev") }
