@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Raul’la tanışmanın ön koşulu olan aracı Salton’da bul.",
+    "sceneId": "salton"
+  },
+  {
+    "type": "guide",
+    "tr": "Aracı Balsero’da Randy’ye teslim etmek yeni iş bağlantısını açar.",
+    "sceneId": "balsero"
+  }
+]

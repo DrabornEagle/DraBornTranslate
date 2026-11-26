@@ -71,90 +71,132 @@ class GamePacksActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
     private val preferences by lazy { getSharedPreferences("capture", MODE_PRIVATE) }
     private lateinit var download: Button
+    private lateinit var liveDownload: Button
+    private lateinit var missionImport: Button
     private lateinit var imported: Button
+    private lateinit var manage: Button
     private lateinit var state: TextView
     private var busy = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val content = contentPage("Oyun paketleri", Palette.purple)
-        content.addBelow(featureHeader("GTA 6 Türkçe", "Paketten eşleşen altyazıları doğrudan oku.",
+        content.addBelow(featureHeader("GTA 6 Türkçe", "Görev paketini GitHub’dan kur ve çevrimdışı ara.",
             R.drawable.ic_game_package, Palette.purple))
         state = copy("", 14, Palette.mint, true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
         content.addBelow(state.apply {
             background = filled(0xFF20263D.toInt(), 16, Palette.border)
             setPadding(dp(13), dp(11), dp(13), dp(11))
         }, 10)
-        download = press("Türkçe paketi indir", Palette.purple) {
-            install("gtaPackTitle") { app -> ImportedGamePack.downloadGta(app) ?: throw IOException("Paket indirilemedi.") }
+        download = press("GTA 6 paketini indir", Palette.purple) {
+            perform { app ->
+                val status = missionStatus(GtaMissionStore.download(app))
+                if (GtaMissionStore.hasLocal(app)) "$status · Aramada özel paket kullanılıyor." else status
+            }
         }
         content.addBelow(download, 15)
-        imported = press("JSON veya JSON.GZ seç") {
-            @Suppress("DEPRECATION")
-            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                type = "*/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }, 28)
+        content.addBelow(press("Görev ara", Palette.mint) {
+            startActivity(Intent(this, GtaMissionSearchActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            })
+        }, 8)
+        missionImport = press("Görev paketi seç (.zip)") { chooseFile(MISSION_IMPORT, "application/zip") }
+        content.addBelow(missionImport, 12)
+        content.addBelow(copy("Canlı altyazı", 17, Palette.white, true).apply { isAccessibilityHeading = true }, 16)
+        liveDownload = press("GTA 6 altyazı paketini indir") {
+            perform { app ->
+                val title = ImportedGamePack.downloadGta(app) ?: throw IOException("Altyazı paketi indirilemedi.")
+                preferences.edit().putString("gtaPackTitle", title).apply()
+                title
+            }
         }
-        content.addBelow(imported, 10)
-        content.addBelow(press("Yüklü paketleri yönet") { manage() }, 10)
+        content.addBelow(liveDownload, 8)
+        imported = press("Altyazı paketi seç (.json veya .json.gz)") { chooseFile(SUBTITLE_IMPORT, "*/*") }
+        content.addBelow(imported, 8)
+        manage = press("Yüklü paketleri yönet") { managePacks() }
+        content.addBelow(manage, 10)
         render()
     }
 
-    private fun render(message: String? = null) {
-        val hasGta = ImportedGamePack.hasGta(this)
-        val title = preferences.getString("gtaPackTitle", null)
-        state.text = message ?: when {
-            busy -> "Paket hazırlanıyor…"
-            hasGta -> title ?: "GTA 6 Türkçe paketi hazır."
-            else -> "GTA 6 paketi henüz indirilmedi."
-        }
-        download.isEnabled = !busy
-        imported.isEnabled = !busy
-        download.text = if (hasGta) "Paket güncellemesini denetle" else "Türkçe paketi indir"
+    @Suppress("DEPRECATION")
+    private fun chooseFile(code: Int, mime: String) {
+        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            type = mime
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }, code)
     }
 
-    private fun install(key: String, operation: (Context) -> String) {
+    override fun onResume() {
+        super.onResume()
+        render()
+    }
+
+    private fun missionStatus(catalog: GtaMissionCatalog): String {
+        val count = catalog.missions.sumOf { it.textCount }
+        return "Görev paketi hazır · ${catalog.missions.size} görev · $count metin"
+    }
+
+    private fun render(message: String? = null) {
+        val downloaded = GtaMissionStore.hasDownload(this)
+        state.text = message ?: when {
+            busy -> "Paket hazırlanıyor…"
+            GtaMissionStore.hasLocal(this) -> "Özel GTA 6 görev paketi kullanılıyor."
+            downloaded -> "GitHub görev paketi çevrimdışı kullanıma hazır."
+            else -> "GTA 6 görev paketi henüz indirilmedi."
+        }
+        listOf(download, liveDownload, missionImport, imported, manage).forEach { it.isEnabled = !busy }
+        download.text = if (downloaded) "GitHub’daki görev paketini güncelle" else "GTA 6 paketini indir"
+        liveDownload.text = if (ImportedGamePack.hasGta(this)) "Altyazı paketi güncellemesini denetle" else "GTA 6 altyazı paketini indir"
+    }
+
+    private fun perform(operation: (Context) -> String) {
         busy = true
         render()
         val app = applicationContext
         worker.execute {
             val result = runCatching { operation(app) }
-            result.getOrNull()?.let { preferences.edit().putString(key, it).apply() }
             runOnUiThread {
-                if (!isDestroyed) {
+                if (!isDestroyed && !isFinishing) {
                     busy = false
-                    render(result.getOrElse { error ->
-                        val message = error.message ?: "Paket açılamadı."
-                        if (key == "gtaPackTitle" && ImportedGamePack.hasGta(this)) {
-                            "$message Yüklü paket çevrimdışı kullanılabilir."
-                        } else message
-                    })
+                    render(result.getOrElse { error -> error.message ?: "Paket açılamadı." })
                 }
             }
         }
     }
 
-    private fun manage() {
+    private fun managePacks() {
         if (busy) return
-        val ids = buildList {
-            if (ImportedGamePack.hasGta(this@GamePacksActivity)) add("GTA 6 Türkçe" to true)
+        val choices = buildList<Pair<String, (Context) -> Unit>> {
+            if (GtaMissionStore.hasDownload(this@GamePacksActivity)) {
+                add("GitHub görev paketi" to { app -> GtaMissionStore.remove(app, local = false) })
+            }
+            if (GtaMissionStore.hasLocal(this@GamePacksActivity)) {
+                add("Özel görev paketi" to { app -> GtaMissionStore.remove(app, local = true) })
+            }
+            if (ImportedGamePack.hasGta(this@GamePacksActivity)) add("GTA 6 altyazı paketi" to { app ->
+                ImportedGamePack.remove(app, gta = true)
+                preferences.edit().remove("gtaPackTitle").apply()
+            })
             if (ImportedGamePack.hasPack(this@GamePacksActivity)) {
-                add((preferences.getString("packTitle", null) ?: "İçe aktarılan paket") to false)
+                add((preferences.getString("packTitle", null) ?: "İçe aktarılan altyazı paketi") to { app ->
+                    ImportedGamePack.remove(app)
+                    preferences.edit().remove("packTitle").apply()
+                })
             }
         }
-        if (ids.isEmpty()) {
+        if (choices.isEmpty()) {
             render("Yüklü oyun paketi yok.")
             return
         }
         AlertDialog.Builder(this).setTitle("Kaldırılacak paketi seç")
-            .setItems(ids.map { it.first }.toTypedArray()) { _, index ->
-                val (label, gta) = ids[index]
+            .setItems(choices.map { it.first }.toTypedArray()) { _, index ->
+                val (label, remove) = choices[index]
                 AlertDialog.Builder(this).setTitle("$label kaldırılsın mı?")
                     .setNegativeButton("Vazgeç", null).setPositiveButton("Kaldır") { _, _ ->
-                        ImportedGamePack.remove(this, gta = gta)
-                        preferences.edit().remove(if (gta) "gtaPackTitle" else "packTitle").apply()
-                        render()
+                        perform { app ->
+                            remove(app)
+                            "$label kaldırıldı."
+                        }
                     }.show()
             }.setNegativeButton("Kapat", null).show()
     }
@@ -162,13 +204,23 @@ class GamePacksActivity : Activity() {
     @Deprecated("Android activity result")
     override fun onActivityResult(code: Int, result: Int, data: Intent?) {
         super.onActivityResult(code, result, data)
-        if (code == 28 && result == RESULT_OK) data?.data?.let { uri ->
-            install("packTitle") { app -> ImportedGamePack.install(app, uri) }
+        if (result != RESULT_OK) return
+        val uri = data?.data ?: return
+        when (code) {
+            MISSION_IMPORT -> perform { app -> missionStatus(GtaMissionStore.installLocal(app, uri)) }
+            SUBTITLE_IMPORT -> perform { app ->
+                ImportedGamePack.install(app, uri).also { title -> preferences.edit().putString("packTitle", title).apply() }
+            }
         }
     }
 
     override fun onDestroy() {
         worker.shutdown()
         super.onDestroy()
+    }
+
+    private companion object {
+        const val SUBTITLE_IMPORT = 28
+        const val MISSION_IMPORT = 29
     }
 }

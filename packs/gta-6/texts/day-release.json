@@ -1,0 +1,17 @@
+[
+  {
+    "type": "guide",
+    "tr": "Mattia ilkin Rusty Anchor’da buluşur. Lucia’nın elektronik kelepçesi çıkarılır.",
+    "sceneId": "rusty-anchor"
+  },
+  {
+    "type": "guide",
+    "tr": "Kat ve arkadaşlarıyla önce yata, sonra NINE1NINE’a gidilir.",
+    "sceneId": "night-out"
+  },
+  {
+    "type": "guide",
+    "tr": "Mattia ertesi sabah Grassrivers’taki ziyaretçi merkezinden bir çanta alınmasını önerir.",
+    "sceneId": "offer"
+  }
+]

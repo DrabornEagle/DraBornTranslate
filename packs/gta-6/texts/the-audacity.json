@@ -1,0 +1,34 @@
+[
+  {
+    "type": "objective",
+    "en": "Attend the Launch Party",
+    "tr": "Lansman partisine katıl.",
+    "sceneId": "lobby",
+    "contextTr": "Davet geldikten sonra haritada Neo Paloma Apartments’ı bul."
+  },
+  {
+    "type": "guide",
+    "tr": "Mühendisler binanın arka tarafında, asansörlerin yakınında bekler. Onlarla konuşup parti katına çık.",
+    "sceneId": "lobby"
+  },
+  {
+    "type": "guide",
+    "tr": "Partideki sunum bitince mühendisle sahne arkasına geç. Burada Papa Audacity son gösteriden söz eder.",
+    "sceneId": "launch"
+  },
+  {
+    "type": "guide",
+    "tr": "DacityCoin uygulamasında satış seçeneği parti sırasında açılır. Atlayış başlamadan önce satış yapmak hâlâ mümkündür.",
+    "sceneId": "launch"
+  },
+  {
+    "type": "guide",
+    "tr": "Son gösteride motosiklet rampadan geçip çatı havuzuna iner.",
+    "sceneId": "jump"
+  },
+  {
+    "type": "guide",
+    "tr": "Partiden ayrılmak için havuzun karşısındaki binaya geç ve asansörle sokağa in.",
+    "sceneId": "exit"
+  }
+]

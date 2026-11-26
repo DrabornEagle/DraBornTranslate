@@ -4,7 +4,7 @@
 
 [İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.6)
 
-v0.6 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → Türkçe paketi indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.6 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -29,6 +29,10 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 1. **Portal’a bağlan → Oyun profili → GTA 6** seç. Profili **Telefonda oyna** ekranında da açabilirsin. PS5/TV bağlantısı için **Ayarlar → Ek alanlar → GTA 6 için ayarla** seçeneğini kullan.
 2. **Telefon ve Portal paneli** çıkışı aynı Türkçe altyazıyı, görev ve ipucu metinlerini, mesajları ve tuş ipuçlarını iki ekrana gönderir. GTA 6 oyundaki telefon açılınca gönderici adları korunur ve mesajlar sohbet balonlarında gösterilir. **Oyun profili** penceresinden sade sütun görünümüne geçebilirsin.
 3. Oyunun İngilizce altyazısını açık tut. Hazır Türkçe paket bulunmadığında çeviri telefondaki modelle yapılır. İki OCR okuması belirgin biçimde ayrışırsa uygulama paketteki eşleşmeye öncelik verir ve çevrimdışı çeviri için daha tutarlı bir kare bekler.
+
+## GTA 6 görev araması
+
+v0.6.1 kaynak sürümünde **Oyun paketleri → GTA 6 paketini indir** ile görev kataloğu GitHub’dan gelir. İndirme bitince **Görev ara** seçeneğinden görevin Türkçe veya İngilizce adını yaz. Ana ekrandan ve GTA 6 oyun profili penceresinden de aynı aramaya ulaşabilirsin. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
 
 ## Altyazı ve Görsel Çeviri
 

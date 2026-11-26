@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Peacock Bay’de ekiple buluşup binanın helikopter pistine çık.",
+    "sceneId": "building"
+  },
+  {
+    "type": "guide",
+    "tr": "Gösteri ekibinin havadaki varış noktası Catalan Key üzerindedir.",
+    "sceneId": "jump"
+  }
+]

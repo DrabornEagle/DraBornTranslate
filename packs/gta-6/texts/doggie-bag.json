@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Vinny ve Lucia limandaki yolcu gemisinde sahil güvenlik köpeği Rocco’yu arar.",
+    "sceneId": "cruise"
+  },
+  {
+    "type": "guide",
+    "tr": "Rocco’yu aldıktan sonra ekip helikopterle gemiyi terk eder.",
+    "sceneId": "evacuation"
+  }
+]

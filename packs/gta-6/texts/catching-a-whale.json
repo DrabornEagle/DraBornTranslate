@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Önceki gösteriler tamamlandığında Papa Audacity Sundown Airfield’da bekler.",
+    "sceneId": "airfield"
+  },
+  {
+    "type": "guide",
+    "tr": "Tanıtım uçuşu ilgi çekmek için liman ve Tequesta Retreat üzerinden şehrin diğer noktalarına uzanır.",
+    "sceneId": "flight"
+  }
+]

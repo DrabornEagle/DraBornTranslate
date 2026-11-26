@@ -256,7 +256,8 @@ class HomeActivity : Activity() {
                 Source.MOBILE -> "Telefon · Canlı çeviri"
                 else -> "Portal · Canlı çeviri"
             }
-            ImportedGamePack.hasGta(this) -> "GTA 6 Türkçe paketi hazır"
+            GtaMissionStore.installed(this) -> "GTA 6 görev paketi hazır"
+            ImportedGamePack.hasGta(this) -> "GTA 6 altyazı paketi hazır"
             else -> "Çeviri cihazda çalışır"
         }
         connectionStatus.connectionBadge(message, if (state.active) Palette.mint else Palette.blue)
@@ -296,6 +297,9 @@ class HomeActivity : Activity() {
         }, 10)
         content.addBelow(connectionOption("Oyun paketleri", R.drawable.ic_game_package, Palette.peach) {
             open(GamePacksActivity::class.java)
+        }, 8)
+        content.addBelow(connectionOption("Görev ara", R.drawable.ic_game_package, Palette.purple) {
+            open(GtaMissionSearchActivity::class.java)
         }, 8)
         if (savedInstanceState == null && ImportedGamePack.hasGta(this)) checkInstalledPack()
     }

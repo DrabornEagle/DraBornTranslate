@@ -1,0 +1,12 @@
+[
+  {
+    "type": "guide",
+    "tr": "Mia, Lucia’yı satışa hazırladığı evi görmeye götürür.",
+    "sceneId": "property"
+  },
+  {
+    "type": "guide",
+    "tr": "Yan evdeki M7 üyeleriyle karşılaşma, anne kızın planını değiştirir.",
+    "sceneId": "next-door"
+  }
+]

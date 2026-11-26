@@ -12,6 +12,7 @@ import com.draborneagle.draborntranslate.ConsoleSetupActivity
 import com.draborneagle.draborntranslate.TvPanelActivity
 import com.draborneagle.draborntranslate.FocusActivity
 import com.draborneagle.draborntranslate.GamePacksActivity
+import com.draborneagle.draborntranslate.GtaMissionSearchActivity
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -135,6 +136,7 @@ class ConsoleStudioActivity : FlutterActivity() {
                 when (call.arguments as? String) {
                     "focus" -> startActivity(Intent(this, FocusActivity::class.java))
                     "packs" -> startActivity(Intent(this, GamePacksActivity::class.java))
+                    "missions" -> startActivity(Intent(this, GtaMissionSearchActivity::class.java))
                     "tvBrowser" -> startActivity(Intent(this, TvPanelActivity::class.java))
                     "manual" -> startActivity(Intent(this, ConsoleSetupActivity::class.java))
                     "home" -> finish()
