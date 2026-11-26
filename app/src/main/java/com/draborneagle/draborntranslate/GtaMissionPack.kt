@@ -52,26 +52,36 @@ internal data class GtaMission(
     val textCount: Int,
     val aliases: List<String>,
     val prerequisites: List<String>,
+    val mapLabels: List<String> = emptyList(),
+    val giver: String? = null,
+    val profileSource: String? = null,
+    val gallerySource: String? = null,
+    val gameDataSource: String? = null,
 ) {
     val category: String get() = listOfNotNull(type.label, chapter?.let { "Bölüm $it" }, series).joinToString(" · ")
-    val searchNames = (listOfNotNull(title, englishTitle, series, location, id) + aliases).map(::foldMissionName)
-    private val englishName = englishTitle ?: aliases.firstOrNull { missionCode.matches(it) }
+    val code: String? get() = (listOfNotNull(englishTitle, title) + aliases).firstOrNull { missionCode.matches(it) }
+    private val englishName = englishTitle?.takeUnless(missionCode::matches)
+    private val turkishName = title.takeUnless(missionCode::matches)
+    val searchNames = (listOfNotNull(title, englishTitle, id) + mapLabels + aliases).map(::missionNameKey).distinct()
 
-    fun nameIn(language: GtaMissionSearchLanguage) =
-        if (language == GtaMissionSearchLanguage.ENGLISH) englishName ?: title else title
+    fun nameIn(language: GtaMissionSearchLanguage): String {
+        val names = if (language == GtaMissionSearchLanguage.ENGLISH) englishName to turkishName else turkishName to englishName
+        return names.first ?: names.second ?: "Görev adı doğrulanmadı"
+    }
 
     fun alternateNameIn(language: GtaMissionSearchLanguage): String? {
-        val preferred = nameIn(language)
-        return (if (language == GtaMissionSearchLanguage.ENGLISH) title else englishName)?.takeUnless { it == preferred }
+        return (if (language == GtaMissionSearchLanguage.ENGLISH) turkishName else englishName)
+            ?.takeUnless { it == nameIn(language) }
     }
 }
 
 private val missionCode = Regex("[A-Z0-9]+(?:_[A-Z0-9]+)+")
-private fun foldMissionName(text: String) = PackKey.canon(text).replace('ı', 'i')
+private val missionApostrophes = Regex("['’‘ʼ]")
+internal fun missionNameKey(text: String) = PackKey.canon(text.replace(missionApostrophes, "")).replace('ı', 'i')
 
 internal data class GtaMissionCatalog(val version: String, val gameBuild: String, val missions: List<GtaMission>) {
     fun search(query: String, language: GtaMissionSearchLanguage = GtaMissionSearchLanguage.TURKISH): List<GtaMission> {
-        val name = foldMissionName(query)
+        val name = missionNameKey(query)
         if (name.isEmpty()) return missions
         val words = name.split(' ')
         return missions.mapNotNull { mission ->
@@ -82,7 +92,7 @@ internal data class GtaMissionCatalog(val version: String, val gameBuild: String
                 names.any { value -> words.all { value.contains(it) } } -> 2
                 else -> return@mapNotNull null
             }
-            val preferred = foldMissionName(mission.nameIn(language))
+            val preferred = missionNameKey(mission.nameIn(language))
             val matchesPreferred = when (rank) {
                 0 -> name == preferred
                 1 -> preferred.startsWith(name)
@@ -163,7 +173,8 @@ internal object GtaMissionPack {
         return GtaMission(data.id(), data.requiredText("titleTr"), data.text("titleEn"), type, chapter,
             data.text("series"), data.requiredText("summaryTr"), data.text("locationTr"), data.strings("characters"),
             scenes, data.sourceUrl("sourceUrl"), data.sourceUrl("textSourceUrl"), count.toInt(), data.strings("aliases"),
-            data.strings("requires"))
+            data.strings("requires"), data.strings("mapLabels"), data.text("giver"),
+            data.sourceUrl("profileSourceUrl"), data.sourceUrl("gallerySourceUrl"), data.sourceUrl("gameDataSourceUrl"))
     }
 
     private fun texts(zip: ZipFile, mission: GtaMission): List<GtaMissionText> {

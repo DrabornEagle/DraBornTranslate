@@ -80,39 +80,40 @@ class GamePacksActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val content = contentPage("Oyun paketleri", Palette.purple)
-        content.addBelow(featureHeader("GTA 6 Türkçe", "Görev paketini GitHub’dan kur ve çevrimdışı ara.",
-            R.drawable.ic_game_package, Palette.purple))
-        state = copy("", 14, Palette.mint, true).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
-        content.addBelow(state.apply {
-            background = filled(0xFF20263D.toInt(), 16, Palette.border)
-            setPadding(dp(13), dp(11), dp(13), dp(11))
-        }, 10)
-        download = press("GTA 6 paketini indir", Palette.purple) {
+        val content = miamiPage("Oyun Paketleri", Miami.coral)
+        content.addBelow(miamiHero("GTA 6 Türkçe", "Çevrimdışı görev rehberi ve canlı altyazı paketleri.", Miami.coral))
+        val missions = miamiPanel(Miami.coral)
+        missions.addView(copy("Görev rehberi", 19, Palette.white, true).apply { isAccessibilityHeading = true })
+        state = copy("", 14, Miami.coral).apply { accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE }
+        missions.addBelow(state, 5)
+        download = press("GTA 6 paketini indir", Miami.coral) {
             perform { app ->
                 val status = missionStatus(GtaMissionStore.download(app))
                 if (GtaMissionStore.hasLocal(app)) "$status · Aramada özel paket kullanılıyor." else status
             }
         }
-        content.addBelow(download, 15)
-        content.addBelow(press("Görev ara", Palette.mint) {
+        missions.addBelow(download, 12)
+        missions.addBelow(press("Görev ara") {
             startActivity(Intent(this, GtaMissionSearchActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             })
         }, 8)
         missionImport = press("Görev paketi seç (.zip)") { chooseFile(MISSION_IMPORT, "application/zip") }
-        content.addBelow(missionImport, 12)
-        content.addBelow(copy("Canlı altyazı", 17, Palette.white, true).apply { isAccessibilityHeading = true }, 16)
-        liveDownload = press("GTA 6 altyazı paketini indir") {
+        missions.addBelow(missionImport, 8)
+        content.addBelow(missions, 14)
+        val subtitles = miamiPanel(Miami.aqua)
+        subtitles.addView(copy("Canlı altyazı", 19, Palette.white, true).apply { isAccessibilityHeading = true })
+        liveDownload = press("GTA 6 altyazı paketini indir", Miami.aqua) {
             perform { app ->
                 val title = ImportedGamePack.downloadGta(app) ?: throw IOException("Altyazı paketi indirilemedi.")
                 preferences.edit().putString("gtaPackTitle", title).apply()
                 title
             }
         }
-        content.addBelow(liveDownload, 8)
+        subtitles.addBelow(liveDownload, 10)
         imported = press("Altyazı paketi seç (.json veya .json.gz)") { chooseFile(SUBTITLE_IMPORT, "*/*") }
-        content.addBelow(imported, 8)
+        subtitles.addBelow(imported, 8)
+        content.addBelow(subtitles, 12)
         manage = press("Yüklü paketleri yönet") { managePacks() }
         content.addBelow(manage, 10)
         render()
@@ -132,8 +133,7 @@ class GamePacksActivity : Activity() {
     }
 
     private fun missionStatus(catalog: GtaMissionCatalog): String {
-        val count = catalog.missions.sumOf { it.textCount }
-        return "Görev paketi hazır · ${catalog.missions.size} görev · $count metin"
+        return "GitHub paketi hazır · ${catalog.missions.size} görev"
     }
 
     private fun render(message: String? = null) {
@@ -142,7 +142,7 @@ class GamePacksActivity : Activity() {
             busy -> "Paket hazırlanıyor…"
             GtaMissionStore.hasLocal(this) -> "Özel GTA 6 görev paketi kullanılıyor."
             downloaded -> "GitHub görev paketi çevrimdışı kullanıma hazır."
-            else -> "GTA 6 görev paketi henüz indirilmedi."
+            else -> "Uygulamaya dâhil görev rehberi çevrimdışı hazır."
         }
         listOf(download, liveDownload, missionImport, imported, manage).forEach { it.isEnabled = !busy }
         download.text = if (downloaded) "GitHub’daki görev paketini güncelle" else "GTA 6 paketini indir"

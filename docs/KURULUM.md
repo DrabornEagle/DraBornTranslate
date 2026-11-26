@@ -32,7 +32,13 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 ## GTA 6 görev araması
 
-**Oyun paketleri → GTA 6 paketini indir** ile görev kataloğu GitHub’dan gelir. İndirme bitince **Görev ara** seçeneğinden **Türkçe** ya da **İngilizce** başlık görünümünü seçip görev adını yaz. İndirilmiş eski görev paketi arama açıldığında arka planda kontrol edilir. Paketi **Oyun paketleri → GitHub’daki görev paketini güncelle** yoluyla da yenileyebilirsin. Ana ekrandan ve GTA 6 oyun profili penceresinden de aynı aramaya ulaşabilirsin. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
+**Görev Ara** Türkçe veya İngilizce görev adı, harita başlığı ve teknik kodla çalışır. **Meet Raul’s Crew** aramasıyla **Credit Check** görevine ulaşabilirsin. Dâhilî katalog çevrimdışı açılır. **Oyun Paketleri → GTA 6 paketini indir** üzerinden GitHub’daki kataloğu cihazına alabilirsin.
+
+- **Görev Bilgileri** görevi veren karakteri, bilinen mekânları ve sahneleri gösterir. **Profil fotoğrafı ekle** ile aynı karakterin fotoğrafını arama sonuçlarında gösterebilirsin. **Oyundan görüntü ekle** ile kendi yakalamalarını sahneye bağla. Kaynak görselleri bağlantı üzerinden açılır.
+- **Görev Metinleri → Konuşmalar → Canlı kayıt başlat** ile sahneyi seç ve oyuna dön. Canlı çeviri açıkken okunan İngilizce ve Türkçe altyazılar bu göreve eklenir. Görev bitince kaydı durdur. Aynı anda bir görev kayda alınabilir. Uygulama süreci kapanırsa yeni kayıt durur, önceki satırlar cihazda kalır.
+- Eski PS App klibini **Klipten veya görüntüden ekle** ile aç. Altyazı alanını işaretle ve **Klip altyazısını tara** seçeneğini kullan. Uzun kliplerde başlangıçtan veya seçili kareden itibaren iki dakikalık bölümler taranır. Onayladığın satırlar, klipteki yaklaşık zamanlarıyla göreve eklenir. **Bu sayfayı Türkçeye çevir** çevirileri telefona kaydeder.
+- Altyazı görüntüye basılıysa klip taraması onu okuyabilir. SRT/VTT dosyan varsa zaman aralıkları o dosyadan alınır. Önceden çevrilmiş konsol satırlarını **Altyazı geçmişinden seç** ile bağlayabilirsin. Konuşmacı ve sahne **Kayıt ayrıntıları** içinden düzenlenebilir.
+- **Hedefler ve mesajlar** kişisel konuşmalardan ayrı görünür. GitHub rehber ZIP’i özgün görev özetlerini içerir. GTA VI Explorer bağlantıları sağlanan görevlerde ilgili diyalog araması açılır. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
 
 ## Altyazı ve Görsel Çeviri
 

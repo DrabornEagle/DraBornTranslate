@@ -1,12 +1,22 @@
 [
   {
     "type": "guide",
-    "tr": "Görev, bankaya gitmeden önce maskeler ve ekipmana ilişkin hedefler içerir.",
-    "sceneId": "guide-1"
+    "tr": "Raul, Jason ve Lucia’ya ekibini tanıtır. Felipe ulaşımı, Andrea haberleşme ve maskeleri, Karim teknik desteği üstlenir.",
+    "sceneId": "crew"
   },
   {
     "type": "guide",
-    "tr": "Oyun, birden fazla Fleeca noktasına uğramayı ister. Şubeden çıkış ve bir sonraki şubeye geçişi ekrandaki hedefler ayırır.",
-    "sceneId": "guide-2"
+    "tr": "Andrea ile maskeler seçilir. Karim, işaretli paraya takılan mürekkep paketlerini engelleyen cihazı gösterir.",
+    "sceneId": "preparation"
+  },
+  {
+    "type": "guide",
+    "tr": "Jason ile Lucia farklı şubelerde çalışır. Ekip, kimin içeride kalacağını ve çıkışta nasıl buluşacağını koordine eder.",
+    "sceneId": "branches"
+  },
+  {
+    "type": "guide",
+    "tr": "Şubelerden ayrıldıktan sonra ekip polisten kurtulmaya çalışır. Jason ve Lucia eve döndüğünde kapı çalınır.",
+    "sceneId": "apartment"
   }
 ]

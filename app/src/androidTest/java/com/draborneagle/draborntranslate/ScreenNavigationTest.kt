@@ -75,6 +75,7 @@ class ScreenNavigationTest {
                 click("The Audacity")
                 waitFor { resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") }
                 click("Görev metinleri")
+                click("Hedefler ve mesajlar")
                 waitFor { hasText("Lansman partisine katıl.") && hasText("Giriş holü") }
                 assertTrue(hasText("Görev kaynağını aç"))
                 assertTrue(hasText("Görev metinlerini kaynakta aç"))
@@ -88,6 +89,43 @@ class ScreenNavigationTest {
             }
         } finally {
             if (backup == null) file.delete() else file.writeBytes(backup)
+        }
+    }
+
+    @Test
+    fun bundledCatalogFindsTheMapNameAndReopensTheRecordedMissionConversation() {
+        val mission = "rob-bank"
+        val sentence = "Yarın köprüde buluşalım."
+        val sample = JournalLine("Let's meet at the bridge tomorrow.", sentence, MissionLineSource.SUBTITLE_FILE,
+            "crew", "Deniz", startMs = 1_032, endMs = 3_000)
+        val saved = MissionJournal.add(app, mission, listOf(sample))
+        try {
+            assertEquals(1, saved)
+            assertEquals(0, MissionJournal.add(app, mission, listOf(sample)))
+            ActivityScenario.launch(GtaMissionSearchActivity::class.java).use {
+                waitFor { resumed() is GtaMissionSearchActivity && hasText("İngilizce") }
+                click("İngilizce")
+                onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Meet Raul's Crew") }
+                waitFor { hasText("Credit Check") && hasText("Meet Raul’s Crew") }
+                screenshot("06-gorev-ara")
+                click("Credit Check")
+                waitFor { resumed() is GtaMissionDetailsActivity && hasText("Raul Bautista") }
+                screenshot("07-gorev-detayi")
+                click("Görev metinleri")
+                waitFor { hasText(sentence) && hasText("Deniz · Ekiple tanışma") && hasText("Stockyard · Raul’un üssü") }
+                assertTrue(hasText("Konuşma kayıtlarım"))
+                assertTrue(hasText("Görev metinlerini kaynakta aç"))
+                assertFalse(hasText("Görev rehberi"))
+                screenshot("08-gorev-konusmalari")
+            }
+            ActivityScenario.launch(GamePacksActivity::class.java).use {
+                waitFor { resumed() is GamePacksActivity && hasText("GTA 6 Türkçe") }
+                screenshot("09-oyun-paketleri")
+            }
+        } finally {
+            MissionJournal.page(app, mission, 0, 25).lines.filter { it.line.turkish == sentence }.forEach {
+                MissionJournal.delete(app, mission, it.id)
+            }
         }
     }
 

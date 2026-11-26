@@ -6,6 +6,14 @@ plugins {
 def targetAbi = providers.gradleProperty('targetAbi').getOrElse('arm64-v8a')
 def withPs5 = !providers.gradleProperty('skipPs5').isPresent()
 def modelDir = layout.buildDirectory.dir('generated/toz/assets')
+def missionAssets = layout.buildDirectory.dir('generated/gta-missions/assets')
+def missionPackDir = rootProject.file('packs/gta-6')
+def missionManifest = new groovy.json.JsonSlurper().parse(new File(missionPackDir, 'manifest.json'))
+def missionArchive = new File(missionPackDir, "gta-6-tr-${missionManifest.sha256.take(12)}.zip")
+def prepareMissionCatalog = tasks.register('prepareMissionCatalog', Sync) {
+    from(missionArchive) { rename { "gta-6-reference-${missionManifest.version}.zip" } }
+    into(missionAssets)
+}
 
 android {
     namespace 'com.draborneagle.draborntranslate'
@@ -25,8 +33,8 @@ android {
         applicationId 'com.draborneagle.draborntranslate.v5'
         minSdk 29
         targetSdk 35
-        versionCode 10
-        versionName '0.6.2'
+        versionCode 11
+        versionName '0.6.3'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         ndk { abiFilters targetAbi }
         if (withPs5) {
@@ -47,6 +55,7 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     sourceSets.main.assets.srcDir(modelDir.get().asFile)
+    sourceSets.main.assets.srcDir(missionAssets.get().asFile)
 }
 
 kotlin {
@@ -125,4 +134,4 @@ String sha256(InputStream stream) {
     return digest.digest().encodeHex().toString()
 }
 
-tasks.named('preBuild').configure { dependsOn(prepareTozModel) }
+tasks.named('preBuild').configure { dependsOn(prepareTozModel, prepareMissionCatalog) }

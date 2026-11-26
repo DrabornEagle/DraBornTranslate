@@ -18,7 +18,9 @@ GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repli
 
 ## GTA 6 görev araması
 
-**Oyun paketleri → GTA 6 paketini indir** ile görev kataloğunu GitHub’dan yükle. **Görev ara** bölümünde **Türkçe** veya **İngilizce** başlık görünümünü seçip görev adını yaz. **Görev bilgileri** özet, karakterler ve bilinen sahne ortamlarını gösterir. **Görev metinleri** 116 görev kaydının Türkçe rehberlerini ve ilgili kaynak bağlantılarını açar.
+Görev Ara, Türkçe ve İngilizce görev adlarının yanı sıra harita başlıklarını da bulur. Örneğin **Meet Raul’s Crew** araması **Credit Check / Kredi Kontrolü** görevini açar. Katalog 204 görev ve görev adımı içerir. **Görev Bilgileri** içinde karakterler, sahne ortamları, kaynak bağlantıları ve kendi ekran görüntülerinden oluşan galeri bulunur.
+
+**Görev Metinleri → Konuşmalar** üzerinden canlı altyazı kaydını başlatabilir, PS App klibinden seçtiğin videodaki altyazıları tarayabilir veya SRT/VTT dosyası ekleyebilirsin. Kayıtlar görev ve sahneyle birlikte cihazda saklanır. **Oyun Paketleri → GTA 6 paketini indir** güncel rehberi GitHub’dan getirir.
 
 **Attend the Launch Party** veya **Attent the Launch Party** araması Papa Audacity’nin **The Audacity** yan görevini bulur. [Paket içeriği ve kaynaklar](packs/gta-6/README.md)
 

@@ -1,12 +1,27 @@
 [
   {
     "type": "guide",
-    "tr": "Boobie, Jason ile Lucia’yı birlikte yürütülecek bir iş için çağırır.",
-    "sceneId": "guide-1"
+    "tr": "İkili eve döndüğünde Boobie’yi dairede bulur. Boobie, dairede kaldıkları sürece kendisi için çalışacaklarını söyler ve Rockridge’deki işi verir.",
+    "sceneId": "bayside"
   },
   {
     "type": "guide",
-    "tr": "Görev adını ararken Bricked Up başlığını kullan. Kamusal görev dizininde Jason, Lucia ve Boobie bu kayda bağlanır.",
-    "sceneId": "guide-2"
+    "tr": "Lucia, arabayı dikkat çekmeyecek bir yere bırakmayı önerir. İkili Raymond’ı aramak için binaya girer.",
+    "sceneId": "venture"
+  },
+  {
+    "type": "guide",
+    "tr": "Girişte asansör yanındaki kişiyle konuşulur. Üst kattaki kırmızı kapı, Raymond’la görüşmeye giden noktadır.",
+    "sceneId": "raymond"
+  },
+  {
+    "type": "guide",
+    "tr": "Méndez’in ekibi baskın yapınca buluşma yarıda kalır. Jason ve Lucia, Boobie’nin istediği çantayı alıp binadan çıkma seçeneğiyle karşılaşır.",
+    "sceneId": "raid"
+  },
+  {
+    "type": "guide",
+    "tr": "Takipten kurtulduktan sonra Jason ile Lucia, Boobie’nin dairesinden taşınmaları gerektiği konusunda anlaşır.",
+    "sceneId": "departure"
   }
 ]

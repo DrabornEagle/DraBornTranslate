@@ -18,15 +18,21 @@ internal object GtaMissionStore {
     private val repository = URI("https://raw.githubusercontent.com/DrabornEagle/DraBornTranslate/main/packs/gta-6/")
     private val digestPattern = Regex("[a-f0-9]{64}")
     private val lock = Any()
+    private val bundledPrefix = "gta-6-reference-"
+    private val publishedVersion = Regex("[0-9]{4}[.][0-9]{2}[.][0-9]{2}[.][0-9]+")
 
     fun installed(context: Context): Boolean = hasDownload(context) || hasLocal(context)
     fun hasDownload(context: Context): Boolean = destination(context, local = false).isFile
     fun hasLocal(context: Context): Boolean = destination(context, local = true).isFile
 
-    fun catalog(context: Context): GtaMissionCatalog? = activeFile(context).takeIf(File::isFile)?.let(GtaMissionPack::catalog)
+    fun catalog(context: Context): GtaMissionCatalog? = synchronized(lock) {
+        activeFile(context)?.let(GtaMissionPack::catalog)
+    }
 
-    fun texts(context: Context, catalog: GtaMissionCatalog, mission: GtaMission): List<GtaMissionText> =
-        GtaMissionPack.texts(activeFile(context), catalog.version, mission)
+    fun texts(context: Context, catalog: GtaMissionCatalog, mission: GtaMission): List<GtaMissionText> = synchronized(lock) {
+        val file = activeFile(context) ?: throw IOException("Görev paketi açılamadı.")
+        GtaMissionPack.texts(file, catalog.version, mission)
+    }
 
     fun download(context: Context): GtaMissionCatalog = synchronized(lock) {
         val manifest = try {
@@ -83,7 +89,38 @@ internal object GtaMissionStore {
             setRequestProperty("User-Agent", "DraBornTranslate Android")
         }
 
-    private fun activeFile(context: Context) = destination(context, local = hasLocal(context))
+    private fun activeFile(context: Context): File? {
+        val local = destination(context, local = true)
+        if (local.isFile) return local
+        val downloaded = destination(context, local = false).takeIf(File::isFile)
+        val asset = context.assets.list("")?.firstOrNull { it.startsWith(bundledPrefix) && it.endsWith(".zip") }
+            ?: return downloaded
+        val bundledVersion = asset.removePrefix(bundledPrefix).removeSuffix(".zip")
+        if (downloaded != null) {
+            val currentVersion = runCatching { GtaMissionPack.catalog(downloaded).version }.getOrNull()
+            if (currentVersion == bundledVersion || currentVersion != null && isNewer(currentVersion, bundledVersion)) {
+                return downloaded
+            }
+        }
+        val bundled = File(context.cacheDir, asset)
+        if (!bundled.isFile) {
+            stage(bundled) { temp ->
+                context.assets.open(asset).use { source ->
+                    temp.outputStream().use { copyLimited(source, it, GtaMissionPack.MAX_ARCHIVE_BYTES) }
+                }
+                GtaMissionPack.catalog(temp)
+            }
+        }
+        return bundled
+    }
+
+    private fun isNewer(version: String, baseline: String): Boolean {
+        if (!publishedVersion.matches(version) || !publishedVersion.matches(baseline)) return false
+        val parts = version.split('.').zip(baseline.split('.')) { value, reference ->
+            value.toLongOrNull()?.compareTo(reference.toLongOrNull() ?: 0L) ?: 0
+        }
+        return (parts.firstOrNull { it != 0 } ?: 0) > 0
+    }
 
     private fun destination(context: Context, local: Boolean) = File(context.filesDir,
         if (local) "gta-6-missions-local.zip" else "gta-6-missions.zip")

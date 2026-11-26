@@ -16,6 +16,8 @@ import com.draborneagle.draborntranslate.HudBlock
 import com.draborneagle.draborntranslate.HudKind
 import com.draborneagle.draborntranslate.HudTranslationSession
 import com.draborneagle.draborntranslate.ImportedGamePack
+import com.draborneagle.draborntranslate.MissionJournal
+import com.draborneagle.draborntranslate.MissionLineSource
 import com.gametranslator.gametranslator_mobile.core.ContinuationTranslator
 import com.gametranslator.gametranslator_mobile.core.EnglishWords
 import com.gametranslator.gametranslator_mobile.core.ExtraAreas
@@ -261,6 +263,7 @@ object Engine : Native.SessionListener {
     private fun addToHistory(source: String, translation: String, fromPack: Boolean) {
         val app = appContext ?: return
         if (historyOf(app).add(source, translation, fromPack)) saveHistory()
+        MissionJournal.observe(app, source, translation, MissionLineSource.CONSOLE)
     }
 
     private fun saveHistory() {
