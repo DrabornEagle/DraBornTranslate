@@ -57,5 +57,3 @@ GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repli
 ## Derleme ve kaynaklar
 
 [Android derlemesi](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml) · [Kaynak koddan derleme](docs/KURULUM.md#kaynak-koddan-derleme) · [Çeviri bileşeni eşitleme](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/translation-sync.yml)
-
-[GNU AGPL-3.0 lisansı](app/src/main/assets/LICENSE) · [Telif bildirimleri](app/src/main/assets/NOTICE) · [Açık kaynak bileşenleri](docs/KAYNAKLAR.md)
