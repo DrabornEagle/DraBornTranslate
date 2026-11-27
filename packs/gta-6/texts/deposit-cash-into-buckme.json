@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Bir ATM üzerinden BuckMe hesabına nakit yatırılır.",
+    "tr": "Görev haritada bir nokta açmaz. BuckMe’nin ATM bulucusu yakındaki cihazı işaretler.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Cebindeki paranın bir kısmını ATM’den BuckMe’ye aktar. Para hesaba geçtiğinde hedef tamamlanır.",
+    "sceneId": "deposit"
+  },
+  {
+    "type": "objective",
+    "tr": "Bir ATM kullanarak BuckMe hesabına nakit yatır.",
+    "sceneId": "deposit"
   }
 ]

@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Havaalanındaki işin ardından Jason ve Lucia, disk hakkında Raul’dan haber bekler.",
+    "tr": "VCIA Takedown ardından sabit disk satışı konuşulmaya başlanır. Raul’dan haber bekleme hedefinin kendi harita konumu yoktur.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "İlerleme Valentina’nın aramasıyla gelir. Geri aramak beklemeyi kısaltır. Y Hotel’de bırakılan not alınınca Sunset başlar.",
+    "sceneId": "valentina"
   }
 ]

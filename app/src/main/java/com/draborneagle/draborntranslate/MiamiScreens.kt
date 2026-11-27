@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 
 internal object Miami {
@@ -28,10 +29,10 @@ internal object Miami {
     val lavender = 0xFFD2BDFF.toInt()
 }
 
-internal fun Activity.miamiPage(title: String, accent: Int): LinearLayout {
+internal fun Activity.miamiPage(title: String, accent: Int, bindTitle: (TextView) -> Unit = {}): LinearLayout {
     val (scroll, content) = scrollColumn()
     pageRoot(stack().apply {
-        addView(titleBar(title, accent))
+        addView(titleBar(title, accent, bindTitle))
         addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
     }, accent, Miami.night)
     return content

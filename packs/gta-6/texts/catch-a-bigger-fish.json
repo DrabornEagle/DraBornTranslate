@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Cal, iki pounddan ağır bir stoplight papağan balığı yakalamayı önerir.",
+    "tr": "Feng Shui’den sonra Cal bir mesajla kendi avını geçmeni ister. Balık tutma alanına tekneyle gidebilirsin.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Tekneyi demirle ve küçük tuzlu su yemiyle iki pounddan ağır bir stoplight papağan balığı yakala.",
+    "sceneId": "fishing"
+  },
+  {
+    "type": "guide",
+    "tr": "Boyut koşulunu karşılayan balığı yakaladığında sonucu Cal’e göndererek meydan okumayı tamamla.",
+    "sceneId": "send"
   }
 ]

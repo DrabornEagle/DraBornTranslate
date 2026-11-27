@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Cellerica giriş ücreti BuckMe üzerinden Andy’ye gönderilir.",
+    "tr": "Andy, Lucia’yı Cellerica’ya katılma hakkında arar. Ardından ödeme görevi hikâye listesinde görünür.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "BuckMe’den Andy’ye 5.000 dolar öde. Sonraki giriş görevi Peach!, aradan biraz zaman geçince açılır.",
+    "sceneId": "transfer"
+  },
+  {
+    "type": "objective",
+    "tr": "Cellerica giriş ücreti olarak Andy’ye 5.000 dolar gönder.",
+    "sceneId": "transfer"
   }
 ]

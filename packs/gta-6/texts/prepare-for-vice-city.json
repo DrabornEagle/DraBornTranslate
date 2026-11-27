@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Dre’Quan Vice City’de kalacak yer ayarlarken Jason ile Lucia taşınma için 15.000 dolar toplamaya çalışır.",
+    "tr": "İki karakterin şehre taşınma hedefi için toplam 15.000 dolar gerekir. Para farklı işlerden kazanılabilir.",
+    "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Bütçe koşulu ve açık hikâye görevleri tamamlanınca motel odası işaretlenir. Burada Checking Out başlar.",
+    "sceneId": "ready"
+  },
+  {
+    "type": "objective",
+    "tr": "Vice City’ye taşınmak için en az 15.000 dolar kazan.",
     "sceneId": "start"
   }
 ]

@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Vice City’de kullanmak üzere eski araç geri alınır veya yeni bir araç kaydedilir.",
+    "tr": "Bölüm 3’te yeni eve gelince önceki araçların çekildiği öğrenilir ve araç edinme hedefi açılır.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Uygulamadan çekilen araçlardan birinin teslimini isteyebilirsin. Bir karakterin aracını geri almak yeterlidir.",
+    "sceneId": "recover"
+  },
+  {
+    "type": "guide",
+    "tr": "Alternatif olarak kayıt hakkın varsa başka bir aracı Pay ’n’ Spray’de kaydederek aynı hedefi tamamlayabilirsin.",
+    "sceneId": "register"
   }
 ]

@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Lucia, Lorena’ya ilk para transferini yapar.",
+    "tr": "Mami Knows Best sonrasında Lorena, Lucia’yı arar. Hikâye listesindeki yeni hedefi Lucia tamamlayabilir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Lucia’nın vadesiz hesabından Lorena’ya 5.000 dolar gönderilir. Transferi yapmak için bir konuma gitmek gerekmez.",
+    "sceneId": "transfer"
+  },
+  {
+    "type": "objective",
+    "tr": "Lucia’nın BuckMe hesabından Lorena’ya 5.000 dolar gönder.",
+    "sceneId": "transfer"
   }
 ]

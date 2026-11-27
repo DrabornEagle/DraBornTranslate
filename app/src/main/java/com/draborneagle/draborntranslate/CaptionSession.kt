@@ -31,6 +31,8 @@ internal class CaptionSession(
     ),
     private val contextClock: () -> Long = { System.nanoTime() / 1_000_000L },
     private val lookup: ((TranslationInput, (TranslationReply?) -> Unit) -> Unit)? = null,
+    private val onObserved: ((String, Long) -> Unit)? = null,
+    private val onTranslated: ((String, String, Long) -> Unit)? = null,
 ) {
     private data class Request(
         val number: Int,
@@ -38,6 +40,7 @@ internal class CaptionSession(
         val input: TranslationInput,
         val position: CaptionPosition?,
         val allowFallback: Boolean,
+        val observedAt: Long?,
     )
 
     private val cache = object : LinkedHashMap<TranslationInput, TranslationReply>(128, 0.75f, true) {
@@ -53,7 +56,10 @@ internal class CaptionSession(
     private var shownPack: TranslationInput? = null
     private var shownSource: String? = null
 
-    fun read(lines: List<String>, position: CaptionPosition? = null, allowFallback: Boolean = true) {
+    fun read(
+        lines: List<String>, position: CaptionPosition? = null, allowFallback: Boolean = true,
+        observedAt: Long? = null,
+    ) {
         if (closed) return
         val clean = if (readingArea == ReadingArea.GAME_TEXT) steadyGameText(lines) else lines.map { line ->
             val (prefix, body) = SpeakerPrefix.split(line)
@@ -72,13 +78,14 @@ internal class CaptionSession(
             }
             StabilizerKind.TRANSLATE, StabilizerKind.RESTORE -> {
                 val source = action.text ?: return
+                if (observedAt != null) onObserved?.invoke(source, observedAt)
                 clearCaption(hide = readingArea == ReadingArea.GAME_TEXT)
                 val input = subtitleInput(source, action.kind)
+                val request = Request(number, source, input, position, allowFallback, observedAt)
                 val cached = cache[input]
                 if (cached?.fromPack == true) {
-                    deliver(source, cached, position)
+                    deliver(request, cached)
                 } else {
-                    val request = Request(number, source, input, position, allowFallback)
                     val find = lookup
                     if (find == null || cached != null) {
                         onPackMiss(request, cached)
@@ -89,7 +96,7 @@ internal class CaptionSession(
                             }
                             else {
                                 cache[input] = reply
-                                deliver(source, reply, position)
+                                deliver(request, reply)
                             }
                         }
                     }
@@ -160,7 +167,7 @@ internal class CaptionSession(
         if (keepPackedReading(request.input)) return
         when {
             !request.allowFallback -> stabilizer.forgetSent(shownSource)
-            cached != null -> deliver(request.source, cached, request.position)
+            cached != null -> deliver(request, cached)
             else -> enqueue(request)
         }
     }
@@ -183,16 +190,21 @@ internal class CaptionSession(
                         show(null)
                         onFailure(reply.issue)
                     } else {
-                        deliver(request.source, reply, request.position)
+                        deliver(request, reply)
                     }
+                } else if (turkish != null) {
+                    recordTranslation(request, turkish)
                 }
                 translateNext()
             }
         }
     }
 
-    private fun deliver(source: String, reply: TranslationReply, position: CaptionPosition?) {
+    private fun deliver(request: Request, reply: TranslationReply) {
         val turkish = reply.text?.trim() ?: return
+        val source = request.source
+        val position = request.position
+        recordTranslation(request, turkish)
         val changed = if (readingArea == ReadingArea.GAME_TEXT) TextMatch.normalize(source) != TextMatch.normalize(turkish)
         else stabilizer.shouldSend(source, turkish)
         val localized = if (position != null) Gta6Profile.localizeSpeaker(turkish) else turkish
@@ -200,6 +212,13 @@ internal class CaptionSession(
         shownPack = if (changed && reply.fromPack && readingArea == ReadingArea.SUBTITLES) previousSubtitle else null
         shownSource = source.takeIf { changed }
         show(if (changed) Caption(source, displayed, position, reply.packId) else null)
+    }
+
+    private fun recordTranslation(request: Request, text: String) {
+        val time = request.observedAt ?: return
+        if (TextMatch.normalize(request.source) != TextMatch.normalize(text)) {
+            onTranslated?.invoke(request.source, Gta6Profile.localizeSpeaker(text), time)
+        }
     }
 
     private companion object {

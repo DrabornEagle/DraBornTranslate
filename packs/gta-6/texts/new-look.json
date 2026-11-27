@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Lucia, Pearl House Hair Salon’da saç modelini değiştirir.",
+    "tr": "Girls’ Trip’in ardından Lucia’yla kuaföre gir ve salon çalışanıyla konuş.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Menüden herhangi bir ücretli saç modelini seçmek hedefi bitirir.",
+    "sceneId": "style"
   }
 ]

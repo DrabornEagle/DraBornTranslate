@@ -44,6 +44,23 @@ class GtaMissionPackTest {
     }
 
     @Test
+    fun chapterAndTypeFiltersKeepAliasesAndUseTheSelectedLanguage() {
+        val catalog = GtaMissionPack.validate(archive())
+        val side = catalog.missions.single().copy(chapterOrder = 2)
+        val before = side.copy(id = "other", chapterOrder = 1, type = GtaMissionType.STORY)
+        val earlier = side.copy(id = "past", chapter = 1)
+        val redirect = side.copy(id = "old-launch", type = GtaMissionType.STORY, aliases = listOf("OLD_LAUNCH"),
+            searchTarget = side.id)
+        val combined = catalog.copy(missions = listOf(side, before, earlier, redirect))
+        val language = GtaMissionSearchLanguage.ENGLISH
+        assertEquals(listOf(earlier.id, before.id, side.id), combined.search("").map { it.id })
+        assertEquals(listOf(side.id), combined.search("OLD_LAUNCH", language, GtaMissionType.SIDE, 3).map { it.id })
+        assertTrue(combined.search("OLD_LAUNCH", language, GtaMissionType.STORY, 3).isEmpty())
+        assertEquals("Side mission · Chapter 3", side.categoryIn(language))
+        assertEquals("Yan görev · Bölüm 3", side.categoryIn(GtaMissionSearchLanguage.TURKISH))
+    }
+
+    @Test
     fun keepsTextOrderAndOnlyUsesSuppliedSceneTimes() {
         val file = archive()
         val catalog = GtaMissionPack.validate(file)
@@ -94,6 +111,25 @@ class GtaMissionPackTest {
         assertEquals(listOf("Varış", "Çıkış"), transcript.scenes.map { it.title })
         assertEquals(listOf("Merhaba.", "Dışarıda bekliyorum.", "Geliyorum."), transcript.inSceneOrder().map { it.turkish })
         assertEquals(transcript.inSceneOrder(), transcript.inReadingOrder())
+    }
+
+    @Test
+    fun timedCuesUseSceneThenTimeAndMixedCuesKeepAuthoredOrder() {
+        val entry = mission().put("textCount", 4)
+        entry.getJSONArray("scenes").put(JSONObject("""{"id":"exit","titleTr":"Çıkış"}"""))
+        val rows = JSONArray("""
+            [{"type":"dialogue","tr":"Çıkış.","sceneId":"exit","startMs":250},
+             {"type":"dialogue","tr":"Sonra.","sceneId":"arrival","startMs":850},
+             {"type":"dialogue","tr":"Önce.","sceneId":"arrival","startMs":100},
+             {"type":"dialogue","tr":"Hemen ardından.","sceneId":"arrival","startMs":100}]
+        """.trimIndent())
+        val timed = checkNotNull(GtaMissionPack.dialogue(archive(entry, rows), "launch"))
+        assertEquals(listOf("Önce.", "Hemen ardından.", "Sonra.", "Çıkış."), timed.inReadingOrder().map { it.turkish })
+        rows.getJSONObject(2).apply { remove("sceneId"); remove("startMs") }
+        val mixed = checkNotNull(GtaMissionPack.dialogue(archive(entry, rows), "launch"))
+        assertEquals(listOf("Çıkış.", "Sonra.", "Önce.", "Hemen ardından."), mixed.inReadingOrder().map { it.turkish })
+        assertEquals(4, timed.copy(recorded = true).inReadingOrder().size)
+        assertEquals("Çıkış.", timed.copy(recorded = true).inReadingOrder().first().turkish)
     }
 
     @Test
@@ -262,6 +298,7 @@ class GtaMissionPackTest {
         assertTrue(missionImageUri("https://www.gtabase.com/images/gta-6/characters/cal-hampton.jpg") != null)
         assertTrue(missionImageUri("https://www.gtabase.com/images/jch-optimize/ng/cal-hampton.avif") != null)
         assertTrue(missionImageUri("https://www.rockstargames.com/VI/_next/static/media/cal.jpg?imwidth=420") != null)
+        assertTrue(missionImageUri("https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp") != null)
         listOf(
             "http://www.gtabase.com/images/gta-6/cal.jpg",
             "https://www.gtabase.com@other.example/images/gta-6/cal.jpg",
@@ -270,7 +307,25 @@ class GtaMissionPackTest {
             "https://www.gtabase.com:4040/images/gta-6/cal.jpg",
             "https://www.gtabase.com/stream/cal.jpg",
             "https://www.gtabase.com/images/gta-6/cal.html",
+            "https://six.mics.dev/explorer/data/dialogue/image.webp",
         ).forEach { assertTrue(missionImageUri(it) == null) }
+    }
+
+    @Test
+    fun validatesMultipleSceneImagesWithoutReusingTheMissionCover() {
+        val entry = mission().put("mapIconUrl", "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp")
+        val scene = entry.getJSONArray("scenes").getJSONObject(0)
+        val images = JSONArray("""[
+            {"url":"https://www.gtabase.com/images/gta-6/missions/arrival.jpg"},
+            {"url":"https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-entrance.jpg"}
+        ]""")
+        scene.put("images", images)
+        val parsed = GtaMissionPack.validate(archive(entry)).missions.single()
+        assertTrue(parsed.previews.isEmpty())
+        assertEquals(2, parsed.scenes.single().images.size)
+        assertTrue(parsed.mapIcon?.url.orEmpty().endsWith("blip_mission_brian.webp"))
+        images.put(images.getJSONObject(0))
+        assertThrows(IOException::class.java) { GtaMissionPack.validate(archive(entry)) }
     }
 
     private fun mission() = JSONObject(

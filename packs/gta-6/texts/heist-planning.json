@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Raul, Sinfrontera National Bank için ekibi toplar ve soygundan önce gereken hazırlıkları planlar.",
+    "tr": "Security Expert tamamlandığında Raul’un ekibi için hazırlık takibi açılır. Görev kartındaki aşama, diğer hazırlık görevleriyle ilerler.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Company Property, Safe Word, The Missing Link ve Hidden Charges tamamlandığında Raul bankadaki ana görev için haber verir.",
+    "sceneId": "prep"
+  },
+  {
+    "type": "objective",
+    "tr": "Sinfrontera National Bank işi için hazırlık görevlerini tamamla.",
+    "sceneId": "prep"
   }
 ]

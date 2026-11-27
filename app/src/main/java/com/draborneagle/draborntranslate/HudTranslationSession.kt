@@ -9,6 +9,7 @@ import java.util.Locale
 internal class HudTranslationSession(
     private val translate: (TranslationInput, (TranslationReply) -> Unit) -> Unit,
     private val show: (List<HudBlock>) -> Unit,
+    private val onObjectiveTranslated: ((HudBlock, HudBlock) -> Unit)? = null,
 ) {
     private class Region {
         var candidate: HudBlock? = null
@@ -81,7 +82,9 @@ internal class HudTranslationSession(
         }
         val line = source.lines.getOrNull(index)
         if (line == null) {
-            region.rendered = current.copy(lines = rows)
+            val translated = current.copy(lines = rows)
+            region.rendered = translated
+            if (current.kind == HudKind.OBJECTIVE) onObjectiveTranslated?.invoke(current, translated)
             translating = false
             publish()
             next()

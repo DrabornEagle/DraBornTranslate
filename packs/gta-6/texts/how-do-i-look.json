@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Lucia yeni kıyafet seçer. Bargain World daha ekonomik bir seçenek sunar.",
+    "tr": "Lucia için alışveriş hedefi şehrin güneyindeki mağazada tamamlanabilir. Kıyafetleri mağaza içinde seçebilirsin.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Bir üst ve bir pantolon ya da şort al. Manken üzerindeki takım da iki parçayı birlikte karşılar.",
+    "sceneId": "outfit"
   }
 ]

@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Kordell’in ekibiyle bağlantı kurulduktan sonra sıradaki işi Nate haber verecektir.",
+    "tr": "Dirty Work bittikten sonra bir bekleme hedefi açılır. Bu aşamada Nate’e gidilecek bir konum gösterilmez.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Jason tarafındaki açık hikâye görevleri ve Child’s Play tamamlanınca Lucia, Nate’in sonraki işle ilgili aramasını alabilir.",
+    "sceneId": "phone"
   }
 ]

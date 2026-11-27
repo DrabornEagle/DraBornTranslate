@@ -1,12 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Donnie’nin taşıdığı paket sulak alanda kalır. Jason’ın görevi, Donnie’nin bıraktığı yükü geri getirmektir.",
+    "tr": "Oyun kaydı, Donnie’nin Grassrivers’da yanlışlıkla kaybettiği paketi Jason’ın geri aldığını belirtir.",
     "sceneId": "guide-1"
   },
   {
     "type": "guide",
-    "tr": "Bu kayıt Donnie’nin yükünü bulma kısmına aittir. Karavanındaki izleri temizleme işi katalogda ayrı bir göreve bağlıdır.",
+    "tr": "Bu kayıt batık tekneye giden kıyı görevinden ayrıdır. Görev dizininde aramanın kesin konumu ve bitiş koşulu yayımlanmamıştır.",
     "sceneId": "guide-2"
   }
 ]

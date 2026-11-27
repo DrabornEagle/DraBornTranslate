@@ -144,7 +144,7 @@ class CaptureService : Service() {
         if (config.captionEnabled && config.gtaProfileActive) {
             missionRecording = GtaMissionRecording.start(this, intent.getStringExtra(GtaMissionRecording.EXTRA_MISSION_ID))
             profileReader = GtaProfileReader(profileOcr)
-            hudSession = HudTranslationSession(language::translate, ::showHud)
+            hudSession = HudTranslationSession(language::translate, ::showHud, missionRecording?.let { it::translateObjective })
             if (!direct && config.showOnPhone) gtaOverlay = GtaHudOverlay(this, config)
         } else if (config.captionEnabled) {
             ocr = SubtitleReader(readingArea)
@@ -158,13 +158,12 @@ class CaptureService : Service() {
         }
         captions = CaptionSession(
             translate = language::translateFallback,
-            show = { caption ->
-                if (!ended && caption != null) missionRecording?.add(caption.source, caption.turkish)
-                showCaption(caption)
-            },
+            show = ::showCaption,
             lookup = language::lookupPack,
             onFailure = { issue -> updateTranslationIssue(issue ?: "Çeviri yanıtı alınamadı. Satır yeniden denenecek.") },
             readingArea = readingArea,
+            onObserved = { source, time -> missionRecording?.add(source, observedAt = time) },
+            onTranslated = { source, text, time -> missionRecording?.translate(source, text, time) },
         )
         val reserve = { modelReady && ocrPending.compareAndSet(false, true) }
         val discard: () -> Unit = { ocrPending.set(false) }
@@ -263,6 +262,7 @@ class CaptureService : Service() {
         }
         if (source != FrameSource.VISIBLE) sourceChanged(FrameSource.VISIBLE)
         val frameEpoch = epoch
+        val observedAt = if (missionRecording != null) SystemClock.elapsedRealtime() else null
         if (gtaReader != null) {
             gtaReader.read(bitmap) { result ->
                 main.post {
@@ -274,7 +274,8 @@ class CaptureService : Service() {
                         } else {
                             val lines = result.subtitles.map { it.text }
                             updateStatus(if (lines.isEmpty() && result.hud.isEmpty()) waitingForText() else "GTA 6 oyun metni okunuyor.")
-                            captions?.read(lines, result.captionPosition(), result.allowFallback)
+                            missionRecording?.observeObjectives(result.hud, requireConfirmation = true)
+                            captions?.read(lines, result.captionPosition(), result.allowFallback, observedAt)
                             hudSession?.read(result.hud)
                         }
                     }
@@ -293,7 +294,7 @@ class CaptureService : Service() {
                     readingArea == ReadingArea.GAME_TEXT -> "Oyun metni okunuyor."
                     else -> "İngilizce altyazı okunuyor."
                 })
-                captions?.read(lines)
+                captions?.read(lines, observedAt = observedAt)
             }
         }
     }
@@ -314,7 +315,6 @@ class CaptureService : Service() {
 
     private fun showHud(blocks: List<HudBlock>) {
         if (ended) return
-        missionRecording?.observeObjectives(blocks)
         val state = SessionState.current.copy(gameHud = blocks)
         SessionState.update(state)
         renderTranslation(state)

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "2026.11.26.6",
+  "version": "2026.11.27.1",
   "gameBuild": "Xbox Series 1.0.2.1",
   "missions": [
     {
@@ -23,15 +23,89 @@
       ],
       "scenes": [
         {
+          "id": "first-meeting",
+          "titleTr": "Jason ile Lucia’nın tanışması",
+          "environmentTr": "Vice City · geçmişe dönüş",
+          "contextTr": "Gece yaşanan bir trafik kontrolü, Jason ile Lucia’nın ilk karşılaşmasını gösterir.",
+          "images": [
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/lucia-jason-hands-up-sm.jpg"
+            }
+          ],
+          "sourceUrl": "https://www.luciaandjason.com/screenshots#prologue"
+        },
+        {
+          "id": "opening-credits",
+          "titleTr": "Açılış jeneriği",
+          "environmentTr": "Vice City · açılış montajı",
+          "contextTr": "Jason ile Lucia’nın tanışmasını Leonida manzaralarıyla açılış jeneriği izler. Oyun daha sonra Hamlet Cezaevi’ndeki Lucia’ya geçer.",
+          "images": [
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/pilot-over-vice-city-sm.jpg"
+            },
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/wetsuit-boat-sm.jpg"
+            }
+          ],
+          "sourceUrl": "https://www.luciaandjason.com/screenshots#prologue"
+        },
+        {
+          "id": "prison-wing",
+          "titleTr": "Cezaevi koğuşundan çıkış",
+          "environmentTr": "Hamlet Cezaevi",
+          "contextTr": "Lucia’nın ilk oynanabilir bölümünde bir görevli onu hücreden alıp danışmanın yanına götürür.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-1-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-3-768x432.jpg"
+            }
+          ]
+        },
+        {
           "id": "interview",
           "titleTr": "Danışmanla görüşme",
           "environmentTr": "Cezaevi görüşme odası",
-          "contextTr": "Lucia’nın cezaevindeki durumunu tanıtan açılış sahnesi."
+          "contextTr": "Lucia’nın cezaevindeki durumunu tanıtan açılış sahnesi.",
+          "images": [
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/counselor-office-sm.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "Görüşmenin amacı",
           "environmentTr": "Cezaevi"
+        },
+        {
+          "id": "flashback-arrival",
+          "titleTr": "Lucia’nın geçmişe dönüşü",
+          "environmentTr": "Vice City · MoneyShift",
+          "contextTr": "Görüşme, Lucia’nın tutuklanmasına neden olan günün oynanabilir bölümüne geçer.",
+          "images": [
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/lucia-outside-checks-cashed-sm.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-4-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "coffee-shop",
+          "titleTr": "Kafeye geri dönüş",
+          "environmentTr": "Vice City · kafe çevresi",
+          "contextTr": "Lucia, arama bölgesinden sonra kafeye geri döner. Buradaki tutuklanma sahnesi, danışman görüşmesinde anlatılan olayı tamamlar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prologue-5-768x432.jpg"
+            }
+          ]
         }
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_PROLO",
@@ -61,21 +135,95 @@
       ],
       "scenes": [
         {
+          "id": "boat",
+          "titleTr": "Uçağın bıraktığı paketler",
+          "environmentTr": "Leonida Keys · tekne",
+          "contextTr": "Jason ve Cal, Donnie’nin uçağını takip ederek açık sudaki paketleri toplar.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-boat.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-gone-fishing-1-768x432.jpg"
+            }
+          ]
+        },
+        {
           "id": "pelican-valley",
           "titleTr": "Kingfishers bölgesi",
           "environmentTr": "Pelican Valley",
-          "contextTr": "Aksayan işin ardından Jason’ın yöneldiği bölge."
+          "contextTr": "Aksayan işin ardından Jason’ın yöneldiği bölge.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-deal.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-gone-fishing-2-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "Aksayan iş",
-          "environmentTr": "Keys çevresi"
+          "environmentTr": "Keys çevresi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-search-for-donnie.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-shack.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-untie.jpg"
+            }
+          ]
+        },
+        {
+          "id": "plane",
+          "titleTr": "Donnie’yle uçaktan kaçış",
+          "environmentTr": "Grassrivers · deniz uçağı",
+          "contextTr": "Donnie’yi bulduktan sonra uçağa geçilir. İnişten sonra sıra Cal’i evine götürmeye gelir.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-escape-to-plane.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-plane.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishing-escape.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-land-plane.jpg"
+            }
+          ]
+        },
+        {
+          "id": "drive-home",
+          "titleTr": "Cal’i ve Jason’ı eve götürme",
+          "environmentTr": "Leonida Keys · ilk ev",
+          "contextTr": "Cal’i bıraktıktan sonra Jason’ın ilk evine gidilir. Evin kullanılabilir olması görev bölümünü kapatır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-get-in-car.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-drive-to-cal.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-drive-to-jason.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gone-fishin-enter-house.jpg"
+            }
+          ]
         }
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:INT_CHASE",
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/gone-fishing",
       "giver": "Cal Hampton",
-      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/cal"
+      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/cal",
+      "chapterOrder": 1
     },
     {
       "id": "gear-up",
@@ -95,12 +243,28 @@
         {
           "id": "guide-1",
           "titleTr": "Hazırlık",
-          "environmentTr": "Ammu-Nation"
+          "environmentTr": "Ammu-Nation",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gear-up-ammunation.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gear-up-clerk.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gear-up-weapon-1.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Alışveriş sonrası",
-          "environmentTr": "Dükkân ve çevresi"
+          "environmentTr": "Dükkân ve çevresi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gear-up-encounter.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/gear-up",
@@ -108,7 +272,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
       "mapLabels": [
         "Pick Up Another Gun"
-      ]
+      ],
+      "chapterOrder": 2
     },
     {
       "id": "ft-kmodshp",
@@ -130,12 +295,25 @@
         {
           "id": "guide-1",
           "titleTr": "Aracı götür",
-          "environmentTr": "Coastal Auto Care"
+          "environmentTr": "Coastal Auto Care",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/scratch-drive-.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/scratch-talk-.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "İşi tamamla",
-          "environmentTr": "Tamir atölyesi"
+          "environmentTr": "Tamir atölyesi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/scratch-respray-.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/just-a-scratch",
@@ -143,7 +321,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
       "mapLabels": [
         "Fix Your Car"
-      ]
+      ],
+      "chapterOrder": 6
     },
     {
       "id": "com-kbos-shop",
@@ -177,17 +356,47 @@
         {
           "id": "guide-2",
           "titleTr": "Kasadaki görüşme",
-          "environmentTr": "Hediyelik eşya dükkânının satış alanı"
+          "environmentTr": "Hediyelik eşya dükkânının satış alanı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-clerk.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-grab-bat.jpg"
+            }
+          ]
         },
         {
           "id": "guide-3",
           "titleTr": "Arka odaya geç",
-          "environmentTr": "Dükkândaki şifreli kapı ve laboratuvar"
+          "environmentTr": "Dükkândaki şifreli kapı ve laboratuvar",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-keypad.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-code.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-acid.jpg"
+            }
+          ]
         },
         {
           "id": "guide-4",
           "titleTr": "Teslimat",
-          "environmentTr": "Brian’ın güneydeki deposu"
+          "environmentTr": "Brian’ın güneydeki deposu",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-call-brian.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-drop-off-location.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/lab-fees-drop-off.jpg"
+            }
+          ]
         },
         {
           "id": "guide-5",
@@ -200,7 +409,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/brian",
       "mapLabels": [
         "Collect Brian’s Rent"
-      ]
+      ],
+      "chapterOrder": 4
     },
     {
       "id": "com-kbos-colat",
@@ -222,12 +432,28 @@
         {
           "id": "guide-1",
           "titleTr": "Cal’le yola çık",
-          "environmentTr": "Hamlet"
+          "environmentTr": "Hamlet",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention-meet-cal.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention-drive-hamlet.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Phoenix’in teslimi",
-          "environmentTr": "Polis otoparkı, Pay ’n’ Spray ve Brian’ın deposu"
+          "environmentTr": "Polis otoparkı, Pay ’n’ Spray ve Brian’ın deposu",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention-car-drop-off.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/unwanted-attention-payment.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/unwanted-attention",
@@ -235,7 +461,9 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/cal",
       "mapLabels": [
         "Go See Cal"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_cal.webp",
+      "chapterOrder": 3
     },
     {
       "id": "hey-arnold",
@@ -259,12 +487,28 @@
         {
           "id": "guide-1",
           "titleTr": "Aramanın nedeni",
-          "environmentTr": "Brian’ın görev bağlantısı"
+          "environmentTr": "Brian’ın görev bağlantısı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-hey-arnold-mission-walkthrough-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-hey-arnold-mission-walkthrough-6.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Görevi bul",
-          "environmentTr": "Bölüm 1 haritası"
+          "environmentTr": "Bölüm 1 haritası",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-hey-arnold-mission-walkthrough-9.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-hey-arnold-mission-walkthrough-13.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/hey-arnold",
@@ -273,7 +517,9 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/brian",
       "mapLabels": [
         "Meet Brian"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp",
+      "chapterOrder": 9
     },
     {
       "id": "pipework",
@@ -292,12 +538,31 @@
         {
           "id": "guide-1",
           "titleTr": "Kira ziyareti",
-          "environmentTr": "Mandy’nin evi"
+          "environmentTr": "Mandy’nin evi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/pipework-meet-mandy-.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/pipework-follow-mandy-.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Evdeki iş",
-          "environmentTr": "Bakım gereken bölüm"
+          "environmentTr": "Bakım gereken bölüm",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/pipework-plunger-.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/pipework-sink-location-.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/pipework-fix-the-sink-.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/pipework",
@@ -306,7 +571,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/pipework",
       "mapLabels": [
         "Collect Mandy’s Rent"
-      ]
+      ],
+      "chapterOrder": 5
     },
     {
       "id": "feng-shui",
@@ -327,7 +593,18 @@
           "id": "home",
           "titleTr": "Evi hazırlama",
           "environmentTr": "Evin içi",
-          "contextTr": "Mobilyaların yerini değiştirme ve dönüş için yapılan hazırlık."
+          "contextTr": "Mobilyaların yerini değiştirme ve dönüş için yapılan hazırlık.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-feng-shui-walkthrough-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-feng-shui-walkthrough-4.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/gta-6-feng-shui-walkthrough-6.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
@@ -346,7 +623,9 @@
       "mapLabels": [
         "Meet Cal"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/feng-shui"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/feng-shui",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_cal.webp",
+      "chapterOrder": 11
     },
     {
       "id": "coming-home",
@@ -368,18 +647,42 @@
           "id": "release",
           "titleTr": "Lucia’yı karşılama",
           "environmentTr": "Hamlet Correctional",
-          "contextTr": "Lucia’nın tahliyesinden sonraki buluşma."
+          "contextTr": "Lucia’nın tahliyesinden sonraki buluşma.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-2_copy.jpg"
+            }
+          ]
         },
         {
           "id": "rusty-anchor",
           "titleTr": "Kutlama",
           "environmentTr": "Rusty Anchor barı",
-          "contextTr": "Kat ve Mattia’nın katıldığı akşam, çıkan kavganın ardından sona erer."
+          "contextTr": "Kat ve Mattia’nın katıldığı akşam, çıkan kavganın ardından sona erer.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-anchor.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-friends.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-dance.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "Kutlamanın bağlamı",
-          "environmentTr": "Rusty Anchor"
+          "environmentTr": "Rusty Anchor",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-d-man.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coming-home-run-away.jpg"
+            }
+          ]
         }
       ],
       "aliases": [
@@ -393,7 +696,8 @@
       "mapLabels": [
         "Lucia’s Release"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/coming-home"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/coming-home",
+      "chapterOrder": 18
     },
     {
       "id": "int-bank",
@@ -415,12 +719,28 @@
         {
           "id": "guide-1",
           "titleTr": "Lucia’nın hesabı",
-          "environmentTr": "Fleeca şubesi"
+          "environmentTr": "Fleeca şubesi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/buck-me-reception.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/buck-me-ask.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Görüşme sırası",
-          "environmentTr": "Bankanın müşteri alanı"
+          "environmentTr": "Bankanın müşteri alanı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/buck-me-open-fix.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/buck-me-100.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/buck-me",
@@ -428,7 +748,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
       "mapLabels": [
         "Set Up Bank Account"
-      ]
+      ],
+      "chapterOrder": 20
     },
     {
       "id": "cti-pil-rd-bc-parent",
@@ -444,18 +765,20 @@
       "scenes": [
         {
           "id": "guide-1",
-          "titleTr": "Kayıp sevkiyat",
-          "environmentTr": "Grassrivers"
+          "titleTr": "Donnie’nin kayıp paketi",
+          "environmentTr": "Grassrivers",
+          "contextTr": "Oyun kaydı, Donnie’nin Grassrivers’da yanlışlıkla kaybettiği paketi Jason’ın geri aldığını belirtir."
         },
         {
           "id": "guide-2",
-          "titleTr": "Arama bağlamı",
-          "environmentTr": "Bataklık çevresi"
+          "titleTr": "Jason’ın araması",
+          "environmentTr": "Grassrivers",
+          "contextTr": "Bu kayıt batık tekneye giden kıyı görevinden ayrıdır. Görev dizininde aramanın kesin konumu ve bitiş koşulu yayımlanmamıştır."
         }
       ],
       "characters": [
-        "Donnie",
-        "Jason Duval"
+        "Jason Duval",
+        "Donnie"
       ]
     },
     {
@@ -480,12 +803,34 @@
         {
           "id": "guide-1",
           "titleTr": "Yeni iş için görüşme",
-          "environmentTr": "Marina"
+          "environmentTr": "Marina",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth-brian.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth-clean.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Görüşmenin yeri",
           "environmentTr": "Rıhtım ve tekne çevresi"
+        },
+        {
+          "id": "flight",
+          "titleTr": "Bobcat Bay’e uçuş",
+          "environmentTr": "Bobcat Bay · deniz uçağı",
+          "contextTr": "Marinadaki görüşmeyi Bobcat Bay uçuşu ve havadan yapılan teslimatlar izler.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth-fly.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/down-to-earth-drops.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/down-to-earth",
@@ -493,7 +838,9 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/brian",
       "mapLabels": [
         "Meet Brian"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp",
+      "chapterOrder": 21
     },
     {
       "id": "int-plnsh",
@@ -516,12 +863,28 @@
         {
           "id": "guide-1",
           "titleTr": "Planlı uçuş",
-          "environmentTr": "Leonida hava sahası"
+          "environmentTr": "Leonida hava sahası",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Donnie’nin ek hamlesi",
-          "environmentTr": "Yerel motosikletçi grubun buluşması"
+          "environmentTr": "Yerel motosikletçi grubun buluşması",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/clear-skies-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/clear-skies",
@@ -530,7 +893,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/int-plnsh",
       "mapLabels": [
         "Join Donnie On A Job"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_donnie.webp",
+      "chapterOrder": 28
     },
     {
       "id": "day-release",
@@ -552,19 +917,40 @@
           "id": "rusty-anchor",
           "titleTr": "Mattia’yla buluşma",
           "environmentTr": "Rusty Anchor",
-          "contextTr": "Lucia’nın elektronik kelepçesi burada çıkarılır."
+          "contextTr": "Lucia’nın elektronik kelepçesi burada çıkarılır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/day-release-1.jpg"
+            }
+          ]
         },
         {
           "id": "night-out",
           "titleTr": "Vice City gecesi",
           "environmentTr": "Yat ve Club NINE1NINE",
-          "contextTr": "Kat ve Mattia’nın çevresiyle geçirilen gece."
+          "contextTr": "Kat ve Mattia’nın çevresiyle geçirilen gece.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/day-release-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/day-release-4.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/day-release-7.jpg"
+            }
+          ]
         },
         {
           "id": "offer",
           "titleTr": "İş teklifi",
           "environmentTr": "Ertesi sabah",
-          "contextTr": "Teklifin konusu Grassrivers ziyaretçi merkezindeki bir dolapta bulunan çantadır."
+          "contextTr": "Teklifin konusu Grassrivers ziyaretçi merkezindeki bir dolapta bulunan çantadır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/day-release-8.jpg"
+            }
+          ]
         }
       ],
       "aliases": [
@@ -578,7 +964,9 @@
       "mapLabels": [
         "Meet Mattia & Kat"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/day-release"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/day-release",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_mattia.webp",
+      "chapterOrder": 26
     },
     {
       "id": "swamped",
@@ -603,12 +991,25 @@
         {
           "id": "guide-1",
           "titleTr": "Gergin buluşma",
-          "environmentTr": "Grassrivers"
+          "environmentTr": "Grassrivers",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/swamped-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/swamped-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Sulak alandaki takip",
-          "environmentTr": "Grassrivers kanalları"
+          "environmentTr": "Grassrivers kanalları",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/swamped-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/swamped",
@@ -617,7 +1018,9 @@
       "mapLabels": [
         "Meet Brian"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/swamped"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/swamped",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp",
+      "chapterOrder": 31
     },
     {
       "id": "com-kbos-clean",
@@ -640,12 +1043,25 @@
         {
           "id": "guide-1",
           "titleTr": "Karavana dön",
-          "environmentTr": "Donnie’nin karavanı"
+          "environmentTr": "Donnie’nin karavanı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bye-donny.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bye-donny-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "İşi tanı",
-          "environmentTr": "Görev işareti"
+          "environmentTr": "Görev işareti",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bye-donny-3.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/don-gone",
@@ -654,7 +1070,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/com-kbos-clean",
       "mapLabels": [
         "Head to Donnie’s Trailer"
-      ]
+      ],
+      "chapterOrder": 32
     },
     {
       "id": "ho-par-keyco",
@@ -674,16 +1091,19 @@
       "scenes": [
         {
           "id": "guide-1",
-          "titleTr": "Cal’e destek",
-          "environmentTr": "Balık tutulan kıyı"
+          "titleTr": "Cal’in yanına gitme",
+          "environmentTr": "Leonida Keys",
+          "contextTr": "Jason ve Lucia, Donnie’nin ölümünden sonra Cal’le vakit geçirerek ona destek olurlar."
         },
         {
           "id": "guide-2",
-          "titleTr": "Sahnenin amacı",
-          "environmentTr": "Kıyı ve su çevresi"
+          "titleTr": "Birlikte balığa çıkma",
+          "environmentTr": "Leonida Keys · açık su",
+          "contextTr": "Oyun dosyasındaki HO_PAR_KEYCO kodu, aramada Recalibration görevine açılan balık tutma bölümünü işaretler."
         }
       ],
-      "searchTarget": "recalibration"
+      "searchTarget": "recalibration",
+      "gameDataSourceUrl": "https://six.mics.dev/missions/ho-par-keyco"
     },
     {
       "id": "tourist-trap",
@@ -705,12 +1125,50 @@
         {
           "id": "guide-1",
           "titleTr": "Mattia’nın teklifi",
-          "environmentTr": "Grassrivers ziyaretçi merkezi"
+          "environmentTr": "Grassrivers ziyaretçi merkezi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-accept.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Çantayı takip et",
-          "environmentTr": "Ziyaretçi merkezinden çıkış"
+          "environmentTr": "Ziyaretçi merkezinden çıkış",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-pick-up.jpg"
+            }
+          ]
+        },
+        {
+          "id": "capture",
+          "titleTr": "Polisle karşılaşma",
+          "environmentTr": "Turist merkezi · çıkış çevresi",
+          "contextTr": "Çantayı aldıktan sonra polis Jason’ın yolunu keser. Kontrol Lucia’ya geçince Jason’a ulaşması gerekir.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-captured.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-take-cover.jpg"
+            }
+          ]
+        },
+        {
+          "id": "water",
+          "titleTr": "Jason’la açık suya çıkma",
+          "environmentTr": "Kıyı · kaçış teknesi",
+          "contextTr": "Lucia, yaralı Jason’a yardım eder. İkili çantayla birlikte tekneye ulaşır ve kıyıdan uzaklaşır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-help-jason.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/tourist-trap-boat.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/tourist-trap",
@@ -719,7 +1177,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
       "mapLabels": [
         "Take Up Mattia’s Offer"
-      ]
+      ],
+      "chapterOrder": 35
     },
     {
       "id": "bil-house",
@@ -770,17 +1229,37 @@
         {
           "id": "guide-1",
           "titleTr": "Hastaneye git",
-          "environmentTr": "Vice City Hospital"
+          "environmentTr": "Vice City Hospital",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/discharge-1.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-discharge-time-4-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-discharge-time-5-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Ayrılma",
-          "environmentTr": "Hastane ve çevresi"
+          "environmentTr": "Hastane ve çevresi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/discharge-2.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-discharge-time-6-768x432.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/discharge-time",
       "giver": "Lucia Caminos",
-      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia"
+      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
+      "chapterOrder": 37
     },
     {
       "id": "island-dreams",
@@ -797,15 +1276,45 @@
       ],
       "scenes": [
         {
+          "id": "kenton",
+          "titleTr": "Kenton’la buluşma",
+          "environmentTr": "Leonida Keys · Kenton’ın dükkânı",
+          "contextTr": "Jason, Kenton’dan grup dalışı hakkında bilgi alır ve grupla buluşmaya gider.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-1.jpg"
+            }
+          ]
+        },
+        {
           "id": "dive",
           "titleTr": "Batığa dalış",
           "environmentTr": "Gemi enkazı",
-          "contextTr": "Rehberlik edilen dalış grubu ile hazine arayışı aynı bölgede buluşur."
+          "contextTr": "Rehberlik edilen dalış grubu ile hazine arayışı aynı bölgede buluşur.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-4.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "Batık işi",
-          "environmentTr": "Su altındaki gemi enkazı"
+          "environmentTr": "Su altındaki gemi enkazı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-5.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/island-dreams-6.jpg"
+            }
+          ]
         }
       ],
       "aliases": [
@@ -819,7 +1328,9 @@
       "mapLabels": [
         "Work for Kenton"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/island-dreams"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/island-dreams",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_kenton.webp",
+      "chapterOrder": 10
     },
     {
       "id": "com-sfh-fltpk",
@@ -864,17 +1375,31 @@
         {
           "id": "guide-1",
           "titleTr": "Yeni başlangıç",
-          "environmentTr": "Port Gellhorn’daki motel odası"
+          "environmentTr": "Port Gellhorn’daki motel odası",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-bag-1.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Çantanın bağlantısı",
-          "environmentTr": "Motel odası"
+          "environmentTr": "Motel odası",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-bag-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/whats-in-bag-3.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/whats-in-the-bag",
       "giver": "Lucia Caminos",
-      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia"
+      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
+      "chapterOrder": 1
     },
     {
       "id": "ft-motel-shop",
@@ -913,12 +1438,31 @@
         {
           "id": "guide-1",
           "titleTr": "İhtiyaç",
-          "environmentTr": "Port Gellhorn moteli"
+          "environmentTr": "Port Gellhorn moteli",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Bölgeyi tanı",
-          "environmentTr": "Port Gellhorn"
+          "environmentTr": "Port Gellhorn",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-frankie.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/girls-trip-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/girls-trip",
@@ -927,7 +1471,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/mtl-drive",
       "mapLabels": [
         "Find Painkillers"
-      ]
+      ],
+      "chapterOrder": 6
     },
     {
       "id": "moses",
@@ -948,12 +1493,25 @@
           "id": "shop",
           "titleTr": "Tamirciyle tanışma",
           "environmentTr": "Oto tamir atölyesi",
-          "contextTr": "Görüşmede Moses’ın hangi araçlarla ilgilendiği anlaşılır."
+          "contextTr": "Görüşmede Moses’ın hangi araçlarla ilgilendiği anlaşılır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/moses-1.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "Araç bağlantısı",
-          "environmentTr": "Moses Watkins’in garajı"
+          "environmentTr": "Moses Watkins’in garajı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/moses-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/moses-3.jpg"
+            }
+          ]
         }
       ],
       "aliases": [
@@ -967,7 +1525,9 @@
       "mapLabels": [
         "Take A Vehicle to Moses"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/moses"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/moses",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_moses.webp",
+      "chapterOrder": 8
     },
     {
       "id": "cti-mech-stfc",
@@ -990,12 +1550,28 @@
         {
           "id": "guide-1",
           "titleTr": "Aranan araç",
-          "environmentTr": "Port Gellhorn ve çevresi"
+          "environmentTr": "Port Gellhorn ve çevresi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Atölye teslimi",
-          "environmentTr": "Moses’ın atölyesi"
+          "environmentTr": "Moses’ın atölyesi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/daily-driver-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/daily-driver",
@@ -1004,7 +1580,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/cti-mech-stfc",
       "mapLabels": [
         "Steal the Crawler for Moses"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_moses.webp",
+      "chapterOrder": 12
     },
     {
       "id": "mtl-pain",
@@ -1025,12 +1603,31 @@
         {
           "id": "guide-1",
           "titleTr": "Dunk’la buluşma",
-          "environmentTr": "Dunk’ın karavanı ve rıhtım çevresi"
+          "environmentTr": "Dunk’ın karavanı ve rıhtım çevresi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-opening.jpeg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-dr-bill.jpeg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Dr. Bill bağlantısı",
-          "environmentTr": "İş yeri ve teslimat rotası"
+          "environmentTr": "İş yeri ve teslimat rotası",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-docks.jpeg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-meeting.jpeg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/slam-dunk-ending.jpeg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/slam-dunk",
@@ -1040,7 +1637,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/mtl-pain",
       "mapLabels": [
         "Find Painkillers"
-      ]
+      ],
+      "chapterOrder": 14
     },
     {
       "id": "breakfast-run",
@@ -1076,7 +1674,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
       "mapLabels": [
         "Check on Jason"
-      ]
+      ],
+      "chapterOrder": 15
     },
     {
       "id": "coffee-break",
@@ -1100,18 +1699,32 @@
         {
           "id": "guide-1",
           "titleTr": "Oturup plan yap",
-          "environmentTr": "Kahve buluşması"
+          "environmentTr": "Kahve buluşması",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coffee-break-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coffee-break-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Görevin bağlamı",
-          "environmentTr": "Port Gellhorn"
+          "environmentTr": "Port Gellhorn",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/coffee-break-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/coffee-break",
       "locationTr": "Kelly County · Starlet Motel",
       "giver": "Jason Duval / Lucia Caminos",
-      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason"
+      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
+      "chapterOrder": 16
     },
     {
       "id": "afternoon-delight",
@@ -1152,7 +1765,8 @@
       "mapLabels": [
         "Rob Vicki’s Boss"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/afternoon-delight"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/afternoon-delight",
+      "chapterOrder": 23
     },
     {
       "id": "mtl-mud",
@@ -1191,7 +1805,8 @@
       "mapLabels": [
         "Check Out the Mud Club"
       ],
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy",
+      "chapterOrder": 17
     },
     {
       "id": "csc-drt-cnvy",
@@ -1233,7 +1848,9 @@
       "mapLabels": [
         "Join Billy on a Job"
       ],
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_billy.webp",
+      "chapterOrder": 18
     },
     {
       "id": "bil-motel",
@@ -1256,12 +1873,31 @@
         {
           "id": "guide-1",
           "titleTr": "Motelden çık",
-          "environmentTr": "Port Gellhorn moteli"
+          "environmentTr": "Port Gellhorn moteli",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-0.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Şehir değişimi",
-          "environmentTr": "Vice City yolu"
+          "environmentTr": "Vice City yolu",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-5.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/checking-out-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/checking-out",
@@ -1270,7 +1906,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/bil-motel",
       "mapLabels": [
         "Move to Vice City"
-      ]
+      ],
+      "chapterOrder": 24
     },
     {
       "id": "clb-meet",
@@ -1294,17 +1931,37 @@
         {
           "id": "guide-1",
           "titleTr": "Dre’Quan’ı bul",
-          "environmentTr": "Jack of Hearts"
+          "environmentTr": "Jack of Hearts",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-5.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Daire bağlantısı",
-          "environmentTr": "Vice City’deki daire"
+          "environmentTr": "Vice City’deki daire",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/welcome-to-vice-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/welcome-to-vice-city",
       "locationTr": "Vice City · Crosstown, Jack of Hearts",
-      "textSourceUrl": "https://six.mics.dev/missions/clb-meet"
+      "textSourceUrl": "https://six.mics.dev/missions/clb-meet",
+      "chapterOrder": 1
     },
     {
       "id": "play-nurse",
@@ -1338,7 +1995,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/play-nurse",
       "mapLabels": [
         "Play Nurse"
-      ]
+      ],
+      "chapterOrder": 3
     },
     {
       "id": "up-mlspm",
@@ -1372,7 +2030,9 @@
       "mapLabels": [
         "See Linda",
         "The Manager"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_linda.webp",
+      "chapterOrder": 4
     },
     {
       "id": "behind-on-payments",
@@ -1402,7 +2062,8 @@
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/behind-on-payments",
       "giver": "Linda",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/linda"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/linda",
+      "chapterOrder": 13
     },
     {
       "id": "car-service",
@@ -1442,7 +2103,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/car-service",
       "mapLabels": [
         "Steal The Car for Raul"
-      ]
+      ],
+      "chapterOrder": 10
     },
     {
       "id": "clb-deal",
@@ -1465,12 +2127,34 @@
         {
           "id": "guide-1",
           "titleTr": "Boobie’nin ricası",
-          "environmentTr": "Vice City’deki daire"
+          "environmentTr": "Vice City’deki daire",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-0.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Crosstown bağlantısı",
-          "environmentTr": "Vice City · Crosstown"
+          "environmentTr": "Vice City · Crosstown",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-6.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-4.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dealers-choice-2.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/dealers-choice",
@@ -1479,7 +2163,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/clb-deal",
       "mapLabels": [
         "Go See Dre’Quan"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_drequan.webp",
+      "chapterOrder": 2
     },
     {
       "id": "rob-veh",
@@ -1548,7 +2234,8 @@
       "titleEn": "Dubious Provenance",
       "aliases": [
         "ANT_CHASE",
-        "Dubious Provenance"
+        "Dubious Provenance",
+        "ANT_INTRO"
       ],
       "characters": [
         "Jason Duval",
@@ -1561,7 +2248,52 @@
         {
           "id": "guide-1",
           "titleTr": "Kayıt ayrımı",
-          "environmentTr": "Capri antika hikâyesi"
+          "environmentTr": "Capri antika hikâyesi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-3.jpg"
+            }
+          ]
+        },
+        {
+          "id": "antiques",
+          "titleTr": "Antikacıya geri dönme",
+          "environmentTr": "Capri · Evelyn Andrews Antiques",
+          "contextTr": "Dükkândaki ikinci ziyaret Halifax’ın izini sürmeye dönüşür. Arama daha sonra motele uzanır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part-2-1.jpg"
+            }
+          ]
+        },
+        {
+          "id": "halifax",
+          "titleTr": "Halifax’la son karşılaşma",
+          "environmentTr": "Vice City · Maryam’ın evi ve çevresi",
+          "contextTr": "Maryam’ın evinden sonra Halifax’ın peşine düşülür. Son karşılaşma bu görev zincirini kapatır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part3-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part3-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/dubious-provenance-part3-3.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/dubious-provenance",
@@ -1571,7 +2303,8 @@
       "mapLabels": [
         "Visit the Antique Store"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/dubious-provenance"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/dubious-provenance",
+      "chapterOrder": 4
     },
     {
       "id": "mami-knows-best",
@@ -1617,7 +2350,9 @@
       "mapLabels": [
         "Catch Up With Mia"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/mami-knows-best"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/mami-knows-best",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_mia.webp",
+      "chapterOrder": 5
     },
     {
       "id": "tyrone",
@@ -1647,7 +2382,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/tyrone",
       "giver": "Tyrone",
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/tyrone",
-      "gameDataSourceUrl": "https://six.mics.dev/missions/tyrone"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/tyrone",
+      "chapterOrder": 7
     },
     {
       "id": "here-kitty-kitty",
@@ -1681,7 +2417,9 @@
       "mapLabels": [
         "Speak with Tyrone"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/here-kitty-kitty"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/here-kitty-kitty",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_tyrone.webp",
+      "chapterOrder": 8
     },
     {
       "id": "ao-deal-t-synth",
@@ -1709,7 +2447,8 @@
       "titleEn": "Take Out Kitty Litter",
       "giver": "Tyrone",
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/tyrone",
-      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/take-out-kitty-litter"
+      "gallerySourceUrl": "https://www.gtabase.com/gta-6/strangers/take-out-kitty-litter",
+      "chapterOrder": 221
     },
     {
       "id": "top-billing",
@@ -1758,7 +2497,8 @@
       "mapLabels": [
         "Watch the Real Dimez"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/top-billing"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/top-billing",
+      "chapterOrder": 12
     },
     {
       "id": "com-cbo-cbint",
@@ -1796,7 +2536,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/com-cbo-cbint",
       "mapLabels": [
         "Talk to Boobie"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_boobie.webp",
+      "chapterOrder": 13
     },
     {
       "id": "rob-drive",
@@ -1818,12 +2560,31 @@
         {
           "id": "guide-1",
           "titleTr": "Raul’la buluş",
-          "environmentTr": "Rialto Islands ve otopark"
+          "environmentTr": "Rialto Islands ve otopark",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-2.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Teslimata dön",
-          "environmentTr": "Buluşma yeri ve teslim güzergâhı"
+          "environmentTr": "Buluşma yeri ve teslim güzergâhı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-4.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-5.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/first-impressions-6.jpg"
+            }
+          ]
         }
       ],
       "titleEn": "First Impressions",
@@ -1835,7 +2596,9 @@
       "mapLabels": [
         "Meeting with Raul"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/rob-drive"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/rob-drive",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_raul.webp",
+      "chapterOrder": 15
     },
     {
       "id": "caught-slipping",
@@ -1870,7 +2633,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/caught-slipping",
       "giver": "Jason Duval / Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
-      "gameDataSourceUrl": "https://six.mics.dev/missions/caught-slipping"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/caught-slipping",
+      "chapterOrder": 16
     },
     {
       "id": "rob-boat-j",
@@ -1908,7 +2672,9 @@
       "mapLabels": [
         "Meet Raul"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/rob-boat-j"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/rob-boat-j",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_raul.webp",
+      "chapterOrder": 17
     },
     {
       "id": "rob-bank",
@@ -1936,25 +2702,66 @@
           "id": "crew",
           "titleTr": "Ekiple tanışma",
           "environmentTr": "Stockyard · Raul’un üssü",
-          "contextTr": "Raul, Jason ve Lucia’ya ekibini tanıtır. Felipe ulaşımı, Andrea haberleşme ve maskeleri, Karim teknik desteği üstlenir."
+          "contextTr": "Raul, Jason ve Lucia’ya ekibini tanıtır. Felipe ulaşımı, Andrea haberleşme ve maskeleri, Karim teknik desteği üstlenir.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-1.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-credit-check-11-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "preparation",
           "titleTr": "Planlama odası",
           "environmentTr": "Stockyard · üst kat",
-          "contextTr": "Andrea ile maskeler seçilir. Karim, işaretli paraya takılan mürekkep paketlerini engelleyen cihazı gösterir."
+          "contextTr": "Andrea ile maskeler seçilir. Karim, işaretli paraya takılan mürekkep paketlerini engelleyen cihazı gösterir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-credit-check-12-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-credit-check-13-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-credit-check-14-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-credit-check-15-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "branches",
           "titleTr": "Fleeca şubeleri",
           "environmentTr": "Washington Beach ve diğer Fleeca şubeleri",
-          "contextTr": "Jason ile Lucia farklı şubelerde çalışır. Ekip, kimin içeride kalacağını ve çıkışta nasıl buluşacağını koordine eder."
+          "contextTr": "Jason ile Lucia farklı şubelerde çalışır. Ekip, kimin içeride kalacağını ve çıkışta nasıl buluşacağını koordine eder.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-4.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-5.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-6.jpg"
+            }
+          ]
         },
         {
           "id": "apartment",
           "titleTr": "Eve dönüş",
           "environmentTr": "Vice City · Jason ile Lucia’nın dairesi",
-          "contextTr": "Şubelerden ayrıldıktan sonra ekip polisten kurtulmaya çalışır. Jason ve Lucia eve döndüğünde kapı çalınır."
+          "contextTr": "Şubelerden ayrıldıktan sonra ekip polisten kurtulmaya çalışır. Jason ve Lucia eve döndüğünde kapı çalınır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/credit-check-7.jpg"
+            }
+          ]
         }
       ],
       "titleEn": "Credit Check",
@@ -1970,7 +2777,9 @@
       "requires": [
         "rob-boat-j"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/rob-bank"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/rob-bank",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_raul.webp",
+      "chapterOrder": 18
     },
     {
       "id": "clonin-keys-makin-gs",
@@ -2009,7 +2818,8 @@
       "mapLabels": [
         "Steal the Zorrusso for Randy"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/clonin-keys-makin-gs"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/clonin-keys-makin-gs",
+      "chapterOrder": 19
     },
     {
       "id": "randys-wish-list",
@@ -2039,7 +2849,8 @@
       "gallerySourceUrl": "https://www.powerpyx.com/gta-6-randys-wish-list-car-locations-walkthrough/",
       "giver": "Randy",
       "textSourceUrl": "https://six.mics.dev/missions/randys-wish-list",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy",
+      "chapterOrder": 215
     },
     {
       "id": "ban-setup",
@@ -2062,12 +2873,28 @@
         {
           "id": "guide-1",
           "titleTr": "İşin hedefi",
-          "environmentTr": "Sinfrontera National Bank"
+          "environmentTr": "Sinfrontera National Bank",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/snb-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/snb-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/snb-3.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Uzman bağlantısı",
-          "environmentTr": "Planlama görüşmesi"
+          "environmentTr": "Planlama görüşmesi",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/snb-4.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/sinfrontera-national-bank",
@@ -2076,7 +2903,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/ban-setup",
       "mapLabels": [
         "Scope Out the Bank"
-      ]
+      ],
+      "chapterOrder": 21
     },
     {
       "id": "security-expert",
@@ -2112,7 +2940,8 @@
       "locationTr": "Leonard County · Waning Sands",
       "giver": "Raul Bautista",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/raul",
-      "gameDataSourceUrl": "https://six.mics.dev/missions/security-expert"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/security-expert",
+      "chapterOrder": 22
     },
     {
       "id": "clb-steal",
@@ -2149,7 +2978,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/clb-steal",
       "mapLabels": [
         "Meet Dre’Quan"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_drequan.webp",
+      "chapterOrder": 24
     },
     {
       "id": "company-property",
@@ -2189,7 +3020,9 @@
       "mapLabels": [
         "Meet Brian"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/company-property"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/company-property",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp",
+      "chapterOrder": 25
     },
     {
       "id": "ban-carte",
@@ -2229,7 +3062,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/ban-carte",
       "mapLabels": [
         "Meet Andrea"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_andrea.webp",
+      "chapterOrder": 26
     },
     {
       "id": "ban-safe",
@@ -2267,7 +3102,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/ban-safe",
       "mapLabels": [
         "Steal the Practice Safe"
-      ]
+      ],
+      "chapterOrder": 27
     },
     {
       "id": "clb-video",
@@ -2304,7 +3140,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/clb-video",
       "mapLabels": [
         "Shoot the Music Video"
-      ]
+      ],
+      "chapterOrder": 28
     },
     {
       "id": "bricked-up",
@@ -2331,31 +3168,59 @@
           "id": "bayside",
           "titleTr": "Boobie’nin isteği",
           "environmentTr": "Bayside · Jason ile Lucia’nın dairesi",
-          "contextTr": "İkili eve döndüğünde Boobie’yi dairede bulur. Boobie, dairede kaldıkları sürece kendisi için çalışacaklarını söyler ve Rockridge’deki işi verir."
+          "contextTr": "İkili eve döndüğünde Boobie’yi dairede bulur. Boobie, dairede kaldıkları sürece kendisi için çalışacaklarını söyler ve Rockridge’deki işi verir.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-1.jpg"
+            }
+          ]
         },
         {
           "id": "venture",
           "titleTr": "Venture Apartments’a varış",
           "environmentTr": "Rockridge · apartman önü",
-          "contextTr": "Lucia, arabayı dikkat çekmeyecek bir yere bırakmayı önerir. İkili Raymond’ı aramak için binaya girer."
+          "contextTr": "Lucia, arabayı dikkat çekmeyecek bir yere bırakmayı önerir. İkili Raymond’ı aramak için binaya girer.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-2.jpg"
+            }
+          ]
         },
         {
           "id": "raymond",
           "titleTr": "Raymond’ı ararken",
           "environmentTr": "Venture Apartments · lobi ve koridor",
-          "contextTr": "Girişte asansör yanındaki kişiyle konuşulur. Üst kattaki kırmızı kapı, Raymond’la görüşmeye giden noktadır."
+          "contextTr": "Girişte asansör yanındaki kişiyle konuşulur. Üst kattaki kırmızı kapı, Raymond’la görüşmeye giden noktadır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-3.jpg"
+            }
+          ]
         },
         {
           "id": "raid",
           "titleTr": "Baskın",
           "environmentTr": "Venture Apartments · üst katlar",
-          "contextTr": "Méndez’in ekibi baskın yapınca buluşma yarıda kalır. Jason ve Lucia, Boobie’nin istediği çantayı alıp binadan çıkma seçeneğiyle karşılaşır."
+          "contextTr": "Méndez’in ekibi baskın yapınca buluşma yarıda kalır. Jason ve Lucia, Boobie’nin istediği çantayı alıp binadan çıkma seçeneğiyle karşılaşır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-4.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-5.jpg"
+            }
+          ]
         },
         {
           "id": "departure",
           "titleTr": "Bayside’dan ayrılma kararı",
           "environmentTr": "Rockridge’den çıkış",
-          "contextTr": "Takipten kurtulduktan sonra Jason ile Lucia, Boobie’nin dairesinden taşınmaları gerektiği konusunda anlaşır."
+          "contextTr": "Takipten kurtulduktan sonra Jason ile Lucia, Boobie’nin dairesinden taşınmaları gerektiği konusunda anlaşır.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/bricked-up-6.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/bricked-up",
@@ -2368,7 +3233,8 @@
       "textCount": 5,
       "requires": [
         "ban-pkbmb"
-      ]
+      ],
+      "chapterOrder": 32
     },
     {
       "id": "ft-ban-distr",
@@ -2430,12 +3296,40 @@
         {
           "id": "guide-1",
           "titleTr": "Hazırlık sonrası",
-          "environmentTr": "Sinfrontera National Bank"
+          "environmentTr": "Sinfrontera National Bank",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-2.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-3.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-6.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "İşin ardından",
-          "environmentTr": "Y Hotel bağlantısı"
+          "environmentTr": "Y Hotel bağlantısı",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-8.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-9.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-10.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/cartel-heist-11.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/the-cartel-heist",
@@ -2445,7 +3339,8 @@
         "Start the Heist",
         "Wait for Raul to get in Touch"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/the-cartel-heist"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/the-cartel-heist",
+      "chapterOrder": 33
     },
     {
       "id": "ant-recov",
@@ -2490,13 +3385,15 @@
       "scenes": [
         {
           "id": "guide-1",
-          "titleTr": "Heykeli göster",
-          "environmentTr": "Capri’deki antikacı"
+          "titleTr": "Heykeli antikacıya götürme",
+          "environmentTr": "Capri · antika dükkânı",
+          "contextTr": "Jason ve Lucia, ellerindeki heykelin değerini öğrenmek için Capri’deki antikacıya uğrar."
         },
         {
           "id": "guide-2",
-          "titleTr": "Kayıt ayrımı",
-          "environmentTr": "Antika dükkânı"
+          "titleTr": "Antika öyküsünün açılışı",
+          "environmentTr": "Capri",
+          "contextTr": "ANT_INTRO kodu giriş bölümünü bulur. Görevin devamı ve sahneleri Dubious Provenance kartında yer alır."
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/dubious-provenance",
@@ -2575,7 +3472,8 @@
       "mapLabels": [
         "Meet at the Planning Room",
         "Prepping the Explosives"
-      ]
+      ],
+      "chapterOrder": 31
     },
     {
       "id": "mny-hotel",
@@ -2607,7 +3505,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/ocean-beach",
       "giver": "Jason Duval / Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
-      "textSourceUrl": "https://six.mics.dev/missions/mny-hotel"
+      "textSourceUrl": "https://six.mics.dev/missions/mny-hotel",
+      "chapterOrder": 1
     },
     {
       "id": "mny-car",
@@ -2645,7 +3544,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/mny-car",
       "mapLabels": [
         "Speak to the Concierge"
-      ]
+      ],
+      "chapterOrder": 5
     },
     {
       "id": "lawyer-up",
@@ -2686,7 +3586,9 @@
         "Meet Abe Gonzalez"
       ],
       "gameDataSourceUrl": "https://six.mics.dev/missions/lawyer-up",
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_abe.webp",
+      "chapterOrder": 6
     },
     {
       "id": "mny-party",
@@ -2727,7 +3629,8 @@
       "mapLabels": [
         "Work Personal Security"
       ],
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina",
+      "chapterOrder": 7
     },
     {
       "id": "air-tail",
@@ -2793,7 +3696,8 @@
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/drequan",
       "mapLabels": [
         "Shoot a Promo"
-      ]
+      ],
+      "chapterOrder": 10
     },
     {
       "id": "air-train",
@@ -2832,7 +3736,9 @@
       "mapLabels": [
         "Meet Raul",
         "Raul’s Plan"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_raul.webp",
+      "chapterOrder": 12
     },
     {
       "id": "clb-promo",
@@ -2869,7 +3775,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/clb-promo",
       "mapLabels": [
         "Meet Dre’Quan"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_drequan.webp",
+      "chapterOrder": 14
     },
     {
       "id": "cash-injections",
@@ -2906,7 +3814,9 @@
       "mapLabels": [
         "Hang Out With Nate"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/cash-injections"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/cash-injections",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_nate.webp",
+      "chapterOrder": 15
     },
     {
       "id": "amateur-hour",
@@ -2944,7 +3854,8 @@
       "mapLabels": [
         "Workout"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/amateur-hour"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/amateur-hour",
+      "chapterOrder": 16
     },
     {
       "id": "dirty-work",
@@ -2981,7 +3892,8 @@
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andrea",
       "mapLabels": [
         "Deal with Raina"
-      ]
+      ],
+      "chapterOrder": 17
     },
     {
       "id": "too-much-baggage",
@@ -3018,7 +3930,8 @@
       "mapLabels": [
         "Scope Out the Airport"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/too-much-baggage"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/too-much-baggage",
+      "chapterOrder": 13
     },
     {
       "id": "adventures-in-babysitting",
@@ -3055,7 +3968,8 @@
         "Work Security for Andrés"
       ],
       "gameDataSourceUrl": "https://six.mics.dev/missions/adventures-in-babysitting",
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon",
+      "chapterOrder": 18
     },
     {
       "id": "fresh-evidence",
@@ -3093,7 +4007,9 @@
       "mapLabels": [
         "Meet Dre’Quan"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/fresh-evidence"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/fresh-evidence",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_drequan.webp",
+      "chapterOrder": 19
     },
     {
       "id": "air-truck",
@@ -3130,7 +4046,8 @@
       "textSourceUrl": "https://six.mics.dev/missions/air-truck",
       "mapLabels": [
         "Help Kordell’s Crew"
-      ]
+      ],
+      "chapterOrder": 20
     },
     {
       "id": "mny-kidnp",
@@ -3202,7 +4119,8 @@
       "mapLabels": [
         "Help With The Launch Party"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/headliners"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/headliners",
+      "chapterOrder": 22
     },
     {
       "id": "close-surveillance",
@@ -3236,7 +4154,8 @@
       "mapLabels": [
         "Spy on the Bodybuilders"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/close-surveillance"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/close-surveillance",
+      "chapterOrder": 23
     },
     {
       "id": "delivery-method",
@@ -3274,7 +4193,9 @@
       "mapLabels": [
         "Help Andrea"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/delivery-method"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/delivery-method",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_andrea.webp",
+      "chapterOrder": 24
     },
     {
       "id": "team-building",
@@ -3312,7 +4233,9 @@
       "mapLabels": [
         "Meet Kordell"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/team-building"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/team-building",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_kordell.webp",
+      "chapterOrder": 25
     },
     {
       "id": "fully-catered",
@@ -3351,7 +4274,8 @@
       "mapLabels": [
         "Steal a Catering Truck"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/fully-catered"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/fully-catered",
+      "chapterOrder": 26
     },
     {
       "id": "vcia-takedown",
@@ -3393,7 +4317,8 @@
       "mapLabels": [
         "Start the Airport Heist"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/vcia-takedown"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/vcia-takedown",
+      "chapterOrder": 27
     },
     {
       "id": "blood-sweat-and-gear",
@@ -3433,7 +4358,7 @@
       "id": "sfh-taxi",
       "titleTr": "Tomás’la Son Sabah",
       "type": "story",
-      "chapter": 5,
+      "chapter": 4,
       "summaryTr": "Lucia, Tomás’la geçirdiği son sabahı ve tutuklanmasından önce yaşananları hatırlar.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/another-life",
       "aliases": [
@@ -3457,7 +4382,8 @@
       "locationTr": "Vice Beach · Washington Beach",
       "giver": "Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
-      "textSourceUrl": "https://six.mics.dev/missions/sfh-taxi"
+      "textSourceUrl": "https://six.mics.dev/missions/sfh-taxi",
+      "chapterOrder": 2
     },
     {
       "id": "rob-death",
@@ -3494,7 +4420,7 @@
       "id": "starting-from-zero",
       "titleTr": "Sıfırdan Başlamak",
       "type": "story",
-      "chapter": 5,
+      "chapter": 4,
       "summaryTr": "Raul’un ölümünün ardından Jason ve Lucia’nın önceliği dikkat çekmeden eşyalarını geri almaktır.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/starting-from-zero",
       "titleEn": "Starting From Zero",
@@ -3524,7 +4450,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/starting-from-zero",
       "giver": "Jason Duval / Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
-      "gameDataSourceUrl": "https://six.mics.dev/missions/starting-from-zero"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/starting-from-zero",
+      "chapterOrder": 31
     },
     {
       "id": "coa-helis",
@@ -3560,7 +4487,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/bird-in-the-hand",
       "giver": "Giorgio Gallo",
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/giorgio-gallo",
-      "textSourceUrl": "https://six.mics.dev/missions/coa-helis"
+      "textSourceUrl": "https://six.mics.dev/missions/coa-helis",
+      "chapterOrder": 1
     },
     {
       "id": "bil-boss",
@@ -3594,7 +4522,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/taking-liberties",
       "giver": "Giorgio Gallo",
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/giorgio-gallo",
-      "textSourceUrl": "https://six.mics.dev/missions/bil-boss"
+      "textSourceUrl": "https://six.mics.dev/missions/bil-boss",
+      "chapterOrder": 2
     },
     {
       "id": "bil-preg",
@@ -3634,7 +4563,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/bil-preg",
       "mapLabels": [
         "Talk to Mattia"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_mattia.webp",
+      "chapterOrder": 4
     },
     {
       "id": "doggie-bag",
@@ -3681,7 +4612,9 @@
       "mapLabels": [
         "Meet Vinny"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/doggie-bag"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/doggie-bag",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_vinny.webp",
+      "chapterOrder": 3
     },
     {
       "id": "coa-ship",
@@ -3716,7 +4649,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/operation-savage-glory",
       "giver": "Vinny Capsik",
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/vinny-capsik",
-      "textSourceUrl": "https://six.mics.dev/missions/coa-ship"
+      "textSourceUrl": "https://six.mics.dev/missions/coa-ship",
+      "chapterOrder": 5
     },
     {
       "id": "bil-preci",
@@ -3754,7 +4688,9 @@
       "textSourceUrl": "https://six.mics.dev/missions/bil-preci",
       "mapLabels": [
         "Meet with Abe"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_abe.webp",
+      "chapterOrder": 8
     },
     {
       "id": "the-end-of-the-road",
@@ -3787,7 +4723,8 @@
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/the-end-of-the-road",
       "locationTr": "Mariana County · Key Lento",
       "giver": "Jason Duval / Lucia Caminos",
-      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason"
+      "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/jason",
+      "chapterOrder": 9
     },
     {
       "id": "bil-law",
@@ -3820,16 +4757,18 @@
       "textSourceUrl": "https://six.mics.dev/missions/bil-law",
       "mapLabels": [
         "Negotiate a Deal with Abe"
-      ]
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_abe.webp",
+      "chapterOrder": 6
     },
     {
       "id": "the-end-of-the-road-fin-cont",
       "titleTr": "Yolun Sonu · Devam Seçimi",
-      "type": "story",
+      "type": "objective",
       "chapter": 5,
-      "summaryTr": "Final sonrasında oyun, final öncesine dönüp ilerlemeyi tamamlamayı veya yeni bir oyun başlatmayı sunar.",
+      "summaryTr": "Final sonrasındaki devam seçeneği ile hikâyenin son görevi farklı kayıtlardır.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/the-end-of-the-road",
-      "titleEn": "The End of the Road",
+      "titleEn": "After the credits",
       "aliases": [
         "FIN_CONT",
         "The End of the Road"
@@ -3837,13 +4776,15 @@
       "scenes": [
         {
           "id": "guide-1",
-          "titleTr": "Finalden sonra",
-          "environmentTr": "Oyun bitiş ekranı"
+          "titleTr": "Jenerikten sonraki sahne",
+          "environmentTr": "Hikâye finali",
+          "contextTr": "Köprüde biten rotalarda jenerikten sonra Cal’in diskteki dosyaların açılmasını beklediği kısa bir sahne gösterilir."
         },
         {
           "id": "guide-2",
-          "titleTr": "Kayıt bağlamı",
-          "environmentTr": "Menü"
+          "titleTr": "Final öncesine dönüş",
+          "environmentTr": "Hikâye modu · devam ekranı",
+          "contextTr": "Devam seçildiğinde oyun, finalden önceki noktaya döner ve iki karakter de yeniden oynanabilir. Açık kalan görevleri buradan sürdürebilirsin."
         }
       ],
       "gallerySourceUrl": "https://www.gtabase.com/gta-6/missions/the-end-of-the-road",
@@ -3856,7 +4797,7 @@
       "id": "south-leonida-real-estate",
       "titleTr": "Güney Leonida Emlak",
       "type": "story",
-      "chapter": 5,
+      "chapter": 3,
       "summaryTr": "Mia’nın M7 tarafından kaçırılması Lucia’yı bir kurtarma girişimine sürükler. Mia, çıkış yolu olarak Terro’ya yeni bir merkez bulmayı önerir.",
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/south-leonida-real-estate",
       "titleEn": "South Leonida Real Estate",
@@ -3887,13 +4828,15 @@
       "mapLabels": [
         "Meet Mia"
       ],
-      "gameDataSourceUrl": "https://six.mics.dev/missions/south-leonida-real-estate"
+      "gameDataSourceUrl": "https://six.mics.dev/missions/south-leonida-real-estate",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_mia.webp",
+      "chapterOrder": 29
     },
     {
       "id": "spin-on-this",
       "titleTr": "Son Üretim Tesisi",
-      "type": "story",
-      "chapter": 5,
+      "type": "side",
+      "chapter": 3,
       "summaryTr": "Kitty Litter üretimini tamamen kapatmak için son tesise gidilir.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-spin-on-this-shut-down-the-labs-walkthrough/",
       "titleEn": "Spin on This",
@@ -3925,13 +4868,14 @@
         "Shut Down the Labs"
       ],
       "gameDataSourceUrl": "https://six.mics.dev/missions/spin-on-this",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/tyrone"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/tyrone",
+      "chapterOrder": 222
     },
     {
       "id": "delivery-day",
       "titleTr": "Teslimat Günü",
-      "type": "story",
-      "chapter": 5,
+      "type": "side",
+      "chapter": 3,
       "summaryTr": "Randy’nin listedeki son iki aracı Millport’tan gönderilecektir. Limana giderken rakip bir araç hırsızlığı ekibi peşlerine düşer.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-delivery-day-meet-randy-walkthrough/",
       "titleEn": "Delivery Day",
@@ -3963,7 +4907,9 @@
       "mapLabels": [
         "Meet Randy"
       ],
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_randy.webp",
+      "chapterOrder": 218
     },
     {
       "id": "find-donnies-package",
@@ -4000,7 +4946,7 @@
       "id": "prologue-int-cred",
       "titleTr": "Prolog · Jenerik Kaydı",
       "type": "story",
-      "chapter": 5,
+      "chapter": 1,
       "summaryTr": "INT_CRED, Explorer dizininde Prologue başlığı altında görünen ayrı bir koddur. Cezaevi görüşmesiyle başlayan oynanabilir Prolog kaydı ayrıca listelenir.",
       "sourceUrl": "https://www.powerpyx.com/gta-6-prologue-walkthrough/",
       "titleEn": "Prologue",
@@ -4011,15 +4957,27 @@
       "scenes": [
         {
           "id": "guide-1",
-          "titleTr": "Jenerik kaydı",
-          "environmentTr": "Açılış geçişi"
+          "titleTr": "Açılış jeneriği",
+          "environmentTr": "Vice City · açılış montajı",
+          "contextTr": "Jason ile Lucia’nın tanışmasını Leonida manzaralarıyla açılış jeneriği izler. Oyun daha sonra Hamlet Cezaevi’ndeki Lucia’ya geçer.",
+          "images": [
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/pilot-over-vice-city-sm.jpg"
+            },
+            {
+              "url": "https://www.luciaandjason.com/images/screenshots/wetsuit-boat-sm.jpg"
+            }
+          ],
+          "sourceUrl": "https://www.luciaandjason.com/screenshots#prologue"
         }
       ],
-      "gallerySourceUrl": "https://www.powerpyx.com/gta-6-prologue-walkthrough/",
+      "gallerySourceUrl": "https://www.luciaandjason.com/screenshots#prologue",
       "locationTr": "Hamlet Prison",
       "giver": "Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
-      "textSourceUrl": "https://six.mics.dev/missions/prologue-int-cred"
+      "textSourceUrl": "https://six.mics.dev/missions/prologue-int-cred",
+      "searchTarget": "prologue",
+      "chapterOrder": 1
     },
     {
       "id": "the-unknown-stuntman",
@@ -4040,12 +4998,28 @@
           "id": "show",
           "titleTr": "Sahil gösterisi",
           "environmentTr": "Ocean Beach gösteri alanı",
-          "contextTr": "Papa Audacity’nin motosiklet gösterisi projeyi tanıtır."
+          "contextTr": "Papa Audacity’nin motosiklet gösterisi projeyi tanıtır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-unknown-stuntman-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-unknown-stuntman-4-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "İlk davet",
-          "environmentTr": "Ocean Beach"
+          "environmentTr": "Ocean Beach",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-unknown-stuntman-5-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-unknown-stuntman-6-768x432.jpg"
+            }
+          ]
         }
       ],
       "gallerySourceUrl": "https://www.powerpyx.com/gta-6-the-unknown-stuntman-walkthrough/",
@@ -4054,7 +5028,8 @@
         "The Unknown Stuntman"
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_INTRO",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity",
+      "chapterOrder": 232
     },
     {
       "id": "trial-by-tire",
@@ -4076,20 +5051,47 @@
       ],
       "scenes": [
         {
+          "id": "guide-1",
+          "titleTr": "Sınava git",
+          "environmentTr": "La Perle otoparkı",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-4-768x432.jpg"
+            }
+          ]
+        },
+        {
           "id": "garage",
           "titleTr": "Sürüş parkuru",
           "environmentTr": "Çok katlı otoparkın alt katı",
-          "contextTr": "İlk motosiklet parkuru için yönlendirme burada verilir."
-        },
-        {
-          "id": "guide-1",
-          "titleTr": "Sınava git",
-          "environmentTr": "La Perle otoparkı"
+          "contextTr": "İlk motosiklet parkuru için yönlendirme burada verilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-5-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-7-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-8-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Sınavın sonu",
-          "environmentTr": "Otopark katları"
+          "environmentTr": "Otopark katları",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-10-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-trial-by-tire-11-768x432.jpg"
+            }
+          ]
         }
       ],
       "requires": [
@@ -4101,7 +5103,9 @@
         "Meet the AudaCity Engineer"
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_FSTNT",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_papa_audacity.webp",
+      "chapterOrder": 233
     },
     {
       "id": "quit-your-job-sell-your-house",
@@ -4127,13 +5131,32 @@
           "id": "building",
           "titleTr": "Gösteriye hazırlık",
           "environmentTr": "Peacock Bay Condominiums ve helikopter pisti",
-          "contextTr": "Gruptaki roller ve gösterinin hazırlığı burada belirlenir."
+          "contextTr": "Gruptaki roller ve gösterinin hazırlığı burada belirlenir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-quit-your-job-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-quit-your-job-4-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "jump",
           "titleTr": "Havadaki gösteri",
           "environmentTr": "Catalan Key üzeri",
-          "contextTr": "Ekip, atlayış için helikopterle bölgenin üzerine çıkar."
+          "contextTr": "Ekip, atlayış için helikopterle bölgenin üzerine çıkar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-quit-your-job-6-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-quit-your-job-7-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-quit-your-job-8-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
@@ -4150,7 +5173,9 @@
         "Help Papa Audacity"
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_STADM",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_papa_audacity.webp",
+      "chapterOrder": 234
     },
     {
       "id": "audacity-stunts",
@@ -4171,12 +5196,40 @@
           "id": "city",
           "titleTr": "Şehirde tanıtım atlayışları",
           "environmentTr": "Vice City’deki işaretli alanlar",
-          "contextTr": "Ayrı noktalardaki atlayışlar aynı tanıtım çalışmasına bağlıdır."
+          "contextTr": "Ayrı noktalardaki atlayışlar aynı tanıtım çalışmasına bağlıdır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-11-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-13-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-15-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-16-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-1",
           "titleTr": "Şehirdeki duraklar",
-          "environmentTr": "Ocean Beach, Dalton Island ve Stockyard"
+          "environmentTr": "Ocean Beach, Dalton Island ve Stockyard",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-18-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-19-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-21-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-audacity-stunts-22-768x432.jpg"
+            }
+          ]
         }
       ],
       "requires": [
@@ -4187,7 +5240,8 @@
       "aliases": [
         "AudaCity Stunts"
       ],
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity",
+      "chapterOrder": 235
     },
     {
       "id": "catching-a-whale",
@@ -4211,18 +5265,48 @@
           "id": "airfield",
           "titleTr": "Havaalanında buluşma",
           "environmentTr": "Sundown Airfield",
-          "contextTr": "Papa Audacity’nin uçuşla ilgili planı burada başlar."
+          "contextTr": "Papa Audacity’nin uçuşla ilgili planı burada başlar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-3-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "flight",
           "titleTr": "Tanıtım uçuşu",
           "environmentTr": "Liman, Tequesta Retreat ve adliye çevresi",
-          "contextTr": "Şehir üstündeki farklı geçiş noktaları tanıtımın parçalarıdır."
+          "contextTr": "Şehir üstündeki farklı geçiş noktaları tanıtımın parçalarıdır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-5-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-8-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-18-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-19-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "guide-2",
           "titleTr": "Lansmanın bağlantısı",
-          "environmentTr": "Vice City hava rotası"
+          "environmentTr": "Vice City hava rotası",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-15-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-catching-a-whale-16-768x432.jpg"
+            }
+          ]
         }
       ],
       "requires": [
@@ -4234,7 +5318,9 @@
         "Help Papa Audacity"
       ],
       "textSourceUrl": "https://six.mics.dev/dialogue?mission=t:CSC_STU_PLANE",
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_papa_audacity.webp",
+      "chapterOrder": 236
     },
     {
       "id": "the-audacity",
@@ -4263,30 +5349,71 @@
           "id": "lobby",
           "titleTr": "Davet ve buluşma",
           "environmentTr": "Neo Paloma Apartments lobisi",
-          "contextTr": "Binaya girildiğinde mühendisler lobinin arkasındaki asansörlerin yakınındadır."
+          "contextTr": "Binaya girildiğinde mühendisler lobinin arkasındaki asansörlerin yakınındadır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-4-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "launch",
           "titleTr": "Lansman sunumu",
           "environmentTr": "Parti alanı ve sahne arkası",
-          "contextTr": "Mühendisle partiye çıkılır. Sunumun ardından Papa Audacity’yle sahne arkasında görüşülür. DacityCoin satışı bu aşamada açılır."
+          "contextTr": "Mühendisle partiye çıkılır. Sunumun ardından Papa Audacity’yle sahne arkasında görüşülür. DacityCoin satışı bu aşamada açılır. Oyun içi coin uygulamasındaki satış seçeneği gösteri başlamadan kullanılabilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-5-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-6-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-7-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "jump",
           "titleTr": "Son gösteri",
           "environmentTr": "Atlayış rampası ve çatı havuzu",
-          "contextTr": "Motosiklet gösterisi, rampadan çatı havuzuna uzanır."
+          "contextTr": "Motosiklet gösterisi, rampadan çatı havuzuna uzanır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-8-768x432.jpg"
+            }
+          ]
         },
         {
           "id": "exit",
           "titleTr": "Partiden ayrılma",
           "environmentTr": "Havuzun karşısındaki bina ve sokak",
-          "contextTr": "Gösterinin ardından kalabalıktan çıkış, binadaki asansör üzerinden gerçekleşir."
+          "contextTr": "Gösterinin ardından kalabalıktan çıkış, binadaki asansör üzerinden gerçekleşir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-9-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-10-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-11-768x432.jpg"
+            }
+          ]
         },
         {
-          "id": "guide-1",
-          "titleTr": "Lansmandaki zamanlama",
-          "environmentTr": "Tequesta’daki çatı ve havuz"
+          "id": "follow-up-call",
+          "titleTr": "Papa Audacity’yi arama",
+          "environmentTr": "Tequesta · oyun telefonu",
+          "contextTr": "Partiden ayrıldıktan sonra Papa Audacity’yi aramak görev zincirini tamamlar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-the-audacity-12-768x432.jpg"
+            }
+          ]
         }
       ],
       "requires": [
@@ -4298,7 +5425,9 @@
       "mapLabels": [
         "Attend the Launch Party"
       ],
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/papa-audacity",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_papa_audacity.webp",
+      "chapterOrder": 237
     },
     {
       "id": "get-shirleys-rum",
@@ -4325,7 +5454,8 @@
         "Shirley"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shirley"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shirley",
+      "chapterOrder": 7
     },
     {
       "id": "steal-the-scooter",
@@ -4352,7 +5482,8 @@
         "Shirley"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shirley"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shirley",
+      "chapterOrder": 8
     },
     {
       "id": "pick-up-groceries-drop-off-groceries",
@@ -4367,19 +5498,56 @@
       "giver": "Lucia Caminos",
       "profileSourceUrl": "https://www.rockstargames.com/VI/only-in-leonida/lucia",
       "aliases": [
-        "Pick up Groceries & Drop Off Groceries"
+        "Pick up Groceries & Drop Off Groceries",
+        "Pick Up Groceries",
+        "Drop Off Groceries"
       ],
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Mariana County · Key Lento"
+          "titleTr": "Key Lento marketine uğrama",
+          "environmentTr": "Key Lento · market",
+          "contextTr": "Görev Jason’ın evine yakın markette açılır. İçeride görev işaretli raflarda alınabilecek ürünler görünür.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-3-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "shopping",
+          "titleTr": "Alışverişi tamamlama",
+          "environmentTr": "Key Lento · market rafları",
+          "contextTr": "İşaretlenen ürünlerden herhangi üçünü al. Ücret ürün seçildiğinde düşülür, kasada ayrıca işlem gerekmez.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-4-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-5-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "unpack",
+          "titleTr": "Alışverişi eve bırakma",
+          "environmentTr": "Key Lento · Jason’ın evi",
+          "contextTr": "Poşetleri bagajla eve götür. İçeri taşıdığında Jason’ın alışverişi yerleştirdiği kısa sahne başlar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-groceries-7-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
-        "Lucia Caminos"
+        "Jason Duval"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "chapterOrder": 12
     },
     {
       "id": "buy-flowers",
@@ -4406,7 +5574,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 13
     },
     {
       "id": "buy-lucia-a-necklace",
@@ -4433,7 +5602,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 14
     },
     {
       "id": "get-the-chop",
@@ -4453,14 +5623,32 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Mariana County · Key Lento"
+          "titleTr": "Kuaföre uğrama",
+          "environmentTr": "Key Lento · Barnacle Beauties",
+          "contextTr": "Kuyumcunun yanındaki salona Jason’la girip çalışanla konuş.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-the-chop-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "haircut",
+          "titleTr": "Yeni saç modelini seçme",
+          "environmentTr": "Barnacle Beauties · kuaför menüsü",
+          "contextTr": "Herhangi bir saç modelini satın almak görevi bitirir. Saç rengi ve sakal ayarları isteğe bağlıdır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-get-the-chop-3-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
-        "Lucia Caminos"
+        "Jason Duval"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "chapterOrder": 15
     },
     {
       "id": "get-lucias-clothes",
@@ -4487,7 +5675,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 16
     },
     {
       "id": "clean-up-after-donnie",
@@ -4517,7 +5706,8 @@
       "characters": [
         "Donnie"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 19
     },
     {
       "id": "deposit-cash-into-buckme",
@@ -4535,17 +5725,47 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Mariana County · Key Lento"
+          "titleTr": "ATM’yi bulma",
+          "environmentTr": "Oyun telefonu · BuckMe",
+          "contextTr": "Görev haritada bir nokta açmaz. BuckMe’nin ATM bulucusu yakındaki cihazı işaretler.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-deposit-cash-into-buckme-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/deposit-cash-2.jpg"
+            }
+          ]
+        },
+        {
+          "id": "deposit",
+          "titleTr": "Nakit yatırma",
+          "environmentTr": "ATM · hesap işlemleri",
+          "contextTr": "Cebindeki paranın bir kısmını ATM’den BuckMe’ye aktar. Para hesaba geçtiğinde hedef tamamlanır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-deposit-cash-into-buckme-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-deposit-cash-into-buckme-4-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-deposit-cash-into-buckme-5-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-deposit-cash-into-buckme-6-768x432.jpg"
+            }
+          ]
         }
       ],
-      "textCount": 1
+      "textCount": 3,
+      "chapterOrder": 24
     },
     {
       "id": "save-for-the-future",
       "titleTr": "Gelecek İçin Biriktir",
       "titleEn": "Save for the Future",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Aile birikimine para eklenir. Birikim hedefleri ilerledikçe BuckMe yeni ayrıcalıklar açar.",
       "chapter": 1,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/save-for-the-future",
@@ -4557,11 +5777,27 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Mariana County · Key Lento"
+          "titleTr": "Aile hesabına ilk aktarım",
+          "environmentTr": "Oyun telefonu · BuckMe",
+          "contextTr": "BuckMe’de vadesiz hesabından Family Savings’e para aktar. Takip görevi hikâye ilerledikçe yeni birikim eşikleri açar.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/save-for-the-future-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/save-for-the-future-2.jpg"
+            }
+          ]
+        },
+        {
+          "id": "milestones",
+          "titleTr": "Birikim eşiklerini takip etme",
+          "environmentTr": "BuckMe · Family Savings",
+          "contextTr": "İlk eşik 5.000 dolardır. Daha yüksek eşikler hikâyenin ilerleyen kısımlarında yeniden görünür. Bu takip, görev konumu gerektirmez."
         }
       ],
-      "textCount": 1
+      "textCount": 2,
+      "chapterOrder": 25
     },
     {
       "id": "find-the-lost-drugs",
@@ -4616,7 +5852,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 27
     },
     {
       "id": "building-a-life",
@@ -4644,7 +5881,8 @@
         "Jason Duval",
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 29
     },
     {
       "id": "donnies-lost-drugs",
@@ -4664,14 +5902,48 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Leonida Straits Ocean in north-east of Mariana County"
+          "titleTr": "Kıyı açığına gitme",
+          "environmentTr": "Key Lento’nun kuzeyi · Atlantik",
+          "contextTr": "Brian’ın verdiği bilgi, Donnie’nin battığı açık deniz bölgesine götürür. Arama alanına tekneyle ulaşabilirsin."
+        },
+        {
+          "id": "wreck",
+          "titleTr": "Batık tekneyi arama",
+          "environmentTr": "Atlantik · deniz tabanı",
+          "contextTr": "Arama alanının güneydoğusunda batığı bul. Teknenin arka bölmesinde kayıp çanta vardır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-4-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-5-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "dropoff",
+          "titleTr": "Çantayı teslim etme",
+          "environmentTr": "Brian’ın deposu",
+          "contextTr": "Batıktan alınan çantayı Brian’ın deposuna götür. Bu teslimat için rehberde 1.200 dolar ödül belirtilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-donnies-lost-drugs-6-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
+        "Jason Duval",
         "Brian Heder"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "chapterOrder": 33
     },
     {
       "id": "recalibration",
@@ -4695,13 +5967,48 @@
         {
           "id": "start",
           "titleTr": "Görev başlangıcı",
-          "environmentTr": "Mariana County · Key Lento · Jason’s House"
+          "environmentTr": "Mariana County · Key Lento · Jason’s House",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/recalib-beer.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/recalib-talk-to-cal.jpg"
+            }
+          ]
+        },
+        {
+          "id": "fishing",
+          "titleTr": "Cal’le balığa çıkma",
+          "environmentTr": "Leonida Keys · açık su",
+          "contextTr": "Jason ve Lucia Cal’i Donnie’nin ölümünden sonra balığa götürür. Yakalanan balık daha sonra birlikte pişirilir.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/recalib-fishing.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/recalib-grill.jpg"
+            }
+          ]
+        },
+        {
+          "id": "back-home",
+          "titleTr": "Lucia’yla dönüş",
+          "environmentTr": "Leonida Keys · eve dönüş",
+          "contextTr": "Balık tutma ve yemek bölümünden sonra Lucia eve götürülür.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/recalib-lucia.jpg"
+            }
+          ]
         }
       ],
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_lucia.webp",
+      "chapterOrder": 34
     },
     {
       "id": "home-sweet-home",
@@ -4729,7 +6036,8 @@
         "Lucia Caminos",
         "Andy"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 36
     },
     {
       "id": "just-moved-in",
@@ -4757,7 +6065,8 @@
         "Jason Duval",
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 5
     },
     {
       "id": "pick-up-a-gun",
@@ -4777,14 +6086,35 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Kelly County · Port Gellhorn · Gellhorn Outfitters (Ammu-Nation Gun Shop)"
+          "titleTr": "Gellhorn Outfitters’a uğrama",
+          "environmentTr": "Port Gellhorn · Ammu-Nation",
+          "contextTr": "Girls’ Trip sonrasında Port Gellhorn’daki dükkân erişilebilir olur. Hedef Lucia’yla yapılabilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-a-gun-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "locker",
+          "titleTr": "Ekipman seçme",
+          "environmentTr": "Ammu-Nation · satış ve dolap",
+          "contextTr": "Bir ürün satın almak veya yeşil dolaptan mevcut ekipmanı almak hedefi tamamlar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pick-up-a-gun-3-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "mtl-drive"
+      ],
+      "chapterOrder": 7
     },
     {
       "id": "new-look",
@@ -4804,14 +6134,41 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Kelly County · Port Gellhorn"
+          "titleTr": "Pearl House’a uğrama",
+          "environmentTr": "Port Gellhorn · Pearl House Hair Salon",
+          "contextTr": "Girls’ Trip’in ardından Lucia’yla kuaföre gir ve salon çalışanıyla konuş.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-new-look-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-new-look-3-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "style",
+          "titleTr": "Saç modelini satın alma",
+          "environmentTr": "Pearl House · kuaför koltuğu",
+          "contextTr": "Menüden herhangi bir ücretli saç modelini seçmek hedefi bitirir.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/new-look-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/new-look-2.jpg"
+            }
+          ]
         }
       ],
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "mtl-drive"
+      ],
+      "chapterOrder": 9
     },
     {
       "id": "how-do-i-look",
@@ -4831,20 +6188,44 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Kelly County · Port Gellhorn"
+          "titleTr": "Bargain World’e girme",
+          "environmentTr": "Port Gellhorn · Bargain World",
+          "contextTr": "Lucia için alışveriş hedefi şehrin güneyindeki mağazada tamamlanabilir. Kıyafetleri mağaza içinde seçebilirsin.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-how-do-i-look-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "outfit",
+          "titleTr": "Üst ve alt parça seçme",
+          "environmentTr": "Bargain World · kıyafet menüsü",
+          "contextTr": "Bir üst ve bir pantolon ya da şort al. Manken üzerindeki takım da iki parçayı birlikte karşılar.",
+          "images": [
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/how-do-i-look-1.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/how-do-i-look-2.jpg"
+            }
+          ]
         }
       ],
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "mtl-drive"
+      ],
+      "chapterOrder": 10
     },
     {
       "id": "painkiller-supplier",
       "titleTr": "Hap Var mı?",
       "titleEn": "Painkiller Supplier",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Dunk, Jason’ın ihtiyacı olan ağrı kesicilere dair haber alırsa telefonla ulaşacaktır.",
       "chapter": 2,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/painkiller-supplier",
@@ -4854,19 +6235,45 @@
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/dunk",
       "aliases": [
         "Painkiller Supplier",
-        "Got Pills?"
+        "Got Pills?",
+        "Dunk Will Be in Touch"
       ],
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Kelly County · Port Gellhorn"
+          "titleTr": "Dunk’tan ilk haberi bekleme",
+          "environmentTr": "Port Gellhorn · oyun telefonu",
+          "contextTr": "Girls’ Trip’ten sonra hikâye listesine eklenen takip kaydı, Dunk ilk kez arayınca ad değiştirir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-painkiller-supplier-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "second-call",
+          "titleTr": "İkinci arama",
+          "environmentTr": "Oyun telefonu · Dunk",
+          "contextTr": "Hedef Dunk’ın tekrar aramasını bekler. Bu görüşme, Slam Dunk görevini açar. Beklerken diğer Port Gellhorn görevleri ilerletilebilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-painkiller-supplier-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/got-pills-1.jpg"
+            }
+          ]
         }
       ],
       "characters": [
+        "Lucia Caminos",
         "Dunk"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "mtl-drive"
+      ],
+      "chapterOrder": 11
     },
     {
       "id": "ambulance-chaser",
@@ -4896,7 +6303,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 2
     },
     {
       "id": "check-out-mckittrick-farm",
@@ -4923,7 +6331,8 @@
         "Kyle"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle",
+      "chapterOrder": 201
     },
     {
       "id": "collect-chemicals-for-kyle",
@@ -4950,7 +6359,8 @@
         "Kyle"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle",
+      "chapterOrder": 202
     },
     {
       "id": "hit-avery-pawn",
@@ -4977,7 +6387,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 19
     },
     {
       "id": "hit-kingpin-bowling",
@@ -5004,7 +6415,8 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 20
     },
     {
       "id": "impounded-vehicle",
@@ -5031,13 +6443,14 @@
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 21
     },
     {
       "id": "prepare-for-vice-city",
       "titleTr": "Vice City’ye Hazırlan",
       "titleEn": "Prepare for Vice City",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Dre’Quan Vice City’de kalacak yer ayarlarken Jason ile Lucia taşınma için 15.000 dolar toplamaya çalışır.",
       "chapter": 2,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/prepare-for-vice-city",
@@ -5051,14 +6464,27 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Kelly County · Coffee room of Starlet Motel"
+          "titleTr": "Taşınma bütçesini hazırlama",
+          "environmentTr": "Port Gellhorn · hikâye listesi",
+          "contextTr": "İki karakterin şehre taşınma hedefi için toplam 15.000 dolar gerekir. Para farklı işlerden kazanılabilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-prepare-for-vice-city-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "ready",
+          "titleTr": "Motel işaretinin açılması",
+          "environmentTr": "Starlet Motel",
+          "contextTr": "Bütçe koşulu ve açık hikâye görevleri tamamlanınca motel odası işaretlenir. Burada Checking Out başlar."
         }
       ],
       "characters": [
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "chapterOrder": 22
     },
     {
       "id": "veteran-hunted",
@@ -5088,7 +6514,8 @@
         "Bret Vogel"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/bret"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/bret",
+      "chapterOrder": 204
     },
     {
       "id": "get-your-wheels",
@@ -5106,11 +6533,43 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City"
+          "titleTr": "Araçları kontrol etme",
+          "environmentTr": "Vice City · Bayside Apartmanı",
+          "contextTr": "Bölüm 3’te yeni eve gelince önceki araçların çekildiği öğrenilir ve araç edinme hedefi açılır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "recover",
+          "titleTr": "Çekilen aracı geri alma",
+          "environmentTr": "Oyun telefonu · Scooter Bros",
+          "contextTr": "Uygulamadan çekilen araçlardan birinin teslimini isteyebilirsin. Bir karakterin aracını geri almak yeterlidir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-3-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "register",
+          "titleTr": "Başka bir araç kaydetme",
+          "environmentTr": "Vice City · Pay ’n’ Spray",
+          "contextTr": "Alternatif olarak kayıt hakkın varsa başka bir aracı Pay ’n’ Spray’de kaydederek aynı hedefi tamamlayabilirsin.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-get-your-wheels-4-768x432.jpg"
+            }
+          ]
         }
       ],
-      "textCount": 1
+      "textCount": 3,
+      "chapterOrder": 6
     },
     {
       "id": "join-a-street-race",
@@ -5137,7 +6596,8 @@
         "Yago"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago",
+      "chapterOrder": 201
     },
     {
       "id": "send-money-to-lorena",
@@ -5156,20 +6616,45 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere"
+          "titleTr": "Lorena’nın telefonu",
+          "environmentTr": "Vice City · Lucia’nın telefonu",
+          "contextTr": "Mami Knows Best sonrasında Lorena, Lucia’yı arar. Hikâye listesindeki yeni hedefi Lucia tamamlayabilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-send-money-to-lorena-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "transfer",
+          "titleTr": "İlk para transferi",
+          "environmentTr": "Oyun telefonu · BuckMe",
+          "contextTr": "Lucia’nın vadesiz hesabından Lorena’ya 5.000 dolar gönderilir. Transferi yapmak için bir konuma gitmek gerekmez.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-send-money-to-lorena-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.gtabase.com/images/gta-6/missions/send-money-lorena-1.jpg"
+            }
+          ]
         }
       ],
       "characters": [
+        "Lucia Caminos",
         "Lorena"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "requires": [
+        "mami-knows-best"
+      ],
+      "chapterOrder": 9
     },
     {
       "id": "encrypted-hard-drive",
       "titleTr": "Şifreli Sabit Disk",
       "titleEn": "Encrypted Hard Drive",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Cal diskin şifresini çözemeyince yardım için Brian’ın bağlantılarını beklemek gerekir.",
       "chapter": 3,
       "sourceUrl": "https://www.powerpyx.com/gta-6-encrypted-hard-drive-walkthrough/",
@@ -5183,15 +6668,30 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City"
+          "titleTr": "Cal diski inceliyor",
+          "environmentTr": "Vice City · Bayside Apartmanı",
+          "contextTr": "Cal, Tourist Trap’te ele geçirilen diski dairede açmaya çalışır. Şifreyi çözemeyince Brian’ın yardımına ihtiyaç duyar.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-encrypted-hard-drive-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "brian",
+          "titleTr": "Brian’dan haber",
+          "environmentTr": "Oyun telefonu · Cal ve Brian",
+          "contextTr": "İlk aramada Cal bağlantının geciktiğini söyler. Brian daha sonra görüşme ayarladığında Meet the Heders açılır."
         }
       ],
       "characters": [
         "Cal Hampton",
         "Brian Heder"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "tourist-trap"
+      ]
     },
     {
       "id": "buddy",
@@ -5221,7 +6721,9 @@
         "Kyle"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kyle",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_kyle.webp",
+      "chapterOrder": 203
     },
     {
       "id": "meet-the-heders",
@@ -5254,7 +6756,9 @@
         "Jason Duval",
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_brian.webp",
+      "chapterOrder": 3
     },
     {
       "id": "yasmanis-jewelry-jobs",
@@ -5288,7 +6792,8 @@
       "characters": [
         "Yasmani"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 14
     },
     {
       "id": "bumper-to-bumper",
@@ -5319,7 +6824,9 @@
         "Yago"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_yago.webp",
+      "chapterOrder": 202
     },
     {
       "id": "send-more-money-to-lorena",
@@ -5338,20 +6845,38 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere"
+          "titleTr": "Tommy’nin fotoğrafları geliyor",
+          "environmentTr": "Oyun telefonu · Lucia’nın mesajları",
+          "contextTr": "İlk transferden sonraki günlerde Lorena, Tommy’nin fotoğraflarını gönderir. Yeni ödeme hikâye listesine eklenir."
+        },
+        {
+          "id": "transfer",
+          "titleTr": "İkinci para transferi",
+          "environmentTr": "Oyun telefonu · BuckMe",
+          "contextTr": "Önceki işlemi aynı alıcı ve tutarla tekrarla. Bu işlem ayrı bir hikâye hedefi olarak tamamlanır."
+        },
+        {
+          "id": "follow-up",
+          "titleTr": "Lorena’nın geri dönüşü",
+          "environmentTr": "Oyun telefonu · Lucia ve Lorena",
+          "contextTr": "Lorena daha sonra bankanın iki büyük işlemi sorguladığını söyler ve kendisine bir süre para gönderilmemesini ister."
         }
       ],
       "characters": [
+        "Lucia Caminos",
         "Lorena"
       ],
-      "textCount": 1
+      "textCount": 4,
+      "requires": [
+        "send-money-to-lorena"
+      ],
+      "chapterOrder": 11
     },
     {
       "id": "rauls-next-job",
       "titleTr": "Raul’un Sıradaki İşi",
       "titleEn": "Raul’s Next Job",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Raul yeni işi ayarlamak için süre ister. Bir sonraki bağlantı ondan gelecek habere bağlıdır.",
       "chapter": 3,
       "sourceUrl": "https://www.powerpyx.com/gta-6-rauls-next-job-walkthrough/",
@@ -5365,14 +6890,29 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City"
+          "titleTr": "Credit Check sonrasındaki bekleyiş",
+          "environmentTr": "Hikâye listesi · Vice City",
+          "contextTr": "Ekiple tanışmanın ardından Raul sonraki işi hazırlamaya başlar. Listeye bekleme hedefi eklenir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-rauls-next-job-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "message",
+          "titleTr": "Raul bankayı işaretliyor",
+          "environmentTr": "Oyun telefonu · Raul",
+          "contextTr": "Raul’un haberi geldiğinde bekleme hedefi kapanır ve Sinfrontera National Bank keşfi açılır."
         }
       ],
       "characters": [
         "Raul Bautista"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "rob-bank"
+      ]
     },
     {
       "id": "race-against-yago",
@@ -5399,13 +6939,14 @@
         "Yago"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago",
+      "chapterOrder": 20
     },
     {
       "id": "heist-planning",
       "titleTr": "Soygun Planlaması",
       "titleEn": "Heist Planning",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Raul, Sinfrontera National Bank için ekibi toplar ve soygundan önce gereken hazırlıkları planlar.",
       "chapter": 3,
       "series": "Kartel Soygunu",
@@ -5420,14 +6961,30 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City"
+          "titleTr": "Hazırlık listesi açılıyor",
+          "environmentTr": "Hikâye listesi · Sinfrontera",
+          "contextTr": "Security Expert tamamlandığında Raul’un ekibi için hazırlık takibi açılır. Görev kartındaki aşama, diğer hazırlık görevleriyle ilerler.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-heist-planning-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "prep",
+          "titleTr": "Dört hazırlık işi",
+          "environmentTr": "Vice City · hazırlık görevleri",
+          "contextTr": "Company Property, Safe Word, The Missing Link ve Hidden Charges tamamlandığında Raul bankadaki ana görev için haber verir."
         }
       ],
       "characters": [
         "Raul Bautista"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "requires": [
+        "security-expert"
+      ],
+      "chapterOrder": 23
     },
     {
       "id": "mall-rats",
@@ -5458,7 +7015,9 @@
         "Billy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_billy.webp",
+      "chapterOrder": 204
     },
     {
       "id": "brother-to-brother",
@@ -5488,7 +7047,9 @@
         "Yago"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/yago",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_yago.webp",
+      "chapterOrder": 203
     },
     {
       "id": "pool-day",
@@ -5516,7 +7077,8 @@
         "Jason Duval",
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 3
     },
     {
       "id": "heavy-lifting",
@@ -5546,7 +7108,9 @@
       "characters": [
         "Raul Bautista"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_raul.webp",
+      "chapterOrder": 8
     },
     {
       "id": "its-a-date",
@@ -5564,11 +7128,39 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City"
+          "titleTr": "Courtyard Bar’a uğrama",
+          "environmentTr": "Stockyard · Courtyard Bar",
+          "contextTr": "Heavy Lifting’den sonra Stockyard’daki buluşma işareti açılır. Jason ile Lucia bar alanında birlikte vakit geçirebilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-its-a-date-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "bar",
+          "titleTr": "İçecek ve çıkış",
+          "environmentTr": "Stockyard · Courtyard Bar",
+          "contextTr": "İçecek aldıktan sonra sokak tarafına dönmek görevi tamamlar. Bar içindeki dans isteğe bağlıdır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-its-a-date-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-its-a-date-4-768x432.jpg"
+            }
+          ]
         }
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "heavy-lifting"
+      ],
+      "characters": [
+        "Jason Duval",
+        "Lucia Caminos"
+      ],
+      "chapterOrder": 9
     },
     {
       "id": "pay-abes-fee",
@@ -5587,15 +7179,38 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City"
+          "titleTr": "Abe’nin ücret kaydı açılıyor",
+          "environmentTr": "Bölüm 4 · hikâye listesi",
+          "contextTr": "Party Hard’dan sonra Lucretia Law Group için ödeme, zorunlu hikâye adımı olarak listeye eklenir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-pay-abes-fee-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "payment",
+          "titleTr": "75.000 dolar ödeme",
+          "environmentTr": "Oyun telefonu · BuckMe",
+          "contextTr": "Abe’nin ekibine 75.000 dolarlık ödemeyi BuckMe üzerinden yap. Bu bölümdeki ücret, final öncesindeki ikinci ücretten ayrıdır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-pay-abes-fee-2-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-pay-abes-fee-3-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
         "Abe Gonzalez"
       ],
-      "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/abe-gonzalez"
+      "textCount": 3,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/abe-gonzalez",
+      "requires": [
+        "mny-party"
+      ]
     },
     {
       "id": "bad-driver",
@@ -5625,7 +7240,8 @@
         "Andrea"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andrea"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andrea",
+      "chapterOrder": 11
     },
     {
       "id": "attend-eddie-acostas-party",
@@ -5652,7 +7268,8 @@
         "Eddie Acosta"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/eddie-acosta"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/eddie-acosta",
+      "chapterOrder": 4
     },
     {
       "id": "drequans-gift",
@@ -5672,14 +7289,37 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City › La Perle"
+          "titleTr": "Dre’Quan’ın haberi",
+          "environmentTr": "La Perle · Pay ’n’ Spray çevresi",
+          "contextTr": "Photo/Shoot’tan birkaç oyun içi gün sonra Dre’Quan, La Perle’de bir hediye bıraktığını bildirir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-drequans-gift-1-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-drequans-gift-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "motorcycle",
+          "titleTr": "Motosikleti teslim alma",
+          "environmentTr": "La Perle · arka sokak",
+          "contextTr": "Pay ’n’ Spray’in arkasında bekleyen KD’nin SFB 1000’ini teslim al. Araç oyuncunun elinde kalabilir veya satılabilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-drequans-gift-3-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
         "Dre’Quan Priest"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "photo-shoot"
+      ]
     },
     {
       "id": "call-nate",
@@ -5699,14 +7339,27 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere (via phone call)"
+          "titleTr": "Nate’in mesajı",
+          "environmentTr": "Bölüm 4 · Lucia’nın telefonu",
+          "contextTr": "Nate mesaj attığında hikâye listesine arama hedefi eklenir. Hedefin ayrı bir harita konumu yoktur.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-call-nate-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "call",
+          "titleTr": "Nate’i arama",
+          "environmentTr": "Oyun telefonu · Nate",
+          "contextTr": "Nate’i doğrudan telefondan ya da hikâye listesinden ara. Görüşme, Cash Injections buluşmasını haritada görünür kılar."
         }
       ],
       "characters": [
+        "Lucia Caminos",
         "Nate"
       ],
-      "textCount": 1,
+      "textCount": 3,
       "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/nate"
     },
     {
@@ -5730,15 +7383,31 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere (via Phone Call)"
+          "titleTr": "Dirty Work sonrasındaki bekleyiş",
+          "environmentTr": "Bölüm 4 · hikâye listesi",
+          "contextTr": "Dirty Work bittikten sonra bir bekleme hedefi açılır. Bu aşamada Nate’e gidilecek bir konum gösterilmez.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-nate-will-be-in-touch-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "phone",
+          "titleTr": "Lucia’ya gelen telefon",
+          "environmentTr": "Oyun telefonu · Nate",
+          "contextTr": "Jason tarafındaki açık hikâye görevleri ve Child’s Play tamamlanınca Lucia, Nate’in sonraki işle ilgili aramasını alabilir."
         }
       ],
       "characters": [
+        "Lucia Caminos",
         "Nate"
       ],
-      "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/nate"
+      "textCount": 2,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/nate",
+      "requires": [
+        "dirty-work"
+      ]
     },
     {
       "id": "childs-play",
@@ -5769,7 +7438,8 @@
         "Andrés de León"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon"
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/andres-de-leon",
+      "chapterOrder": 21
     },
     {
       "id": "this-is-a-free-call-from",
@@ -5799,7 +7469,8 @@
         "Shayna"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shayna"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/shayna",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_shayna.webp"
     },
     {
       "id": "heist-plans-in-place",
@@ -5820,20 +7491,40 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere (via Phone Call)"
+          "titleTr": "Havaalanı hazırlıklarının takibi",
+          "environmentTr": "Bölüm 4 · hikâye listesi",
+          "contextTr": "Fully Catered sonrası Raul’un mesajıyla açılan hazırlık kaydı, VCIA hazırlıkları bitince yeni adını alır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-heist-plans-in-place-1-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-heist-plans-in-place-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "ready",
+          "titleTr": "Nate’in başlama haberi",
+          "environmentTr": "Oyun telefonu · Lucia ve Nate",
+          "contextTr": "Headliners da tamamlandığında Lucia’ya gelen Nate araması beklemeyi bitirir ve VCIA Takedown açılır."
         }
       ],
       "characters": [
+        "Lucia Caminos",
+        "Nate",
         "Raul Bautista"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "fully-catered"
+      ]
     },
     {
       "id": "tie-up-loose-ends",
       "titleTr": "Yarım Kalan İşleri Bitir",
       "titleEn": "Tie Up Loose Ends",
-      "type": "story",
+      "type": "objective",
       "summaryTr": "Havaalanındaki işin ardından Jason ve Lucia, disk hakkında Raul’dan haber bekler.",
       "chapter": 4,
       "sourceUrl": "https://www.gtabase.com/gta-6/missions/tie-up-loose-ends",
@@ -5847,14 +7538,32 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere"
+          "titleTr": "Havaalanı işi sonrasındaki bekleme",
+          "environmentTr": "Vice City · hikâye listesi",
+          "contextTr": "VCIA Takedown ardından sabit disk satışı konuşulmaya başlanır. Raul’dan haber bekleme hedefinin kendi harita konumu yoktur.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-tie-up-loose-ends-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "valentina",
+          "titleTr": "Valentina’nın haberi",
+          "environmentTr": "Oyun telefonu · Valentina",
+          "contextTr": "İlerleme Valentina’nın aramasıyla gelir. Geri aramak beklemeyi kısaltır. Y Hotel’de bırakılan not alınınca Sunset başlar."
         }
       ],
       "characters": [
-        "Raul Bautista"
+        "Jason Duval",
+        "Lucia Caminos",
+        "Valentina"
       ],
-      "textCount": 1
+      "textCount": 2,
+      "requires": [
+        "vcia-takedown"
+      ],
+      "chapterOrder": 28
     },
     {
       "id": "thats-where-the-money-is",
@@ -5884,7 +7593,8 @@
         "Yasmani"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/yasmani"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/yasmani",
+      "chapterOrder": 29
     },
     {
       "id": "call-valentina-back",
@@ -5903,15 +7613,32 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere"
+          "titleTr": "Disk anlaşmasına ilişkin güncelleme",
+          "environmentTr": "Vice City · oyun telefonu",
+          "contextTr": "Valentina arayıp sabit disk anlaşmasının durumunu anlatır. Geri arama hedefi hikâye listesine düşer.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-call-valentina-back-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "return-call",
+          "titleTr": "Valentina’yı geri arama",
+          "environmentTr": "Oyun telefonu · Valentina",
+          "contextTr": "Jason veya Lucia’yla telefondan arayabilirsin. Hikâye listesindeki hedef de numarayı doğrudan çevirir. Geri arama Sunset’i erkene alır."
         }
       ],
       "characters": [
-        "Valentina"
+        "Valentina",
+        "Jason Duval",
+        "Lucia Caminos"
       ],
-      "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina"
+      "textCount": 3,
+      "profileSourceUrl": "https://www.gtabase.com/characters/gta-6/valentina",
+      "requires": [
+        "tie-up-loose-ends"
+      ]
     },
     {
       "id": "sunset",
@@ -5942,7 +7669,8 @@
         "Jason Duval",
         "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 30
     },
     {
       "id": "unfinished-business",
@@ -5962,14 +7690,44 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Vice City › Lucretia Law Firm (Abe Gonzalez)"
+          "titleTr": "Final öncesindeki serbest zaman",
+          "environmentTr": "Bölüm 5 · hikâye listesi",
+          "contextTr": "Honest Abe ardından açık işleri bitirebilir veya final anlaşmasını ilerletebilirsin. Oyun bu noktada bir sonraki görüşmeyi bekler.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-unfinished-business-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "abe",
+          "titleTr": "İkinci ücret ve görüşme",
+          "environmentTr": "Vice City · Abe’nin ofisi",
+          "contextTr": "İkinci görüşmeye geçmek için BuckMe üzerinden 150.000 dolar ödenir. Ofisteki görüşme, Protective Custody aşamasına bağlanır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-unfinished-business-2-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "penthouse",
+          "titleTr": "Giorgio’nun çatı katına dönüş",
+          "environmentTr": "Vice City · Giorgio’nun çatı katı",
+          "contextTr": "Ofisten çıktıktan sonra çatı katına dönüş ve Giorgio’yla sinematik başlar. Bu geçiş final zincirinin parçasıdır."
         }
       ],
       "characters": [
-        "Abe Gonzalez"
+        "Abe Gonzalez",
+        "Giorgio Gallo",
+        "Jason Duval",
+        "Lucia Caminos"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "requires": [
+        "bil-law"
+      ],
+      "chapterOrder": 7
     },
     {
       "id": "catch-a-bigger-fish",
@@ -5988,14 +7746,63 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Mariana County · Gambit Bay"
+          "titleTr": "Cal’in balık meydan okuması",
+          "environmentTr": "Mariana County · Gambit Bay",
+          "contextTr": "Feng Shui’den sonra Cal bir mesajla kendi avını geçmeni ister. Balık tutma alanına tekneyle gidebilirsin.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-3-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-4-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-5-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "fishing",
+          "titleTr": "Tekneyi sabitleyip balık tutma",
+          "environmentTr": "Gambit Bay · açık su",
+          "contextTr": "Tekneyi demirle ve küçük tuzlu su yemiyle iki pounddan ağır bir stoplight papağan balığı yakala.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-6-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-7-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-8-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "send",
+          "titleTr": "Sonucu Cal’e gönderme",
+          "environmentTr": "Gambit Bay · balıkçılık ekranı",
+          "contextTr": "Boyut koşulunu karşılayan balığı yakaladığında sonucu Cal’e göndererek meydan okumayı tamamla.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-9-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta6-walkthrough-cal-catch-a-bigger-fish-parrotfish-10-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
+        "Jason Duval",
         "Cal Hampton"
       ],
-      "textCount": 1
+      "textCount": 3,
+      "requires": [
+        "feng-shui"
+      ],
+      "chapter": 1,
+      "chapterOrder": 17
     },
     {
       "id": "search-for-the-skunk-ape",
@@ -6025,7 +7832,9 @@
         "Kirk"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_kirk.webp",
+      "chapterOrder": 201
     },
     {
       "id": "search-for-tree-effigies",
@@ -6052,7 +7861,8 @@
         "Kirk"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk",
+      "chapterOrder": 202
     },
     {
       "id": "help-kirk-find-mr-mangrove",
@@ -6082,7 +7892,8 @@
         "Kirk"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/kirk",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_kirk.webp"
     },
     {
       "id": "gellhorns-missing-tourists",
@@ -6104,7 +7915,8 @@
           "environmentTr": "Kelly County · Port Gellhorn"
         }
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 208
     },
     {
       "id": "missing-person",
@@ -6133,7 +7945,8 @@
       "characters": [
         "Alvan West"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapterOrder": 209
     },
     {
       "id": "steal-vehicles-for-moses",
@@ -6159,7 +7972,9 @@
         "Moses"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/moses"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/moses",
+      "chapter": 2,
+      "chapterOrder": 206
     },
     {
       "id": "collect-moses-gift",
@@ -6185,7 +8000,9 @@
         "Moses"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/moses"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/moses",
+      "chapter": 2,
+      "chapterOrder": 207
     },
     {
       "id": "the-impaler",
@@ -6216,7 +8033,8 @@
         "Billy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy",
+      "chapterOrder": 205
     },
     {
       "id": "hometown-heroes",
@@ -6246,7 +8064,9 @@
         "Billy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/billy",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_billy.webp",
+      "chapterOrder": 206
     },
     {
       "id": "climbing-the-cellerichain",
@@ -6273,7 +8093,8 @@
         "Andy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy",
+      "chapterOrder": 207
     },
     {
       "id": "pay-the-cellerica-fee",
@@ -6292,15 +8113,34 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Anywhere via phone message from Andy"
+          "titleTr": "Andy’nin üyelik araması",
+          "environmentTr": "Bölüm 3 · Lucia’nın telefonu",
+          "contextTr": "Andy, Lucia’yı Cellerica’ya katılma hakkında arar. Ardından ödeme görevi hikâye listesinde görünür.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pay-cellerica-fee-1-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "transfer",
+          "titleTr": "Giriş ücretini gönderme",
+          "environmentTr": "Oyun telefonu · BuckMe",
+          "contextTr": "BuckMe’den Andy’ye 5.000 dolar öde. Sonraki giriş görevi Peach!, aradan biraz zaman geçince açılır.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-pay-cellerica-fee-2-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
+        "Lucia Caminos",
         "Andy"
       ],
-      "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
+      "textCount": 3,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy",
+      "chapterOrder": 208
     },
     {
       "id": "peach",
@@ -6330,7 +8170,9 @@
         "Andy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_cellerica.webp",
+      "chapterOrder": 209
     },
     {
       "id": "read-the-label",
@@ -6361,7 +8203,8 @@
         "Cecilia"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy",
+      "chapterOrder": 210
     },
     {
       "id": "puff-puff-pass",
@@ -6393,7 +8236,8 @@
         "Cecilia"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/andy",
+      "chapterOrder": 211
     },
     {
       "id": "dale-mamba",
@@ -6423,7 +8267,8 @@
         "Randy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy",
+      "chapterOrder": 216
     },
     {
       "id": "mansion-thrax",
@@ -6453,7 +8298,8 @@
         "Randy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy",
+      "chapterOrder": 217
     },
     {
       "id": "collect-the-tempesta",
@@ -6480,7 +8326,8 @@
         "Randy"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/randy",
+      "chapterOrder": 219
     },
     {
       "id": "the-last-mile-passing-the-torch",
@@ -6510,7 +8357,9 @@
         "Pilot Pete"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_pilot_pete.webp",
+      "chapterOrder": 201
     },
     {
       "id": "the-last-mile-backseat-pilot",
@@ -6532,15 +8381,55 @@
       "scenes": [
         {
           "id": "start",
-          "titleTr": "Görev başlangıcı",
-          "environmentTr": "Kelly County · Wild Hog Airfield"
+          "titleTr": "Pete’in yeni teslimatları",
+          "environmentTr": "Port Gellhorn · Wild Hog Airfield",
+          "contextTr": "Passing the Torch’tan sonra Pete mesaj atar. Jason önceki havalimanına dönüp deniz uçağına biner.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-4-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-6-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "supplier",
+          "titleTr": "Tedarikçinin yanına iniş",
+          "environmentTr": "Port Gellhorn · su üstündeki iniş alanı",
+          "contextTr": "Paketi almak için tedarikçinin yakınında suya in. Teslimatlar için iki oyun içi saat verilir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-5-768x432.jpg"
+            }
+          ]
+        },
+        {
+          "id": "deliveries",
+          "titleTr": "Yedi teslimat ve hangara dönüş",
+          "environmentTr": "Teslimat güzergâhı · açık hava",
+          "contextTr": "Yedi işaretli noktada teslimat yapıp uçağı kalkış hangarına geri götür. Süresinde biten görev 20.000 dolar verir.",
+          "images": [
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-7-768x432.jpg"
+            },
+            {
+              "url": "https://www.powerpyx.com/wp-content/uploads/gta-6-walkthrough-the-last-mile-backseat-pilot-8-768x432.jpg"
+            }
+          ]
         }
       ],
       "characters": [
+        "Jason Duval",
         "Pilot Pete"
       ],
-      "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete"
+      "textCount": 3,
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete",
+      "requires": [
+        "the-last-mile-passing-the-torch"
+      ],
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_pilot_pete.webp",
+      "chapterOrder": 202
     },
     {
       "id": "petes-deliveries-southpoint-airfield",
@@ -6567,7 +8456,8 @@
         "Pilot Pete"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/pilot-pete",
+      "chapterOrder": 203
     },
     {
       "id": "the-final-flush",
@@ -6597,7 +8487,10 @@
         "Dr. Merle"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/dr-merle"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/dr-merle",
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_dr_merle.webp",
+      "chapter": 1,
+      "chapterOrder": 205
     },
     {
       "id": "retest-freddies-defenses",
@@ -6623,7 +8516,9 @@
         "Freddie"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/freddie"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/freddie",
+      "chapter": 1,
+      "chapterOrder": 206
     },
     {
       "id": "bring-out-the-chimp",
@@ -6651,7 +8546,9 @@
       "characters": [
         "Noah"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapter": 3,
+      "chapterOrder": 224
     },
     {
       "id": "sisters-of-the-sea",
@@ -6680,7 +8577,9 @@
         "Rosebud"
       ],
       "textCount": 1,
-      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/rosebud"
+      "profileSourceUrl": "https://www.gtabase.com/gta-6/characters/rosebud",
+      "chapter": 3,
+      "chapterOrder": 225
     },
     {
       "id": "twin-flames",
@@ -6709,7 +8608,9 @@
       "characters": [
         "Tyler"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapter": 3,
+      "chapterOrder": 226
     },
     {
       "id": "dodo-rise",
@@ -6738,7 +8639,9 @@
       "characters": [
         "Yvonne"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "chapter": 3,
+      "chapterOrder": 227
     },
     {
       "id": "scarlet-sun",
@@ -6766,7 +8669,8 @@
       "characters": [
         "Scarlet"
       ],
-      "textCount": 1
+      "textCount": 1,
+      "mapIconUrl": "https://six.mics.dev/explorer/assets/ui_art/map_blips/blip_mission_scarlet_sun.webp"
     }
   ]
 }

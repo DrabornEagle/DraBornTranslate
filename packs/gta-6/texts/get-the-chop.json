@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Barnacle Beauties’te Jason’ın saçı veya sakalı için yeni bir görünüm seçilir.",
+    "tr": "Kuyumcunun yanındaki salona Jason’la girip çalışanla konuş.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Herhangi bir saç modelini satın almak görevi bitirir. Saç rengi ve sakal ayarları isteğe bağlıdır.",
+    "sceneId": "haircut"
   }
 ]

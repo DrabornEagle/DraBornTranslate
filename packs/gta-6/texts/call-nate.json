@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Nate aranarak birlikte zaman geçirmek için bir buluşma ayarlanır.",
+    "tr": "Nate mesaj attığında hikâye listesine arama hedefi eklenir. Hedefin ayrı bir harita konumu yoktur.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Nate’i doğrudan telefondan ya da hikâye listesinden ara. Görüşme, Cash Injections buluşmasını haritada görünür kılar.",
+    "sceneId": "call"
+  },
+  {
+    "type": "objective",
+    "tr": "Lucia’nın telefonundan Nate’i ara.",
+    "sceneId": "call"
   }
 ]

@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Brian, Donnie’nin teknesinin Corsair Key açıklarına battığını söyler. Görev, teknede kalan yükün bulunmasıyla ilgilidir.",
+    "tr": "Brian’ın verdiği bilgi, Donnie’nin battığı açık deniz bölgesine götürür. Arama alanına tekneyle ulaşabilirsin.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Arama alanının güneydoğusunda batığı bul. Teknenin arka bölmesinde kayıp çanta vardır.",
+    "sceneId": "wreck"
+  },
+  {
+    "type": "guide",
+    "tr": "Batıktan alınan çantayı Brian’ın deposuna götür. Bu teslimat için rehberde 1.200 dolar ödül belirtilir.",
+    "sceneId": "dropoff"
   }
 ]

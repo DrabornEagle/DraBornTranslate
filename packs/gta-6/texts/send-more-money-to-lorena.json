@@ -1,7 +1,22 @@
 [
   {
     "type": "guide",
-    "tr": "Lorena’ya önceki ödemenin ardından bir transfer daha yapılır.",
+    "tr": "İlk transferden sonraki günlerde Lorena, Tommy’nin fotoğraflarını gönderir. Yeni ödeme hikâye listesine eklenir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Önceki işlemi aynı alıcı ve tutarla tekrarla. Bu işlem ayrı bir hikâye hedefi olarak tamamlanır.",
+    "sceneId": "transfer"
+  },
+  {
+    "type": "guide",
+    "tr": "Lorena daha sonra bankanın iki büyük işlemi sorguladığını söyler ve kendisine bir süre para gönderilmemesini ister.",
+    "sceneId": "follow-up"
+  },
+  {
+    "type": "objective",
+    "tr": "BuckMe üzerinden Lorena’ya 5.000 dolar daha gönder.",
+    "sceneId": "transfer"
   }
 ]

@@ -56,6 +56,8 @@ class SubtitlePipeline(
 
     /** Çeviri gösterildiğinde (kaynak, çeviri). */
     var onPair: ((String, String) -> Unit)? = null
+    internal var onCueObserved: ((String, Long) -> Unit)? = null
+    internal var onCueTranslated: ((String, String, Long) -> Unit)? = null
     /** Çeviri başarısız olduğunda kaynak satır. */
     var onTranslateFailed: ((String) -> Unit)? = null
     /** Okunan ve temizlenen ham metin (boş olabilir); tanılama için. */
@@ -104,7 +106,7 @@ class SubtitlePipeline(
     }
 
     /** Bir karenin okuması: [lines] yukarıdan aşağı satırlar, [box] yazının ekrandaki yeri. */
-    fun onRead(lines: List<String>, box: TextBox?, allowFallback: Boolean = true) {
+    fun onRead(lines: List<String>, box: TextBox?, allowFallback: Boolean = true, observedAt: Long? = null) {
         val tidied = lines.map { tidy(it) }.filter { it.isNotEmpty() }
         val text = (repeats?.without(tidied) ?: tidied).joinToString("\n")
         onReadText?.invoke(text)
@@ -127,21 +129,27 @@ class SubtitlePipeline(
                 StabilizerKind.RESTORE -> {
                     readings.clear()
                     val source = action.text ?: return
+                    if (observedAt != null) onCueObserved?.invoke(source, observedAt)
                     val number = ++latest
                     onScreen = number
                     val cached = cache[key(source)]?.takeIf { allowFallback || it.fromPack }
                     if (cached != null) {
+                        recordTranslation(source, cached.text, observedAt)
                         if (cached.fromPack || !PackCaptionContinuity.isReread(source, shownPackSource)) {
                             show(source, cached, box, ON_SCREEN_MS, replaces = false)
                         }
-                    } else request(number, source, box, allowFallback)
+                    } else request(number, source, box, allowFallback, observedAt)
                 }
                 StabilizerKind.TRANSLATE -> {
                     val source = settle(action.text ?: return)
+                    if (observedAt != null) onCueObserved?.invoke(source, observedAt)
                     val number = ++latest
                     onScreen = number
                     val cached = cache[key(source)]?.takeIf { allowFallback || it.fromPack }
-                    if (cached != null) deliver(number, source, cached, box) else request(number, source, box, allowFallback)
+                    if (cached != null) {
+                        recordTranslation(source, cached.text, observedAt)
+                        deliver(number, source, cached, box)
+                    } else request(number, source, box, allowFallback, observedAt)
                 }
             }
         }
@@ -160,7 +168,7 @@ class SubtitlePipeline(
         return ReadingConsensus.merge(source, listOf(source) + related, check)
     }
 
-    private fun request(number: Int, source: String, box: TextBox?, allowFallback: Boolean) {
+    private fun request(number: Int, source: String, box: TextBox?, allowFallback: Boolean, observedAt: Long?) {
         firstSeenOf[number] = if (seenAt > 0) seenAt else clock()
         requestedAt[number] = clock()
         translateExecutor.execute {
@@ -198,10 +206,17 @@ class SubtitlePipeline(
                     onTranslateFailed?.invoke(source)
                     return@synchronized
                 }
+                recordTranslation(source, translated, observedAt)
                 val result = CachedSubtitle(translated, packed != null)
                 cache[key(source)] = result
                 deliver(number, source, result, box)
             }
+        }
+    }
+
+    private fun recordTranslation(source: String, text: String, observedAt: Long?) {
+        if (observedAt != null && TextMatch.normalize(source) != TextMatch.normalize(text)) {
+            onCueTranslated?.invoke(source, text, observedAt)
         }
     }
 

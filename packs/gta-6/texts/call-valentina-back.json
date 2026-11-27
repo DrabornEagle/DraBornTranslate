@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Valentina, sabit diske ilişkin anlaşmayı görüşür. Telefonla aramak görüşmenin ilerlemesini sağlayabilir.",
+    "tr": "Valentina arayıp sabit disk anlaşmasının durumunu anlatır. Geri arama hedefi hikâye listesine düşer.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Jason veya Lucia’yla telefondan arayabilirsin. Hikâye listesindeki hedef de numarayı doğrudan çevirir. Geri arama Sunset’i erkene alır.",
+    "sceneId": "return-call"
+  },
+  {
+    "type": "objective",
+    "tr": "Jason veya Lucia’nın telefonuyla Valentina’yı ara.",
+    "sceneId": "return-call"
   }
 ]

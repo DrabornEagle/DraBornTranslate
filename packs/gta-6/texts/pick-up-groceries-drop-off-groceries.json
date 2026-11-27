@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Jason evin market alışverişini tamamlar ve aldığı malzemeleri eve bırakır.",
+    "tr": "Görev Jason’ın evine yakın markette açılır. İçeride görev işaretli raflarda alınabilecek ürünler görünür.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "İşaretlenen ürünlerden herhangi üçünü al. Ücret ürün seçildiğinde düşülür, kasada ayrıca işlem gerekmez.",
+    "sceneId": "shopping"
+  },
+  {
+    "type": "guide",
+    "tr": "Poşetleri bagajla eve götür. İçeri taşıdığında Jason’ın alışverişi yerleştirdiği kısa sahne başlar.",
+    "sceneId": "unpack"
   }
 ]

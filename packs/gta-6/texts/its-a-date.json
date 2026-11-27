@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Stockyard’daki Courtyard Bar’a dönüp birlikte vakit geçirme fırsatı.",
+    "tr": "Heavy Lifting’den sonra Stockyard’daki buluşma işareti açılır. Jason ile Lucia bar alanında birlikte vakit geçirebilir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "İçecek aldıktan sonra sokak tarafına dönmek görevi tamamlar. Bar içindeki dans isteğe bağlıdır.",
+    "sceneId": "bar"
   }
 ]

@@ -1,12 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Donnie’nin kaybından etkilenen Cal’i Jason ve Lucia birlikte balığa çıkarır.",
+    "tr": "Jason ve Lucia, Donnie’nin ölümünden sonra Cal’le vakit geçirerek ona destek olurlar.",
     "sceneId": "guide-1"
   },
   {
     "type": "guide",
-    "tr": "Görevin odağı Cal’le vakit geçirmek ve Donnie’yi anmaktır. Kayıp paket araması farklı bir görev kaydıdır.",
+    "tr": "Oyun dosyasındaki HO_PAR_KEYCO kodu, aramada Recalibration görevine açılan balık tutma bölümünü işaretler.",
     "sceneId": "guide-2"
   }
 ]

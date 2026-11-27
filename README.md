@@ -20,9 +20,9 @@ GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repli
 
 ## GTA 6 görev araması
 
-Görev Ara, 204 görev ve oyun kaydını Türkçe, İngilizce ve harita başlıklarıyla eşleştirir. **Meet Raul’s Crew** araması **Credit Check** görevini, **BIL_HOUSE** araması **Home Sweet Home** görevini açar. Cal Hampton ve Kenton Rees gibi doğrulanmış karakter portreleri kendiliğinden görünür. **Görev Bilgileri** aşamaları Türkçe sahne özetlerinin üstünde gösterir. 195 görev kartında sahne özeti bulunur.
+Görev Ara, 204 görev ve oyun kaydını 196 kartta Türkçe, İngilizce ve harita başlıklarıyla eşleştirir. **Ana görev**, **Yan görev**, **Görev hedefi** ve bölüm filtreleri seçilen dile göre görünür. **Meet Raul’s Crew** araması **Credit Check** görevini, **BIL_HOUSE** araması **Home Sweet Home** görevini açar. Eşleştirmesi bulunan 55 kartta oyun içi harita simgesi görünür. **Görev Bilgileri** kartlarında 154 aşamaya doğrudan açılabilen kaynak görselleri bağlıdır.
 
-**Görev Metinleri → Konuşmalar → Bütün konuşmayı oku** seçili görevin repliklerini sahne başlıkları olmadan tek akışta gösterir. **Görev Bilgileri → Bu görevde canlı altyazı** ile oynarken okunan altyazılar telefona kaydedilir. Göreve bağlanmış yayımlanmış replikler GitHub görev paketinden otomatik gelir. Hazır katalogda henüz yayımlanmış replik bulunmuyor. [Görev paketi içeriği](packs/gta-6/README.md)
+**Görev Metinleri → Konuşmalar → Bütün konuşmayı oku** seçili görevin repliklerini tek akışta gösterir. **Bu görevde canlı altyazı** ile cihazın okuyabildiği satırlar oynanış sırasıyla kaydedilir. Çevirisi sonradan gelen satır kayıttaki yerini korur. Hazır pakette Türkçe görev aşamaları ve kaynaklar bulunur. [Görev paketi içeriği](packs/gta-6/README.md)
 
 **Attend the Launch Party** veya **Attent the Launch Party** araması Papa Audacity’nin **The Audacity** yan görevini bulur. [Paket içeriği ve kaynaklar](packs/gta-6/README.md)
 

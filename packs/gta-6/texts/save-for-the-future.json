@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Aile birikimine para eklenir. Birikim hedefleri ilerledikçe BuckMe yeni ayrıcalıklar açar.",
+    "tr": "BuckMe’de vadesiz hesabından Family Savings’e para aktar. Takip görevi hikâye ilerledikçe yeni birikim eşikleri açar.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "İlk eşik 5.000 dolardır. Daha yüksek eşikler hikâyenin ilerleyen kısımlarında yeniden görünür. Bu takip, görev konumu gerektirmez.",
+    "sceneId": "milestones"
   }
 ]

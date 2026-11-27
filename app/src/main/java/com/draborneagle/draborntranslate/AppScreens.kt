@@ -205,10 +205,13 @@ internal fun Context.backButton(accent: Int, label: String = "Geri", action: () 
     setOnClickListener { action() }
 }
 
-internal fun Activity.titleBar(title: String, accent: Int = Palette.blue) = row().apply {
+internal fun Activity.titleBar(title: String, accent: Int = Palette.blue, bindTitle: (TextView) -> Unit = {}) = row().apply {
     setPadding(dp(16), dp(8), dp(16), dp(8))
     addView(backButton(accent) { finish() }, LinearLayout.LayoutParams(dp(48), dp(48)))
-    addView(copy(title, 20, Palette.white, true).apply { isAccessibilityHeading = true },
+    addView(copy(title, 20, Palette.white, true).apply {
+        isAccessibilityHeading = true
+        bindTitle(this)
+    },
         LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
 }
 

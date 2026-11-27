@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Raul yeni işi ayarlamak için süre ister. Bir sonraki bağlantı ondan gelecek habere bağlıdır.",
+    "tr": "Ekiple tanışmanın ardından Raul sonraki işi hazırlamaya başlar. Listeye bekleme hedefi eklenir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Raul’un haberi geldiğinde bekleme hedefi kapanır ve Sinfrontera National Bank keşfi açılır.",
+    "sceneId": "message"
   }
 ]

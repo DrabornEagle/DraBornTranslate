@@ -11,13 +11,30 @@ import java.net.URI
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
-internal enum class GtaMissionType(val key: String, val label: String) {
-    STORY("story", "Ana hikâye"), SIDE("side", "Yan hikâye"), OBJECTIVE("objective", "Görev hedefi"),
+internal const val GTA_PROLOGUE = 0
+internal const val GTA_NO_CHAPTER = 6
+
+internal enum class GtaMissionType(val key: String) {
+    STORY("story"), SIDE("side"), OBJECTIVE("objective");
+
+    fun searchLabel(language: GtaMissionSearchLanguage) = when (this) {
+        STORY -> language.local("Ana görev", "Main mission")
+        SIDE -> language.local("Yan görev", "Side mission")
+        OBJECTIVE -> language.local("Görev hedefi", "Objective")
+    }
 }
 
 internal enum class GtaMissionSearchLanguage(val label: String, val searchHint: String) {
     TURKISH("Türkçe", "Türkçe görev adı"),
-    ENGLISH("İngilizce", "İngilizce görev adı veya kod");
+    ENGLISH("İngilizce", "Mission name or code");
+
+    fun local(turkish: String, english: String) = if (this == TURKISH) turkish else english
+
+    fun chapterLabel(chapter: Int) = when (chapter) {
+        GTA_PROLOGUE -> local("Prolog", "Prologue")
+        GTA_NO_CHAPTER -> local("Bölüm belirtilmemiş", "Chapter unspecified")
+        else -> local("Bölüm $chapter", "Chapter $chapter")
+    }
 
     companion object {
         fun fromName(name: String?) = entries.firstOrNull { it.name == name } ?: TURKISH
@@ -29,13 +46,18 @@ internal enum class GtaTextType(val key: String, val label: String) {
     HINT("hint", "İpucu"), INTERFACE("ui", "Arayüz"), GUIDE("guide", "Görev rehberi"), OTHER("other", "Diğer"),
 }
 
-internal data class GtaMissionImage(val url: String, val caption: String? = null)
+internal data class GtaMissionImage(val url: String, val caption: String? = null, val englishCaption: String? = null) {
+    fun captionIn(language: GtaMissionSearchLanguage): String? =
+        if (language == GtaMissionSearchLanguage.ENGLISH) englishCaption else caption
+}
 
 internal data class GtaMissionScene(
     val id: String,
     val title: String,
     val environment: String?,
     val context: String?,
+    val images: List<GtaMissionImage> = emptyList(),
+    val source: String? = null,
 )
 
 internal data class GtaConversationSummary(
@@ -70,8 +92,15 @@ internal data class GtaMission(
     val dialogueSource: String? = null,
     val conversationSummaries: List<GtaConversationSummary> = emptyList(),
     val searchTarget: String? = null,
+    val mapIcon: GtaMissionImage? = null,
+    val chapterOrder: Int? = null,
 ) {
-    val category: String get() = listOfNotNull(type.label, chapter?.let { "Bölüm $it" }, series).joinToString(" · ")
+    val chapterGroup: Int get() = if (id == "prologue") GTA_PROLOGUE else chapter ?: GTA_NO_CHAPTER
+
+    fun categoryIn(language: GtaMissionSearchLanguage): String =
+        listOfNotNull(type.searchLabel(language), chapterGroup.takeUnless { it == GTA_NO_CHAPTER }
+            ?.let(language::chapterLabel), series).joinToString(" · ")
+
     val code: String? get() = (listOfNotNull(englishTitle, title) + aliases).firstOrNull { missionCode.matches(it) }
     private val englishName = englishTitle?.takeUnless(missionCode::matches)
     private val turkishName = title.takeUnless(missionCode::matches)
@@ -116,11 +145,21 @@ internal data class GtaMissionCatalog(
             .flatMap { it.split(" / ").asSequence() }
             .firstNotNullOfOrNull { name -> portrait(name)?.let { name to it } }
 
-    fun search(query: String, language: GtaMissionSearchLanguage = GtaMissionSearchLanguage.TURKISH): List<GtaMission> {
+    fun search(
+        query: String,
+        language: GtaMissionSearchLanguage = GtaMissionSearchLanguage.TURKISH,
+        type: GtaMissionType? = null,
+        chapter: Int? = null,
+    ): List<GtaMission> {
+        val eligible = searchEntries.filter { (mission, _) ->
+            (type == null || mission.type == type) && (chapter == null || mission.chapterGroup == chapter)
+        }
         val name = missionNameKey(query)
-        if (name.isEmpty()) return searchEntries.map { it.first }
+        if (name.isEmpty()) return eligible.map { it.first }.sortedWith(
+            compareBy(GtaMission::chapterGroup, { it.chapterOrder ?: Int.MAX_VALUE }),
+        )
         val words = name.split(' ')
-        return searchEntries.mapNotNull { (mission, names) ->
+        return eligible.mapNotNull { (mission, names) ->
             val rank = when {
                 name in names -> 0
                 names.any { it.startsWith(name) } -> 1
@@ -150,16 +189,23 @@ internal data class GtaMissionText(
     val subtitleKey: Long? = null,
 )
 
-internal data class GtaMissionDialogue(val scenes: List<GtaMissionScene>, val lines: List<GtaMissionText>) {
+internal data class GtaMissionDialogue(
+    val scenes: List<GtaMissionScene>,
+    val lines: List<GtaMissionText>,
+    val recorded: Boolean = false,
+) {
     val readableLines = lines.filter { it.turkish != null || it.english != null }
 
     fun inSceneOrder(): List<GtaMissionText> {
         val byScene = readableLines.groupBy { it.sceneId }
-        return scenes.flatMap { byScene[it.id].orEmpty() }
+        return scenes.flatMap { scene ->
+            val rows = byScene[scene.id].orEmpty()
+            if (rows.all { it.startMs != null }) rows.sortedBy { it.startMs } else rows
+        }
     }
 
     fun inReadingOrder(): List<GtaMissionText> =
-        if (readableLines.any { it.sceneId == null }) readableLines else inSceneOrder()
+        if (recorded || readableLines.any { it.sceneId == null }) readableLines else inSceneOrder()
 
     fun resolveSubtitles(find: (Set<Long>) -> Map<Long, String>): GtaMissionDialogue {
         val keys = lines.filter { it.turkish == null }.mapNotNullTo(mutableSetOf()) { it.subtitleKey }
@@ -246,10 +292,7 @@ internal object GtaMissionPack {
             val id = entry.id()
             val previews = galleries?.optJSONArray(id)?.let { items ->
                 checkPack(items.length() in 1..3)
-                items.objects().map { image ->
-                    GtaMissionImage(imageUrl(image.requiredText("url")),
-                        image.text("captionTr")?.also { checkPack(it.length <= 120) })
-                }
+                items.objects().map { it.missionImage() }
             }.orEmpty()
             mission(entry, previews, dialogues?.sourceUrl(id))
         }
@@ -265,7 +308,14 @@ internal object GtaMissionPack {
 
     private fun mission(data: JSONObject, previews: List<GtaMissionImage>, dialogue: String?): GtaMission {
         val scenes = data.optJSONArray("scenes")?.objects()?.map { scene ->
-            GtaMissionScene(scene.id(), scene.requiredText("titleTr"), scene.text("environmentTr"), scene.text("contextTr"))
+            val images = scene.optJSONArray("images")?.let { gallery ->
+                checkPack(gallery.length() in 1..4)
+                gallery.objects().map { it.missionImage() }.also { photos ->
+                    checkPack(photos.distinctBy { it.url }.size == photos.size)
+                }
+            }.orEmpty()
+            GtaMissionScene(scene.id(), scene.requiredText("titleTr"), scene.text("environmentTr"), scene.text("contextTr"),
+                images, scene.sourceUrl("sourceUrl"))
         }.orEmpty()
         checkPack(scenes.map { it.id }.toSet().size == scenes.size)
         val type = GtaMissionType.entries.firstOrNull { it.key == data.text("type") } ?: invalid()
@@ -288,7 +338,8 @@ internal object GtaMissionPack {
             data.strings("requires"), data.strings("mapLabels"), data.text("giver"),
             data.sourceUrl("profileSourceUrl"), data.sourceUrl("gallerySourceUrl"), data.sourceUrl("gameDataSourceUrl"),
             previews, dialogue ?: data.sourceUrl("textSourceUrl")?.takeIf { it.startsWith("https://six.mics.dev/dialogue?") },
-            conversations, data.text("searchTarget"))
+            conversations, data.text("searchTarget"), data.text("mapIconUrl")?.let { GtaMissionImage(imageUrl(it)) },
+            data.optionalNumber("chapterOrder")?.also { checkPack(it in 1L..1500L) }?.toInt())
     }
 
     private fun texts(zip: ZipFile, mission: GtaMission): List<GtaMissionText> {
@@ -339,6 +390,12 @@ internal object GtaMissionPack {
     private fun JSONObject.requiredText(name: String) = text(name) ?: invalid()
     private fun JSONObject.id() = requiredText("id").also { checkPack(it.length <= 80 && identifier.matches(it)) }
 
+    private fun JSONObject.missionImage() = GtaMissionImage(
+        imageUrl(requiredText("url")),
+        text("captionTr")?.also { checkPack(it.length <= 120) },
+        text("captionEn")?.also { checkPack(it.length <= 120) },
+    )
+
     private fun JSONObject.sourceUrl(name: String): String? = text(name)?.also { value ->
         val uri = runCatching { URI(value) }.getOrNull() ?: invalid()
         checkPack(uri.scheme == "https" && uri.host != null && uri.userInfo == null && uri.port in listOf(-1, 443))
@@ -376,7 +433,10 @@ internal fun missionImageUri(url: String): URI? {
     val supported = when (uri.host) {
         "www.rockstargames.com" -> path.startsWith("/VI/_next/static/media/")
         "www.gtabase.com" -> path.startsWith("/images/gta-6/") || path.startsWith("/images/jch-optimize/ng/")
-        "www.powerpyx.com" -> path.startsWith("/wp-content/uploads/gta-6-")
+        "www.powerpyx.com" -> path.startsWith("/wp-content/uploads/gta-6-") ||
+            path.startsWith("/wp-content/uploads/gta6-walkthrough-")
+        "six.mics.dev" -> path.startsWith("/explorer/assets/ui_art/map_blips/blip_")
+        "www.luciaandjason.com" -> path.startsWith("/images/screenshots/")
         else -> false
     }
     return uri.takeIf { supported && path.substringAfterLast('.').lowercase() in setOf("jpg", "jpeg", "webp", "png", "avif") }

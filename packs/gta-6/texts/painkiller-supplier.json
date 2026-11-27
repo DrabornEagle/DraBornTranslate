@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Dunk, Jason’ın ihtiyacı olan ağrı kesicilere dair haber alırsa telefonla ulaşacaktır.",
+    "tr": "Girls’ Trip’ten sonra hikâye listesine eklenen takip kaydı, Dunk ilk kez arayınca ad değiştirir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Hedef Dunk’ın tekrar aramasını bekler. Bu görüşme, Slam Dunk görevini açar. Beklerken diğer Port Gellhorn görevleri ilerletilebilir.",
+    "sceneId": "second-call"
   }
 ]

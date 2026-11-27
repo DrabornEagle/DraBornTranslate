@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Cal diskin şifresini çözemeyince yardım için Brian’ın bağlantılarını beklemek gerekir.",
+    "tr": "Cal, Tourist Trap’te ele geçirilen diski dairede açmaya çalışır. Şifreyi çözemeyince Brian’ın yardımına ihtiyaç duyar.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "İlk aramada Cal bağlantının geciktiğini söyler. Brian daha sonra görüşme ayarladığında Meet the Heders açılır.",
+    "sceneId": "brian"
   }
 ]

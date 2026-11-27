@@ -32,9 +32,9 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 ## GTA 6 görev araması
 
-**Görev Ara** Türkçe veya İngilizce görev adı, harita başlığı ve teknik kodla çalışır. **Meet Raul’s Crew** aramasıyla **Credit Check** görevine ulaşabilirsin. Dâhilî katalog çevrimdışı açılır. **Oyun Paketleri → GTA 6 paketini indir** üzerinden GitHub’daki kataloğu cihazına alabilirsin.
+**Görev Ara** Türkçe veya İngilizce görev adı, harita başlığı ve teknik kodla çalışır. Görev türü ile bölüm filtrelerini birlikte kullanabilirsin. **Meet Raul’s Crew** aramasıyla **Credit Check** görevine ulaşabilirsin. Dâhilî katalog çevrimdışı açılır. **Oyun Paketleri → GTA 6 paketini indir** üzerinden GitHub’daki kataloğu cihazına alabilirsin.
 
-- **Görev Bilgileri** görev aşamalarını Türkçe sahne özetlerinden önce gösterir. **Önce tamamlanacak görev** kartı aynı ekrandadır. Karakter portreleri ve görev kareleri otomatik yüklenir.
+- **Görev Bilgileri** görev aşamalarını Türkçe sahne özetlerinden önce gösterir. **Önce tamamlanacak görev** kartı aynı ekrandadır. Görev kareleri eşleştirildikleri aşamanın altında açılır.
 - **Görev Bilgileri → Bu görevde canlı altyazı** üzerinden Portal, PS Remote Play veya konsol bağlantısını seç. Oyunda İngilizce altyazıyı ve konuşmacı adlarını aç. Görevi bitirince canlı çeviriyi durdur. **Görev Metinleri → Konuşmalar** görev paketindeki replikleri veya son oyun oturumunda kaydedilen altyazıları açar.
 - **Bütün konuşmayı oku** seçili görevin repliklerini tek akışta gösterir. Yayımlanan görev replikleri için sahne ve konuşmacı bilgileri isteğe bağlıdır.
 - **Hedefler/Kaynaklar** hedefleri, görev rehberlerini, karakter ve görsel kaynaklarını açar. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)

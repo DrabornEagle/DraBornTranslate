@@ -36,6 +36,32 @@ class CaptionSessionTest {
     }
 
     @Test
+    fun missionRecordingRetainsTheObservedLineWhenTranslationFallsBehind() {
+        val observed = mutableListOf<Pair<Long, String>>()
+        val translated = mutableListOf<Pair<Long, String>>()
+        val mission = CaptionSession(
+            translate = { input, answer -> requests.addLast(input to answer) },
+            show = { caption = it },
+            onFailure = {},
+            stabilizer = SubtitleStabilizer(clock = { now }),
+            onObserved = { source, time -> observed.add(time to source) },
+            onTranslated = { _, text, time -> translated.add(time to text) },
+        )
+        mission.read(listOf("Get to the bridge!"), observedAt = 100)
+        now += 340
+        mission.read(listOf("We must leave now."), observedAt = 440)
+        now += 340
+        mission.read(listOf("Close the gate."), observedAt = 780)
+
+        assertEquals(listOf(100L to "Get to the bridge!", 440L to "We must leave now.", 780L to "Close the gate."), observed)
+        requests.removeFirst().second(TranslationReply("Köprüye git!"))
+        assertNull(caption)
+        requests.removeFirst().second(TranslationReply("Kapıyı kapat."))
+        assertEquals(listOf(100L to "Köprüye git!", 780L to "Kapıyı kapat."), translated)
+        assertEquals("Kapıyı kapat.", caption?.turkish)
+    }
+
+    @Test
     fun subtitleIsRemovedWhenSourceDisappears() {
         session.read(listOf("Follow me."))
         requests.removeFirst().second(TranslationReply("Beni takip et."))

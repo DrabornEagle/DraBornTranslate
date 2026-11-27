@@ -102,6 +102,10 @@ class ScreenNavigationTest {
                 onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("Attent the Launch Party") }
                 click("İngilizce")
                 waitFor { hasText("The Audacity") }
+                assertTrue(hasText("Mission Search"))
+                assertTrue(hasText("Chapter 3"))
+                click("Side mission")
+                waitFor { hasText("The Audacity") }
                 click("The Audacity")
                 waitFor {
                     resumed() is GtaMissionDetailsActivity && hasText("Neo Paloma Apartments") &&
@@ -133,6 +137,8 @@ class ScreenNavigationTest {
                 waitFor { resumed() is GtaMissionSearchActivity && hasText("The Audacity") }
                 click("Türkçe")
                 waitFor { hasText("Lansman Partisine Katıl") }
+                assertTrue(hasText("Yan görev"))
+                assertTrue(hasText("Bölüm 3"))
             }
         } finally {
             if (backup == null) file.delete() else file.writeBytes(backup)
@@ -366,7 +372,7 @@ class ScreenNavigationTest {
             onMain { (resumed()?.window?.decorView?.findChild { it is EditText } as EditText).setText("gone fishing") }
             waitFor {
                 hasText("Gone Fishing") && resumed()?.window?.decorView?.findChild {
-                    it is ImageView && it.contentDescription == "Cal Hampton profil resmi"
+                    it is ImageView && it.contentDescription == "Cal Hampton portrait"
                 } != null
             }
             screenshot("06-gorev-ara")

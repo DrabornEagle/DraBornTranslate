@@ -1,12 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Oyun, final öncesine dönüp ilerlemeyi sürdürmeyi veya yeni bir oyun açmayı sunar.",
+    "tr": "Köprüde biten rotalarda jenerikten sonra Cal’in diskteki dosyaların açılmasını beklediği kısa bir sahne gösterilir.",
     "sceneId": "guide-1"
   },
   {
     "type": "guide",
-    "tr": "Bu kayıtta görülen ifadeler, final sahnesindeki konuşmalardan farklı olarak devam seçenekleriyle ilgilidir.",
+    "tr": "Devam seçildiğinde oyun, finalden önceki noktaya döner ve iki karakter de yeniden oynanabilir. Açık kalan görevleri buradan sürdürebilirsin.",
     "sceneId": "guide-2"
   }
 ]

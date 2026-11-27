@@ -511,17 +511,18 @@ object Engine : Native.SessionListener {
         // bitmez; üç kez çevrildikten sonra bir süre okunmaz.
         built.repeats = RepeatedText()
         built.onRepeatBlocked = { line -> log(2, "arayüz yazısı: \"$line\" yineleniyor, artık çevrilmeyecek") }
-        val recording = missionRecording
+        missionRecording?.let { recording ->
+            built.onCueObserved = { source, time -> recording.add(source, observedAt = time) }
+            built.onCueTranslated = { source, translation, time ->
+                recording.translate(source, Gta6Profile.localizeSpeaker(translation), time)
+            }
+        }
         built.onPair = { source, translation ->
             lastSource = source
             lastTranslation = translation
             translatedCount++
             // Yalnız altyazı satırları geçmişe girer; ek alanların çevirileri girmez (bilgisayarda da öyle).
             addToHistory(source, translation, fromPack = lastPackSource == source)
-            if (recording != null && running && !stopRequested &&
-                (runningGame.isBlank() || ExtraAreas.isGta6(runningGame, null))) {
-                recording.add(source, translation)
-            }
             log(2, "çeviri: \"${source.replace('\n', ' ')}\" → \"$translation\"")
             notifyChanged()
         }
@@ -1062,15 +1063,11 @@ object Engine : Native.SessionListener {
         val ocr = gtaReader ?: GtaProfileReader(reader).also { gtaReader = it }
         val hud = gtaHud ?: run {
             val translator = GameTranslatorEngine(app, GameReadingProfile.GTA_6)
-            val recording = missionRecording
             gtaTranslator = translator
             HudTranslationSession({ input, done ->
                 val requested = if (settings.packsEnabled) translator::translate else translator::translateFallback
                 requested(input) { reply -> reader.execute { done(reply) } }
-            }, { blocks ->
-                recording?.observeObjectives(blocks)
-                publishGtaHud(blocks)
-            }).also { gtaHud = it }
+            }, ::publishGtaHud, missionRecording?.let { it::translateObjective }).also { gtaHud = it }
         }
         ocr.read(bitmap) { result ->
             try {
@@ -1079,7 +1076,11 @@ object Engine : Native.SessionListener {
                     hud.clearPauseMenu()
                     return@read
                 }
-                current.onRead(result.subtitles.map { it.text }, result.captionPosition()?.box, result.allowFallback)
+                val recording = missionRecording?.takeIf { !stopRequested &&
+                    (runningGame.isBlank() || ExtraAreas.isGta6(runningGame, null)) }
+                recording?.observeObjectives(result.hud, requireConfirmation = true)
+                current.onRead(result.subtitles.map { it.text }, result.captionPosition()?.box, result.allowFallback,
+                    observedAt = now.takeIf { recording != null })
                 hud.read(result.hud)
             } finally {
                 reading.set(false)

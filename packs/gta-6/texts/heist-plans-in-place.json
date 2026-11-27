@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Havaalanı işinin hazırlıkları tamamlanır. Başlama zamanını Nate ekibe bildirecektir.",
+    "tr": "Fully Catered sonrası Raul’un mesajıyla açılan hazırlık kaydı, VCIA hazırlıkları bitince yeni adını alır.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Headliners da tamamlandığında Lucia’ya gelen Nate araması beklemeyi bitirir ve VCIA Takedown açılır.",
+    "sceneId": "ready"
   }
 ]

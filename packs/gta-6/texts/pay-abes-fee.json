@@ -1,7 +1,17 @@
 [
   {
     "type": "guide",
-    "tr": "Abe Gonzalez yeni kimlikler için 75.000 dolar ister. Ödeme BuckMe üzerinden Lucretia Law Group’a gönderilir.",
+    "tr": "Party Hard’dan sonra Lucretia Law Group için ödeme, zorunlu hikâye adımı olarak listeye eklenir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Abe’nin ekibine 75.000 dolarlık ödemeyi BuckMe üzerinden yap. Bu bölümdeki ücret, final öncesindeki ikinci ücretten ayrıdır.",
+    "sceneId": "payment"
+  },
+  {
+    "type": "objective",
+    "tr": "BuckMe ile Lucretia Law Group’a 75.000 dolar öde.",
+    "sceneId": "payment"
   }
 ]

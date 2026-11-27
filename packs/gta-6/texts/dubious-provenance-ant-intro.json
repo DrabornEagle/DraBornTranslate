@@ -1,12 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Jason ve Lucia heykelin değerini anlamak için Capri’deki antikacıya gider.",
+    "tr": "Jason ve Lucia, ellerindeki heykelin değerini öğrenmek için Capri’deki antikacıya uğrar.",
     "sceneId": "guide-1"
   },
   {
     "type": "guide",
-    "tr": "Bu ad, kovalamaca verisi içeren ANT_CHASE ile de eşleşir. Antikacıya yapılan ilk ziyaret ANT_INTRO koduyla aranabilir.",
+    "tr": "ANT_INTRO kodu giriş bölümünü bulur. Görevin devamı ve sahneleri Dubious Provenance kartında yer alır.",
     "sceneId": "guide-2"
   }
 ]

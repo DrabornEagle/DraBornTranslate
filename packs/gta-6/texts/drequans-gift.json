@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Dre’Quan, çekimdeki yardım için La Perle’de alınabilecek bir hediye bırakır.",
+    "tr": "Photo/Shoot’tan birkaç oyun içi gün sonra Dre’Quan, La Perle’de bir hediye bıraktığını bildirir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Pay ’n’ Spray’in arkasında bekleyen KD’nin SFB 1000’ini teslim al. Araç oyuncunun elinde kalabilir veya satılabilir.",
+    "sceneId": "motorcycle"
   }
 ]

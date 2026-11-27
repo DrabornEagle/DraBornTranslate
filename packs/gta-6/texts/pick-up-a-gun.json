@@ -1,7 +1,12 @@
 [
   {
     "type": "guide",
-    "tr": "Gellhorn Outfitters’ta bir silah satın alınabilir veya dolapta duran mevcut silahlardan biri alınabilir.",
+    "tr": "Girls’ Trip sonrasında Port Gellhorn’daki dükkân erişilebilir olur. Hedef Lucia’yla yapılabilir.",
     "sceneId": "start"
+  },
+  {
+    "type": "guide",
+    "tr": "Bir ürün satın almak veya yeşil dolaptan mevcut ekipmanı almak hedefi tamamlar.",
+    "sceneId": "locker"
   }
 ]

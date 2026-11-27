@@ -2,9 +2,9 @@
 
 **Oyun Paketleri → GTA 6 paketini indir** GitHub’daki manifesti ve ZIP’i indirir. Uygulamayla gelen görev kataloğu çevrimdışı arama için de kullanılabilir. **Görev Ara** Türkçe ve İngilizce başlıkları, oyunda görünen başlıkları ve teknik kodları eşleştirir.
 
-2026.11.26.6 kataloğunda 204 görev ve oyun kaydı bulunur. Birden fazla kodla eşleşen görevler aramada tek kart açar. **Görev Bilgileri** bölümünde aşamalar, sahne özetlerinin üstünde yer alır. Aramada açılan 197 görev kartının 195’inde toplam 311 Türkçe sahne özeti bulunur. Portre ve oyun kareleri yayımlandıkları adreslerden yüklenir.
+2026.11.27.1 kataloğundaki 204 kayıt aramada 196 kart açar. Görev araması Türkçe ve İngilizce ana görev, yan görev, hedef ve bölüm filtrelerini içerir. 33 kaydın aşamaları, hedefleri veya teknik kod bağlantıları güncellendi. Aramada açılan kartların 55’i oyun içi harita simgesine bağlıdır. Kartlardaki 370 aşamanın 154’ünde kaynak görseli, 101’inde birden fazla görsel bulunur.
 
-**Konuşmalar → Bütün konuşmayı oku** seçili görevin tüm okunabilir `dialogue` kayıtlarını tek akışta gösterir. **Sahnelere göre** bilinen sahneleri ve ortamları gösterir. Sekme açıldığında GitHub görev paketi en fazla saatte bir otomatik denetlenir. Doğrulanmış arşiv çevrimdışı kalır. Bu katalog 343 rehber ve bir hedef kaydı içerir. Yayımlanmış konuşma sayısı sıfırdır. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir. **Bu görevde canlı altyazı** üzerinden başlatılan bir oturumun replikleri cihazda saklanır. Görevin yayımlanmış konuşmaları varsa paket kullanılır. Diğer görevlerde **Konuşmalar**, son kayıtlı oynanışın ekranda okunabilen repliklerini gösterir.
+**Konuşmalar → Bütün konuşmayı oku** seçili görevin okunabilir `dialogue` kayıtlarını tek akışta gösterir. **Sahnelere göre** aynı sırayı sahne başlıklarıyla gösterir. **Bu görevde canlı altyazı** üzerinden başlatılan oturum cihazın gördüğü replikleri zaman sırasıyla saklar ve sonradan gelen Türkçe çeviriyi aynı satıra ekler. GitHub görev paketi Konuşmalar açıldığında en fazla saatte bir denetlenir ve doğrulanmış arşiv çevrimdışı kalır. Yayındaki pakette tam oyun konuşması bulunmuyor. **Hedefler/Kaynaklar** görev hedeflerini ve rehber bağlantılarını içerir.
 
 | Kaynak | Kapsam |
 | --- | --- |
@@ -13,13 +13,15 @@
 | [GTA VI Explorer diyalog araması](https://six.mics.dev/dialogue) | 136.961 diyalog satırı, İngilizce ve İspanyolca. |
 | [PowerPyx görev rehberi](https://www.powerpyx.com/gta-6-full-walkthrough-all-missions/) ve [GTABase](https://www.gtabase.com/gta-6/missions/) | Görev başlıkları, haritadaki adlar, karakterler ve rehber görselleri. |
 | [Rockstar Games görselleri](https://www.rockstargames.com/VI/media/screenshots) | Resmî tanıtım görselleri ve karakter profilleri. |
+| [GTA VI Explorer harita işaretleri](https://six.mics.dev/ui-art#map-blips) | Katalogdaki görev ve karakter işaretlerinin yayımlanan oyun dokuları. |
+| [Lucia & Jason oynanış galerisi](https://www.luciaandjason.com/screenshots#prologue) | Açılışın ve prologun sahneye bağlanan oyun kareleri. |
 | [AudaCity yan hikâyesi](https://six.mics.dev/extras/audacity) ve [The Audacity görev rehberi](https://www.powerpyx.com/gta-6-the-audacity-attend-the-launch-party-walkthrough/) | Lansman hedefinin adı, ön koşulu, karakterleri ve sahne ortamları. |
 
 Sahne zamanı için videonun veya sahnenin başlangıcına göre ölçüm gerekir. Metin dökümündeki satır numarası ve hash, videodaki saniyeyi vermez.
 
 ## Görev paketi yayını
 
-1. [catalog.json](catalog.json) dosyasında görev bilgilerini düzenle. Her görevin `id` değeri benzersiz olmalı. İsteğe bağlı `scenes`, `requires`, `mapLabels`, `giver`, `sourceUrl`, `textSourceUrl`, `gameDataSourceUrl`, `profileSourceUrl` ve `gallerySourceUrl` alanları sahne bilgilerini, farklı adları ve kaynakları bağlar.
+1. [catalog.json](catalog.json) dosyasında görev bilgilerini düzenle. Her görevin `id` değeri benzersiz olmalı. `chapterOrder` bölümdeki gezinme sırasını, `mapIconUrl` kaynağı eşleştirilmiş harita simgesini verir. `scenes` öğeleri sahne sırasıyla yazılır. Her sahnenin `images` dizisi o aşamaya ait en fazla dört farklı görsel URL’si içerir.
 2. Eklemeye yetkili olduğun metinleri `texts/<görev-id>.json` dosyasına sıralı JSON dizisi olarak kaydet. Her satırda aşağıdaki alanları kullan.
 3. İsteğe bağlı `media.json` içinde yayıncıya ait görsel URL’lerini `portraits` ve `previews` alanlarında tanımla. `portraitAliases` kısa karakter adlarını portre anahtarlarına bağlar.
 4. İsteğe bağlı `conversations.json` içinde görev kimliklerini Türkçe sahne özetlerine bağla. Her özet `titleTr` ve `summaryTr` değerlerini, varsa `locationTr` metnini ve `speakers` dizisini içerir.
@@ -38,6 +40,6 @@ ZIP’in adı SHA-256 özetinden üretilir. Uygulama arşivin boyutunu, özetini
 
 ## Altyazı anahtarları
 
-`scenes` dizisi sahnelerin okuma sırasını, `texts/<görev-id>.json` her sahnedeki repliklerin sırasını belirler. Sahne ilişkisinin eksik olduğu görevlerde **Bütün konuşmayı oku** dosyadaki sırayı kullanır. Böyle bir dosyada replikleri konuşma sırasına göre yaz. Sahne başlığı için `titleTr`, bilinen ortam için `environmentTr` kullan.
+`scenes` dizisi sahnelerin sırasını belirler. Bir sahnedeki tüm repliklerin `startMs` değeri varsa satırlar zamana göre dizilir. Eşit zamanlarda veya zaman bilgisi eksikse dosyadaki sıraya başvurulur. Satırlardan birinin sahne bilgisi eksikse iki okuma görünümü de tüm satırları dosyadaki sırayla gösterir. Sahne başlığı için `titleTr`, bilinen ortam için `environmentTr` kullan.
 
 `gta-6.gz` bir Türkçe çeviri sözlüğüdür. Görev, sahne, konuşmacı ve sıra bilgilerini görev paketi sağlar. `subtitleKey` alanı İngilizce metnin [PackKey](../../app/src/main/java/com/gametranslator/gametranslator_mobile/core/GamePacks.kt) ile hesaplanan anahtarını kullanır. Uygulama önce `entries`, sonra `segments` tablosunda tam eşleşme arar. Yayımlanmış replikte anahtar varsa ve gerekli altyazı paketi cihazda yoksa onu da otomatik indirir.
