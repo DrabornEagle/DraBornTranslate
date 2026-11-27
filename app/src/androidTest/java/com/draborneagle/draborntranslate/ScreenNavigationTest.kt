@@ -255,11 +255,12 @@ class ScreenNavigationTest {
                 waitFor { hasText("Deneme görevi") && hasText("Görev metinleri") }
                 click("Görev metinleri")
                 val readingOrder = listOf("Holde buluşma", "Deniz", "Asansörün yanında buluşalım.",
+                    "Sahnesi belirtilmemiş", "Kapı açık.",
                     "Asansöre geçiş", "Ece", "Yoldayım.")
                 waitFor { readingOrder.all(::hasText) && hasText("Apartman girişi") }
                 assertReadingOrder(readingOrder)
                 listOf("Girişe git.", "Replik açıklaması", "Eşleşmeyen", "Oyunu kaydet.",
-                    "Önceliği düşük karşılık.", "Görevin diyalog arşivini aç", "Kapı açık.").forEach { item ->
+                    "Önceliği düşük karşılık.", "Görevin diyalog arşivini aç").forEach { item ->
                     assertFalse(item, hasText(item))
                 }
                 click("Bütün konuşmayı oku")
@@ -274,7 +275,7 @@ class ScreenNavigationTest {
                 assertFalse(hasText("Holde buluşma"))
                 click("Sahnelere göre")
                 waitFor { readingOrder.all(::hasText) }
-                assertFalse(hasText("Kapı açık."))
+                assertReadingOrder(readingOrder)
                 click("Hedefler/Kaynaklar")
                 waitFor { hasText("Girişe git.") }
                 assertFalse(hasText("Yoldayım."))
@@ -378,7 +379,7 @@ class ScreenNavigationTest {
             screenshot("06-gorev-ara")
             click("Gone Fishing")
             waitFor {
-                resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") && hasText("Buluşma noktası") &&
+                resumed() is GtaMissionDetailsActivity && hasText("Cal Hampton") && hasText("Uçağın bıraktığı paketler") &&
                     hasText("Sahne özetleri") && hasText("Teknedeki iş") && hasText("Kampı terk ederken")
             }
             assertFalse(hasText("Profil fotoğrafı ekle"))
@@ -415,7 +416,7 @@ class ScreenNavigationTest {
             waitFor { hasText("Meet the Heders") }
             assertFalse(hasText("Görev adı doğrulanmadı"))
             click("Meet the Heders")
-            waitFor { hasText("Brian’la balkon görüşmesi") && hasText("Balkondaki konuşma") }
+            waitFor { hasText("Görev başlangıcı") && hasText("Heder’larla akşam yemeği") && hasText("Balkondaki konuşma") }
             click("Görev metinleri")
             waitFor { hasText("Bu görev için konuşma kaydı bulunmuyor.") }
             assertFalse(hasText("Balkondaki konuşma"))
