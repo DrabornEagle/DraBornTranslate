@@ -1,0 +1,107 @@
+{
+  "ban-carte": {
+    "stages": {
+      "flow-sloppy-mollys": "Yürüyerek takip",
+      "flow-cockfight": "Mekân içi oynanış",
+      "flow-photoshoot": "Sahne içi oynanış",
+      "flow-warehouse-exit": "Kaçış",
+      "flow-to-raul": "Araç içi konuşma",
+      "flow-monty-handover": "Görev içi konuşma",
+      "flow-questioning": "Görev içi konuşma",
+      "flow-monty-answers": "Görev içi konuşma"
+    },
+    "steps": {
+      "1": "flow-sloppy-mollys",
+      "2": "flow-cockfight",
+      "3": "flow-cockfight",
+      "4": "flow-cockfight",
+      "5": "cinematic-ban-carte-mcs1-confront-gang-contact",
+      "7": "flow-warehouse-exit",
+      "8": "flow-warehouse-exit",
+      "9": "flow-to-raul",
+      "11": "flow-monty-handover",
+      "12": "flow-monty-handover",
+      "13": "flow-questioning",
+      "14": "flow-monty-answers",
+      "15": "flow-monty-answers"
+    }
+  },
+  "bricked-up": {
+    "cinematics": [
+      "flow-boobie-assignment"
+    ],
+    "stages": {
+      "flow-venture-drive": "Araç içi konuşma",
+      "flow-venture-lobby": "Binaya giriş",
+      "flow-venture-raid": "Baskın ve çatışma",
+      "flow-apartment-escape": "Yaya kaçış",
+      "flow-window-exit": "Kaçış ve araç değişimi",
+      "flow-jack-of-hearts-drive": "Araç içi konuşma"
+    },
+    "steps": {
+      "1": "flow-boobie-assignment",
+      "2": "flow-venture-drive",
+      "3": "flow-venture-lobby",
+      "4": "flow-venture-lobby",
+      "6": "flow-window-exit",
+      "7": "flow-jack-of-hearts-drive",
+      "8": "flow-jack-of-hearts-drive"
+    }
+  },
+  "rob-bank": {
+    "cinematics": [
+      "flow-following-morning"
+    ],
+    "stages": {
+      "flow-bank-gear": "Görev hazırlığı",
+      "washington-beach-fleeca-yolculugu": "Araç içi konuşma ve telsiz",
+      "flow-washington-beach-bank": "Görev içi konuşma",
+      "flow-second-fleeca": "Araç içi konuşma ve şube",
+      "flow-thompson-fleeca": "Şube ve kaçış",
+      "flow-return-home": "Kaçış ve eve dönüş"
+    },
+    "steps": {
+      "1": "cinematic-rob-bank-int",
+      "2": "flow-bank-gear",
+      "3": "flow-bank-gear",
+      "4": "flow-bank-gear",
+      "5": "flow-bank-gear",
+      "6": "washington-beach-fleeca-yolculugu",
+      "7": "flow-washington-beach-bank",
+      "8": "flow-second-fleeca",
+      "9": "flow-second-fleeca",
+      "10": "flow-thompson-fleeca",
+      "11": "flow-return-home",
+      "12": "cinematic-rob-bank-ext"
+    }
+  },
+  "gone-fishing": {
+    "stages": {
+      "flow-follow-plane": "Tekneyle takip",
+      "flow-spot-donnie": "Dürbünle gözlem",
+      "flow-dock-approach": "Teknede konuşma",
+      "flow-windmill": "Yaya ilerleme",
+      "flow-donnie-rescue": "Kamptaki oynanış",
+      "flow-escape-in-plane": "Uçakla kaçış"
+    },
+    "steps": {
+      "1": "flow-follow-plane",
+      "2": "flow-follow-plane",
+      "3": "flow-dock-approach",
+      "4": "flow-windmill",
+      "5": "flow-donnie-rescue",
+      "6": "flow-donnie-rescue",
+      "7": "flow-escape-in-plane",
+      "8": "flow-escape-in-plane",
+      "9": "flow-escape-in-plane",
+      "10": "flow-escape-in-plane",
+      "11": "cinematic-int-chase-mcs1-plane-land",
+      "12": "cinematic-int-chase-mcs1-plane-land"
+    },
+    "frames": {
+      "cinematic-int-chase-ext-rs1": [
+        "https://gameta.gg/media/missions/gone-fishing/09.webp"
+      ]
+    }
+  }
+}

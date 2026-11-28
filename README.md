@@ -4,9 +4,9 @@
   <img src="app/src/main/res/drawable-nodpi/brand_mark.webp" width="68" height="68" alt="">
   <h1>DraBornTranslate</h1>
   <p><strong>PlayStation oyunlarını Türkçe oku.</strong><br>Canlı altyazı, oyun içi metin çevirisi ve PS App yakalamaları.</p>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.11/DraBornTranslate-v0.7.11-Kisisel-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.7.11%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.7.11 imzalı APK’yı indir"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.12/DraBornTranslate-v0.7.12-Kisisel-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.7.12%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.7.12 imzalı APK’yı indir"></a>
   <a href="docs/KURULUM.md"><img src="https://img.shields.io/badge/KURULUM-REHBER%C4%B0-BDA5FF?style=for-the-badge&amp;labelColor=161529" alt="Kurulum rehberi"></a>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.11"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.7.11 sürüm notları"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.12"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.7.12 sürüm notları"></a>
   <p><sub>İmzalı APK · Android 10+ · ARM64</sub></p>
 </div>
 
@@ -18,13 +18,11 @@ GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repli
 
 **Capiche · Türkçe dublaj** GTA 6 profilinden ve konsol ayarlarından açılır. Konsolun ham oyun görüntüsü aynı ağdaki bilgisayarda bir tarayıcı penceresine aktarılabilir. Dublajı Capiche’nin masaüstü sayfası yürütür. Duraklatma menüsündeki sol liste oyuna dönünce ilk yeni okumada kapanır. [Capiche kurulum adımları](docs/KURULUM.md#capiche-ile-t%C3%BCrk%C3%A7e-dublaj)
 
-## GTA 6 görev araması
+## GTA 6 Görev Ara/Oku
 
-Görev Ara, 204 görev ve oyun kaydını Türkçe, İngilizce ve harita başlıklarıyla eşleştirir. **Meet Raul’s Crew** araması **Credit Check** görevini, **BIL_HOUSE** araması **Home Sweet Home** görevini açar. Cal Hampton ve Kenton Rees gibi doğrulanmış karakter portreleri kendiliğinden görünür. **Görev Bilgileri** aşamaları Türkçe sahne özetlerinin üstünde gösterir. 195 görev kartında sahne özeti bulunur.
+Görev Ara/Oku, görevleri Türkçe ve İngilizce ad, harita başlığı ve teknik kodla bulur. **Meet Raul’s Crew** araması **Credit Check** görevini açar.
 
-**Görev Metinleri → Konuşmalar** bölümündeki **Sahnelere göre** ve **Hızlı Oku** görünümleri aynı sırayı kullanır. v0.7.11’de 59 görevde ara sahneler ve oynanış konuşmaları kayıtlarla eşleştirildi. **Ek replikleri göster** ile diğer altyazılara, **Oynanış kaydımı göster** ile kendi oturumunun sırasına ulaşabilirsin. Adı doğrulanamayan konuşmacılar NPC olarak görünür. [v0.7.11 kaynak dosyaları ve derleme adımları](releases/v0.7.11/README.md)
-
-**Attend the Launch Party** veya **Attent the Launch Party** araması Papa Audacity’nin **The Audacity** yan görevini bulur. [Paket içeriği ve kaynaklar](packs/gta-6/README.md)
+**Görev Metinleri → Konuşmalar**, kayıtlarla eşleştirilen sahneleri görev akışıyla gösterir. Sahne türü, karakter adı ve sahne görselleri ilgili metnin yanında yer alır. **Sahnelere göre** ve **Hızlı Oku** aynı sırayı kullanır. Görev Detayı’nın sonundaki ok sayfa başına döner. [v0.7.12 kaynak dosyaları ve derleme adımları](releases/v0.7.12/README.md)
 
 ## Uygulamadan · v0.5.5
 
@@ -54,7 +52,7 @@ Görev Ara, 204 görev ve oyun kaydını Türkçe, İngilizce ve harita başlık
 
 ## İndir ve kur
 
-1. [DraBornTranslate v0.7.11 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.11/DraBornTranslate-v0.7.11-Kisisel-Android-arm64.apk).
+1. [DraBornTranslate v0.7.12 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.12/DraBornTranslate-v0.7.12-Kisisel-Android-arm64.apk).
 2. APK’yı Android telefonunda aç. Önceki v5 serisi kurulumunun üzerine yükleyebilirsin.
 3. Ana ekrandan bağlantını seç. [PS5, Portal ve Remote Play kurulum adımları](docs/KURULUM.md).
 

@@ -1,0 +1,109 @@
+{
+  "ban-carte": {
+    "slug": "the-missing-link",
+    "root": "BAN_CARTE",
+    "stages": [
+      ["cinematic-ban-carte-int", null, [1, 2], ["INT"]],
+      ["flow-sloppy-mollys", "Andrea ile Sloppy Molly’s’e giriş", [3, 5], ["FOLLOW_ANDREA", "WNT1_1", "WNT1_2", "ANIMAL_WAIT1", "ANIMAL_WAIT3"]],
+      ["flow-cockfight", "Arka oda ve horoz dövüşü", [6, 7], ["WNT3", "IG5_INTRODUCE"]],
+      ["cinematic-ban-carte-mcs1-confront-gang-contact", "Monty ile fotoğraf odasında tanışma", [8, 9], ["MCS1"]],
+      ["flow-photoshoot", "Monty’nin fotoğraf çekimi", [10, 11], ["PHOTOS1_INT_A", "PHOTOS2_BANT"]],
+      ["cinematic-ban-carte-mcs2-gang-contact-start-fight", "Tekila ve Monty’nin fenalaşması", [12, 13], ["MCS2"]],
+      ["cinematic-ban-carte-mcs3-gang-backup", null, [14, 14], ["MCS3", "MCS3_LO"]],
+      ["flow-warehouse-exit", "Depodan çıkış ve Monty’yi arabaya taşıma", [15, 18], ["IG8_ROLLER_DOOR", "CLEAR_PATH", "GOT_BOSS_CARTEL1", "IG9_PARKED", "ESCAPE_BANT1"]],
+      ["flow-to-raul", "Raul’un buluşma yerine yolculuk", [19, 21], ["ESCAPED_WAREHOUS", "CAR_BANTER_1", "PCALL_TOJASON"]],
+      ["flow-monty-handover", "Monty’yi buluşma yerine getirme", [22, 22], ["IG11_REMOVE1", "IG11_REMOVE2"]],
+      ["flow-questioning", "Raul’un Monty’yle görüşmesi", [23, 25], ["INTERR_SETUP", "IG12_INTERR1", "IG12_INTERR2", "IG12_INTERR5:1-5"]],
+      ["cinematic-ban-carte-mcs7-player-enters-excavator", null, [0, 0], ["MCS7"]],
+      ["cinematic-ban-carte-mcs8-player-prepares-excavator", null, [0, 0], ["MCS8"]],
+      ["flow-monty-answers", "Monty’nin verdiği bilgiler", [26, 30], ["IG12_INTERR5:6-8", "INTERROG3", "INTERROG7", "INTERROG9", "INTERROG12"]],
+      ["flow-watson-bay-finish", "Görüşme sonrası", [31, 31], []]
+    ],
+    "frames": {
+      "flow-sloppy-mollys": [1],
+      "flow-cockfight": [2, 3, 4],
+      "cinematic-ban-carte-mcs1-confront-gang-contact": [5],
+      "cinematic-ban-carte-mcs2-gang-contact-start-fight": [6],
+      "flow-warehouse-exit": [7, 8],
+      "flow-to-raul": [9],
+      "flow-monty-handover": [10, 11, 12],
+      "flow-questioning": [13],
+      "flow-monty-answers": [14, 15]
+    }
+  },
+  "bricked-up": {
+    "slug": "bricked-up",
+    "root": "CLB_TOWER",
+    "stages": [
+      ["cinematic-clb-tower-int", null, [1, 1], ["INT:1-13"]],
+      ["flow-boobie-assignment", "Boobie’nin verdiği iş", [2, 4], ["INT:46-117"]],
+      ["flow-venture-drive", "Venture Apartments’a yolculuk", [5, 8], ["DRIVE_TOWER_1", "WNT_NBH"]],
+      ["flow-venture-lobby", "Girişte Raymond’u sorma", [9, 12], ["IG4_G", "MCS1_LI_DOOR"]],
+      ["cinematic-clb-tower-mcs1-deal", "Raymond’un dairesi ve Ernesto’nun telefonu", [13, 16], ["MCS1"]],
+      ["flow-venture-raid", "Daireye baskın", [17, 19], ["DEAD_BODIES_J", "MCS2_LI_ELEVS"]],
+      ["cinematic-clb-tower-mcs2-elevator", null, [20, 21], ["MCS2"]],
+      ["flow-apartment-escape", "Daireler ve merdivenlerden kaçış", [22, 27], ["3FLOOR_BLOCK_BL", "WALL_HOLE_J"]],
+      ["flow-window-exit", "Pencereden çıkış ve araç", [28, 32], ["USE_STAIRS", "GET_CAR_BL"]],
+      ["flow-jack-of-hearts-drive", "Jack of Hearts’a dönüş", [33, 34], []],
+      ["cinematic-clb-tower-ext", null, [35, 36], ["EXT:1-18"]],
+      ["bricked-up-after-the-raid", null, [37, 37], ["EXT:32-59"]]
+    ],
+    "frames": {
+      "flow-venture-drive": [1, 2, 3],
+      "flow-venture-lobby": [4],
+      "flow-apartment-escape": [5],
+      "flow-window-exit": [6],
+      "flow-jack-of-hearts-drive": [7, 8]
+    }
+  },
+  "rob-bank": {
+    "slug": "credit-check",
+    "root": "ROB_BANK",
+    "stages": [
+      ["cinematic-rob-bank-int", "Raul’un planı ve ekiple tanışma", [1, 4], ["INT:10-65"]],
+      ["flow-bank-gear", "Maskeler ve görev hazırlığı", [5, 5], ["IG1_GET_MASKS", "IG2_GET_CHARGES"]],
+      ["washington-beach-fleeca-yolculugu", null, [6, 9], ["GOTO_BANK_BL", "GUNSTOREHINT_BL", "C_KARIM_BRIEF"]],
+      ["flow-washington-beach-bank", "Washington Beach Fleeca şubesi", [10, 11], ["IG4_J_KICK_F_DR", "C_TIMER_015_LEAVE"]],
+      ["flow-second-fleeca", "İkinci Fleeca şubesi ve kasa", [12, 15], ["BRIEF_BANK2_SAFE", "C_BANTER_DRIVE2", "ARRIVE_BANK2B_BL", "STAY_COOL"]],
+      ["flow-thompson-fleeca", "Thompson’daki Fleeca şubesi", [16, 19], ["DOG_J", "C_BRIEF_LOC3", "ENTER_BANK3_J", "BREACH_BL"]],
+      ["flow-return-home", "Polisten kurtulup eve dönme", [20, 21], ["C_FINISH"]],
+      ["cinematic-rob-bank-ext", "Valentina’nın ziyareti ve sonrası", [22, 24], ["EXT"]],
+      ["flow-following-morning", "Ertesi sabah", [25, 26], []]
+    ],
+    "frames": {
+      "flow-bank-gear": [1, 2, 3],
+      "washington-beach-fleeca-yolculugu": [6],
+      "flow-washington-beach-bank": [7],
+      "flow-second-fleeca": [8, 9],
+      "flow-thompson-fleeca": [10],
+      "flow-return-home": [11],
+      "cinematic-rob-bank-ext": [12]
+    }
+  },
+  "gone-fishing": {
+    "slug": "gone-fishing",
+    "root": "INT_CHASE",
+    "stages": [
+      ["cinematic-int-chase-int", null, [1, 3], ["INT"]],
+      ["flow-follow-plane", "Uçağı takip etme ve denizdeki paketler", [4, 7], ["STARTHOOK", "BRICK1SUCCESS", "SECONDDROP", "GOTOSCOPE"]],
+      ["flow-spot-donnie", "Dürbünle Donnie’yi bulma", [8, 10], ["IG17_EXIT3"]],
+      ["flow-dock-approach", "Kampa yaklaşma", [11, 12], ["IG10_DISEMB1"]],
+      ["cinematic-int-chase-mcs7-disembark", "Donnie’yi aramak için tekneden inme", [0, 0], ["MCS7"]],
+      ["flow-windmill", "Rüzgâr türbini ve Cal’in ayrılması", [13, 15], ["WT_HINT_2", "WINDMILL_COMBAT", "CAL_LEAVE_COMBAT"]],
+      ["flow-donnie-rescue", "Kampta Donnie’yi kurtarma", [16, 19], ["WT_START_2", "WT_HINT_1", "HELP_START", "IG31_SURROUND3"]],
+      ["flow-escape-in-plane", "Zombix’i alıp su uçağıyla kaçma", [20, 22], ["ATPOS2_J", "EXIT_DOCKHOUSE", "POS9BARK"]],
+      ["cinematic-int-chase-mcs8-midflight-banter", null, [0, 0], ["MCS8"]],
+      ["cinematic-int-chase-mcs1-plane-land", null, [23, 23], ["MCS1", "LEAVE_WEAPONS"]],
+      ["cinematic-int-chase-mcs2-friend-drop-off", null, [0, 0], ["MCS2"]],
+      ["cinematic-int-chase-ext-rs1", null, [0, 0], ["EXT_RS1"]]
+    ],
+    "frames": {
+      "flow-follow-plane": [1, 2],
+      "flow-dock-approach": [3],
+      "flow-windmill": [4],
+      "flow-donnie-rescue": [5, 6],
+      "flow-escape-in-plane": [7, 8, 9, 10],
+      "cinematic-int-chase-mcs1-plane-land": [11, 12]
+    }
+  }
+}
