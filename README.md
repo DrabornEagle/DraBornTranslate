@@ -4,9 +4,9 @@
   <img src="app/src/main/res/drawable-nodpi/brand_mark.webp" width="68" height="68" alt="">
   <h1>DraBornTranslate</h1>
   <p><strong>PlayStation oyunlarını Türkçe oku.</strong><br>Canlı altyazı, oyun içi metin çevirisi ve PS App yakalamaları.</p>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.12/DraBornTranslate-v0.7.12-Kisisel-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.7.12%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.7.12 imzalı APK’yı indir"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.13/DraBornTranslate-v0.7.13-Kisisel-Android-arm64.apk"><img src="https://img.shields.io/badge/ANDROID-v0.7.13%20APK-74F0D0?style=for-the-badge&amp;logo=android&amp;logoColor=74F0D0&amp;labelColor=161529" alt="v0.7.13 imzalı APK’yı indir"></a>
   <a href="docs/KURULUM.md"><img src="https://img.shields.io/badge/KURULUM-REHBER%C4%B0-BDA5FF?style=for-the-badge&amp;labelColor=161529" alt="Kurulum rehberi"></a>
-  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.12"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.7.12 sürüm notları"></a>
+  <a href="https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.13"><img src="https://img.shields.io/badge/S%C3%9CR%C3%9CM-NOTLARI-FFB59B?style=for-the-badge&amp;labelColor=161529" alt="v0.7.13 sürüm notları"></a>
   <p><sub>İmzalı APK · Android 10+ · ARM64</sub></p>
 </div>
 
@@ -22,7 +22,7 @@ GTA 6 canlı altyazı paketi ilk altyazıdan itibaren önceliklidir. Aynı repli
 
 Görev Ara/Oku, görevleri Türkçe ve İngilizce ad, harita başlığı ve teknik kodla bulur. **Meet Raul’s Crew** araması **Credit Check** görevini açar.
 
-**Görev Metinleri → Konuşmalar**, kayıtlarla eşleştirilen sahneleri görev akışıyla gösterir. Sahne türü, karakter adı ve sahne görselleri ilgili metnin yanında yer alır. **Sahnelere göre** ve **Hızlı Oku** aynı sırayı kullanır. Görev Detayı’nın sonundaki ok sayfa başına döner. [v0.7.12 kaynak dosyaları ve derleme adımları](releases/v0.7.12/README.md)
+**Görev Metinleri → Konuşmalar**, kayıtlarla eşleştirilen sahneleri görev akışıyla gösterir. Sahne türü, karakter adı ve sahne görselleri ilgili metnin yanında yer alır. **Sahnelere göre** ve **Hızlı Oku** aynı sırayı kullanır. **Daha Fazla Oku** sıradaki replikleri açar. Görev Detayı başlığının sağındaki ok sayfanın başına döner. [v0.7.13 kaynak dosyaları ve derleme adımları](releases/v0.7.13/README.md)
 
 ## Uygulamadan · v0.5.5
 
@@ -52,10 +52,10 @@ Görev Ara/Oku, görevleri Türkçe ve İngilizce ad, harita başlığı ve tekn
 
 ## İndir ve kur
 
-1. [DraBornTranslate v0.7.12 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.12/DraBornTranslate-v0.7.12-Kisisel-Android-arm64.apk).
+1. [DraBornTranslate v0.7.13 imzalı APK’yı indir](https://github.com/DrabornEagle/DraBornTranslate/releases/download/v0.7.13/DraBornTranslate-v0.7.13-Kisisel-Android-arm64.apk).
 2. APK’yı Android telefonunda aç. Önceki v5 serisi kurulumunun üzerine yükleyebilirsin.
 3. Ana ekrandan bağlantını seç. [PS5, Portal ve Remote Play kurulum adımları](docs/KURULUM.md).
 
 ## Derleme ve kaynaklar
 
-[Android derlemesi](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml) · [Kaynak koddan derleme](docs/KURULUM.md#kaynak-koddan-derleme) · [Çeviri bileşeni eşitleme](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/translation-sync.yml)
+[Android derlemesi](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/android.yml) · [Bu sürümün kaynakları ve derlemesi](releases/v0.7.13/README.md) · [Çeviri bileşeni eşitleme](https://github.com/DrabornEagle/DraBornTranslate/actions/workflows/translation-sync.yml)

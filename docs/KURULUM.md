@@ -1,10 +1,10 @@
-# DraBornTranslate v0.7.12
+# DraBornTranslate v0.7.13
 
-**Android 10+ · ARM64 · Android sürüm kodu 20**
+**Android 10+ · ARM64 · Android sürüm kodu 31**
 
-[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.12)
+[İmzalı APK ve sürüm notları](https://github.com/DrabornEagle/DraBornTranslate/releases/tag/v0.7.13)
 
-v0.7.12 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
+v0.7.13 imzalı APK’yı indir ve mevcut kurulumun üzerine yükle. İlk kurulumda **Oyun paketleri → GTA 6 altyazı paketini indir** yolunu kullan. Paket cihaza kaydedilir. Pakete uyan satırlar yerel tablodan, diğer metinler telefondaki Töz-Çevir modelinden alınır.
 
 ## PS5 ve TV
 
@@ -36,7 +36,7 @@ PS5’te ikinci Remote Play oturumu kabul edilmezse ana ekrandaki **Telefonda oy
 
 - **Görev Bilgileri** görev aşamalarını Türkçe sahne özetlerinden önce gösterir. **Önce tamamlanacak görev** kartı aynı ekrandadır. Karakter portreleri ve görev kareleri otomatik yüklenir.
 - **Görev Bilgileri → Bu görevde canlı altyazı** üzerinden Portal, PS Remote Play veya konsol bağlantısını seç. Oyunda İngilizce altyazıyı ve konuşmacı adlarını aç. Görevi bitirince canlı çeviriyi durdur. **Görev Metinleri → Konuşmalar** görev paketindeki replikleri veya son oyun oturumunda kaydedilen altyazıları açar.
-- **Sahnelere göre** ve **Hızlı Oku** görevdeki aynı sıralamayı kullanır. Sahne başlığında bağlam ve eşleşen oyun görselleri yer alır. Sayfanın sonundaki ok ekranı yukarı kaydırır.
+- **Sahnelere göre** ve **Hızlı Oku** görevdeki aynı sıralamayı kullanır. Sahne başlığında bağlam ve eşleşen oyun görselleri yer alır. **Daha Fazla Oku** sıradaki replikleri açar. Görev Detayı başlığının sağındaki ok ekranı yukarı kaydırır.
 - **Hedefler/Kaynaklar** hedefleri, görev rehberlerini, karakter ve görsel kaynaklarını açar. [Görev paketi ve içe aktarma biçimi](../packs/gta-6/README.md)
 
 ## Capiche ile Türkçe dublaj
@@ -68,9 +68,9 @@ PS5’in otomatik yüklemesi yakalamaları PS App’e getirir. Telefona kaydetme
 
 ## Kaynak koddan derleme
 
-[v0.7.12 Android derlemesi ve görev akışı kaynakları](../releases/v0.7.12/README.md)
+[v0.7.13 Android derlemesi ve görev akışı kaynakları](../releases/v0.7.13/README.md)
 
-Flutter 3.50.1, Android SDK 36, Build Tools 35.0.0 ve 36.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
+Depodaki Android uygulama modülünün derlemesi için Flutter 3.50.1, Android SDK 36, Build Tools 35.0.0 ve 36.0.0, NDK 28.2.13676358, CMake 3.22.1, JDK 17 ve `protoc` gerekir. CMake’e verilen Python yorumlayıcısında `protobuf` ve `grpcio-tools` kurulu olmalıdır.
 
 ```bash
 bash scripts/build-console-ui.sh

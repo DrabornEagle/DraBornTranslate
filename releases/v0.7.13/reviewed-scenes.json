@@ -1,0 +1,110 @@
+{
+  "building-a-life": {
+    "root": "COM_SFH_FPF",
+    "source": "https://gameta.gg/gta6/missions/building-a-life/",
+    "stages": [
+      ["evde-sehpa", "Jason eve geldiğinde", "gameplay", "Evin salonunda", ["IG1_ENTER"]],
+      ["sehpa-vidalari", "Sehpanın ayaklarını monte etme", "gameplay", "Sehpayı birlikte kurma", ["IG1_HEX"]],
+      ["sehpa-yeniden", "Ayakları söküp yeniden takma", "gameplay", "Sehpanın düzeltilmesi", ["IG1_REBUILD1", "IG1_REBUILD2", "IG1_REBUILD3", "IG1_REBUILD4"]],
+      ["sehpa-cam", "Cam tablayı getirme", "gameplay", "Evin salonunda", ["IG1_GLASS4", "CAREFUL"]],
+      ["sehpa-kapanis", "Sehpa tamamlandıktan sonra", "cinematic", "Sinematik ara sahne", ["EXT"]]
+    ],
+    "frames": {
+      "evde-sehpa": ["https://gameta.gg/media/missions/building-a-life/01.webp", "https://gameta.gg/media/missions/building-a-life/02.webp"],
+      "sehpa-vidalari": ["https://gameta.gg/media/missions/building-a-life/03.webp", "https://gameta.gg/media/missions/building-a-life/04.webp"],
+      "sehpa-yeniden": ["https://gameta.gg/media/missions/building-a-life/05.webp", "https://gameta.gg/media/missions/building-a-life/06.webp"],
+      "sehpa-cam": ["https://gameta.gg/media/missions/building-a-life/07.webp"],
+      "sehpa-kapanis": ["https://gameta.gg/media/missions/building-a-life/08.webp"]
+    }
+  },
+  "steal-the-scooter": {
+    "root": "CI_UP_BBNSHP",
+    "source": "https://www.powerpyx.com/gta-6-steal-the-scooter-walkthrough/",
+    "stages": [
+      ["shirley-istek", "Shirley’nin Peggy hakkında konuşması", "gameplay", "Shirley’nin evi", ["IG5_TALKSTART", "IG5_TALK1", "IG5_TALK2", "IG5_TALK3", "SCTREQ_SER", "IG5_TALK4", "SCTREQ_RECOG", "IG5_TALK5", "SCTREQ_SEE", "IG5_TALK6"]],
+      ["peggy-scooter", "Peggy’nin scooter’ını alma", "gameplay", "Peggy’nin evi", ["IG5_PEGGY2"]],
+      ["shirley-teslim", "Scooter’ı Shirley’ye götürme", "gameplay", "Shirley’nin evine dönüş", ["IG5_GOTSCOOT"]]
+    ]
+  },
+  "find-the-lost-drugs": {
+    "root": "CTI_PIL_RD_BG",
+    "source": "https://www.powerpyx.com/gta-6-find-the-lost-drugs-walkthrough/",
+    "stages": [
+      ["kulube-yakininda", "Kulübe çevresine yaklaşma", "gameplay", "Paket araması", ["CABINAPPROACH"]],
+      ["paketi-inceleme", "Paketten geriye kalanları inceleme", "gameplay", "Paket araması", ["INSPECT"]]
+    ]
+  },
+  "clean-up-after-donnie": {
+    "root": "CTI_PIL_RD_SH",
+    "source": "https://clutchbase.app/gta6/guides/gta-6-clean-up-after-donnie",
+    "stages": [
+      ["cal-arama", "Arama sırasında Cal’le konuşma", "call", "Telefon görüşmesi", ["INTRO_CAL1"]],
+      ["hamlet-balikci", "Balık noktasında paketin izini sürme", "gameplay", "Hamlet’teki balıkçı", ["TRACK_INTRO", "TRACK_INTRO2"]],
+      ["hamlet-kulube", "Nehir aşağısındaki kulübeye ulaşma", "gameplay", "Kingfishers’ın kulübesi", ["HUNT1_TALK1", "HUNT2_TALK2"]],
+      ["donnie-geri-donus", "Paketi bulduğunu Donnie’ye bildirme", "call", "Telefon görüşmesi", ["OUTRO_DON"]]
+    ]
+  },
+  "gear-up": {
+    "root": "FT_AMUCO",
+    "source": "https://www.gtabase.com/gta-6/missions/gear-up",
+    "stages": [
+      ["andrew-dukkani", "Ammu-Nation’da Andrew’la konuşma", "gameplay", "Dükkâna giriş", ["V1_NOTICE_TALK"]],
+      ["andrew-onerisi", "Andrew’nun tüfek önerileri", "gameplay", "Silah seçimi", ["V1_COLLECT2"]],
+      ["andrew-dolap", "Silah dolaplarını öğrenme", "gameplay", "Satın alma sonrası", ["LOCKER", "LEAVE3"]]
+    ]
+  },
+  "up-mlspm": {
+    "root": "UP_MLSPM",
+    "source": "https://www.gtabase.com/gta-6/missions/overnight-charges",
+    "stages": [
+      ["motel-borcu", "Linda’yla motel borcunu konuşma", "cinematic", "Starlet Motel", ["MCS1"]]
+    ]
+  },
+  "pool-day": {
+    "root": "HO_PAR_HOLPO",
+    "source": "https://www.gtabase.com/gta-6/missions/pool-day",
+    "stages": [
+      ["havuz-kabanasi", "Havuz kenarındaki kabanaya geliş", "cinematic", "Otel havuzu", ["MCS1"]]
+    ]
+  },
+  "buddy": {
+    "root": "CSS_FARMTR",
+    "source": "https://www.powerpyx.com/gta-6-buddy-check-on-kyle-walkthrough/",
+    "stages": [
+      ["kyle-ahir", "Ahırın yanında Kyle’la konuşma", "cinematic", "McKittrick Çiftliği", ["MCS1"]]
+    ]
+  },
+  "clonin-keys-makin-gs": {
+    "root": "CTI_SHOW_HATH",
+    "source": "https://www.powerpyx.com/gta-6-clonin-keys-makin-gs-steal-the-zorrusso-for-randy-walkthrough/",
+    "stages": [
+      ["randy-kopyalayici", "Randy’den anahtar kopyalayıcıyı öğrenme", "call", "Telefon görüşmesi", ["CALL_J"]],
+      ["hathaway-garaj", "Hathaway garajında Zorrusso’yu arama", "gameplay", "Ocean Beach", ["ARR_BJ", "CLONER_BJ"]],
+      ["zorrusso-cikis", "Zorrusso’yu çalıştırıp uzaklaşma", "gameplay", "Takip cihazıyla kaçış", ["CLONE_BJ", "TRACKER_BJ"]]
+    ]
+  },
+  "blood-sweat-and-gear": {
+    "root": "COM_UP_BBWOR",
+    "source": "https://www.powerpyx.com/gta-6-blood-sweat-and-gear-work-out-walkthrough/",
+    "stages": [
+      ["antrenman-nate", "Nate’in soyunma dolabını göstermesi", "gameplay", "Trauma Floor", ["HENCH_GREET"]],
+      ["antrenman-kordell", "Antrenmandan sonra Kordell’le konuşma", "gameplay", "Spor salonu", ["LEADER_TALK", "LEADER_COMMEND"]]
+    ]
+  },
+  "buy-flowers": {
+    "root": "FT_PGIFT",
+    "source": "https://www.gtabase.com/gta-6/strangers/buy-flowers",
+    "stages": [
+      ["key-lento-cicekci", "Çiçekçiye Lucia’dan bahsetme", "gameplay", "Key Lento çiçek tezgâhı", ["ORDER_FLOWERS"]],
+      ["gulleri-gonder", "Gülleri eve gönderme", "gameplay", "Çiçek siparişi", ["PICKED_FLOWERS4"]]
+    ]
+  },
+  "read-the-label": {
+    "root": "CSC_MLM_LEDR2",
+    "source": "https://www.powerpyx.com/gta-6-read-the-label-retrieve-the-cellerica-van-walkthrough/",
+    "stages": [
+      ["andy-minibus", "Minibüsle giderken Andy’nin araması", "call", "Minibüste telefon görüşmesi", ["PHONE_ANDY1"]],
+      ["cellerica-depo", "Minibüsü Cellerica’nın deposuna bırakma", "gameplay", "Belville", ["DROPOFF"]]
+    ]
+  }
+}
